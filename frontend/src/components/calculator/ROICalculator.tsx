@@ -3,6 +3,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { useToast } from '@/hooks/use-toast';
+import { leadService } from '@/services/leadService';
+import type { ROIData } from '@/types/api';
 
 interface ROIMetrics {
   currentLeads: number;
@@ -36,6 +41,11 @@ const ROICalculator = () => {
   });
 
   const [results, setResults] = useState<ROIResults | null>(null);
+  const [userEmail, setUserEmail] = useState('');
+  const [showEmailForm, setShowEmailForm] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [savedSuccessfully, setSavedSuccessfully] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     calculateROI();
@@ -78,6 +88,65 @@ const ROICalculator = () => {
 
   const formatPercentage = (value: number) => {
     return `${value.toFixed(1)}%`;
+  };
+
+  const handleSaveROIData = async () => {
+    if (!userEmail.trim()) {
+      toast({
+        title: "Email necessário",
+        description: "Por favor, informe seu email para salvar os dados.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!results) {
+      toast({
+        title: "Dados não calculados",
+        description: "Aguarde o cálculo terminar antes de salvar.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsSaving(true);
+
+    try {
+      const roiData: ROIData = {
+        currentLeads: metrics.currentLeads,
+        conversionRate: metrics.conversionRate,
+        averageDealValue: metrics.averageDealValue,
+        salesCycleMonths: metrics.salesCycleMonths,
+        sdrSalary: metrics.sdrSalary,
+        projectedROI: results.withSDRAI.totalROI
+      };
+
+      const response = await leadService.submitROIData({
+        email: userEmail,
+        roiData
+      });
+
+      if (response.success) {
+        setSavedSuccessfully(true);
+        setShowEmailForm(false);
+        
+        toast({
+          title: "Dados salvos com sucesso!",
+          description: "Nossa equipe pode entrar em contato para apresentar uma proposta personalizada.",
+          duration: 5000
+        });
+      } else {
+        throw new Error(response.error || 'Erro ao salvar dados');
+      }
+    } catch (error: any) {
+      toast({
+        title: "Erro ao salvar dados",
+        description: error.message || "Tente novamente mais tarde.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -249,9 +318,54 @@ const ROICalculator = () => {
         <p className="text-gray-400 text-sm mb-4">
           * Projeções baseadas em dados reais de clientes ROI Labs
         </p>
-        <button className="bg-primary-600 hover:bg-primary-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors">
-          Quero uma Análise Personalizada
-        </button>
+        
+        {!savedSuccessfully ? (
+          <div className="space-y-4">
+            {!showEmailForm ? (
+              <Button 
+                onClick={() => setShowEmailForm(true)}
+                className="bg-primary-600 hover:bg-primary-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
+              >
+                Salvar Cálculo e Receber Proposta
+              </Button>
+            ) : (
+              <div className="max-w-md mx-auto space-y-3">
+                <Input
+                  type="email"
+                  placeholder="seu.email@empresa.com"
+                  value={userEmail}
+                  onChange={(e) => setUserEmail(e.target.value)}
+                  className="bg-gray-900 border-gray-700 text-white"
+                  disabled={isSaving}
+                />
+                <div className="flex gap-2">
+                  <Button
+                    onClick={handleSaveROIData}
+                    disabled={isSaving || !userEmail.trim()}
+                    className="bg-primary-600 hover:bg-primary-700 flex-1"
+                  >
+                    {isSaving ? 'Salvando...' : 'Salvar e Receber Proposta'}
+                  </Button>
+                  <Button
+                    onClick={() => setShowEmailForm(false)}
+                    variant="outline"
+                    className="border-gray-600 text-gray-300"
+                    disabled={isSaving}
+                  >
+                    Cancelar
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="bg-green-900/20 border border-green-500/30 rounded-lg p-4 max-w-md mx-auto">
+            <div className="text-green-400 mb-2">✅ Cálculo salvo com sucesso!</div>
+            <p className="text-sm text-gray-300">
+              Nossa equipe analisará seu perfil e entrará em contato com uma proposta personalizada.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

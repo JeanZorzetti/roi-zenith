@@ -1,6 +1,76 @@
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 import AnimatedSection from '@/components/AnimatedSection';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
+import { contactService } from '@/services/contactService';
+import type { ContactRequest } from '@/types/api';
+
+const contactSchema = z.object({
+  name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
+  email: z.string().email('Email inválido'),
+  company: z.string().optional(),
+  phone: z.string().optional(),
+  subject: z.string().min(5, 'Assunto deve ter pelo menos 5 caracteres'),
+  message: z.string().min(10, 'Mensagem deve ter pelo menos 10 caracteres')
+});
+
+type ContactData = z.infer<typeof contactSchema>;
 
 const ContactPage = () => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors }
+  } = useForm<ContactData>({
+    resolver: zodResolver(contactSchema)
+  });
+
+  const onSubmit = async (data: ContactData) => {
+    setIsSubmitting(true);
+
+    try {
+      const contactData: ContactRequest = {
+        name: data.name,
+        email: data.email,
+        company: data.company,
+        phone: data.phone,
+        subject: data.subject,
+        message: data.message
+      };
+
+      const response = await contactService.submitContact(contactData);
+
+      if (response.success) {
+        toast({
+          title: "Mensagem enviada com sucesso!",
+          description: "Nossa equipe entrará em contato em breve.",
+          duration: 5000
+        });
+        reset();
+      } else {
+        throw new Error(response.error || 'Erro ao enviar mensagem');
+      }
+    } catch (error: any) {
+      toast({
+        title: "Erro ao enviar mensagem",
+        description: error.message || "Tente novamente mais tarde.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="min-h-screen pt-20">
       <AnimatedSection className="container mx-auto px-4 py-20">
@@ -15,51 +85,100 @@ const ContactPage = () => {
 
         <div className="grid lg:grid-cols-2 gap-12">
           <div>
-            <form className="space-y-6">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Nome Completo
-                </label>
-                <input
+                <Label className="block text-sm font-medium text-gray-300 mb-2">
+                  Nome Completo *
+                </Label>
+                <Input
+                  {...register('name')}
                   type="text"
-                  className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:border-primary-400 focus:outline-none text-white"
+                  className="bg-gray-900 border-gray-700 text-white focus:border-primary-400"
+                  placeholder="Seu nome completo"
                 />
+                {errors.name && (
+                  <p className="text-red-400 text-sm mt-1">{errors.name.message}</p>
+                )}
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Email Empresarial
-                </label>
-                <input
+                <Label className="block text-sm font-medium text-gray-300 mb-2">
+                  Email Empresarial *
+                </Label>
+                <Input
+                  {...register('email')}
                   type="email"
-                  className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:border-primary-400 focus:outline-none text-white"
+                  className="bg-gray-900 border-gray-700 text-white focus:border-primary-400"
+                  placeholder="seu.email@empresa.com"
                 />
+                {errors.email && (
+                  <p className="text-red-400 text-sm mt-1">{errors.email.message}</p>
+                )}
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label className="block text-sm font-medium text-gray-300 mb-2">
+                    Empresa
+                  </Label>
+                  <Input
+                    {...register('company')}
+                    type="text"
+                    className="bg-gray-900 border-gray-700 text-white focus:border-primary-400"
+                    placeholder="Nome da empresa"
+                  />
+                </div>
+                
+                <div>
+                  <Label className="block text-sm font-medium text-gray-300 mb-2">
+                    Telefone
+                  </Label>
+                  <Input
+                    {...register('phone')}
+                    type="tel"
+                    className="bg-gray-900 border-gray-700 text-white focus:border-primary-400"
+                    placeholder="(11) 99999-9999"
+                  />
+                </div>
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Empresa
-                </label>
-                <input
+                <Label className="block text-sm font-medium text-gray-300 mb-2">
+                  Assunto *
+                </Label>
+                <Input
+                  {...register('subject')}
                   type="text"
-                  className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:border-primary-400 focus:outline-none text-white"
+                  className="bg-gray-900 border-gray-700 text-white focus:border-primary-400"
+                  placeholder="Interesse em SDR AI"
                 />
+                {errors.subject && (
+                  <p className="text-red-400 text-sm mt-1">{errors.subject.message}</p>
+                )}
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Mensagem
-                </label>
-                <textarea
+                <Label className="block text-sm font-medium text-gray-300 mb-2">
+                  Mensagem *
+                </Label>
+                <Textarea
+                  {...register('message')}
                   rows={5}
-                  className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:border-primary-400 focus:outline-none text-white resize-none"
-                  placeholder="Conte-nos sobre seu projeto e como podemos ajudar..."
+                  className="bg-gray-900 border-gray-700 text-white focus:border-primary-400 resize-none"
+                  placeholder="Conte-nos sobre seu projeto e como podemos ajudar com SDR AI..."
                 />
+                {errors.message && (
+                  <p className="text-red-400 text-sm mt-1">{errors.message.message}</p>
+                )}
               </div>
               
-              <button className="w-full bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg transition-colors">
-                Enviar Mensagem
-              </button>
+              <Button 
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full bg-primary-600 hover:bg-primary-700 text-white"
+              >
+                {isSubmitting ? 'Enviando...' : 'Enviar Mensagem'}
+              </Button>
             </form>
           </div>
 
@@ -90,6 +209,13 @@ const ContactPage = () => {
                 <p>Sábado: 9h às 12h</p>
                 <p>Domingo: Fechado</p>
               </div>
+            </div>
+
+            <div className="bg-gradient-to-r from-primary-900/20 to-secondary-900/20 p-6 rounded-lg border border-primary-500/30">
+              <h4 className="text-lg font-semibold text-white mb-2">🚀 Resposta Rápida</h4>
+              <p className="text-gray-300 text-sm">
+                Mensagens sobre SDR AI são priorizadas e respondidas em até 2 horas durante horário comercial.
+              </p>
             </div>
           </div>
         </div>

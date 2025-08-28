@@ -8,6 +8,9 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
+import { useToast } from '@/hooks/use-toast';
+import { leadService } from '@/services/leadService';
+import type { LeadCaptureRequest } from '@/types/api';
 
 const leadCaptureSchema = z.object({
   fullName: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
@@ -27,12 +30,17 @@ const leadCaptureSchema = z.object({
 type LeadCaptureData = z.infer<typeof leadCaptureSchema>;
 
 interface LeadCaptureFormProps {
-  onSubmit: (data: LeadCaptureData) => void;
+  onSubmit?: (data: LeadCaptureData) => void;
   isLoading?: boolean;
+  onSuccess?: () => void;
 }
 
-const LeadCaptureForm = ({ onSubmit, isLoading = false }: LeadCaptureFormProps) => {
+const LeadCaptureForm = ({ onSubmit, isLoading = false, onSuccess }: LeadCaptureFormProps) => {
   const [step, setStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [nextSteps, setNextSteps] = useState<string[]>([]);
+  const { toast } = useToast();
   const totalSteps = 3;
 
   const {
@@ -51,6 +59,61 @@ const LeadCaptureForm = ({ onSubmit, isLoading = false }: LeadCaptureFormProps) 
 
   const prevStep = () => {
     if (step > 1) setStep(step - 1);
+  };
+
+  const handleFormSubmit = async (data: LeadCaptureData) => {
+    // If custom onSubmit is provided, use it
+    if (onSubmit) {
+      onSubmit(data);
+      return;
+    }
+
+    // Otherwise, submit to backend
+    setIsSubmitting(true);
+
+    try {
+      const leadData: LeadCaptureRequest = {
+        fullName: data.fullName,
+        email: data.email,
+        company: data.company,
+        role: data.role,
+        companySector: data.companySector as any,
+        teamSize: data.teamSize as any,
+        monthlyLeads: data.monthlyLeads as any,
+        budget: data.budget as any,
+        currentChallenges: data.currentChallenges,
+        timeline: data.timeline as any,
+        gdprConsent: data.gdprConsent,
+        marketingConsent: data.marketingConsent
+      };
+
+      const response = await leadService.submitLead(leadData);
+
+      if (response.success && response.data) {
+        setSubmitted(true);
+        setNextSteps(response.data.nextSteps);
+        
+        toast({
+          title: "Proposta em preparação!",
+          description: "Nossa equipe especializada entrará em contato em breve.",
+          duration: 5000
+        });
+
+        if (onSuccess) {
+          onSuccess();
+        }
+      } else {
+        throw new Error(response.error || 'Erro ao enviar proposta');
+      }
+    } catch (error: any) {
+      toast({
+        title: "Erro ao enviar proposta",
+        description: error.message || "Tente novamente mais tarde.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const renderStep1 = () => (
@@ -274,6 +337,43 @@ const LeadCaptureForm = ({ onSubmit, isLoading = false }: LeadCaptureFormProps) 
     </div>
   );
 
+  // Success screen
+  if (submitted) {
+    return (
+      <div className="max-w-2xl mx-auto text-center">
+        <div className="bg-gradient-to-r from-green-900/20 to-primary-900/20 p-8 rounded-lg border border-green-500/30 mb-8">
+          <div className="text-6xl mb-4">🎉</div>
+          <h2 className="text-3xl font-bold text-white mb-4">Proposta Personalizada em Preparação!</h2>
+          <p className="text-xl text-gray-300 mb-6">
+            Obrigado pelo seu interesse! Nossa equipe especializada está preparando uma proposta exclusiva para você.
+          </p>
+        </div>
+
+        {nextSteps.length > 0 && (
+          <div className="bg-gray-900/50 p-6 rounded-lg border border-gray-700 mb-6">
+            <h3 className="text-xl font-semibold text-white mb-4">🚀 Próximos Passos:</h3>
+            <ul className="text-left space-y-2">
+              {nextSteps.map((step, index) => (
+                <li key={index} className="flex items-start text-gray-300">
+                  <span className="bg-primary-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm mr-3 mt-0.5 flex-shrink-0">
+                    {index + 1}
+                  </span>
+                  {step}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        <div className="bg-primary-900/20 p-4 rounded-lg border border-primary-500/30">
+          <p className="text-primary-400 font-medium">
+            ⚡ Resposta prioritária: Nossa equipe responde em até 2 horas durante horário comercial
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-2xl mx-auto">
       {/* Progress Bar */}
@@ -290,7 +390,7 @@ const LeadCaptureForm = ({ onSubmit, isLoading = false }: LeadCaptureFormProps) 
         </div>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-8">
         {step === 1 && renderStep1()}
         {step === 2 && renderStep2()}
         {step === 3 && renderStep3()}
@@ -318,10 +418,10 @@ const LeadCaptureForm = ({ onSubmit, isLoading = false }: LeadCaptureFormProps) 
           ) : (
             <Button
               type="submit"
-              disabled={isLoading}
+              disabled={isSubmitting || isLoading}
               className="bg-primary-600 hover:bg-primary-700 ml-auto"
             >
-              {isLoading ? 'Enviando...' : 'Ver Minha Proposta SDR AI'}
+              {isSubmitting || isLoading ? 'Enviando...' : 'Ver Minha Proposta SDR AI'}
             </Button>
           )}
         </div>
