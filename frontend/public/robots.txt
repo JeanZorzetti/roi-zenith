@@ -1,14 +1,18 @@
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
-
 User-agent: *
 Allow: /
+
+# Sitemap
+Sitemap: https://roilabs.com.br/sitemap.xml
+
+# Disallow admin/dashboard paths
+Disallow: /dashboard
+Disallow: /admin
+
+# Allow important pages
+Allow: /home
+Allow: /about  
+Allow: /products
+Allow: /solutions
+Allow: /calculator
+Allow: /resources
+Allow: /contact

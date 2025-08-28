@@ -60,7 +60,7 @@ const LeadCaptureForm = ({ onSubmit, isLoading = false }: LeadCaptureFormProps) 
         <p className="text-gray-400">Conte-nos sobre você e sua empresa</p>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <Label htmlFor="fullName" className="text-gray-300">Nome Completo *</Label>
           <Input
@@ -89,7 +89,7 @@ const LeadCaptureForm = ({ onSubmit, isLoading = false }: LeadCaptureFormProps) 
         </div>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <Label htmlFor="company" className="text-gray-300">Empresa *</Label>
           <Input
@@ -126,7 +126,7 @@ const LeadCaptureForm = ({ onSubmit, isLoading = false }: LeadCaptureFormProps) 
         <p className="text-gray-400">Ajude-nos a entender suas necessidades</p>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <Label className="text-gray-300">Setor da Empresa *</Label>
           <Select onValueChange={(value) => setValue('companySector', value)}>
@@ -166,7 +166,7 @@ const LeadCaptureForm = ({ onSubmit, isLoading = false }: LeadCaptureFormProps) 
         </div>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <Label className="text-gray-300">Volume Mensal de Leads *</Label>
           <Select onValueChange={(value) => setValue('monthlyLeads', value)}>

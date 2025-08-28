@@ -91,7 +91,7 @@ const ROICalculator = () => {
         </p>
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-8">
+      <div className="grid md:grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Input Panel */}
         <Card className="bg-gray-900/50 border-gray-700">
           <CardHeader>
@@ -180,7 +180,7 @@ const ROICalculator = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="text-center p-4 bg-gray-800/50 rounded-lg">
                   <p className="text-gray-400 text-sm">Leads Qualificados</p>
                   <p className="text-2xl font-bold text-primary-400">
@@ -202,7 +202,7 @@ const ROICalculator = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="text-center p-4 bg-gray-800/50 rounded-lg">
                   <p className="text-gray-400 text-sm">Tempo Economizado</p>
                   <p className="text-2xl font-bold text-secondary-400">

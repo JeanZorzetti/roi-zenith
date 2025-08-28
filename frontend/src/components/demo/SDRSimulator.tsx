@@ -132,7 +132,7 @@ const SDRSimulator = () => {
     switch (engagement) {
       case 'hot': return 'Pronto para compra';
       case 'warm': return 'Interessado';
-      case 'cold': return 'Precisar nurturing';
+      case 'cold': return 'Precisa nurturing';
       default: return 'Indefinido';
     }
   };
