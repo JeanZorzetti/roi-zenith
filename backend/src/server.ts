@@ -1,0 +1,85 @@
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import morgan from 'morgan';
+import rateLimit from 'express-rate-limit';
+import dotenv from 'dotenv';
+import { connectDB } from './utils/database';
+import { errorHandler, notFound } from './middleware/errorMiddleware';
+
+// Route imports
+import authRoutes from './routes/authRoutes';
+import contactRoutes from './routes/contactRoutes';
+import leadRoutes from './routes/leadRoutes';
+
+// Load environment variables
+dotenv.config();
+
+const app = express();
+const PORT = process.env.PORT || 5000;
+
+// Connect to MongoDB
+connectDB();
+
+// Security middleware
+app.use(helmet());
+
+// CORS configuration
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:8082',
+  credentials: true
+}));
+
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: (parseInt(process.env.RATE_LIMIT_WINDOW!) || 15) * 60 * 1000, // 15 minutes
+  max: parseInt(process.env.RATE_LIMIT_MAX!) || 100, // limit each IP to 100 requests per windowMs
+  message: {
+    error: 'Too many requests from this IP, please try again later.'
+  }
+});
+app.use('/api/', limiter);
+
+// Logging
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+}
+
+// Body parsing
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true }));
+
+// Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/contact', contactRoutes);
+app.use('/api/leads', leadRoutes);
+
+// Health check
+app.get('/api/health', (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'ROI Labs API is healthy',
+    timestamp: new Date().toISOString(),
+    version: '1.0.0'
+  });
+});
+
+// Error handling middleware
+app.use(notFound);
+app.use(errorHandler);
+
+const server = app.listen(PORT, () => {
+  console.log(`🚀 ROI Labs API server running on port ${PORT}`);
+  console.log(`📊 Environment: ${process.env.NODE_ENV}`);
+  console.log(`🔗 Frontend URL: ${process.env.FRONTEND_URL}`);
+});
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (err: any) => {
+  console.error('Unhandled Promise Rejection:', err);
+  server.close(() => {
+    process.exit(1);
+  });
+});
+
+export default app;
