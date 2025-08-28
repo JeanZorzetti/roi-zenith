@@ -6,7 +6,7 @@ const AboutPage = () => {
       <AnimatedSection className="container mx-auto px-4 py-20">
         <div className="text-center">
           <h1 className="text-5xl font-bold mb-8 bg-gradient-to-r from-primary-400 to-secondary-400 bg-clip-text text-transparent">
-            Sobre a ROI Zenith
+            Sobre a ROI Labs
           </h1>
           <p className="text-xl text-gray-300 mb-12 max-w-3xl mx-auto">
             Revolucionamos a pré-venda com IA especializada em SDR, transformando prospects em oportunidades qualificadas.
@@ -39,7 +39,7 @@ const AboutPage = () => {
           <div>
             <h2 className="text-3xl font-bold mb-6">Nossa História</h2>
             <p className="text-gray-300">
-              Fundada em 2020, a ROI Zenith nasceu da frustração com processos de pré-venda ineficientes. 
+              Fundada em 2020, a ROI Labs nasceu da frustração com processos de pré-venda ineficientes. 
               Desenvolvemos o primeiro SDR AI que realmente entende negócios. Hoje, nossos SDR AI qualificam 
               milhares de prospects diariamente, gerando 300%+ de ROI para mais de 200 empresas.
             </p>

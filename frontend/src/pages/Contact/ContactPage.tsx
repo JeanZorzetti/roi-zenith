@@ -9,7 +9,7 @@ const ContactPage = () => {
             Entre em Contato
           </h1>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            Pronto para transformar seus dados em resultados? Vamos conversar sobre suas necessidades.
+            Pronto para revolucionar suas vendas com SDR AI? Vamos conversar sobre suas necessidades.
           </p>
         </div>
 
@@ -69,7 +69,7 @@ const ContactPage = () => {
               <div className="space-y-4 text-gray-300">
                 <p>
                   <strong className="text-primary-400">Email:</strong><br />
-                  contato@roizenith.com
+                  contato@roilabs.com.br
                 </p>
                 <p>
                   <strong className="text-primary-400">Telefone:</strong><br />

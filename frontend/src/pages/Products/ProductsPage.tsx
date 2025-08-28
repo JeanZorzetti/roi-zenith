@@ -3,7 +3,7 @@ import AnimatedSection from '@/components/AnimatedSection';
 const ProductsPage = () => {
   const products = [
     {
-      name: "Zenith SDR AI Pro",
+      name: "ROI Labs SDR AI Pro",
       description: "SDR AI completo para qualificação inteligente de prospects e geração de oportunidades.",
       features: ["Qualificação automática", "Engajamento personalizado", "Handoff inteligente"],
       price: "A partir de R$ 4.500/mês",
