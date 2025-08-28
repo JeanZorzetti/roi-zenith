@@ -15,6 +15,13 @@ yarn-error.log*
 # OS
 Thumbs.db
 
-# Build outputs
-dist
-build
+# Build outputs that should be ignored (we want dist to be built)
+# dist
+# build
+
+# Frontend specific
+frontend/node_modules
+frontend/.env*.local
+
+# Claude specific
+.claude
