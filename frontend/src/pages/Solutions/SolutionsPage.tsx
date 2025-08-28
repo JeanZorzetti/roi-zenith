@@ -3,28 +3,30 @@ import AnimatedSection from '@/components/AnimatedSection';
 const SolutionsPage = () => {
   const solutions = [
     {
+      industry: "SaaS B2B",
+      title: "SDR AI para SaaS",
+      description: "Qualifique prospects enterprise com precisão, identifique pain points e conecte com decisores certos.",
+      benefits: ["85% aumento em MQLs", "50% redução no CAC", "300% ROI em pré-vendas"],
+      core: true
+    },
+    {
+      industry: "Tech Startups",
+      title: "Growth SDR AI", 
+      description: "Acelere crescimento com SDR AI que escala conforme demanda, sem overhead de contratação.",
+      benefits: ["10x mais prospects qualificados", "60% redução time-to-market", "Growth sustentável"],
+      core: true
+    },
+    {
       industry: "E-commerce",
-      title: "Otimização de Conversão",
-      description: "Aumente suas vendas com análise preditiva de comportamento do cliente e otimização de funil.",
-      benefits: ["35% aumento na conversão", "Redução de 40% no CAC", "ROI de 300% em 6 meses"]
+      title: "Revenue Optimization AI",
+      description: "Otimize funil de vendas com analytics preditivos e automação de conversão.",
+      benefits: ["35% aumento na conversão", "40% redução no CAC", "Revenue predictability"]
     },
     {
-      industry: "Fintech",
-      title: "Risk & Fraud Detection", 
-      description: "Detecte fraudes em tempo real e otimize modelos de risco com machine learning avançado.",
-      benefits: ["99.7% precisão na detecção", "Redução de 60% em perdas", "Compliance automatizado"]
-    },
-    {
-      industry: "SaaS",
-      title: "Customer Success Analytics",
-      description: "Previna churn e maximize LTV com insights profundos sobre saúde do cliente.",
-      benefits: ["45% redução no churn", "25% aumento no LTV", "NPS 15 pontos maior"]
-    },
-    {
-      industry: "Manufatura",
-      title: "Predictive Maintenance",
-      description: "Reduza downtime e custos operacionais com manutenção preditiva baseada em IoT.",
-      benefits: ["70% menos downtime", "30% redução em custos", "Eficiência 25% maior"]
+      industry: "Fintechs",
+      title: "Compliance-First Sales AI",
+      description: "SDR AI que navega regulamentações financeiras enquanto maximiza aquisição de clientes.",
+      benefits: ["100% compliance garantido", "3x mais qualified leads", "Risk mitigation"]
     }
   ];
 
@@ -33,20 +35,27 @@ const SolutionsPage = () => {
       <AnimatedSection className="container mx-auto px-4 py-20">
         <div className="text-center mb-16">
           <h1 className="text-5xl font-bold mb-8 bg-gradient-to-r from-primary-400 to-secondary-400 bg-clip-text text-transparent">
-            Soluções por Vertical
+            SDR AI por Vertical
           </h1>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            Soluções especializadas para diferentes indústrias, adaptadas aos desafios específicos do seu setor.
+            SDR AI especializado para cada setor, com conhecimento profundo de mercado e estratégias de pré-venda customizadas.
           </p>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8">
           {solutions.map((solution, index) => (
-            <div key={index} className="bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-lg p-8 hover:border-primary-400 transition-all">
-              <div className="flex items-center mb-4">
+            <div key={index} className={`bg-gray-900/30 backdrop-blur-sm border rounded-lg p-8 hover:border-primary-400 transition-all ${
+              solution.core ? 'border-primary-500/50 ring-1 ring-primary-500/20' : 'border-gray-800'
+            }`}>
+              <div className="flex items-center gap-3 mb-4">
                 <span className="bg-primary-600/20 text-primary-400 px-3 py-1 rounded-full text-sm font-medium">
                   {solution.industry}
                 </span>
+                {solution.core && (
+                  <span className="bg-secondary-600 text-white px-3 py-1 rounded-full text-xs font-medium">
+                    SDR AI CORE
+                  </span>
+                )}
               </div>
               
               <h3 className="text-2xl font-bold mb-4 text-white">{solution.title}</h3>

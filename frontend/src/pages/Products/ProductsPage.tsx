@@ -3,21 +3,22 @@ import AnimatedSection from '@/components/AnimatedSection';
 const ProductsPage = () => {
   const products = [
     {
-      name: "ROI Analytics Pro",
-      description: "Plataforma completa de analytics com IA integrada para insights em tempo real.",
-      features: ["Dashboards personalizáveis", "ML automatizado", "Alertas inteligentes"],
+      name: "Zenith SDR AI Pro",
+      description: "SDR AI completo para qualificação inteligente de prospects e geração de oportunidades.",
+      features: ["Qualificação automática", "Engajamento personalizado", "Handoff inteligente"],
+      price: "A partir de R$ 4.500/mês",
+      core: true
+    },
+    {
+      name: "Lead Intelligence",
+      description: "Analytics avançado para insights profundos sobre comportamento de prospects.",
+      features: ["Scoring preditivo", "Análise de jornada", "Triggers comportamentais"],
       price: "A partir de R$ 2.500/mês"
     },
     {
-      name: "Zenith Predictor",
-      description: "Modelos preditivos avançados para forecasting e análise de tendências.",
-      features: ["Previsões precisas", "Análise de cenários", "Integração API"],
-      price: "A partir de R$ 4.000/mês"
-    },
-    {
-      name: "Data Pipeline Suite",
-      description: "Solução completa para ETL, processamento e governança de dados.",
-      features: ["Automação total", "Monitoramento 24/7", "Compliance LGPD"],
+      name: "Sales Pipeline AI",
+      description: "Otimização completa do funil de vendas com previsibilidade e automação.",
+      features: ["Forecast inteligente", "Pipeline automation", "Revenue optimization"],
       price: "A partir de R$ 3.200/mês"
     }
   ];
@@ -30,13 +31,20 @@ const ProductsPage = () => {
             Nossos Produtos
           </h1>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            Soluções completas de IA e Analytics para transformar seus dados em vantagem competitiva.
+            SDR AI e soluções complementares para revolucionar sua estratégia de pré-vendas e crescimento.
           </p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8">
           {products.map((product, index) => (
-            <div key={index} className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-lg p-6 hover:border-primary-400 transition-all">
+            <div key={index} className={`bg-gray-900/50 backdrop-blur-sm border rounded-lg p-6 hover:border-primary-400 transition-all ${
+              product.core ? 'border-primary-500 ring-2 ring-primary-500/20' : 'border-gray-800'
+            }`}>
+              {product.core && (
+                <div className="bg-primary-600 text-white px-3 py-1 rounded-full text-xs font-medium mb-4 inline-block">
+                  CORE BUSINESS
+                </div>
+              )}
               <h3 className="text-2xl font-bold mb-4 text-primary-400">{product.name}</h3>
               <p className="text-gray-300 mb-6">{product.description}</p>
               

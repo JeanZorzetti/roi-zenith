@@ -73,19 +73,19 @@ export default function HeroSection() {
       <div className="hero-content relative z-10 text-center max-w-6xl px-8">
         <h1 className="text-hero mb-8">
           <span className={`block ${mounted ? 'fade-in-up visible' : 'fade-in-up'}`} style={{ animationDelay: '0.5s' }}>
-            Inteligência.
+            SDR AI.
           </span>
           <span className={`block ${mounted ? 'fade-in-up visible' : 'fade-in-up'}`} style={{ animationDelay: '1s' }}>
-            Redefinida.
+            Revolucionário.
           </span>
           <span className={`block ${mounted ? 'fade-in-up visible' : 'fade-in-up'}`} style={{ animationDelay: '1.5s' }}>
-            Para sempre.
+            Resultados.
           </span>
         </h1>
         
         <p className={`text-xl md:text-2xl font-light text-text-secondary mb-12 ${mounted ? 'fade-in-up visible' : 'fade-in-up'}`} 
            style={{ animationDelay: '2s' }}>
-          Não vendemos tecnologia. Entregamos tempo.
+          Transforme prospects em oportunidades com Inteligência Artificial de pré-vendas.
         </p>
         
         <Button
@@ -95,7 +95,7 @@ export default function HeroSection() {
           className={`text-lg px-12 py-4 ${mounted ? 'fade-in-up visible' : 'fade-in-up'}`}
           style={{ animationDelay: '2.5s' }}
         >
-          Descobrir o futuro
+          Ver SDR AI em ação
         </Button>
       </div>
       

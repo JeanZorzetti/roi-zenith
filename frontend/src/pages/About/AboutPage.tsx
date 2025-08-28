@@ -9,7 +9,7 @@ const AboutPage = () => {
             Sobre a ROI Zenith
           </h1>
           <p className="text-xl text-gray-300 mb-12 max-w-3xl mx-auto">
-            Transformamos dados em insights poderosos que impulsionam o crescimento dos negócios.
+            Revolucionamos a pré-venda com IA especializada em SDR, transformando prospects em oportunidades qualificadas.
           </p>
         </div>
         
@@ -17,21 +17,21 @@ const AboutPage = () => {
           <div>
             <h2 className="text-3xl font-bold mb-6">Nossa Missão</h2>
             <p className="text-gray-300 mb-6">
-              Capacitar empresas com soluções de IA e analytics avançados que desbloqueiam o potencial 
-              oculto nos dados, gerando ROI mensurável e vantagem competitiva sustentável.
+              Revolucionar o processo de pré-venda através de SDR AI que qualifica prospects com precisão 
+              cirúrgica, aumentando conversão e reduzindo custos de aquisição de clientes.
             </p>
             <ul className="space-y-3 text-gray-300">
               <li className="flex items-center">
                 <span className="w-2 h-2 bg-primary-400 rounded-full mr-3"></span>
-                Inovação contínua em IA
+                SDR AI de alta performance
               </li>
               <li className="flex items-center">
                 <span className="w-2 h-2 bg-primary-400 rounded-full mr-3"></span>
-                Resultados mensuráveis
+                Qualificação inteligente de leads
               </li>
               <li className="flex items-center">
                 <span className="w-2 h-2 bg-primary-400 rounded-full mr-3"></span>
-                Parcerias de longo prazo
+                ROI comprovado em pré-vendas
               </li>
             </ul>
           </div>
@@ -39,9 +39,9 @@ const AboutPage = () => {
           <div>
             <h2 className="text-3xl font-bold mb-6">Nossa História</h2>
             <p className="text-gray-300">
-              Fundada em 2020, a ROI Zenith nasceu da necessidade de democratizar o acesso 
-              a insights de dados avançados. Hoje, atendemos mais de 500 empresas globalmente, 
-              gerando milhões em ROI adicional através de nossas soluções.
+              Fundada em 2020, a ROI Zenith nasceu da frustração com processos de pré-venda ineficientes. 
+              Desenvolvemos o primeiro SDR AI que realmente entende negócios. Hoje, nossos SDR AI qualificam 
+              milhares de prospects diariamente, gerando 300%+ de ROI para mais de 200 empresas.
             </p>
           </div>
         </div>
