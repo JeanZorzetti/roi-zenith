@@ -61,7 +61,46 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+				// ROI LABS Premium Colors
+				'pure-black': 'hsl(var(--pure-black))',
+				'deep-black': 'hsl(var(--deep-black))', 
+				'charcoal': 'hsl(var(--charcoal))',
+				'dark-gray': 'hsl(var(--dark-gray))',
+				'medium-gray': 'hsl(var(--medium-gray))',
+				'light-gray': 'hsl(var(--light-gray))',
+				'pure-white': 'hsl(var(--pure-white))',
+				'text-primary': 'hsl(var(--text-primary))',
+				'text-secondary': 'hsl(var(--text-secondary))',
+				'text-tertiary': 'hsl(var(--text-tertiary))'
+			},
+			// Premium Gradients
+			backgroundImage: {
+				'gradient-hero': 'var(--gradient-hero)',
+				'gradient-card': 'var(--gradient-card)',
+				'gradient-glow': 'var(--gradient-glow)'
+			},
+			// Premium Shadows
+			boxShadow: {
+				'premium': 'var(--shadow-premium)',
+				'glow': 'var(--shadow-glow)',
+				'soft': 'var(--shadow-soft)'
+			},
+			// Enhanced Border Radius
+			borderRadius: {
+				lg: 'var(--radius)',
+				md: 'calc(var(--radius) - 2px)',
+				sm: 'calc(var(--radius) - 4px)',
+				xl: 'var(--radius-large)',
+				'2xl': 'var(--radius-xl)'
+			},
+			// Premium Typography
+			fontFamily: {
+				'sans': ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Text', 'Inter', 'sans-serif']
+			},
+			// Enhanced Spacing
+			maxWidth: {
+				'content': 'var(--content-width)'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

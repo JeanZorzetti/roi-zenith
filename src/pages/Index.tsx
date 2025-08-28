@@ -1,12 +1,39 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from 'react';
+import Navigation from '@/components/Navigation';
+import HeroSection from '@/components/HeroSection';
+import ProductShowcase from '@/components/ProductShowcase';
+import FeaturesSection from '@/components/FeaturesSection';
+import StatsSection from '@/components/StatsSection';
+import TestimonialsSection from '@/components/TestimonialsSection';
+import CTASection from '@/components/CTASection';
+import Footer from '@/components/Footer';
+import CustomCursor from '@/components/CustomCursor';
+import LoadingScreen from '@/components/LoadingScreen';
+import EasterEgg from '@/components/EasterEgg';
 
 const Index = () => {
+  const [loading, setLoading] = useState(true);
+
+  const handleLoadingComplete = () => {
+    setLoading(false);
+  };
+
+  if (loading) {
+    return <LoadingScreen onComplete={handleLoadingComplete} />;
+  }
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen bg-pure-black text-pure-white overflow-x-hidden">
+      <CustomCursor />
+      <EasterEgg />
+      <Navigation />
+      <HeroSection />
+      <ProductShowcase />
+      <FeaturesSection />
+      <StatsSection />
+      <TestimonialsSection />
+      <CTASection />
+      <Footer />
     </div>
   );
 };
