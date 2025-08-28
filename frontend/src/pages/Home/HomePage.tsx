@@ -3,7 +3,6 @@ import HeroSection from '@/components/HeroSection';
 import ProductShowcase from '@/components/ProductShowcase';
 import FeaturesSection from '@/components/FeaturesSection';
 import StatsSection from '@/components/StatsSection';
-import TestimonialsSection from '@/components/TestimonialsSection';
 import CTASection from '@/components/CTASection';
 import LoadingScreen from '@/components/LoadingScreen';
 import SDRTestimonials from '@/components/testimonials/SDRTestimonials';
@@ -27,12 +26,11 @@ const HomePage = () => {
       <FeaturesSection />
       <StatsSection />
       
-      {/* New SDR Testimonials */}
+      {/* SDR Testimonials - Replacing old testimonials */}
       <AnimatedSection className="py-20 bg-gray-950">
         <SDRTestimonials />
       </AnimatedSection>
       
-      <TestimonialsSection />
       <CTASection />
     </>
   );
