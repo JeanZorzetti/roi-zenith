@@ -16,6 +16,7 @@ const navigationItems = [
   { label: 'Sobre', path: '/about' },
   { label: 'Produtos', path: '/products' },
   { label: 'Soluções', path: '/solutions' },
+  { label: 'Calculadora', path: '/calculator' },
   { label: 'Recursos', path: '/resources' },
   { label: 'Contato', path: '/contact' },
 ];

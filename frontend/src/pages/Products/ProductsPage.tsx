@@ -1,4 +1,5 @@
 import AnimatedSection from '@/components/AnimatedSection';
+import SDRSimulator from '@/components/demo/SDRSimulator';
 
 const ProductsPage = () => {
   const products = [
@@ -66,6 +67,11 @@ const ProductsPage = () => {
             </div>
           ))}
         </div>
+      </AnimatedSection>
+
+      {/* SDR Simulator Section */}
+      <AnimatedSection className="container mx-auto px-4 py-20">
+        <SDRSimulator />
       </AnimatedSection>
     </div>
   );

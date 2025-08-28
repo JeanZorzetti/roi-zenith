@@ -10,6 +10,7 @@ const ProductsPage = lazy(() => import('@/pages/Products/ProductsPage'));
 const SolutionsPage = lazy(() => import('@/pages/Solutions/SolutionsPage'));
 const ResourcesPage = lazy(() => import('@/pages/Resources/ResourcesPage'));
 const ContactPage = lazy(() => import('@/pages/Contact/ContactPage'));
+const CalculatorPage = lazy(() => import('@/pages/Calculator/CalculatorPage'));
 const DashboardPage = lazy(() => import('@/pages/Dashboard/DashboardPage'));
 const NotFoundPage = lazy(() => import('@/pages/NotFound'));
 
@@ -33,6 +34,7 @@ const AppRouter = () => {
             <Route path="products" element={<ProductsPage />} />
             <Route path="solutions" element={<SolutionsPage />} />
             <Route path="resources" element={<ResourcesPage />} />
+            <Route path="calculator" element={<CalculatorPage />} />
             <Route path="contact" element={<ContactPage />} />
           </Route>
 

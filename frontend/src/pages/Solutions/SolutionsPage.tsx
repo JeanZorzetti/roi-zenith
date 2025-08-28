@@ -1,4 +1,5 @@
 import AnimatedSection from '@/components/AnimatedSection';
+import CaseStudies from '@/components/case-studies/CaseStudies';
 
 const SolutionsPage = () => {
   const solutions = [
@@ -78,6 +79,13 @@ const SolutionsPage = () => {
           ))}
         </div>
       </AnimatedSection>
+
+      {/* Case Studies Section */}
+      <div className="bg-gray-950 py-20">
+        <AnimatedSection>
+          <CaseStudies />
+        </AnimatedSection>
+      </div>
     </div>
   );
 };
