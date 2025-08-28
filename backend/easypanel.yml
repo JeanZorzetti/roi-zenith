@@ -1,0 +1,54 @@
+version: '1'
+
+services:
+  roi-labs-api:
+    image: roi-labs-backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    
+    domains:
+      - back.roilabs.com.br
+    
+    ports:
+      - target: 5000
+        published: 5000
+        protocol: tcp
+    
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      # These will be set in EasyPanel environment variables
+      MONGODB_URI: $MONGODB_URI
+      JWT_SECRET: $JWT_SECRET
+      JWT_EXPIRE: 7d
+      EMAIL_HOST: $EMAIL_HOST
+      EMAIL_PORT: $EMAIL_PORT
+      EMAIL_USER: $EMAIL_USER
+      EMAIL_PASS: $EMAIL_PASS
+      EMAIL_FROM: $EMAIL_FROM
+      FRONTEND_URL: https://roilabs.com.br
+      RATE_LIMIT_WINDOW: 15
+      RATE_LIMIT_MAX: 100
+    
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: unless-stopped
+      update_config:
+        parallelism: 1
+        delay: 10s
+        failure_action: rollback
+        order: start-first
+      rollback_config:
+        parallelism: 1
+        delay: 10s
+        failure_action: pause
+        order: stop-first
+    
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:5000/api/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
