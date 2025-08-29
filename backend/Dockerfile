@@ -7,9 +7,9 @@ FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# Install dependencies based on the preferred package manager
+# Install ALL dependencies (including devDependencies for building)
 COPY package.json package-lock.json* ./
-RUN npm ci --only=production --ignore-scripts
+RUN npm ci --ignore-scripts
 
 # Rebuild the source code only when needed
 FROM base AS builder
@@ -19,6 +19,13 @@ COPY . .
 
 # Build the application
 RUN npm run build
+
+# Production dependencies only
+FROM base AS prod-deps
+RUN apk add --no-cache libc6-compat
+WORKDIR /app
+COPY package.json package-lock.json* ./
+RUN npm ci --only=production --ignore-scripts
 
 # Production image, copy all the files and run the app
 FROM base AS runner
@@ -32,7 +39,7 @@ RUN adduser --system --uid 1001 nodejs
 
 # Copy the built application
 COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
-COPY --from=deps --chown=nodejs:nodejs /app/node_modules ./node_modules
+COPY --from=prod-deps --chown=nodejs:nodejs /app/node_modules ./node_modules
 COPY --chown=nodejs:nodejs package.json ./
 
 USER nodejs
