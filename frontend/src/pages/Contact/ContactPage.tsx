@@ -85,7 +85,7 @@ const ContactPage = () => {
 
         <div className="grid lg:grid-cols-2 gap-12">
           <div>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <form id="contact-form" onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <div>
                 <Label className="block text-sm font-medium text-gray-300 mb-2">
                   Nome Completo *

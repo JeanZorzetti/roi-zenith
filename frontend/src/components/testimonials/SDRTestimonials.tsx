@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -108,6 +109,7 @@ const testimonials: Testimonial[] = [
 
 const SDRTestimonials = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const navigate = useNavigate();
   const [selectedMetric, setSelectedMetric] = useState<'leads' | 'conversion' | 'time' | 'roi'>('roi');
 
   const currentTestimonial = testimonials[currentIndex];
@@ -118,6 +120,17 @@ const SDRTestimonials = () => {
 
   const prevTestimonial = () => {
     setCurrentIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length);
+  };
+
+  const handleCTAClick = () => {
+    navigate('/contact');
+    // Scroll to the contact form
+    setTimeout(() => {
+      const formElement = document.querySelector('#contact-form');
+      if (formElement) {
+        formElement.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 100);
   };
 
   const getMetricValue = (metric: string, testimonial: Testimonial) => {
@@ -305,7 +318,11 @@ const SDRTestimonials = () => {
             Junte-se a mais de 200 empresas que já transformaram suas vendas
           </p>
         </div>
-        <Button size="lg" className="bg-primary-600 hover:bg-primary-700">
+        <Button 
+          size="lg" 
+          className="bg-primary-600 hover:bg-primary-700 transform hover:scale-105 transition-all duration-300" 
+          onClick={handleCTAClick}
+        >
           Quero Resultados Como Estes
         </Button>
       </div>
