@@ -196,7 +196,7 @@ const ROICalculator = () => {
                 max={1000}
                 min={10}
                 step={10}
-                className="w-full"
+                className="w-full [&_[role=slider]]:border-gray-400 [&_[role=slider]]:bg-gray-800 [&>span:first-child]:bg-gray-700 [&>span>span]:bg-gray-400"
               />
               <div className="flex justify-between text-xs text-gray-500">
                 <span>10</span>
@@ -219,7 +219,7 @@ const ROICalculator = () => {
                 max={30}
                 min={5}
                 step={1}
-                className="w-full"
+                className="w-full [&_[role=slider]]:border-gray-400 [&_[role=slider]]:bg-gray-800 [&>span:first-child]:bg-gray-700 [&>span>span]:bg-gray-400"
               />
               <div className="flex justify-between text-xs text-gray-500">
                 <span>5%</span>
@@ -242,7 +242,7 @@ const ROICalculator = () => {
                 max={200000}
                 min={5000}
                 step={5000}
-                className="w-full"
+                className="w-full [&_[role=slider]]:border-gray-400 [&_[role=slider]]:bg-gray-800 [&>span:first-child]:bg-gray-700 [&>span>span]:bg-gray-400"
               />
               <div className="flex justify-between text-xs text-gray-500">
                 <span>R$ 5k</span>
@@ -265,7 +265,7 @@ const ROICalculator = () => {
                 max={12}
                 min={1}
                 step={1}
-                className="w-full"
+                className="w-full [&_[role=slider]]:border-gray-400 [&_[role=slider]]:bg-gray-800 [&>span:first-child]:bg-gray-700 [&>span>span]:bg-gray-400"
               />
               <div className="flex justify-between text-xs text-gray-500">
                 <span>1 mês</span>
@@ -288,7 +288,7 @@ const ROICalculator = () => {
                 max={20000}
                 min={3000}
                 step={500}
-                className="w-full"
+                className="w-full [&_[role=slider]]:border-gray-400 [&_[role=slider]]:bg-gray-800 [&>span:first-child]:bg-gray-700 [&>span>span]:bg-gray-400"
               />
               <div className="flex justify-between text-xs text-gray-500">
                 <span>R$ 3k</span>
