@@ -1,5 +1,6 @@
 import AnimatedSection from '@/components/AnimatedSection';
 import SDRSimulator from '@/components/demo/SDRSimulator';
+import { Link } from 'react-router-dom';
 
 const ProductsPage = () => {
   const products = [
@@ -8,19 +9,22 @@ const ProductsPage = () => {
       description: "SDR AI completo para qualificação inteligente de prospects e geração de oportunidades.",
       features: ["Qualificação automática", "Engajamento personalizado", "Handoff inteligente"],
       price: "A partir de R$ 4.500/mês",
-      core: true
+      core: true,
+      link: "/products/sdr-pro"
     },
     {
       name: "Lead Intelligence",
       description: "Analytics avançado para insights profundos sobre comportamento de prospects.",
       features: ["Scoring preditivo", "Análise de jornada", "Triggers comportamentais"],
-      price: "A partir de R$ 2.500/mês"
+      price: "A partir de R$ 2.500/mês",
+      link: "/products/lead-intelligence"
     },
     {
       name: "Sales Pipeline AI",
       description: "Otimização completa do funil de vendas com previsibilidade e automação.",
       features: ["Forecast inteligente", "Pipeline automation", "Revenue optimization"],
-      price: "A partir de R$ 3.200/mês"
+      price: "A partir de R$ 3.200/mês",
+      link: "/products/sales-pipeline"
     }
   ];
 
@@ -60,9 +64,12 @@ const ProductsPage = () => {
               
               <div className="border-t border-gray-800 pt-4">
                 <p className="text-lg font-semibold text-white">{product.price}</p>
-                <button className="w-full mt-3 bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded transition-colors">
+                <Link 
+                  to={product.link}
+                  className="w-full mt-3 bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded transition-colors block text-center"
+                >
                   Saiba Mais
-                </button>
+                </Link>
               </div>
             </div>
           ))}

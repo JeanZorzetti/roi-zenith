@@ -7,6 +7,9 @@ import LoadingScreen from '@/components/LoadingScreen';
 const HomePage = lazy(() => import('@/pages/Home/HomePage'));
 const AboutPage = lazy(() => import('@/pages/About/AboutPage'));
 const ProductsPage = lazy(() => import('@/pages/Products/ProductsPage'));
+const SDRProPage = lazy(() => import('@/pages/Products/SDRProPage'));
+const LeadIntelligencePage = lazy(() => import('@/pages/Products/LeadIntelligencePage'));
+const SalesPipelinePage = lazy(() => import('@/pages/Products/SalesPipelinePage'));
 const SolutionsPage = lazy(() => import('@/pages/Solutions/SolutionsPage'));
 const ResourcesPage = lazy(() => import('@/pages/Resources/ResourcesPage'));
 const ContactPage = lazy(() => import('@/pages/Contact/ContactPage'));
@@ -32,6 +35,9 @@ const AppRouter = () => {
             <Route path="home" element={<HomePage />} />
             <Route path="about" element={<AboutPage />} />
             <Route path="products" element={<ProductsPage />} />
+            <Route path="products/sdr-pro" element={<SDRProPage />} />
+            <Route path="products/lead-intelligence" element={<LeadIntelligencePage />} />
+            <Route path="products/sales-pipeline" element={<SalesPipelinePage />} />
             <Route path="solutions" element={<SolutionsPage />} />
             <Route path="resources" element={<ResourcesPage />} />
             <Route path="calculator" element={<CalculatorPage />} />

@@ -20,11 +20,14 @@
     --foreground: var(--pure-white);
     
     /* Interactive Elements */
-    --primary: var(--pure-white);
-    --primary-foreground: var(--pure-black);
+    --primary: 210 100% 50%;
+    --primary-foreground: var(--pure-white);
     
-    --secondary: var(--dark-gray);
+    --secondary: 280 100% 60%;
     --secondary-foreground: var(--pure-white);
+    
+    --accent: 45 100% 55%;
+    --accent-foreground: var(--pure-black);
     
     /* Surfaces */
     --card: var(--deep-black);
@@ -37,8 +40,8 @@
     --muted: var(--dark-gray);
     --muted-foreground: 0 0% 70%;
     
-    --accent: var(--charcoal);
-    --accent-foreground: var(--pure-white);
+    --muted-accent: var(--charcoal);
+    --muted-accent-foreground: var(--pure-white);
     
     --destructive: 0 84% 60%;
     --destructive-foreground: var(--pure-white);
