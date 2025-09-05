@@ -1,33 +1,44 @@
+import { useNavigate } from 'react-router-dom';
 import AnimatedSection from '@/components/AnimatedSection';
 import CaseStudies from '@/components/case-studies/CaseStudies';
 
 const SolutionsPage = () => {
+  const navigate = useNavigate();
+
+  const handleCaseStudyClick = (caseStudyPath: string) => {
+    navigate(caseStudyPath);
+  };
+
   const solutions = [
     {
       industry: "SaaS B2B",
       title: "SDR AI para SaaS",
       description: "Qualifique prospects enterprise com precisão, identifique pain points e conecte com decisores certos.",
       benefits: ["85% aumento em MQLs", "50% redução no CAC", "300% ROI em pré-vendas"],
-      core: true
+      core: true,
+      caseStudyPath: "/solutions/case-study/saas"
     },
     {
       industry: "Tech Startups",
       title: "Growth SDR AI", 
       description: "Acelere crescimento com SDR AI que escala conforme demanda, sem overhead de contratação.",
       benefits: ["10x mais prospects qualificados", "60% redução time-to-market", "Growth sustentável"],
-      core: true
+      core: true,
+      caseStudyPath: "/solutions/case-study/startup"
     },
     {
       industry: "E-commerce",
       title: "Revenue Optimization AI",
       description: "Otimize funil de vendas com analytics preditivos e automação de conversão.",
-      benefits: ["35% aumento na conversão", "40% redução no CAC", "Revenue predictability"]
+      benefits: ["35% aumento na conversão", "40% redução no CAC", "Revenue predictability"],
+      caseStudyPath: "/solutions/case-study/ecommerce"
     },
     {
       industry: "Fintechs",
       title: "Compliance-First Sales AI",
       description: "SDR AI que navega regulamentações financeiras enquanto maximiza aquisição de clientes.",
-      benefits: ["100% compliance garantido", "3x mais qualified leads", "Risk mitigation"]
+      benefits: ["100% compliance garantido", "3x mais qualified leads", "Risk mitigation"],
+      caseStudyPath: "/solutions/case-study/fintech"
     }
   ];
 
@@ -72,7 +83,10 @@ const SolutionsPage = () => {
                 ))}
               </div>
               
-              <button className="w-full mt-6 bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded transition-colors">
+              <button 
+                className="w-full mt-6 bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded transition-colors"
+                onClick={() => solution.caseStudyPath && handleCaseStudyClick(solution.caseStudyPath)}
+              >
                 Ver Case Study
               </button>
             </div>

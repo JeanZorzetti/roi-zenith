@@ -14,7 +14,8 @@
       "Bash(git pull:*)",
       "Bash(npm run build:*)",
       "Bash(npm init:*)",
-      "WebFetch(domain:back.roilabs.com.br)"
+      "WebFetch(domain:back.roilabs.com.br)",
+      "Bash(curl:*)"
     ],
     "deny": [],
     "ask": []
