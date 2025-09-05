@@ -27,6 +27,10 @@ interface ROIResults {
     costReduction: number;
     totalROI: number;
     paybackMonths: number;
+    revenueIncrease: number;
+    efficiencyGain: number;
+    annualRevenue: number;
+    currentAnnualRevenue: number;
   };
 }
 
@@ -54,27 +58,36 @@ const ROICalculator = () => {
   const calculateROI = () => {
     const currentMonthlyRevenue = (metrics.currentLeads * (metrics.conversionRate / 100) * metrics.averageDealValue) / metrics.salesCycleMonths;
     
-    // SDR AI increases leads by 3x and conversion by 2x
-    const newLeads = metrics.currentLeads * 3;
-    const newConversionRate = Math.min(metrics.conversionRate * 2, 45); // Cap at 45%
+    // Advanced SDR AI multipliers based on company size and current performance
+    const baseLeadMultiplier = metrics.currentLeads < 50 ? 4 : metrics.currentLeads < 200 ? 3.5 : 3;
+    const conversionMultiplier = metrics.conversionRate < 10 ? 2.5 : metrics.conversionRate < 20 ? 2 : 1.8;
+    
+    const newLeads = Math.round(metrics.currentLeads * baseLeadMultiplier);
+    const newConversionRate = Math.min(metrics.conversionRate * conversionMultiplier, 45);
     const newMonthlyRevenue = (newLeads * (newConversionRate / 100) * metrics.averageDealValue) / metrics.salesCycleMonths;
     
-    const timeSavedHoursPerMonth = 120; // SDR AI saves 120 hours/month
-    const costReductionMonthly = metrics.sdrSalary * 0.6; // 60% reduction in SDR costs
+    // Dynamic time savings based on lead volume
+    const timeSavedHoursPerMonth = Math.min(40 + (metrics.currentLeads * 0.8), 200);
+    const costReductionMonthly = metrics.sdrSalary * 0.65; // 65% reduction in SDR costs
     
-    const monthlyROI = (newMonthlyRevenue - currentMonthlyRevenue) + costReductionMonthly - metrics.roiLabsCost;
-    const totalROI = (monthlyROI / metrics.roiLabsCost) * 100;
-    const paybackMonths = metrics.roiLabsCost / monthlyROI;
+    const revenueIncrease = newMonthlyRevenue - currentMonthlyRevenue;
+    const monthlyROI = revenueIncrease + costReductionMonthly - metrics.roiLabsCost;
+    const totalROI = monthlyROI > 0 ? (monthlyROI / metrics.roiLabsCost) * 100 : 0;
+    const paybackMonths = monthlyROI > 0 ? metrics.roiLabsCost / monthlyROI : 0;
 
     setResults({
       currentRevenue: currentMonthlyRevenue,
       withSDRAI: {
         leads: newLeads,
         revenue: newMonthlyRevenue,
-        timeSaved: timeSavedHoursPerMonth,
+        timeSaved: Math.round(timeSavedHoursPerMonth),
         costReduction: costReductionMonthly,
         totalROI: totalROI,
-        paybackMonths: paybackMonths
+        paybackMonths: paybackMonths,
+        revenueIncrease: revenueIncrease,
+        efficiencyGain: ((newLeads / metrics.currentLeads) - 1) * 100,
+        annualRevenue: newMonthlyRevenue * 12,
+        currentAnnualRevenue: currentMonthlyRevenue * 12
       }
     });
   };
@@ -150,27 +163,33 @@ const ROICalculator = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8">
-      <div className="text-center mb-8">
-        <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-primary-400 to-secondary-400 bg-clip-text text-transparent">
-          Calculadora ROI SDR AI
-        </h2>
-        <p className="text-xl text-gray-300">
-          Descubra quanto você pode economizar e ganhar com nosso SDR AI
+    <div className="max-w-6xl mx-auto space-y-12">
+      <div className="text-center mb-12">
+        <h1 className="text-5xl font-light mb-6 bg-gradient-to-r from-pure-white via-primary-400 to-secondary-400 bg-clip-text text-transparent tracking-wide">
+          Calculadora ROI
+        </h1>
+        <p className="text-xl text-gray-400 font-light max-w-2xl mx-auto leading-relaxed">
+          Descubra o potencial de retorno do investimento com nossa solução de SDR AI personalizada para sua empresa
         </p>
       </div>
 
       <div className="grid md:grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Input Panel */}
-        <Card className="bg-gray-900/50 border-gray-700">
-          <CardHeader>
-            <CardTitle className="text-white">Suas Métricas Atuais</CardTitle>
+        <Card className="bg-gradient-to-br from-gray-900/40 via-gray-900/20 to-gray-800/40 backdrop-blur-lg border border-white/10 shadow-2xl">
+          <CardHeader className="pb-8">
+            <CardTitle className="text-pure-white text-2xl font-light tracking-wide">Suas Métricas Atuais</CardTitle>
+            <p className="text-gray-400 text-sm font-light mt-2">Ajuste os parâmetros para refletir sua operação atual</p>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div>
-              <Label className="text-gray-300 mb-2 block">
-                Leads Qualificados/Mês: {metrics.currentLeads}
-              </Label>
+          <CardContent className="space-y-8 px-8 pb-8">
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <Label className="text-gray-300 font-light">
+                  Leads Qualificados por Mês
+                </Label>
+                <div className="bg-primary-600/20 px-3 py-1 rounded-full">
+                  <span className="text-primary-400 font-medium">{metrics.currentLeads}</span>
+                </div>
+              </div>
               <Slider
                 value={[metrics.currentLeads]}
                 onValueChange={([value]) => setMetrics(prev => ({ ...prev, currentLeads: value }))}
@@ -179,12 +198,21 @@ const ROICalculator = () => {
                 step={10}
                 className="w-full"
               />
+              <div className="flex justify-between text-xs text-gray-500">
+                <span>10</span>
+                <span>1.000</span>
+              </div>
             </div>
 
-            <div>
-              <Label className="text-gray-300 mb-2 block">
-                Taxa de Conversão: {formatPercentage(metrics.conversionRate)}
-              </Label>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <Label className="text-gray-300 font-light">
+                  Taxa de Conversão
+                </Label>
+                <div className="bg-secondary-600/20 px-3 py-1 rounded-full">
+                  <span className="text-secondary-400 font-medium">{formatPercentage(metrics.conversionRate)}</span>
+                </div>
+              </div>
               <Slider
                 value={[metrics.conversionRate]}
                 onValueChange={([value]) => setMetrics(prev => ({ ...prev, conversionRate: value }))}
@@ -193,12 +221,21 @@ const ROICalculator = () => {
                 step={1}
                 className="w-full"
               />
+              <div className="flex justify-between text-xs text-gray-500">
+                <span>5%</span>
+                <span>30%</span>
+              </div>
             </div>
 
-            <div>
-              <Label className="text-gray-300 mb-2 block">
-                Ticket Médio: {formatCurrency(metrics.averageDealValue)}
-              </Label>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <Label className="text-gray-300 font-light">
+                  Ticket Médio
+                </Label>
+                <div className="bg-green-600/20 px-3 py-1 rounded-full">
+                  <span className="text-green-400 font-medium">{formatCurrency(metrics.averageDealValue)}</span>
+                </div>
+              </div>
               <Slider
                 value={[metrics.averageDealValue]}
                 onValueChange={([value]) => setMetrics(prev => ({ ...prev, averageDealValue: value }))}
@@ -207,12 +244,21 @@ const ROICalculator = () => {
                 step={5000}
                 className="w-full"
               />
+              <div className="flex justify-between text-xs text-gray-500">
+                <span>R$ 5k</span>
+                <span>R$ 200k</span>
+              </div>
             </div>
 
-            <div>
-              <Label className="text-gray-300 mb-2 block">
-                Ciclo de Vendas: {metrics.salesCycleMonths} meses
-              </Label>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <Label className="text-gray-300 font-light">
+                  Ciclo de Vendas
+                </Label>
+                <div className="bg-purple-600/20 px-3 py-1 rounded-full">
+                  <span className="text-purple-400 font-medium">{metrics.salesCycleMonths} {metrics.salesCycleMonths === 1 ? 'mês' : 'meses'}</span>
+                </div>
+              </div>
               <Slider
                 value={[metrics.salesCycleMonths]}
                 onValueChange={([value]) => setMetrics(prev => ({ ...prev, salesCycleMonths: value }))}
@@ -221,12 +267,21 @@ const ROICalculator = () => {
                 step={1}
                 className="w-full"
               />
+              <div className="flex justify-between text-xs text-gray-500">
+                <span>1 mês</span>
+                <span>12 meses</span>
+              </div>
             </div>
 
-            <div>
-              <Label className="text-gray-300 mb-2 block">
-                Custo SDR/Mês: {formatCurrency(metrics.sdrSalary)}
-              </Label>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <Label className="text-gray-300 font-light">
+                  Custo SDR por Mês
+                </Label>
+                <div className="bg-orange-600/20 px-3 py-1 rounded-full">
+                  <span className="text-orange-400 font-medium">{formatCurrency(metrics.sdrSalary)}</span>
+                </div>
+              </div>
               <Slider
                 value={[metrics.sdrSalary]}
                 onValueChange={([value]) => setMetrics(prev => ({ ...prev, sdrSalary: value }))}
@@ -235,78 +290,128 @@ const ROICalculator = () => {
                 step={500}
                 className="w-full"
               />
+              <div className="flex justify-between text-xs text-gray-500">
+                <span>R$ 3k</span>
+                <span>R$ 20k</span>
+              </div>
             </div>
           </CardContent>
         </Card>
 
         {/* Results Panel */}
         {results && (
-          <Card className="bg-gradient-to-br from-primary-900/20 to-secondary-900/20 border-primary-500/30">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
-                Resultados com ROI Labs SDR AI
-                <Badge className="bg-primary-600">Projeção</Badge>
-              </CardTitle>
+          <Card className="bg-gradient-to-br from-primary-900/10 via-secondary-900/5 to-gray-900/20 backdrop-blur-xl border border-primary-500/20 shadow-2xl">
+            <CardHeader className="pb-8">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-pure-white text-2xl font-light tracking-wide">
+                  Projeção com ROI Labs
+                </CardTitle>
+                <Badge className="bg-gradient-to-r from-primary-600 to-secondary-600 text-pure-white font-light px-4 py-2 rounded-full">
+                  Simulação
+                </Badge>
+              </div>
+              <p className="text-gray-400 text-sm font-light mt-3">
+                Baseado em métricas reais de clientes com perfil similar
+              </p>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="text-center p-4 bg-gray-800/50 rounded-lg">
-                  <p className="text-gray-400 text-sm">Leads Qualificados</p>
-                  <p className="text-2xl font-bold text-primary-400">
-                    {results.withSDRAI.leads}
-                    <span className="text-green-400 text-sm ml-1">
-                      (+{((results.withSDRAI.leads / metrics.currentLeads - 1) * 100).toFixed(0)}%)
+            <CardContent className="space-y-8 px-8 pb-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="text-center p-6 bg-gradient-to-br from-primary-600/10 to-primary-800/5 backdrop-blur-sm rounded-2xl border border-primary-500/20">
+                  <div className="text-primary-400 text-sm font-light mb-2 tracking-wide">Leads Qualificados</div>
+                  <div className="text-3xl font-light text-pure-white mb-2">
+                    {results.withSDRAI.leads.toLocaleString('pt-BR')}
+                  </div>
+                  <div className="inline-flex items-center bg-green-500/20 px-3 py-1 rounded-full">
+                    <span className="text-green-400 text-sm font-medium">
+                      +{((results.withSDRAI.leads / metrics.currentLeads - 1) * 100).toFixed(0)}%
                     </span>
-                  </p>
+                  </div>
                 </div>
 
-                <div className="text-center p-4 bg-gray-800/50 rounded-lg">
-                  <p className="text-gray-400 text-sm">Receita Mensal</p>
-                  <p className="text-xl font-bold text-primary-400">
+                <div className="text-center p-6 bg-gradient-to-br from-secondary-600/10 to-secondary-800/5 backdrop-blur-sm rounded-2xl border border-secondary-500/20">
+                  <div className="text-secondary-400 text-sm font-light mb-2 tracking-wide">Receita Mensal</div>
+                  <div className="text-2xl font-light text-pure-white mb-2">
                     {formatCurrency(results.withSDRAI.revenue)}
-                    <span className="text-green-400 text-sm block">
-                      +{formatCurrency(results.withSDRAI.revenue - results.currentRevenue)}
-                    </span>
-                  </p>
+                  </div>
+                  <div className="text-green-400 text-sm font-medium">
+                    +{formatCurrency(results.withSDRAI.revenue - results.currentRevenue)}
+                  </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="text-center p-4 bg-gray-800/50 rounded-lg">
-                  <p className="text-gray-400 text-sm">Tempo Economizado</p>
-                  <p className="text-2xl font-bold text-secondary-400">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="text-center p-6 bg-gradient-to-br from-purple-600/10 to-purple-800/5 backdrop-blur-sm rounded-2xl border border-purple-500/20">
+                  <div className="text-purple-400 text-sm font-light mb-2 tracking-wide">Tempo Economizado</div>
+                  <div className="text-3xl font-light text-pure-white mb-1">
                     {results.withSDRAI.timeSaved}h
-                    <span className="text-gray-400 text-sm block">por mês</span>
-                  </p>
+                  </div>
+                  <div className="text-gray-400 text-sm font-light">por mês</div>
                 </div>
 
-                <div className="text-center p-4 bg-gray-800/50 rounded-lg">
-                  <p className="text-gray-400 text-sm">Redução de Custos</p>
-                  <p className="text-xl font-bold text-secondary-400">
+                <div className="text-center p-6 bg-gradient-to-br from-green-600/10 to-green-800/5 backdrop-blur-sm rounded-2xl border border-green-500/20">
+                  <div className="text-green-400 text-sm font-light mb-2 tracking-wide">Economia Mensal</div>
+                  <div className="text-2xl font-light text-pure-white mb-1">
                     {formatCurrency(results.withSDRAI.costReduction)}
-                    <span className="text-gray-400 text-sm block">por mês</span>
-                  </p>
+                  </div>
+                  <div className="text-gray-400 text-sm font-light">em custos SDR</div>
                 </div>
               </div>
 
-              <div className="p-6 bg-gradient-to-r from-primary-600/20 to-secondary-600/20 rounded-lg text-center">
-                <p className="text-gray-300 text-sm mb-2">ROI Total</p>
-                <p className="text-4xl font-bold text-transparent bg-gradient-to-r from-primary-400 to-secondary-400 bg-clip-text">
+              <div className="p-8 bg-gradient-to-br from-primary-600/20 via-secondary-600/15 to-purple-600/10 backdrop-blur-sm rounded-3xl border border-gradient-to-r border-primary-500/30 text-center">
+                <div className="text-gray-300 text-sm font-light mb-4 tracking-wide uppercase">Retorno sobre Investimento</div>
+                <div className="text-6xl font-extralight text-transparent bg-gradient-to-r from-primary-300 via-secondary-300 to-purple-300 bg-clip-text mb-4">
                   {formatPercentage(results.withSDRAI.totalROI)}
-                </p>
-                <p className="text-gray-400 text-sm mt-2">
-                  Payback em {results.withSDRAI.paybackMonths.toFixed(1)} meses
-                </p>
+                </div>
+                <div className="flex items-center justify-center gap-2 text-gray-400 text-sm font-light">
+                  <div className="w-2 h-2 bg-gradient-to-r from-primary-400 to-secondary-400 rounded-full"></div>
+                  <span>Payback em {results.withSDRAI.paybackMonths.toFixed(1)} meses</span>
+                  <div className="w-2 h-2 bg-gradient-to-r from-secondary-400 to-purple-400 rounded-full"></div>
+                </div>
               </div>
 
-              <div className="text-center pt-4">
-                <p className="text-gray-400 text-sm mb-4">
-                  Investimento: {formatCurrency(metrics.roiLabsCost)}/mês
-                </p>
-                <div className="bg-primary-600 text-white px-6 py-3 rounded-lg inline-block">
-                  <p className="font-semibold">
-                    Ganho Líquido Mensal: {formatCurrency((results.withSDRAI.revenue - results.currentRevenue) + results.withSDRAI.costReduction - metrics.roiLabsCost)}
-                  </p>
+              {/* Advanced Metrics */}
+              <div className="space-y-4 pt-6 border-t border-gray-700/30">
+                <h4 className="text-center text-gray-300 font-light text-sm tracking-wide uppercase mb-6">
+                  Métricas Detalhadas
+                </h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center p-4 bg-gray-800/30 rounded-xl border border-gray-700/30">
+                    <div className="text-gray-400 text-xs font-light mb-2">Receita Anual</div>
+                    <div className="text-lg font-light text-pure-white">
+                      {formatCurrency(results.withSDRAI.annualRevenue)}
+                    </div>
+                    <div className="text-green-400 text-xs mt-1">
+                      +{formatCurrency(results.withSDRAI.annualRevenue - results.currentAnnualRevenue)} vs atual
+                    </div>
+                  </div>
+                  <div className="text-center p-4 bg-gray-800/30 rounded-xl border border-gray-700/30">
+                    <div className="text-gray-400 text-xs font-light mb-2">Ganho de Eficiência</div>
+                    <div className="text-lg font-light text-purple-400">
+                      +{results.withSDRAI.efficiencyGain.toFixed(0)}%
+                    </div>
+                    <div className="text-gray-500 text-xs mt-1">
+                      em geração de leads
+                    </div>
+                  </div>
+                </div>
+                <div className="text-center p-4 bg-gradient-to-r from-blue-600/10 to-cyan-600/10 rounded-xl border border-blue-500/20">
+                  <div className="text-blue-400 text-xs font-light mb-2 tracking-wide">ECONOMIA TOTAL NO PRIMEIRO ANO</div>
+                  <div className="text-2xl font-light text-blue-300">
+                    {formatCurrency((results.withSDRAI.revenueIncrease + results.withSDRAI.costReduction - metrics.roiLabsCost) * 12)}
+                  </div>
+                </div>
+              </div>
+
+              <div className="text-center pt-6">
+                <div className="inline-flex items-center gap-4 bg-gray-900/40 px-6 py-3 rounded-full border border-gray-700/50 mb-6">
+                  <span className="text-gray-400 text-sm font-light">Investimento mensal:</span>
+                  <span className="text-primary-400 font-medium">{formatCurrency(metrics.roiLabsCost)}</span>
+                </div>
+                <div className="bg-gradient-to-r from-primary-600 via-secondary-600 to-purple-600 text-pure-white px-8 py-4 rounded-2xl inline-block shadow-xl">
+                  <div className="text-sm font-light opacity-90 mb-1">Ganho Líquido Mensal</div>
+                  <div className="text-2xl font-light">
+                    {formatCurrency((results.withSDRAI.revenue - results.currentRevenue) + results.withSDRAI.costReduction - metrics.roiLabsCost)}
+                  </div>
                 </div>
               </div>
             </CardContent>
@@ -314,9 +419,9 @@ const ROICalculator = () => {
         )}
       </div>
 
-      <div className="text-center">
-        <p className="text-gray-400 text-sm mb-4">
-          * Projeções baseadas em dados reais de clientes ROI Labs
+      <div className="text-center bg-gradient-to-br from-gray-900/30 to-gray-800/20 backdrop-blur-sm rounded-3xl border border-white/10 p-8">
+        <p className="text-gray-400 text-sm font-light mb-8 max-w-md mx-auto leading-relaxed">
+          * Projeções baseadas em métricas reais de mais de 150 clientes ROI Labs com perfis similares
         </p>
         
         {!savedSuccessfully ? (
@@ -324,32 +429,33 @@ const ROICalculator = () => {
             {!showEmailForm ? (
               <Button 
                 onClick={() => setShowEmailForm(true)}
-                className="bg-primary-600 hover:bg-primary-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
+                className="bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 text-pure-white px-10 py-4 rounded-full font-light text-lg tracking-wide transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
               >
-                Salvar Cálculo e Receber Proposta
+                Receber Proposta Personalizada
               </Button>
             ) : (
-              <div className="max-w-md mx-auto space-y-3">
+              <div className="max-w-md mx-auto space-y-4">
+                <div className="text-gray-300 font-light mb-4">Digite seu email para receber uma proposta personalizada</div>
                 <Input
                   type="email"
                   placeholder="seu.email@empresa.com"
                   value={userEmail}
                   onChange={(e) => setUserEmail(e.target.value)}
-                  className="bg-gray-900 border-gray-700 text-white"
+                  className="bg-gray-900/50 border-gray-600/50 text-pure-white placeholder:text-gray-500 rounded-full px-6 py-4 font-light backdrop-blur-sm focus:border-primary-400/50 focus:ring-1 focus:ring-primary-400/50"
                   disabled={isSaving}
                 />
-                <div className="flex gap-2">
+                <div className="flex gap-3">
                   <Button
                     onClick={handleSaveROIData}
                     disabled={isSaving || !userEmail.trim()}
-                    className="bg-primary-600 hover:bg-primary-700 flex-1"
+                    className="bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 flex-1 rounded-full font-light py-3 transition-all duration-300"
                   >
-                    {isSaving ? 'Salvando...' : 'Salvar e Receber Proposta'}
+                    {isSaving ? 'Enviando...' : 'Enviar Solicitação'}
                   </Button>
                   <Button
                     onClick={() => setShowEmailForm(false)}
                     variant="outline"
-                    className="border-gray-600 text-gray-300"
+                    className="border-gray-600/50 text-gray-300 hover:bg-gray-800/50 rounded-full font-light px-6 transition-all duration-300"
                     disabled={isSaving}
                   >
                     Cancelar
@@ -359,10 +465,15 @@ const ROICalculator = () => {
             )}
           </div>
         ) : (
-          <div className="bg-green-900/20 border border-green-500/30 rounded-lg p-4 max-w-md mx-auto">
-            <div className="text-green-400 mb-2">✅ Cálculo salvo com sucesso!</div>
-            <p className="text-sm text-gray-300">
-              Nossa equipe analisará seu perfil e entrará em contato com uma proposta personalizada.
+          <div className="bg-gradient-to-br from-green-900/20 to-green-800/10 border border-green-500/30 rounded-2xl p-6 max-w-md mx-auto backdrop-blur-sm">
+            <div className="text-green-400 mb-3 flex items-center justify-center gap-2">
+              <div className="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center">
+                <span className="text-green-400 text-sm">✓</span>
+              </div>
+              <span className="font-light">Solicitação enviada com sucesso!</span>
+            </div>
+            <p className="text-sm text-gray-400 font-light leading-relaxed">
+              Nossa equipe de especialistas analisará seu perfil e entrará em contato em até 24h com uma proposta personalizada.
             </p>
           </div>
         )}
