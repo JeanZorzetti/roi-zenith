@@ -38,7 +38,7 @@ const ROICalculator = () => {
   const [metrics, setMetrics] = useState<ROIMetrics>({
     currentLeads: 100,
     conversionRate: 15,
-    averageDealValue: 50000,
+    averageDealValue: 15000,
     salesCycleMonths: 6,
     sdrSalary: 8000,
     roiLabsCost: 4500
@@ -240,12 +240,12 @@ const ROICalculator = () => {
                 value={[metrics.averageDealValue]}
                 onValueChange={([value]) => setMetrics(prev => ({ ...prev, averageDealValue: value }))}
                 max={200000}
-                min={5000}
-                step={5000}
+                min={1000}
+                step={1000}
                 className="w-full [&_[role=slider]]:border-gray-400 [&_[role=slider]]:bg-gray-800 [&>span:first-child]:bg-gray-700 [&>span>span]:bg-gray-400"
               />
               <div className="flex justify-between text-xs text-gray-500">
-                <span>R$ 5k</span>
+                <span>R$ 1k</span>
                 <span>R$ 200k</span>
               </div>
             </div>
