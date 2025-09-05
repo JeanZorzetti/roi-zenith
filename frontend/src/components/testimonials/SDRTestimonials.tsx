@@ -312,19 +312,28 @@ const SDRTestimonials = () => {
       </div>
 
       {/* CTA */}
-      <div className="text-center mt-12">
-        <div className="mb-4">
-          <p className="text-gray-400 text-sm">
-            Junte-se a mais de 200 empresas que já transformaram suas vendas
+      <div className="text-center mt-16">
+        <div className="glass-card p-8 max-w-2xl mx-auto border border-white/10">
+          <div className="mb-8">
+            <h3 className="text-2xl font-bold text-white mb-4">
+              Pronto para Transformar suas Vendas?
+            </h3>
+            <p className="text-gray-300 mb-4">
+              Junte-se a mais de 200 empresas que já transformaram suas vendas com nosso SDR AI
+            </p>
+            <div className="h-0.5 w-24 bg-gradient-to-r from-primary to-secondary mx-auto rounded-full"></div>
+          </div>
+          <Button 
+            size="lg" 
+            className="bg-gradient-to-r from-primary to-secondary text-white hover:from-primary/90 hover:to-secondary/90 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl px-8 py-4 text-lg font-semibold rounded-xl border-2 border-white/20 backdrop-blur-sm" 
+            onClick={handleCTAClick}
+          >
+            🚀 Quero Resultados Como Estes
+          </Button>
+          <p className="text-gray-400 text-xs mt-4">
+            Resposta em até 2 horas • Sem compromisso
           </p>
         </div>
-        <Button 
-          size="lg" 
-          className="bg-primary-600 hover:bg-primary-700 transform hover:scale-105 transition-all duration-300" 
-          onClick={handleCTAClick}
-        >
-          Quero Resultados Como Estes
-        </Button>
       </div>
     </div>
   );
