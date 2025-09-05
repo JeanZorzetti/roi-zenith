@@ -1,8 +1,22 @@
 import AnimatedSection from '@/components/AnimatedSection';
 import { ArrowLeft, CheckCircle, PlayCircle, BarChart3, MessageSquare, Target, Users } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const SDRProPage = () => {
+  const navigate = useNavigate();
+
+  const handleScheduleDemo = () => {
+    navigate('/contact', { 
+      state: { 
+        subject: 'Demonstração ROI Labs SDR AI Pro',
+        message: 'Tenho interesse em ver uma demonstração completa do ROI Labs SDR AI Pro. Gostaria de entender como pode qualificar nossos prospects automaticamente e aumentar nossa taxa de conversão.'
+      } 
+    });
+  };
+
+  const handleWatchDemo = () => {
+    navigate('/calculator');
+  };
   const features = [
     {
       icon: <Target className="w-8 h-8 text-primary-400" />,
@@ -78,10 +92,16 @@ const SDRProPage = () => {
             engajamento personalizado e geração de oportunidades no piloto automático.
           </p>
           <div className="flex flex-wrap gap-4">
-            <button className="bg-primary-600 hover:bg-primary-700 text-white px-8 py-4 rounded-lg font-semibold transition-colors">
+            <button 
+              onClick={handleScheduleDemo}
+              className="bg-primary-600 hover:bg-primary-700 text-white px-8 py-4 rounded-lg font-semibold transition-colors"
+            >
               Agendar Demonstração
             </button>
-            <button className="border border-primary-400 text-primary-400 hover:bg-primary-400/10 px-8 py-4 rounded-lg font-semibold transition-colors flex items-center">
+            <button 
+              onClick={handleWatchDemo}
+              className="border border-primary-400 text-primary-400 hover:bg-primary-400/10 px-8 py-4 rounded-lg font-semibold transition-colors flex items-center"
+            >
               <PlayCircle className="w-5 h-5 mr-2" />
               Ver Demo ao Vivo
             </button>

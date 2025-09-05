@@ -1,8 +1,22 @@
 import AnimatedSection from '@/components/AnimatedSection';
 import { ArrowLeft, CheckCircle, PlayCircle, Target, Zap, TrendingUp, DollarSign } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const SalesPipelinePage = () => {
+  const navigate = useNavigate();
+
+  const handleScheduleDemo = () => {
+    navigate('/contact', { 
+      state: { 
+        subject: 'Demonstração Sales Pipeline AI - Otimização de Funil',
+        message: 'Tenho interesse em ver uma demonstração do Sales Pipeline AI para entender como pode otimizar nosso funil de vendas e aumentar nossa previsibilidade de receita.'
+      } 
+    });
+  };
+
+  const handleViewForecast = () => {
+    navigate('/calculator');
+  };
   const features = [
     {
       icon: <TrendingUp className="w-8 h-8 text-accent-400" />,
@@ -94,10 +108,16 @@ const SalesPipelinePage = () => {
             Transforme seu pipeline em uma máquina de crescimento previsível.
           </p>
           <div className="flex flex-wrap gap-4">
-            <button className="bg-accent-600 hover:bg-accent-700 text-white px-8 py-4 rounded-lg font-semibold transition-colors">
+            <button 
+              onClick={handleScheduleDemo}
+              className="bg-accent-600 hover:bg-accent-700 text-white px-8 py-4 rounded-lg font-semibold transition-colors"
+            >
               Ver Pipeline Demo
             </button>
-            <button className="border border-accent-400 text-accent-400 hover:bg-accent-400/10 px-8 py-4 rounded-lg font-semibold transition-colors flex items-center">
+            <button 
+              onClick={handleViewForecast}
+              className="border border-accent-400 text-accent-400 hover:bg-accent-400/10 px-8 py-4 rounded-lg font-semibold transition-colors flex items-center"
+            >
               <PlayCircle className="w-5 h-5 mr-2" />
               Forecast ao Vivo
             </button>

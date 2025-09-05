@@ -1,8 +1,22 @@
 import AnimatedSection from '@/components/AnimatedSection';
 import { ArrowLeft, CheckCircle, PlayCircle, Brain, TrendingUp, Zap, Eye } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const LeadIntelligencePage = () => {
+  const navigate = useNavigate();
+
+  const handleScheduleDemo = () => {
+    navigate('/contact', { 
+      state: { 
+        subject: 'Demonstração Lead Intelligence - Analytics Avançado',
+        message: 'Tenho interesse em ver uma demonstração do Lead Intelligence para entender como pode revelar insights profundos sobre nossos prospects e aumentar nossa taxa de conversão.'
+      } 
+    });
+  };
+
+  const handleViewDashboard = () => {
+    navigate('/calculator');
+  };
   const features = [
     {
       icon: <Brain className="w-8 h-8 text-secondary-400" />,
@@ -94,10 +108,16 @@ const LeadIntelligencePage = () => {
             Saiba exatamente quando, como e por que cada lead está pronto para comprar.
           </p>
           <div className="flex flex-wrap gap-4">
-            <button className="bg-secondary-600 hover:bg-secondary-700 text-white px-8 py-4 rounded-lg font-semibold transition-colors">
+            <button 
+              onClick={handleScheduleDemo}
+              className="bg-secondary-600 hover:bg-secondary-700 text-white px-8 py-4 rounded-lg font-semibold transition-colors"
+            >
               Ver Demonstração
             </button>
-            <button className="border border-secondary-400 text-secondary-400 hover:bg-secondary-400/10 px-8 py-4 rounded-lg font-semibold transition-colors flex items-center">
+            <button 
+              onClick={handleViewDashboard}
+              className="border border-secondary-400 text-secondary-400 hover:bg-secondary-400/10 px-8 py-4 rounded-lg font-semibold transition-colors flex items-center"
+            >
               <PlayCircle className="w-5 h-5 mr-2" />
               Dashboard ao Vivo
             </button>

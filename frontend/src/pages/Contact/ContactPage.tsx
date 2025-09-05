@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -25,15 +26,27 @@ type ContactData = z.infer<typeof contactSchema>;
 const ContactPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const location = useLocation();
 
   const {
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors }
   } = useForm<ContactData>({
     resolver: zodResolver(contactSchema)
   });
+
+  // Pre-fill form if coming from CTA buttons
+  useEffect(() => {
+    if (location.state?.subject) {
+      setValue('subject', location.state.subject);
+    }
+    if (location.state?.message) {
+      setValue('message', location.state.message);
+    }
+  }, [location.state, setValue]);
 
   const onSubmit = async (data: ContactData) => {
     setIsSubmitting(true);
