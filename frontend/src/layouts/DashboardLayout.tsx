@@ -85,7 +85,7 @@ const DashboardLayout = () => {
 
       {/* Premium Sidebar */}
       <div className={`
-        fixed inset-y-0 left-0 z-50 w-80 bg-gradient-to-b from-gray-900/95 via-gray-900/98 to-black/95 backdrop-blur-2xl border-r border-gray-700/30 transform transition-all duration-500 ease-out lg:translate-x-0 lg:static lg:inset-0 shadow-2xl shadow-black/50
+        fixed inset-y-0 left-0 z-50 w-80 bg-gradient-to-b from-gray-900/95 via-gray-900/98 to-black/95 backdrop-blur-2xl border-r border-gray-700/30 transform transition-all duration-500 ease-out lg:translate-x-0 shadow-2xl shadow-black/50
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         {/* Sidebar Background Effects */}
