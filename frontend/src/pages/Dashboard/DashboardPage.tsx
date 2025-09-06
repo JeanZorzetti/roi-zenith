@@ -111,10 +111,10 @@ const DashboardPage = () => {
       <div className="p-6 lg:p-8">
         <AnimatedSection>
           {/* Header */}
-          <div className="mb-12">
+          <div className="mb-12 pt-8">
             <h1 className="text-4xl lg:text-5xl font-bold mb-4">
               <span className="bg-gradient-to-r from-primary-400 via-secondary-400 to-primary-400 bg-clip-text text-transparent">
-                {getGreeting()}, {user?.name?.split(' ')[0]}! 
+                {getGreeting()}, {user?.name?.split(' ')[0] || 'Usuário'}!
               </span>
               <span className="ml-3">👋</span>
             </h1>
