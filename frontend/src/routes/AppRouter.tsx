@@ -1,7 +1,9 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Suspense, lazy } from 'react';
 import MainLayout from '@/layouts/MainLayout';
+import DashboardLayout from '@/layouts/DashboardLayout';
 import LoadingScreen from '@/components/LoadingScreen';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 // Lazy load pages for better performance
 const HomePage = lazy(() => import('@/pages/Home/HomePage'));
@@ -63,7 +65,13 @@ const AppRouter = () => {
           </Route>
 
           {/* Protected routes */}
-          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/dashboard" element={
+            <ProtectedRoute>
+              <DashboardLayout />
+            </ProtectedRoute>
+          }>
+            <Route index element={<DashboardPage />} />
+          </Route>
 
           {/* 404 */}
           <Route path="*" element={<NotFoundPage />} />
