@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import AnimatedSection from '@/components/AnimatedSection';
 import { whitepapers, whitepapersCategories, searchWhitepapers, getFeaturedWhitepapers } from '@/data/whitepapers';
 import type { Whitepaper } from '@/data/whitepapers';
+import { downloadWhitepaper } from '@/utils/pdfGenerator';
 import { Download, FileText, Calendar, Users, Tag, ExternalLink } from 'lucide-react';
 
 const WhitepapersPage = () => {
@@ -34,14 +35,8 @@ const WhitepapersPage = () => {
   };
 
   const handleDownload = (whitepaper: Whitepaper) => {
-    // In a real implementation, this would handle the actual file download
-    // For now, we'll simulate the download process
-    const link = document.createElement('a');
-    link.href = whitepaper.downloadUrl;
-    link.download = `${whitepaper.id}.pdf`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    // Generate and download the real PDF
+    downloadWhitepaper(whitepaper);
   };
 
   const featuredWhitepapers = getFeaturedWhitepapers();
