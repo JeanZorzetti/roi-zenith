@@ -16,6 +16,8 @@ const CaseStudyStartupPage = lazy(() => import('@/pages/Solutions/CaseStudyStart
 const CaseStudyEcommercePage = lazy(() => import('@/pages/Solutions/CaseStudyEcommercePage'));
 const CaseStudyFintechPage = lazy(() => import('@/pages/Solutions/CaseStudyFintechPage'));
 const ResourcesPage = lazy(() => import('@/pages/Resources/ResourcesPage'));
+const BlogPage = lazy(() => import('@/pages/Resources/BlogPage'));
+const BlogPostPage = lazy(() => import('@/pages/Resources/BlogPostPage'));
 const ContactPage = lazy(() => import('@/pages/Contact/ContactPage'));
 const CalculatorPage = lazy(() => import('@/pages/Calculator/CalculatorPage'));
 const DashboardPage = lazy(() => import('@/pages/Dashboard/DashboardPage'));
@@ -48,6 +50,8 @@ const AppRouter = () => {
             <Route path="solutions/case-study/ecommerce" element={<CaseStudyEcommercePage />} />
             <Route path="solutions/case-study/fintech" element={<CaseStudyFintechPage />} />
             <Route path="resources" element={<ResourcesPage />} />
+            <Route path="resources/blog" element={<BlogPage />} />
+            <Route path="resources/blog/:slug" element={<BlogPostPage />} />
             <Route path="calculator" element={<CalculatorPage />} />
             <Route path="contact" element={<ContactPage />} />
           </Route>

@@ -1,6 +1,8 @@
+import { useNavigate } from 'react-router-dom';
 import AnimatedSection from '@/components/AnimatedSection';
 
 const ResourcesPage = () => {
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen pt-20">
       <AnimatedSection className="container mx-auto px-4 py-20">
@@ -19,7 +21,10 @@ const ResourcesPage = () => {
             <p className="text-gray-300 mb-4">
               Insights sobre tendências em IA, cases de sucesso e melhores práticas.
             </p>
-            <button className="text-primary-400 hover:text-primary-300">
+            <button 
+              className="text-primary-400 hover:text-primary-300 font-light transition-colors"
+              onClick={() => navigate('/resources/blog')}
+            >
               Ver artigos →
             </button>
           </div>
