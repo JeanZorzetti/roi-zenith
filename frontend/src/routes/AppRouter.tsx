@@ -20,6 +20,7 @@ const BlogPage = lazy(() => import('@/pages/Resources/BlogPage'));
 const BlogPostPage = lazy(() => import('@/pages/Resources/BlogPostPage'));
 const DocsPage = lazy(() => import('@/pages/Resources/DocsPage'));
 const DocPage = lazy(() => import('@/pages/Resources/DocPage'));
+const WhitepapersPage = lazy(() => import('@/pages/Resources/WhitepapersPage'));
 const ContactPage = lazy(() => import('@/pages/Contact/ContactPage'));
 const CalculatorPage = lazy(() => import('@/pages/Calculator/CalculatorPage'));
 const DashboardPage = lazy(() => import('@/pages/Dashboard/DashboardPage'));
@@ -56,6 +57,7 @@ const AppRouter = () => {
             <Route path="resources/blog/:slug" element={<BlogPostPage />} />
             <Route path="resources/docs" element={<DocsPage />} />
             <Route path="resources/docs/:slug" element={<DocPage />} />
+            <Route path="resources/whitepapers" element={<WhitepapersPage />} />
             <Route path="calculator" element={<CalculatorPage />} />
             <Route path="contact" element={<ContactPage />} />
           </Route>

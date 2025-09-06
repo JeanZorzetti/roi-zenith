@@ -47,7 +47,10 @@ const ResourcesPage = () => {
             <p className="text-gray-300 mb-4">
               Estudos aprofundados sobre ROI em IA e transformação digital.
             </p>
-            <button className="text-primary-400 hover:text-primary-300">
+            <button 
+              className="text-primary-400 hover:text-primary-300 font-light transition-colors"
+              onClick={() => navigate('/resources/whitepapers')}
+            >
               Download gratuito →
             </button>
           </div>
