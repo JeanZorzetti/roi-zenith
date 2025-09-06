@@ -26,6 +26,7 @@ const WhitepapersPage = lazy(() => import('@/pages/Resources/WhitepapersPage'));
 const ContactPage = lazy(() => import('@/pages/Contact/ContactPage'));
 const CalculatorPage = lazy(() => import('@/pages/Calculator/CalculatorPage'));
 const DashboardPage = lazy(() => import('@/pages/Dashboard/DashboardPage'));
+const AnalyticsPage = lazy(() => import('@/pages/Dashboard/AnalyticsPage'));
 const NotFoundPage = lazy(() => import('@/pages/NotFound'));
 
 // Loading fallback component
@@ -71,6 +72,7 @@ const AppRouter = () => {
             </ProtectedRoute>
           }>
             <Route index element={<DashboardPage />} />
+            <Route path="analytics" element={<AnalyticsPage />} />
           </Route>
 
           {/* 404 */}
