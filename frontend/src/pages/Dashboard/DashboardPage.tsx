@@ -26,11 +26,21 @@ import {
 const DashboardPage = () => {
   const { user } = useAuthStore();
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [selectedMetric, setSelectedMetric] = useState('leads');
+  const [analyticsTimeframe, setAnalyticsTimeframe] = useState('7d');
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
+
+  const refreshData = async () => {
+    setIsRefreshing(true);
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    setIsRefreshing(false);
+  };
 
   // Advanced metrics with more sophisticated data
   const metrics = [
@@ -272,33 +282,118 @@ const DashboardPage = () => {
                       <p className="text-gray-400">Últimos 30 dias com IA preditiva</p>
                     </div>
                     <div className="flex gap-3">
-                      <button className="px-6 py-3 bg-primary-600/20 border border-primary-500/30 text-primary-300 rounded-xl font-semibold hover:bg-primary-600/30 transition-all">
+                      <button 
+                        onClick={() => setAnalyticsTimeframe('realtime')}
+                        className={`px-6 py-3 border rounded-xl font-semibold transition-all ${
+                          analyticsTimeframe === 'realtime'
+                            ? 'bg-primary-600/20 border-primary-500/30 text-primary-300'
+                            : 'bg-gray-800/50 border-gray-700/50 text-gray-300 hover:bg-gray-700/50'
+                        }`}
+                      >
                         Tempo Real
                       </button>
-                      <button className="px-6 py-3 bg-gray-800/50 border border-gray-700/50 text-gray-300 rounded-xl font-semibold hover:bg-gray-700/50 transition-all">
+                      <button 
+                        onClick={() => setAnalyticsTimeframe('historical')}
+                        className={`px-6 py-3 border rounded-xl font-semibold transition-all ${
+                          analyticsTimeframe === 'historical'
+                            ? 'bg-primary-600/20 border-primary-500/30 text-primary-300'
+                            : 'bg-gray-800/50 border-gray-700/50 text-gray-300 hover:bg-gray-700/50'
+                        }`}
+                      >
                         Histórico
                       </button>
                     </div>
                   </div>
                   
-                  {/* Premium Chart Placeholder */}
-                  <div className="h-96 bg-gradient-to-br from-gray-950/80 via-gray-900/60 to-gray-950/80 rounded-2xl border border-white/5 flex items-center justify-center backdrop-blur group-hover:shadow-2xl transition-all duration-500">
-                    <div className="text-center">
-                      <div className="relative mb-8">
-                        <div className="absolute inset-0 bg-gradient-to-r from-primary-600 via-secondary-600 to-primary-600 rounded-full opacity-20 blur-2xl scale-150"></div>
-                        <div className="relative bg-gradient-to-br from-primary-600 to-secondary-600 rounded-full p-6 shadow-2xl">
-                          <BarChart3 className="h-20 w-20 text-white" />
+                  {/* Interactive Analytics Chart */}
+                  <div className="h-96 bg-gradient-to-br from-gray-950/80 via-gray-900/60 to-gray-950/80 rounded-2xl border border-white/5 p-6 backdrop-blur group-hover:shadow-2xl transition-all duration-500">
+                    {analyticsTimeframe === 'realtime' ? (
+                      <div className="h-full flex flex-col">
+                        <div className="flex items-center justify-between mb-6">
+                          <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                            <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                            Dados em Tempo Real
+                          </h3>
+                          <button 
+                            onClick={refreshData}
+                            disabled={isRefreshing}
+                            className="p-2 rounded-lg bg-gray-800/50 text-gray-400 hover:text-white transition-all"
+                          >
+                            <Activity className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+                          </button>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-4 mb-6">
+                          <div className="bg-blue-500/10 rounded-xl p-4 border border-blue-500/20">
+                            <div className="text-2xl font-black text-white">2,847</div>
+                            <div className="text-sm text-blue-400">Leads Ativos</div>
+                          </div>
+                          <div className="bg-emerald-500/10 rounded-xl p-4 border border-emerald-500/20">
+                            <div className="text-2xl font-black text-white">18.4%</div>
+                            <div className="text-sm text-emerald-400">Taxa Conversão</div>
+                          </div>
+                          <div className="bg-purple-500/10 rounded-xl p-4 border border-purple-500/20">
+                            <div className="text-2xl font-black text-white">R$ 89.2K</div>
+                            <div className="text-sm text-purple-400">Revenue</div>
+                          </div>
+                          <div className="bg-orange-500/10 rounded-xl p-4 border border-orange-500/20">
+                            <div className="text-2xl font-black text-white">342%</div>
+                            <div className="text-sm text-orange-400">ROI Médio</div>
+                          </div>
+                        </div>
+
+                        <div className="flex-1 bg-gray-900/50 rounded-xl p-4 border border-gray-700/20">
+                          <div className="text-center py-8">
+                            <BarChart3 className="h-12 w-12 text-primary-400 mx-auto mb-4" />
+                            <p className="text-gray-400">Gráfico interativo em desenvolvimento</p>
+                          </div>
                         </div>
                       </div>
-                      <h3 className="text-2xl font-bold text-white mb-3">Dashboard Inteligente</h3>
-                      <p className="text-gray-400 mb-6 max-w-md">
-                        IA avançada processando seus dados para insights em tempo real
-                      </p>
-                      <button className="group inline-flex items-center px-8 py-4 bg-gradient-to-r from-primary-600 via-secondary-600 to-primary-600 text-white rounded-2xl font-bold hover:shadow-2xl hover:shadow-primary-500/25 transition-all duration-500 hover:scale-105">
-                        <PlayCircle className="h-6 w-6 mr-3 group-hover:scale-110 transition-transform" />
-                        Ativar Visualização
-                      </button>
-                    </div>
+                    ) : (
+                      <div className="h-full flex flex-col">
+                        <div className="mb-6">
+                          <h3 className="text-lg font-bold text-white mb-4">Dados Históricos - Últimos 30 dias</h3>
+                          <div className="flex gap-2">
+                            {['7d', '30d', '90d'].map((period) => (
+                              <button
+                                key={period}
+                                onClick={() => setSelectedMetric(period)}
+                                className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${
+                                  selectedMetric === period
+                                    ? 'bg-primary-500/20 text-primary-400 border border-primary-500/40'
+                                    : 'bg-gray-800/50 text-gray-400 hover:bg-gray-700/50'
+                                }`}
+                              >
+                                {period}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                        
+                        <div className="flex-1 space-y-4">
+                          {[
+                            { day: 'Seg', value: 85, leads: 247 },
+                            { day: 'Ter', value: 92, leads: 289 },
+                            { day: 'Qua', value: 78, leads: 198 },
+                            { day: 'Qui', value: 95, leads: 342 },
+                            { day: 'Sex', value: 88, leads: 267 },
+                            { day: 'Sáb', value: 73, leads: 156 },
+                            { day: 'Dom', value: 69, leads: 134 }
+                          ].map((data, index) => (
+                            <div key={index} className="flex items-center gap-4">
+                              <span className="text-sm text-gray-400 w-8">{data.day}</span>
+                              <div className="flex-1 bg-gray-800/30 rounded-full h-3 relative overflow-hidden">
+                                <div 
+                                  className="bg-gradient-to-r from-primary-500 to-secondary-500 h-full rounded-full transition-all duration-1000"
+                                  style={{ width: `${data.value}%` }}
+                                ></div>
+                              </div>
+                              <span className="text-sm text-white font-bold w-12">{data.leads}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -348,15 +443,27 @@ const DashboardPage = () => {
                     })}
                   </div>
 
-                  <button className="w-full mt-8 text-primary-400 hover:text-primary-300 text-sm font-bold py-4 border-t border-white/10 hover:bg-white/5 transition-all duration-300 rounded-b-2xl">
-                    Ver todas as 47 atividades →
-                  </button>
+                  <div className="mt-8 border-t border-white/10 pt-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="text-sm text-gray-400">47 atividades hoje</span>
+                      <button 
+                        onClick={refreshData}
+                        disabled={isRefreshing}
+                        className="p-1 rounded text-gray-400 hover:text-white transition-all"
+                      >
+                        <Activity className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+                      </button>
+                    </div>
+                    <button className="w-full text-primary-400 hover:text-primary-300 text-sm font-bold py-3 hover:bg-white/5 transition-all duration-300 rounded-xl">
+                      Ver todas as atividades →
+                    </button>
+                  </div>
                 </div>
               </div>
             </AnimatedSection>
           </div>
 
-          {/* Premium Quick Actions */}
+          {/* Interactive Premium Actions */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               {
@@ -366,7 +473,8 @@ const DashboardPage = () => {
                 gradient: 'from-blue-600 via-cyan-500 to-blue-600',
                 bgGradient: 'from-blue-500/10 via-cyan-500/5 to-blue-500/10',
                 borderGradient: 'from-blue-400/50 via-cyan-400/30 to-blue-400/50',
-                stats: '2.8K leads ativos'
+                stats: '2.8K leads ativos',
+                action: () => window.open('/dashboard/leads', '_self')
               },
               {
                 title: 'Analytics Preditivo',
@@ -375,7 +483,8 @@ const DashboardPage = () => {
                 gradient: 'from-emerald-600 via-teal-500 to-emerald-600',
                 bgGradient: 'from-emerald-500/10 via-teal-500/5 to-emerald-500/10',
                 borderGradient: 'from-emerald-400/50 via-teal-400/30 to-emerald-400/50',
-                stats: '94% precisão IA'
+                stats: '94% precisão IA',
+                action: () => window.open('/dashboard/analytics', '_self')
               },
               {
                 title: 'ROI Intelligence',
@@ -384,13 +493,14 @@ const DashboardPage = () => {
                 gradient: 'from-violet-600 via-purple-500 to-fuchsia-600',
                 bgGradient: 'from-violet-500/10 via-purple-500/5 to-fuchsia-500/10',
                 borderGradient: 'from-violet-400/50 via-purple-400/30 to-fuchsia-400/50',
-                stats: '342% ROI médio'
+                stats: '342% ROI médio',
+                action: () => window.open('/dashboard/reports', '_self')
               }
             ].map((action, index) => {
               const Icon = action.icon;
               return (
                 <AnimatedSection key={action.title} delay={1.0 + index * 0.2}>
-                  <div className="group relative cursor-pointer h-full">
+                  <div onClick={action.action} className="group relative cursor-pointer h-full">
                     <div className={`absolute -inset-1 bg-gradient-to-r ${action.borderGradient} rounded-3xl opacity-0 group-hover:opacity-100 transition-all duration-1000 blur-xl`}></div>
                     <div className={`relative bg-gradient-to-br ${action.bgGradient} backdrop-blur-2xl border border-white/10 rounded-3xl p-8 hover:border-white/20 transition-all duration-500 h-full shadow-2xl hover:shadow-3xl hover:-translate-y-3 group-hover:scale-[1.02]`}>
                       <div className="flex items-center justify-between mb-6">

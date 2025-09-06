@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
 import { 
@@ -25,11 +25,108 @@ const DashboardLayout = () => {
   const location = useLocation();
   const { user, logout } = useAuthStore();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState([
+    {
+      id: 1,
+      title: 'Novo lead qualificado',
+      message: 'João Silva da TechCorp demonstrou alto interesse',
+      time: '2 min atrás',
+      type: 'lead',
+      unread: true
+    },
+    {
+      id: 2,
+      title: 'Meta de conversão atingida',
+      message: 'Campanha Google Ads superou 25% da meta mensal',
+      time: '15 min atrás',
+      type: 'success',
+      unread: true
+    },
+    {
+      id: 3,
+      title: 'Relatório pronto',
+      message: 'Análise de ROI mensal está disponível para download',
+      time: '1h atrás',
+      type: 'report',
+      unread: false
+    },
+    {
+      id: 4,
+      title: 'Alerta de performance',
+      message: 'Taxa de conversão do LinkedIn caiu 12% esta semana',
+      time: '2h atrás',
+      type: 'warning',
+      unread: false
+    }
+  ]);
 
   const handleLogout = () => {
     logout();
     navigate('/home');
   };
+
+  const searchableItems = [
+    { title: 'Dashboard', description: 'Visão geral e métricas principais', path: '/dashboard', type: 'page' },
+    { title: 'Analytics', description: 'Análises avançadas com IA', path: '/dashboard/analytics', type: 'page' },
+    { title: 'Leads', description: 'Gestão completa de leads', path: '/dashboard/leads', type: 'page' },
+    { title: 'Relatórios', description: 'Documentos e insights', path: '/dashboard/reports', type: 'page' },
+    { title: 'Configurações', description: 'Preferências do sistema', path: '/dashboard/settings', type: 'page' },
+    { title: 'João Silva', description: 'Lead qualificado da TechCorp', path: '/dashboard/leads', type: 'lead' },
+    { title: 'Maria Santos', description: 'Lead em negociação - InovaSoft', path: '/dashboard/leads', type: 'lead' },
+    { title: 'Relatório de Performance', description: 'Análise mensal de métricas', path: '/dashboard/reports', type: 'report' },
+    { title: 'Google Ads', description: 'Campanha com ROI de 342%', path: '/dashboard/analytics', type: 'campaign' },
+    { title: 'Meta de Conversão', description: 'Objetivo: 20% - Atual: 18.4%', path: '/dashboard/analytics', type: 'metric' }
+  ];
+
+  useEffect(() => {
+    if (searchTerm.length > 0) {
+      const filtered = searchableItems.filter(item =>
+        item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.description.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setSearchResults(filtered);
+    } else {
+      setSearchResults([]);
+    }
+  }, [searchTerm]);
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const handleSearchSelect = (item: any) => {
+    navigate(item.path);
+    setSearchTerm('');
+    setSearchResults([]);
+  };
+
+  const markNotificationAsRead = (id: number) => {
+    setNotifications(prev => 
+      prev.map(notif => 
+        notif.id === id ? { ...notif, unread: false } : notif
+      )
+    );
+  };
+
+  const unreadCount = notifications.filter(n => n.unread).length;
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (showNotifications && !(event.target as Element).closest('.notifications-dropdown')) {
+        setShowNotifications(false);
+      }
+      if (searchResults.length > 0 && !(event.target as Element).closest('.search-container')) {
+        setSearchResults([]);
+        setSearchTerm('');
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showNotifications, searchResults]);
 
   const menuItems = [
     { 
@@ -304,24 +401,115 @@ const DashboardLayout = () => {
             </button>
 
             {/* Search */}
-            <div className="flex-1 max-w-lg mx-6">
+            <div className="flex-1 max-w-lg mx-6 search-container">
               <div className="relative">
                 <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
                 <input
                   type="text"
-                  placeholder="Buscar..."
+                  placeholder="Buscar leads, relatórios, páginas..."
+                  value={searchTerm}
+                  onChange={handleSearch}
                   className="w-full pl-12 pr-4 py-3 bg-gray-800/50 border border-gray-700/50 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500/50 transition-all"
                 />
+                
+                {/* Search Results Dropdown */}
+                {searchResults.length > 0 && (
+                  <div className="absolute top-full mt-2 w-full bg-gray-900/95 backdrop-blur-xl border border-gray-700/50 rounded-xl shadow-2xl z-50 max-h-80 overflow-y-auto">
+                    {searchResults.map((item, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleSearchSelect(item)}
+                        className="w-full text-left p-4 hover:bg-gray-800/50 transition-colors border-b border-gray-700/30 last:border-b-0"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className={`w-2 h-2 rounded-full ${
+                            item.type === 'page' ? 'bg-blue-500' :
+                            item.type === 'lead' ? 'bg-green-500' :
+                            item.type === 'report' ? 'bg-purple-500' :
+                            item.type === 'campaign' ? 'bg-orange-500' : 'bg-cyan-500'
+                          }`}></div>
+                          <div className="flex-1">
+                            <div className="font-medium text-white">{item.title}</div>
+                            <div className="text-sm text-gray-400">{item.description}</div>
+                          </div>
+                          <div className="text-xs text-gray-500 capitalize">{item.type}</div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 
             {/* Right side */}
             <div className="flex items-center space-x-4">
               {/* Notifications */}
-              <button className="relative p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800/50 transition-colors">
-                <Bell className="h-5 w-5" />
-                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
-              </button>
+              <div className="relative notifications-dropdown">
+                <button 
+                  onClick={() => setShowNotifications(!showNotifications)}
+                  className="relative p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800/50 transition-colors"
+                >
+                  <Bell className="h-5 w-5" />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
+                  )}
+                </button>
+
+                {/* Notifications Dropdown */}
+                {showNotifications && (
+                  <div className="absolute right-0 mt-2 w-96 bg-gray-900/95 backdrop-blur-xl border border-gray-700/50 rounded-xl shadow-2xl z-50 max-h-96 overflow-y-auto">
+                    <div className="p-4 border-b border-gray-700/30">
+                      <div className="flex items-center justify-between">
+                        <h3 className="font-bold text-white">Notificações</h3>
+                        <span className="text-sm text-gray-400">{unreadCount} não lidas</span>
+                      </div>
+                    </div>
+                    
+                    <div className="max-h-80 overflow-y-auto">
+                      {notifications.map((notification) => (
+                        <button
+                          key={notification.id}
+                          onClick={() => markNotificationAsRead(notification.id)}
+                          className={`w-full text-left p-4 hover:bg-gray-800/30 transition-colors border-b border-gray-700/20 last:border-b-0 ${
+                            notification.unread ? 'bg-gray-800/10' : ''
+                          }`}
+                        >
+                          <div className="flex items-start gap-3">
+                            <div className={`w-3 h-3 rounded-full mt-1 flex-shrink-0 ${
+                              notification.type === 'lead' ? 'bg-green-500' :
+                              notification.type === 'success' ? 'bg-emerald-500' :
+                              notification.type === 'report' ? 'bg-blue-500' :
+                              notification.type === 'warning' ? 'bg-yellow-500' : 'bg-gray-500'
+                            }`}></div>
+                            <div className="flex-1 min-w-0">
+                              <div className={`font-medium ${notification.unread ? 'text-white' : 'text-gray-300'}`}>
+                                {notification.title}
+                              </div>
+                              <div className="text-sm text-gray-400 mt-1 line-clamp-2">
+                                {notification.message}
+                              </div>
+                              <div className="text-xs text-gray-500 mt-2">
+                                {notification.time}
+                              </div>
+                            </div>
+                            {notification.unread && (
+                              <div className="w-2 h-2 bg-primary-500 rounded-full flex-shrink-0 mt-2"></div>
+                            )}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                    
+                    <div className="p-4 border-t border-gray-700/30">
+                      <button className="w-full text-center text-sm text-primary-400 hover:text-primary-300 font-medium">
+                        Ver todas as notificações
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
 
               {/* User avatar */}
               <div className="h-8 w-8 bg-gradient-to-br from-primary-600 to-secondary-600 rounded-full flex items-center justify-center shadow-lg">
