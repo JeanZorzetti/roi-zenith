@@ -18,6 +18,8 @@ const CaseStudyFintechPage = lazy(() => import('@/pages/Solutions/CaseStudyFinte
 const ResourcesPage = lazy(() => import('@/pages/Resources/ResourcesPage'));
 const BlogPage = lazy(() => import('@/pages/Resources/BlogPage'));
 const BlogPostPage = lazy(() => import('@/pages/Resources/BlogPostPage'));
+const DocsPage = lazy(() => import('@/pages/Resources/DocsPage'));
+const DocPage = lazy(() => import('@/pages/Resources/DocPage'));
 const ContactPage = lazy(() => import('@/pages/Contact/ContactPage'));
 const CalculatorPage = lazy(() => import('@/pages/Calculator/CalculatorPage'));
 const DashboardPage = lazy(() => import('@/pages/Dashboard/DashboardPage'));
@@ -52,6 +54,8 @@ const AppRouter = () => {
             <Route path="resources" element={<ResourcesPage />} />
             <Route path="resources/blog" element={<BlogPage />} />
             <Route path="resources/blog/:slug" element={<BlogPostPage />} />
+            <Route path="resources/docs" element={<DocsPage />} />
+            <Route path="resources/docs/:slug" element={<DocPage />} />
             <Route path="calculator" element={<CalculatorPage />} />
             <Route path="contact" element={<ContactPage />} />
           </Route>

@@ -34,7 +34,10 @@ const ResourcesPage = () => {
             <p className="text-gray-300 mb-4">
               Guias técnicos, APIs e tutoriais para desenvolvedores.
             </p>
-            <button className="text-primary-400 hover:text-primary-300">
+            <button 
+              className="text-primary-400 hover:text-primary-300 font-light transition-colors"
+              onClick={() => navigate('/resources/docs')}
+            >
               Acessar docs →
             </button>
           </div>
