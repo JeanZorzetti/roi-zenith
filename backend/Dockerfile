@@ -17,6 +17,9 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# Generate Prisma Client first
+RUN npx prisma generate
+
 # Build the application
 RUN npm run build
 
@@ -40,6 +43,7 @@ RUN adduser --system --uid 1001 nodejs
 # Copy the built application
 COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
 COPY --from=prod-deps --chown=nodejs:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=nodejs:nodejs /app/prisma ./prisma
 COPY --chown=nodejs:nodejs package.json ./
 
 USER nodejs
