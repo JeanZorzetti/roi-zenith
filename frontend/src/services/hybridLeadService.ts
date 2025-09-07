@@ -5,6 +5,9 @@ import { Lead, ApiResponse } from '@/types/api';
 
 class HybridLeadService {
   private useDatabaseFallback = true;
+  private apiUnavailable = false;
+  private lastApiCheck = 0;
+  private apiCheckInterval = 5 * 60 * 1000; // 5 minutes
 
   constructor() {
     this.checkDatabaseConnection();
@@ -12,6 +15,30 @@ class HybridLeadService {
 
   private async checkDatabaseConnection() {
     this.useDatabaseFallback = await testDatabaseConnection();
+  }
+
+  private shouldTryApi(): boolean {
+    // If API is known to be unavailable, only retry every 5 minutes
+    if (this.apiUnavailable) {
+      const now = Date.now();
+      if (now - this.lastApiCheck < this.apiCheckInterval) {
+        return false;
+      }
+      this.lastApiCheck = now;
+    }
+    return true;
+  }
+
+  private handleApiError(error: any) {
+    // Check if it's a 403 authorization error
+    if (error.message?.includes('Access denied') || error.message?.includes('Forbidden')) {
+      this.apiUnavailable = true;
+      this.lastApiCheck = Date.now();
+      // Only log once when API becomes unavailable
+      console.info('API access denied - switching to database mode');
+    } else {
+      console.warn('API call failed, falling back to database:', error.message);
+    }
   }
 
   // Get all leads with hybrid approach
@@ -31,18 +58,22 @@ class HybridLeadService {
     };
     analytics?: any;
   }> {
-    try {
-      // Try API first
-      const apiResponse = await apiLeadService.getLeads(params);
-      if (apiResponse.success && apiResponse.data) {
-        return {
-          leads: apiResponse.data.leads,
-          pagination: apiResponse.data.pagination,
-          analytics: apiResponse.data.analytics
-        };
+    // Only try API if it's not known to be unavailable
+    if (this.shouldTryApi()) {
+      try {
+        const apiResponse = await apiLeadService.getLeads(params);
+        if (apiResponse.success && apiResponse.data) {
+          // API is working, reset unavailable flag
+          this.apiUnavailable = false;
+          return {
+            leads: apiResponse.data.leads,
+            pagination: apiResponse.data.pagination,
+            analytics: apiResponse.data.analytics
+          };
+        }
+      } catch (error) {
+        this.handleApiError(error);
       }
-    } catch (error) {
-      console.warn('API call failed, falling back to database:', error);
     }
 
     // Fallback to database if available
@@ -77,14 +108,17 @@ class HybridLeadService {
 
   // Get single lead
   async getLead(id: string): Promise<Lead | null> {
-    try {
-      // Try API first
-      const apiResponse = await apiLeadService.getLead(id);
-      if (apiResponse.success && apiResponse.data) {
-        return apiResponse.data.lead;
+    // Only try API if it's not known to be unavailable
+    if (this.shouldTryApi()) {
+      try {
+        const apiResponse = await apiLeadService.getLead(id);
+        if (apiResponse.success && apiResponse.data) {
+          this.apiUnavailable = false;
+          return apiResponse.data.lead;
+        }
+      } catch (error) {
+        this.handleApiError(error);
       }
-    } catch (error) {
-      console.warn('API call failed, falling back to database:', error);
     }
 
     // Fallback to database
@@ -101,14 +135,17 @@ class HybridLeadService {
 
   // Update lead
   async updateLead(id: string, updates: any): Promise<Lead | null> {
-    try {
-      // Try API first
-      const apiResponse = await apiLeadService.updateLead(id, updates);
-      if (apiResponse.success && apiResponse.data) {
-        return apiResponse.data.lead;
+    // Only try API if it's not known to be unavailable
+    if (this.shouldTryApi()) {
+      try {
+        const apiResponse = await apiLeadService.updateLead(id, updates);
+        if (apiResponse.success && apiResponse.data) {
+          this.apiUnavailable = false;
+          return apiResponse.data.lead;
+        }
+      } catch (error) {
+        this.handleApiError(error);
       }
-    } catch (error) {
-      console.warn('API call failed, falling back to database:', error);
     }
 
     // Fallback to database
