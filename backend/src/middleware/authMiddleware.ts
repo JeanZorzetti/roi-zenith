@@ -1,12 +1,13 @@
 import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
-import User, { IUser } from '../models/User';
+import { UserService } from '../models/User';
+import { User } from '@prisma/client';
 
 // Extend Request interface to include user
 declare global {
   namespace Express {
     interface Request {
-      user?: IUser;
+      user?: User;
     }
   }
 }
@@ -18,9 +19,9 @@ export interface JWTPayload {
 }
 
 // Generate JWT token
-export const generateToken = (user: IUser): string => {
+export const generateToken = (user: User): string => {
   const payload: JWTPayload = {
-    userId: user._id?.toString() || '',
+    userId: user.id,
     email: user.email,
     role: user.role
   };
@@ -54,7 +55,7 @@ export const protect = async (req: Request, res: Response, next: NextFunction) =
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JWTPayload;
 
     // Get user from token
-    const user = await User.findById(decoded.userId).select('-password');
+    const user = await UserService.findUserById(decoded.userId);
 
     if (!user) {
       return res.status(401).json({
@@ -115,7 +116,7 @@ export const optionalAuth = async (req: Request, res: Response, next: NextFuncti
   if (token) {
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JWTPayload;
-      const user = await User.findById(decoded.userId).select('-password');
+      const user = await UserService.findUserById(decoded.userId);
       
       if (user) {
         req.user = user;

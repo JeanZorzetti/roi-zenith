@@ -112,7 +112,6 @@ export const login = async (req: Request, res: Response) => {
       role: user.role,
       company: user.company,
       position: user.position,
-      isEmailVerified: user.isEmailVerified,
       createdAt: user.createdAt
     };
 
@@ -153,7 +152,6 @@ export const getMe = async (req: Request, res: Response) => {
       role: user.role,
       company: user.company,
       position: user.position,
-      isEmailVerified: user.isEmailVerified,
       createdAt: user.createdAt
     };
 
@@ -186,7 +184,7 @@ export const updateProfile = async (req: Request, res: Response) => {
     }
 
     const { name, company, position } = req.body;
-    const userId = req.user?._id;
+    const userId = req.user?.id;
 
     if (!userId) {
       return res.status(401).json({
@@ -195,11 +193,7 @@ export const updateProfile = async (req: Request, res: Response) => {
       });
     }
 
-    const user = await User.findByIdAndUpdate(
-      userId,
-      { name, company, position },
-      { new: true, runValidators: true }
-    ).select('-password');
+    const user = await UserService.updateUser(userId, { name, company, position });
 
     if (!user) {
       return res.status(404).json({

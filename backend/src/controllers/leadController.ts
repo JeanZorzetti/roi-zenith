@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { validationResult } from 'express-validator';
-import Lead from '../models/Lead';
+import { LeadService } from '../models/Lead';
 import { emailService } from '../services/emailService';
 
 // Submit lead capture form
@@ -19,7 +19,7 @@ export const submitLead = async (req: Request, res: Response) => {
     const leadData = req.body;
 
     // Check if lead with same email already exists
-    const existingLead = await Lead.findOne({ email: leadData.email });
+    const existingLead = await LeadService.findLeadByEmail(leadData.email);
     if (existingLead) {
       return res.status(400).json({
         success: false,
@@ -27,8 +27,8 @@ export const submitLead = async (req: Request, res: Response) => {
       });
     }
 
-    // Create lead record (score is calculated automatically in pre-save hook)
-    const lead = await Lead.create(leadData);
+    // Create lead record (score is calculated automatically)
+    const lead = await LeadService.createLead(leadData);
 
     // Send notification email to admin
     const emailSent = await emailService.sendLeadNotification(lead);
@@ -41,7 +41,7 @@ export const submitLead = async (req: Request, res: Response) => {
       message: 'Obrigado pelo seu interesse! Nossa equipe especializada entrará em contato em breve com uma proposta personalizada.',
       data: {
         lead: {
-          _id: lead._id,
+          _id: lead.id,
           fullName: lead.fullName,
           email: lead.email,
           company: lead.company,
