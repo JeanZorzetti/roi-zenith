@@ -1,0 +1,111 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Lead {
+  id              String   @id @default(cuid())
+  fullName        String   @map("full_name")
+  email           String   @unique
+  company         String
+  role            String
+  companySector   String   @map("company_sector")
+  teamSize        String   @map("team_size")
+  monthlyLeads    String   @map("monthly_leads")
+  budget          String
+  currentChallenges String @map("current_challenges") @db.Text
+  timeline        String
+  gdprConsent     Boolean  @default(true) @map("gdpr_consent")
+  marketingConsent Boolean @default(false) @map("marketing_consent")
+  status          LeadStatus @default(NEW)
+  score           Int      @default(0)
+  source          String
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("leads")
+}
+
+model User {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  name        String
+  password    String
+  role        UserRole @default(USER)
+  avatar      String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+model Campaign {
+  id          String   @id @default(cuid())
+  name        String
+  type        String
+  status      CampaignStatus @default(DRAFT)
+  budget      Decimal
+  spent       Decimal  @default(0)
+  impressions Int      @default(0)
+  clicks      Int      @default(0)
+  conversions Int      @default(0)
+  startDate   DateTime @map("start_date")
+  endDate     DateTime? @map("end_date")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("campaigns")
+}
+
+model Analytics {
+  id        String   @id @default(cuid())
+  metric    String
+  value     Decimal
+  date      DateTime
+  category  String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("analytics")
+}
+
+model Report {
+  id          String   @id @default(cuid())
+  title       String
+  description String?  @db.Text
+  type        String
+  data        Json
+  generatedBy String   @map("generated_by")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("reports")
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  DEMO_SCHEDULED
+  PROPOSAL_SENT
+  CLOSED_WON
+  CLOSED_LOST
+}
+
+enum UserRole {
+  ADMIN
+  USER
+  MANAGER
+}
+
+enum CampaignStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  COMPLETED
+}

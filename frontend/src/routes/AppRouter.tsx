@@ -30,6 +30,7 @@ const AnalyticsPage = lazy(() => import('@/pages/Dashboard/AnalyticsPage'));
 const LeadsPage = lazy(() => import('@/pages/Dashboard/LeadsPage'));
 const ReportsPage = lazy(() => import('@/pages/Dashboard/ReportsPage'));
 const SettingsPage = lazy(() => import('@/pages/Dashboard/SettingsPage'));
+const DatabaseTestPage = lazy(() => import('@/pages/Database/DatabaseTest'));
 const NotFoundPage = lazy(() => import('@/pages/NotFound'));
 
 // Loading fallback component
@@ -79,6 +80,7 @@ const AppRouter = () => {
             <Route path="leads" element={<LeadsPage />} />
             <Route path="reports" element={<ReportsPage />} />
             <Route path="settings" element={<SettingsPage />} />
+            <Route path="database-test" element={<DatabaseTestPage />} />
           </Route>
 
           {/* 404 */}

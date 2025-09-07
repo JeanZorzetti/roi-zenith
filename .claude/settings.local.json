@@ -15,7 +15,11 @@
       "Bash(npm run build:*)",
       "Bash(npm init:*)",
       "WebFetch(domain:back.roilabs.com.br)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "WebSearch",
+      "WebFetch(domain:easypanel.io)",
+      "Bash(npx prisma generate:*)",
+      "Bash(npx prisma migrate dev:*)"
     ],
     "deny": [],
     "ask": []

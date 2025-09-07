@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { leadService } from '@/services/leadService';
+import { hybridLeadService } from '@/services/hybridLeadService';
 import { Lead } from '@/types/api';
 import {
   Users,
@@ -144,16 +144,40 @@ const LeadsPage = () => {
     try {
       setIsLoading(true);
       
-      // Generate or use existing mock data
+      // Use hybrid service to load leads (tries API first, then database, then mock)
+      const result = await hybridLeadService.getLeads({
+        page: currentPage,
+        limit: pagination.limit,
+        status: selectedStatus,
+        sector: selectedSector,
+        search: searchTerm
+      });
+
+      setLeads(result.leads);
+      setPagination(result.pagination);
+
+      // For status counts, we need all leads - try to get stats
       if (allLeads.length === 0) {
-        const mockLeads = generateMockLeads();
-        setAllLeads(mockLeads);
+        try {
+          const stats = await hybridLeadService.getLeadStats();
+          // Update status counts based on stats
+          const totalLeads = Object.values(stats).reduce((sum, count) => sum + count, 0);
+          if (totalLeads > 0) {
+            setAllLeads(result.leads); // Use current leads as reference
+          }
+        } catch (error) {
+          console.warn('Failed to load stats, using mock data');
+          const mockLeads = generateMockLeads();
+          setAllLeads(mockLeads);
+        }
       }
+    } catch (error) {
+      console.error('Error loading leads:', error);
+      // Fallback to mock data
+      const mockLeads = generateMockLeads();
+      setAllLeads(mockLeads);
+      const filteredLeads = applyFilters(mockLeads);
       
-      const leadsData = allLeads.length > 0 ? allLeads : generateMockLeads();
-      const filteredLeads = applyFilters(leadsData);
-      
-      // Pagination
       const startIndex = (currentPage - 1) * pagination.limit;
       const endIndex = startIndex + pagination.limit;
       const paginatedLeads = filteredLeads.slice(startIndex, endIndex);
@@ -165,23 +189,45 @@ const LeadsPage = () => {
         total: filteredLeads.length,
         limit: pagination.limit
       });
-
-      if (allLeads.length === 0) {
-        setAllLeads(leadsData);
-      }
-    } catch (error) {
-      console.error('Error loading leads:', error);
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleStatusUpdate = async (leadId: string, newStatus: string) => {
-    const updatedAllLeads = allLeads.map(lead =>
-      lead._id === leadId ? { ...lead, status: newStatus as any } : lead
-    );
-    setAllLeads(updatedAllLeads);
-    loadLeads(); // Refresh current view
+    try {
+      // Try to update via hybrid service
+      const updatedLead = await hybridLeadService.updateLeadStatus(leadId, newStatus);
+      
+      if (updatedLead) {
+        // Update local state
+        const updatedAllLeads = allLeads.map(lead =>
+          lead._id === leadId ? { ...lead, status: newStatus as any } : lead
+        );
+        setAllLeads(updatedAllLeads);
+        
+        // Update current leads display
+        const updatedCurrentLeads = leads.map(lead =>
+          lead._id === leadId ? { ...lead, status: newStatus as any } : lead
+        );
+        setLeads(updatedCurrentLeads);
+      } else {
+        // Fallback to local state update only
+        const updatedAllLeads = allLeads.map(lead =>
+          lead._id === leadId ? { ...lead, status: newStatus as any } : lead
+        );
+        setAllLeads(updatedAllLeads);
+        loadLeads(); // Refresh current view
+      }
+    } catch (error) {
+      console.error('Error updating lead status:', error);
+      // Fallback to local state update
+      const updatedAllLeads = allLeads.map(lead =>
+        lead._id === leadId ? { ...lead, status: newStatus as any } : lead
+      );
+      setAllLeads(updatedAllLeads);
+      loadLeads(); // Refresh current view
+    }
   };
 
   const handleExport = async (format: string) => {
