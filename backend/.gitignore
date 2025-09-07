@@ -58,3 +58,4 @@ logs
 # Windows
 Thumbs.db
 desktop.ini
+/src/generated/prisma

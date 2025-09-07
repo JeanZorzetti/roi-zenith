@@ -1,36 +1,41 @@
-import mongoose from 'mongoose';
+import { PrismaClient } from '@prisma/client';
+
+declare global {
+  var __prisma: PrismaClient | undefined;
+}
+
+// Initialize Prisma Client
+export const prisma = globalThis.__prisma || new PrismaClient({
+  log: process.env.NODE_ENV === 'development' ? ['query'] : [],
+});
+
+if (process.env.NODE_ENV !== 'production') {
+  globalThis.__prisma = prisma;
+}
 
 export const connectDB = async (): Promise<void> => {
   try {
-    const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/roi-labs';
-    
-    const conn = await mongoose.connect(mongoUri);
-    
-    console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
-    console.log(`📋 Database: ${conn.connection.name}`);
-    
+    await prisma.$connect();
+    console.log('✅ Database connected successfully');
+    console.log('📋 Database: SQLite (development)');
   } catch (error: any) {
-    console.error('❌ MongoDB connection error:', error.message);
+    console.error('❌ Database connection error:', error.message);
     process.exit(1);
   }
 };
 
-// Handle connection events
-mongoose.connection.on('disconnected', () => {
-  console.log('⚠️  MongoDB disconnected');
-});
-
-mongoose.connection.on('reconnected', () => {
-  console.log('✅ MongoDB reconnected');
-});
+// Handle graceful shutdown
+export const disconnectDB = async (): Promise<void> => {
+  await prisma.$disconnect();
+};
 
 process.on('SIGINT', async () => {
   try {
-    await mongoose.connection.close();
-    console.log('👋 MongoDB connection closed through app termination');
+    await disconnectDB();
+    console.log('👋 Database connection closed through app termination');
     process.exit(0);
   } catch (error) {
-    console.error('Error closing MongoDB connection:', error);
+    console.error('Error closing database connection:', error);
     process.exit(1);
   }
 });

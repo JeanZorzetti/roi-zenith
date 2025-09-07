@@ -1,85 +1,78 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import { User } from '@prisma/client';
 import bcrypt from 'bcryptjs';
+import { prisma } from '../utils/database';
 
-export interface IUser extends Document {
+export interface CreateUserData {
   name: string;
   email: string;
   password: string;
-  role: 'user' | 'admin';
+  role?: 'USER' | 'ADMIN' | 'MANAGER';
   company?: string;
   position?: string;
-  isEmailVerified: boolean;
-  emailVerificationToken?: string;
-  passwordResetToken?: string;
-  passwordResetExpires?: Date;
-  createdAt: Date;
-  updatedAt: Date;
-  comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
-const userSchema = new Schema<IUser>({
-  name: {
-    type: String,
-    required: [true, 'Name is required'],
-    trim: true,
-    maxlength: [50, 'Name cannot be more than 50 characters']
-  },
-  email: {
-    type: String,
-    required: [true, 'Email is required'],
-    unique: true,
-    lowercase: true,
-    match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please add a valid email']
-  },
-  password: {
-    type: String,
-    required: [true, 'Password is required'],
-    minlength: [8, 'Password must be at least 8 characters'],
-    select: false // Don't return password by default
-  },
-  role: {
-    type: String,
-    enum: ['user', 'admin'],
-    default: 'user'
-  },
-  company: {
-    type: String,
-    trim: true,
-    maxlength: [100, 'Company name cannot be more than 100 characters']
-  },
-  position: {
-    type: String,
-    trim: true,
-    maxlength: [50, 'Position cannot be more than 50 characters']
-  },
-  isEmailVerified: {
-    type: Boolean,
-    default: false
-  },
-  emailVerificationToken: String,
-  passwordResetToken: String,
-  passwordResetExpires: Date
-}, {
-  timestamps: true
-});
+export interface UpdateUserData {
+  name?: string;
+  company?: string;
+  position?: string;
+}
 
-// Index for performance
-userSchema.index({ email: 1 });
-
-// Hash password before saving
-userSchema.pre('save', async function(next) {
-  if (!this.isModified('password')) {
-    next();
+export class UserService {
+  static async hashPassword(password: string): Promise<string> {
+    const salt = await bcrypt.genSalt(12);
+    return bcrypt.hash(password, salt);
   }
-  
-  const salt = await bcrypt.genSalt(12);
-  this.password = await bcrypt.hash(this.password, salt);
-  next();
-});
 
-// Compare password method
-userSchema.methods.comparePassword = async function(candidatePassword: string): Promise<boolean> {
-  return await bcrypt.compare(candidatePassword, this.password);
-};
+  static async comparePassword(candidatePassword: string, hashedPassword: string): Promise<boolean> {
+    return bcrypt.compare(candidatePassword, hashedPassword);
+  }
 
-export default mongoose.model<IUser>('User', userSchema);
+  static async createUser(userData: CreateUserData): Promise<User> {
+    const hashedPassword = await this.hashPassword(userData.password);
+    
+    return prisma.user.create({
+      data: {
+        ...userData,
+        password: hashedPassword,
+        role: userData.role || 'USER',
+      },
+    });
+  }
+
+  static async findUserByEmail(email: string): Promise<User | null> {
+    return prisma.user.findUnique({
+      where: { email: email.toLowerCase() },
+    });
+  }
+
+  static async findUserByEmailWithPassword(email: string): Promise<User | null> {
+    return prisma.user.findUnique({
+      where: { email: email.toLowerCase() },
+    });
+  }
+
+  static async findUserById(id: string): Promise<User | null> {
+    return prisma.user.findUnique({
+      where: { id },
+    });
+  }
+
+  static async updateUser(id: string, userData: UpdateUserData): Promise<User> {
+    return prisma.user.update({
+      where: { id },
+      data: userData,
+    });
+  }
+
+  static async deleteUser(id: string): Promise<User> {
+    return prisma.user.delete({
+      where: { id },
+    });
+  }
+
+  static async getAllUsers(): Promise<User[]> {
+    return prisma.user.findMany({
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+}

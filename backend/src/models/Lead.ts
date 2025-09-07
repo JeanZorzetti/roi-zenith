@@ -1,211 +1,192 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import { Lead, LeadStatus } from '@prisma/client';
+import { prisma } from '../utils/database';
 
-export interface ILead extends Document {
-  // Basic Information
+export interface CreateLeadData {
   fullName: string;
   email: string;
   company: string;
   role: string;
-  
-  // Business Context
   companySector: string;
   teamSize: string;
   monthlyLeads: string;
   budget: string;
   currentChallenges: string;
   timeline: string;
-  
-  // Consent
   gdprConsent: boolean;
   marketingConsent?: boolean;
-  
-  // Lead Management
-  status: 'new' | 'contacted' | 'qualified' | 'demo_scheduled' | 'proposal_sent' | 'closed_won' | 'closed_lost';
-  score: number; // Lead score 0-100
-  source: string; // Where the lead came from
-  assignedTo?: mongoose.Types.ObjectId; // User ID
-  notes: string[];
-  
-  // Communication tracking
-  lastContactDate?: Date;
-  nextFollowUpDate?: Date;
-  
-  // ROI Calculator data (if submitted)
-  roiData?: {
-    currentLeads: number;
-    conversionRate: number;
-    averageDealValue: number;
-    salesCycleMonths: number;
-    sdrSalary: number;
-    projectedROI: number;
-  };
-  
-  createdAt: Date;
-  updatedAt: Date;
+  source: string;
 }
 
-const leadSchema = new Schema<ILead>({
-  // Basic Information
-  fullName: {
-    type: String,
-    required: [true, 'Full name is required'],
-    trim: true,
-    maxlength: [100, 'Name cannot be more than 100 characters']
-  },
-  email: {
-    type: String,
-    required: [true, 'Email is required'],
-    lowercase: true,
-    match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please add a valid email']
-  },
-  company: {
-    type: String,
-    required: [true, 'Company is required'],
-    trim: true,
-    maxlength: [100, 'Company name cannot be more than 100 characters']
-  },
-  role: {
-    type: String,
-    required: [true, 'Role is required'],
-    trim: true,
-    maxlength: [50, 'Role cannot be more than 50 characters']
-  },
-  
-  // Business Context
-  companySector: {
-    type: String,
-    required: [true, 'Company sector is required'],
-    enum: ['saas', 'fintech', 'ecommerce', 'startup', 'consulting', 'other']
-  },
-  teamSize: {
-    type: String,
-    required: [true, 'Team size is required'],
-    enum: ['1-5', '6-15', '16-50', '51+']
-  },
-  monthlyLeads: {
-    type: String,
-    required: [true, 'Monthly leads is required'],
-    enum: ['<100', '100-500', '500-1000', '1000+']
-  },
-  budget: {
-    type: String,
-    required: [true, 'Budget is required'],
-    enum: ['<5k', '5k-15k', '15k-30k', '30k+']
-  },
-  currentChallenges: {
-    type: String,
-    required: [true, 'Current challenges is required'],
-    minlength: [10, 'Challenges description must be at least 10 characters'],
-    maxlength: [1000, 'Challenges description cannot be more than 1000 characters']
-  },
-  timeline: {
-    type: String,
-    required: [true, 'Timeline is required'],
-    enum: ['immediate', '30days', '90days', 'planning']
-  },
-  
-  // Consent
-  gdprConsent: {
-    type: Boolean,
-    required: [true, 'GDPR consent is required'],
-    validate: {
-      validator: function(v: boolean) { return v === true; },
-      message: 'GDPR consent must be accepted'
-    }
-  },
-  marketingConsent: {
-    type: Boolean,
-    default: false
-  },
-  
-  // Lead Management
-  status: {
-    type: String,
-    enum: ['new', 'contacted', 'qualified', 'demo_scheduled', 'proposal_sent', 'closed_won', 'closed_lost'],
-    default: 'new'
-  },
-  score: {
-    type: Number,
-    min: 0,
-    max: 100,
-    default: 0
-  },
-  source: {
-    type: String,
-    default: 'website'
-  },
-  assignedTo: {
-    type: Schema.Types.ObjectId,
-    ref: 'User'
-  },
-  notes: [{
-    type: String,
-    maxlength: [500, 'Note cannot be more than 500 characters']
-  }],
-  
-  // Communication tracking
-  lastContactDate: Date,
-  nextFollowUpDate: Date,
-  
-  // ROI Calculator data
-  roiData: {
-    currentLeads: Number,
-    conversionRate: Number,
-    averageDealValue: Number,
-    salesCycleMonths: Number,
-    sdrSalary: Number,
-    projectedROI: Number
-  }
-}, {
-  timestamps: true
-});
+export interface UpdateLeadData {
+  status?: LeadStatus;
+  score?: number;
+  fullName?: string;
+  company?: string;
+  role?: string;
+  companySector?: string;
+  teamSize?: string;
+  monthlyLeads?: string;
+  budget?: string;
+  currentChallenges?: string;
+  timeline?: string;
+}
 
-// Indexes for performance
-leadSchema.index({ email: 1 });
-leadSchema.index({ status: 1 });
-leadSchema.index({ companySector: 1 });
-leadSchema.index({ createdAt: -1 });
-leadSchema.index({ score: -1 });
+export interface LeadFilters {
+  status?: string;
+  sector?: string;
+  search?: string;
+  page?: number;
+  limit?: number;
+}
 
-// Calculate lead score based on profile
-leadSchema.pre('save', function(next) {
-  if (this.isNew) {
+export class LeadService {
+  static calculateScore(leadData: CreateLeadData): number {
     let score = 0;
     
     // Budget scoring (30 points max)
-    if (this.budget === '30k+') score += 30;
-    else if (this.budget === '15k-30k') score += 25;
-    else if (this.budget === '5k-15k') score += 15;
+    if (leadData.budget === '30k+') score += 30;
+    else if (leadData.budget === '15k-30k') score += 25;
+    else if (leadData.budget === '5k-15k') score += 15;
     else score += 5;
     
     // Team size scoring (20 points max)
-    if (this.teamSize === '51+') score += 20;
-    else if (this.teamSize === '16-50') score += 15;
-    else if (this.teamSize === '6-15') score += 10;
+    if (leadData.teamSize === '51+') score += 20;
+    else if (leadData.teamSize === '16-50') score += 15;
+    else if (leadData.teamSize === '6-15') score += 10;
     else score += 5;
     
     // Timeline scoring (20 points max)
-    if (this.timeline === 'immediate') score += 20;
-    else if (this.timeline === '30days') score += 15;
-    else if (this.timeline === '90days') score += 10;
+    if (leadData.timeline === 'immediate') score += 20;
+    else if (leadData.timeline === '30days') score += 15;
+    else if (leadData.timeline === '90days') score += 10;
     else score += 5;
     
     // Volume scoring (15 points max)
-    if (this.monthlyLeads === '1000+') score += 15;
-    else if (this.monthlyLeads === '500-1000') score += 12;
-    else if (this.monthlyLeads === '100-500') score += 8;
+    if (leadData.monthlyLeads === '1000+') score += 15;
+    else if (leadData.monthlyLeads === '500-1000') score += 12;
+    else if (leadData.monthlyLeads === '100-500') score += 8;
     else score += 3;
     
     // Sector scoring (10 points max)
-    if (['saas', 'fintech', 'startup'].includes(this.companySector)) score += 10;
+    if (['saas', 'fintech', 'startup'].includes(leadData.companySector)) score += 10;
     else score += 5;
     
     // Marketing consent bonus (5 points)
-    if (this.marketingConsent) score += 5;
+    if (leadData.marketingConsent) score += 5;
     
-    this.score = Math.min(score, 100);
+    return Math.min(score, 100);
   }
-  next();
-});
 
-export default mongoose.model<ILead>('Lead', leadSchema);
+  static async createLead(leadData: CreateLeadData): Promise<Lead> {
+    const score = this.calculateScore(leadData);
+    
+    return prisma.lead.create({
+      data: {
+        ...leadData,
+        score,
+        marketingConsent: leadData.marketingConsent || false,
+      },
+    });
+  }
+
+  static async findLeadById(id: string): Promise<Lead | null> {
+    return prisma.lead.findUnique({
+      where: { id },
+    });
+  }
+
+  static async findLeadByEmail(email: string): Promise<Lead | null> {
+    return prisma.lead.findUnique({
+      where: { email: email.toLowerCase() },
+    });
+  }
+
+  static async updateLead(id: string, leadData: UpdateLeadData): Promise<Lead> {
+    return prisma.lead.update({
+      where: { id },
+      data: leadData,
+    });
+  }
+
+  static async deleteLead(id: string): Promise<Lead> {
+    return prisma.lead.delete({
+      where: { id },
+    });
+  }
+
+  static async getLeads(filters: LeadFilters = {}): Promise<{
+    leads: Lead[];
+    total: number;
+    pages: number;
+  }> {
+    const { status, sector, search, page = 1, limit = 25 } = filters;
+    const skip = (page - 1) * limit;
+
+    const where: any = {};
+
+    // Apply status filter
+    if (status && status !== 'all') {
+      where.status = status.toUpperCase();
+    }
+
+    // Apply sector filter
+    if (sector && sector !== 'all') {
+      where.companySector = sector;
+    }
+
+    // Apply search filter
+    if (search) {
+      where.OR = [
+        { fullName: { contains: search, mode: 'insensitive' } },
+        { email: { contains: search, mode: 'insensitive' } },
+        { company: { contains: search, mode: 'insensitive' } },
+        { role: { contains: search, mode: 'insensitive' } },
+      ];
+    }
+
+    const [leads, total] = await Promise.all([
+      prisma.lead.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+      }),
+      prisma.lead.count({ where }),
+    ]);
+
+    return {
+      leads,
+      total,
+      pages: Math.ceil(total / limit),
+    };
+  }
+
+  static async getLeadStats(): Promise<Record<string, number>> {
+    const stats = await prisma.lead.groupBy({
+      by: ['status'],
+      _count: { status: true },
+    });
+
+    const result: Record<string, number> = {
+      NEW: 0,
+      CONTACTED: 0,
+      QUALIFIED: 0,
+      DEMO_SCHEDULED: 0,
+      PROPOSAL_SENT: 0,
+      CLOSED_WON: 0,
+      CLOSED_LOST: 0,
+    };
+
+    stats.forEach((stat) => {
+      result[stat.status] = stat._count.status;
+    });
+
+    return result;
+  }
+
+  static async getAllLeads(): Promise<Lead[]> {
+    return prisma.lead.findMany({
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+}

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { validationResult } from 'express-validator';
-import User, { IUser } from '../models/User';
+import { UserService } from '../models/User';
 import { generateToken } from '../middleware/authMiddleware';
 
 // Register user
@@ -19,7 +19,7 @@ export const register = async (req: Request, res: Response) => {
     const { name, email, password, company, position } = req.body;
 
     // Check if user already exists
-    const existingUser = await User.findOne({ email });
+    const existingUser = await UserService.findUserByEmail(email);
     if (existingUser) {
       return res.status(400).json({
         success: false,
@@ -28,7 +28,7 @@ export const register = async (req: Request, res: Response) => {
     }
 
     // Create user
-    const user = await User.create({
+    const user = await UserService.createUser({
       name,
       email,
       password,
@@ -41,13 +41,12 @@ export const register = async (req: Request, res: Response) => {
 
     // Remove password from response
     const userResponse = {
-      _id: user._id,
+      _id: user.id,
       name: user.name,
       email: user.email,
       role: user.role,
       company: user.company,
       position: user.position,
-      isEmailVerified: user.isEmailVerified,
       createdAt: user.createdAt
     };
 
@@ -85,7 +84,7 @@ export const login = async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
     // Check if user exists and get password
-    const user = await User.findOne({ email }).select('+password');
+    const user = await UserService.findUserByEmailWithPassword(email);
     if (!user) {
       return res.status(401).json({
         success: false,
@@ -94,7 +93,7 @@ export const login = async (req: Request, res: Response) => {
     }
 
     // Check password
-    const isPasswordValid = await user.comparePassword(password);
+    const isPasswordValid = await UserService.comparePassword(password, user.password);
     if (!isPasswordValid) {
       return res.status(401).json({
         success: false,

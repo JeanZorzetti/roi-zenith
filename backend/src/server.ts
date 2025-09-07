@@ -18,7 +18,7 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Connect to MongoDB
+// Connect to Database
 connectDB();
 
 // Security middleware
@@ -49,6 +49,9 @@ app.use(cors({
   },
   credentials: true
 }));
+
+// Trust proxy (needed for rate limiting behind proxy)
+app.set('trust proxy', 1);
 
 // Rate limiting
 const limiter = rateLimit({
