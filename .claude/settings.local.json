@@ -22,7 +22,10 @@
       "Bash(npx prisma migrate dev:*)",
       "Bash(dir print:*)",
       "Bash(npm remove:*)",
-      "Bash(npx prisma:*)"
+      "Bash(npx prisma:*)",
+      "Bash(npm config get:*)",
+      "Bash(npm config:*)",
+      "Bash(npm:*)"
     ],
     "deny": [],
     "ask": []

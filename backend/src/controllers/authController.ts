@@ -106,7 +106,7 @@ export const login = async (req: Request, res: Response) => {
 
     // Remove password from response
     const userResponse = {
-      _id: user._id,
+      _id: user.id,
       name: user.name,
       email: user.email,
       role: user.role,
@@ -146,7 +146,7 @@ export const getMe = async (req: Request, res: Response) => {
     }
 
     const userResponse = {
-      _id: user._id,
+      _id: user.id,
       name: user.name,
       email: user.email,
       role: user.role,

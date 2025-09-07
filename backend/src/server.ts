@@ -9,7 +9,6 @@ import { errorHandler, notFound } from './middleware/errorMiddleware';
 
 // Route imports
 import authRoutes from './routes/authRoutes';
-import contactRoutes from './routes/contactRoutes';
 import leadRoutes from './routes/leadRoutes';
 
 // Load environment variables
@@ -74,7 +73,6 @@ app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use('/api/auth', authRoutes);
-app.use('/api/contact', contactRoutes);
 app.use('/api/leads', leadRoutes);
 
 // Health check
