@@ -19,7 +19,8 @@
       "WebSearch",
       "WebFetch(domain:easypanel.io)",
       "Bash(npx prisma generate:*)",
-      "Bash(npx prisma migrate dev:*)"
+      "Bash(npx prisma migrate dev:*)",
+      "Bash(dir print:*)"
     ],
     "deny": [],
     "ask": []

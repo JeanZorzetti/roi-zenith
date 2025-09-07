@@ -151,7 +151,7 @@ const DashboardLayout = () => {
       path: '/dashboard/leads', 
       active: location.pathname.startsWith('/dashboard/leads'),
       description: 'Gestão de leads',
-      count: 247
+      count: 0
     },
     { 
       icon: FileText, 
@@ -159,7 +159,7 @@ const DashboardLayout = () => {
       path: '/dashboard/reports', 
       active: location.pathname.startsWith('/dashboard/reports'),
       description: 'Documentos e insights',
-      count: 12
+      count: 0
     },
     { 
       icon: Settings, 
@@ -360,13 +360,13 @@ const DashboardLayout = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div className="text-center p-3 bg-gray-800/30 rounded-xl border border-gray-700/30 hover:border-gray-600/50 transition-all duration-300 group">
                   <div className="text-lg font-black text-emerald-400 group-hover:scale-110 transition-transform duration-300">
-                    94%
+                    0%
                   </div>
                   <div className="text-xs text-gray-500">IA Score</div>
                 </div>
                 <div className="text-center p-3 bg-gray-800/30 rounded-xl border border-gray-700/30 hover:border-gray-600/50 transition-all duration-300 group">
                   <div className="text-lg font-black text-blue-400 group-hover:scale-110 transition-transform duration-300">
-                    342%
+                    0%
                   </div>
                   <div className="text-xs text-gray-500">ROI Médio</div>
                 </div>

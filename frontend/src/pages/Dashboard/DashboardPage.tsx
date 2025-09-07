@@ -108,9 +108,9 @@ const DashboardPage = () => {
   };
 
   const quickStats = [
-    { label: 'Visualizações hoje', value: '1,247', icon: Eye, color: 'text-blue-400' },
-    { label: 'Cliques CTR', value: '8.3%', icon: MousePointer, color: 'text-green-400' },
-    { label: 'Score IA', value: '94%', icon: Zap, color: 'text-yellow-400' }
+    { label: 'Visualizações hoje', value: '0', icon: Eye, color: 'text-blue-400' },
+    { label: 'Cliques CTR', value: '0%', icon: MousePointer, color: 'text-green-400' },
+    { label: 'Score IA', value: '0%', icon: Zap, color: 'text-yellow-400' }
   ];
 
   return (
@@ -284,19 +284,19 @@ const DashboardPage = () => {
                         
                         <div className="grid grid-cols-2 gap-4 mb-6">
                           <div className="bg-blue-500/10 rounded-xl p-4 border border-blue-500/20">
-                            <div className="text-2xl font-black text-white">2,847</div>
+                            <div className="text-2xl font-black text-white">0</div>
                             <div className="text-sm text-blue-400">Leads Ativos</div>
                           </div>
                           <div className="bg-emerald-500/10 rounded-xl p-4 border border-emerald-500/20">
-                            <div className="text-2xl font-black text-white">18.4%</div>
+                            <div className="text-2xl font-black text-white">0%</div>
                             <div className="text-sm text-emerald-400">Taxa Conversão</div>
                           </div>
                           <div className="bg-purple-500/10 rounded-xl p-4 border border-purple-500/20">
-                            <div className="text-2xl font-black text-white">R$ 89.2K</div>
+                            <div className="text-2xl font-black text-white">R$ 0</div>
                             <div className="text-sm text-purple-400">Revenue</div>
                           </div>
                           <div className="bg-orange-500/10 rounded-xl p-4 border border-orange-500/20">
-                            <div className="text-2xl font-black text-white">342%</div>
+                            <div className="text-2xl font-black text-white">0%</div>
                             <div className="text-sm text-orange-400">ROI Médio</div>
                           </div>
                         </div>
@@ -331,13 +331,13 @@ const DashboardPage = () => {
                         
                         <div className="flex-1 space-y-4">
                           {[
-                            { day: 'Seg', value: 85, leads: 247 },
-                            { day: 'Ter', value: 92, leads: 289 },
-                            { day: 'Qua', value: 78, leads: 198 },
-                            { day: 'Qui', value: 95, leads: 342 },
-                            { day: 'Sex', value: 88, leads: 267 },
-                            { day: 'Sáb', value: 73, leads: 156 },
-                            { day: 'Dom', value: 69, leads: 134 }
+                            { day: 'Seg', value: 0, leads: 0 },
+                            { day: 'Ter', value: 0, leads: 0 },
+                            { day: 'Qua', value: 0, leads: 0 },
+                            { day: 'Qui', value: 0, leads: 0 },
+                            { day: 'Sex', value: 0, leads: 0 },
+                            { day: 'Sáb', value: 0, leads: 0 },
+                            { day: 'Dom', value: 0, leads: 0 }
                           ].map((data, index) => (
                             <div key={index} className="flex items-center gap-4">
                               <span className="text-sm text-gray-400 w-8">{data.day}</span>
@@ -442,7 +442,7 @@ const DashboardPage = () => {
                 gradient: 'from-emerald-600 via-teal-500 to-emerald-600',
                 bgGradient: 'from-emerald-500/10 via-teal-500/5 to-emerald-500/10',
                 borderGradient: 'from-emerald-400/50 via-teal-400/30 to-emerald-400/50',
-                stats: '94% precisão IA',
+                stats: '0% precisão IA',
                 action: () => window.open('/dashboard/analytics', '_self')
               },
               {
@@ -452,7 +452,7 @@ const DashboardPage = () => {
                 gradient: 'from-violet-600 via-purple-500 to-fuchsia-600',
                 bgGradient: 'from-violet-500/10 via-purple-500/5 to-fuchsia-500/10',
                 borderGradient: 'from-violet-400/50 via-purple-400/30 to-fuchsia-400/50',
-                stats: '342% ROI médio',
+                stats: '0% ROI médio',
                 action: () => window.open('/dashboard/reports', '_self')
               }
             ].map((action, index) => {
