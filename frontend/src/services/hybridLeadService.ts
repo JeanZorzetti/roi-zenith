@@ -63,8 +63,16 @@ class HybridLeadService {
       }
     }
 
-    // Final fallback to mock data (existing behavior)
-    return this.getMockLeads(params);
+    // Return empty state instead of mock data
+    return {
+      leads: [],
+      pagination: {
+        page: params?.page || 1,
+        pages: 1,
+        total: 0,
+        limit: params?.limit || 25
+      }
+    };
   }
 
   // Get single lead
@@ -169,15 +177,15 @@ class HybridLeadService {
       }
     }
 
-    // Return mock stats
+    // Return empty stats
     return {
-      new: 89,
-      contacted: 67,
-      qualified: 45,
-      demo_scheduled: 23,
-      proposal_sent: 18,
-      closed_won: 5,
-      closed_lost: 12
+      new: 0,
+      contacted: 0,
+      qualified: 0,
+      demo_scheduled: 0,
+      proposal_sent: 0,
+      closed_won: 0,
+      closed_lost: 0
     };
   }
 

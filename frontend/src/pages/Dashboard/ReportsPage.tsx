@@ -79,153 +79,44 @@ const ReportsPage = () => {
     { value: 'activity', label: 'Atividade' }
   ];
 
-  const reports: ReportData[] = [
-    {
-      id: 'performance-monthly',
-      title: 'Relatório de Performance Mensal',
-      type: 'performance',
-      description: 'Análise completa das métricas de performance dos últimos 30 dias',
-      dateRange: '01/11/2024 - 30/11/2024',
-      status: 'ready',
-      lastGenerated: '2024-11-30T15:30:00Z',
-      size: '2.4 MB',
-      format: 'PDF',
-      icon: BarChart3,
-      color: 'text-blue-400',
-      bgColor: 'bg-blue-500/20',
-      borderColor: 'border-blue-500/40',
-      data: { value: '12,847', change: '+23.5%', trend: 'up' }
-    },
-    {
-      id: 'conversion-analysis',
-      title: 'Análise de Conversão',
-      type: 'conversion',
-      description: 'Taxa de conversão por canal e campanha com insights IA',
-      dateRange: '01/11/2024 - 30/11/2024',
-      status: 'ready',
-      lastGenerated: '2024-11-30T14:15:00Z',
-      size: '1.8 MB',
-      format: 'Excel',
-      icon: Target,
-      color: 'text-emerald-400',
-      bgColor: 'bg-emerald-500/20',
-      borderColor: 'border-emerald-500/40',
-      data: { value: '18.4%', change: '+5.2%', trend: 'up' }
-    },
-    {
-      id: 'roi-comprehensive',
-      title: 'ROI Abrangente',
-      type: 'roi',
-      description: 'Retorno sobre investimento detalhado por campanha e período',
-      dateRange: '01/10/2024 - 30/11/2024',
-      status: 'generating',
-      lastGenerated: '2024-11-29T18:45:00Z',
-      size: '3.1 MB',
-      format: 'PDF',
-      icon: DollarSign,
-      color: 'text-purple-400',
-      bgColor: 'bg-purple-500/20',
-      borderColor: 'border-purple-500/40',
-      data: { value: '342%', change: '+15.8%', trend: 'up' }
-    },
-    {
-      id: 'pipeline-weekly',
-      title: 'Pipeline Semanal',
-      type: 'pipeline',
-      description: 'Status do pipeline de vendas com previsões IA',
-      dateRange: '25/11/2024 - 30/11/2024',
-      status: 'ready',
-      lastGenerated: '2024-11-30T12:00:00Z',
-      size: '892 KB',
-      format: 'CSV',
-      icon: LineChart,
-      color: 'text-orange-400',
-      bgColor: 'bg-orange-500/20',
-      borderColor: 'border-orange-500/40',
-      data: { value: '89', change: '-2.1%', trend: 'down' }
-    },
-    {
-      id: 'activity-dashboard',
-      title: 'Dashboard de Atividades',
-      type: 'activity',
-      description: 'Relatório de atividades de leads e engajamento',
-      dateRange: '01/11/2024 - 30/11/2024',
-      status: 'scheduled',
-      lastGenerated: '2024-11-29T09:30:00Z',
-      size: '1.2 MB',
-      format: 'Excel',
-      icon: Activity,
-      color: 'text-cyan-400',
-      bgColor: 'bg-cyan-500/20',
-      borderColor: 'border-cyan-500/40',
-      data: { value: '1,247', change: '+8.3%', trend: 'up' }
-    }
-  ];
+  const reports: ReportData[] = [];
 
   const kpiMetrics = [
     {
       title: 'Leads Gerados',
-      value: '12,847',
-      change: '+23.5%',
-      trend: 'up',
+      value: '0',
+      change: '0%',
+      trend: 'neutral',
       icon: Users,
       period: 'últimos 30 dias'
     },
     {
       title: 'Taxa de Conversão',
-      value: '18.4%',
-      change: '+5.2%',
-      trend: 'up',
+      value: '0%',
+      change: '0%',
+      trend: 'neutral',
       icon: Target,
       period: 'média mensal'
     },
     {
       title: 'ROI Médio',
-      value: '342%',
-      change: '+15.8%',
-      trend: 'up',
+      value: '0%',
+      change: '0%',
+      trend: 'neutral',
       icon: DollarSign,
       period: 'todas as campanhas'
     },
     {
       title: 'Tempo Médio de Ciclo',
-      value: '14 dias',
-      change: '-2.3 dias',
-      trend: 'up',
+      value: '0 dias',
+      change: '0 dias',
+      trend: 'neutral',
       icon: Clock,
       period: 'lead → cliente'
     }
   ];
 
-  const insights = [
-    {
-      type: 'success',
-      title: 'Performance Excepcional',
-      message: 'Google Ads superou a meta mensal em 28%. Considere aumentar o budget.',
-      icon: CheckCircle,
-      color: 'text-emerald-400',
-      bgColor: 'bg-emerald-500/10',
-      borderColor: 'border-emerald-500/20'
-    },
-    {
-      type: 'warning',
-      title: 'Atenção Necessária',
-      message: 'Taxa de conversão do LinkedIn Ads caiu 12%. Revisar targeting.',
-      icon: AlertTriangle,
-      color: 'text-yellow-400',
-      bgColor: 'bg-yellow-500/10',
-      borderColor: 'border-yellow-500/20'
-    },
-    {
-      type: 'info',
-      title: 'Oportunidade Identificada',
-      message: 'Leads de e-commerce têm 34% mais chance de conversão às quartas-feiras.',
-      icon: Sparkles,
-      color: 'text-blue-400',
-      bgColor: 'bg-blue-500/10',
-      borderColor: 'border-blue-500/20'
-    }
-  ];
+  const insights: any[] = [];
 
   const generateReport = async (reportId: string) => {
     setIsGenerating(true);

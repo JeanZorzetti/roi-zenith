@@ -48,8 +48,8 @@ const SettingsPage = () => {
     email: user?.email || '',
     company: user?.company || '',
     position: user?.position || '',
-    phone: '+55 11 99999-9999',
-    location: 'São Paulo, SP',
+    phone: '',
+    location: '',
     timezone: 'America/Sao_Paulo',
     avatar: null as File | null
   });
@@ -91,11 +91,11 @@ const SettingsPage = () => {
 
   // Subscription Settings
   const [subscriptionData] = useState({
-    plan: 'Premium',
-    status: 'active',
-    nextBilling: '2024-12-30',
-    amount: 'R$ 297,00',
-    features: ['IA Avançada', 'Relatórios Ilimitados', 'Suporte Premium', 'API Access']
+    plan: 'Free',
+    status: 'inactive',
+    nextBilling: '',
+    amount: 'R$ 0,00',
+    features: []
   });
 
   const tabs = [

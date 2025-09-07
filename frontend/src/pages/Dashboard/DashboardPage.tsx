@@ -42,15 +42,15 @@ const DashboardPage = () => {
     setIsRefreshing(false);
   };
 
-  // Advanced metrics with more sophisticated data
+  // Clean metrics ready for real data
   const metrics = [
     {
       title: 'Total de Leads',
-      value: '2,847',
-      previousValue: '2,542',
-      change: '+12%',
-      changeValue: '+305',
-      trend: 'up',
+      value: '0',
+      previousValue: '0',
+      change: '0%',
+      changeValue: '0',
+      trend: 'neutral',
       icon: Users,
       gradient: 'from-blue-600 via-blue-500 to-cyan-500',
       bgGradient: 'from-blue-500/10 via-blue-600/5 to-cyan-500/10',
@@ -59,11 +59,11 @@ const DashboardPage = () => {
     },
     {
       title: 'Taxa de Conversão',
-      value: '24.8%',
-      previousValue: '21.6%',
-      change: '+3.2%',
-      changeValue: '+3.2pp',
-      trend: 'up',
+      value: '0%',
+      previousValue: '0%',
+      change: '0%',
+      changeValue: '0%',
+      trend: 'neutral',
       icon: Target,
       gradient: 'from-emerald-600 via-emerald-500 to-teal-500',
       bgGradient: 'from-emerald-500/10 via-emerald-600/5 to-teal-500/10',
@@ -72,11 +72,11 @@ const DashboardPage = () => {
     },
     {
       title: 'ROI Médio',
-      value: '342%',
-      previousValue: '290%',
-      change: '+18%',
-      changeValue: '+52pp',
-      trend: 'up',
+      value: '0%',
+      previousValue: '0%',
+      change: '0%',
+      changeValue: '0%',
+      trend: 'neutral',
       icon: DollarSign,
       gradient: 'from-violet-600 via-purple-500 to-fuchsia-500',
       bgGradient: 'from-violet-500/10 via-purple-600/5 to-fuchsia-500/10',
@@ -85,11 +85,11 @@ const DashboardPage = () => {
     },
     {
       title: 'Tempo Médio de Ciclo',
-      value: '14 dias',
-      previousValue: '16 dias',
-      change: '-12.5%',
-      changeValue: '-2 dias',
-      trend: 'up',
+      value: '0 dias',
+      previousValue: '0 dias',
+      change: '0%',
+      changeValue: '0 dias',
+      trend: 'neutral',
       icon: Clock,
       gradient: 'from-orange-600 via-red-500 to-pink-500',
       bgGradient: 'from-orange-500/10 via-red-600/5 to-pink-500/10',
@@ -98,48 +98,7 @@ const DashboardPage = () => {
     }
   ];
 
-  const recentActivities = [
-    { 
-      id: 1, 
-      message: 'Novo lead qualificado: Tech Corp Solutions', 
-      time: '2 min atrás', 
-      status: 'success',
-      icon: Users,
-      value: 'R$ 45.000'
-    },
-    { 
-      id: 2, 
-      message: 'Conversão realizada: StartupX Digital', 
-      time: '15 min atrás', 
-      status: 'success',
-      icon: Target,
-      value: 'R$ 12.500'
-    },
-    { 
-      id: 3, 
-      message: 'Relatório mensal gerado com 98% precisão', 
-      time: '1 hora atrás', 
-      status: 'info',
-      icon: FileText,
-      value: '156 páginas'
-    },
-    { 
-      id: 4, 
-      message: 'Meta de conversão Q4 atingida! 🎉', 
-      time: '2 horas atrás', 
-      status: 'celebration',
-      icon: Award,
-      value: '124%'
-    },
-    { 
-      id: 5, 
-      message: 'IA detectou oportunidade premium', 
-      time: '3 horas atrás', 
-      status: 'ai',
-      icon: Sparkles,
-      value: 'R$ 89.000'
-    }
-  ];
+  const recentActivities: any[] = [];
 
   const getGreeting = () => {
     const hour = new Date().getHours();

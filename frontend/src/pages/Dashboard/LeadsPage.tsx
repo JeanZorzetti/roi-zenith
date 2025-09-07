@@ -67,40 +67,7 @@ const LeadsPage = () => {
     { value: 'consulting', label: 'Consultoria', count: 9 }
   ];
 
-  // Generate comprehensive mock data
-  const generateMockLeads = () => {
-    const names = ['João Silva', 'Maria Santos', 'Pedro Costa', 'Ana Oliveira', 'Carlos Lima', 'Lucia Ferreira', 'Rafael Nascimento', 'Beatriz Almeida', 'Diego Rocha', 'Camila Cardoso', 'Fernando Dias', 'Juliana Ribeiro', 'Gustavo Moreira', 'Patricia Lopes', 'Rodrigo Barbosa', 'Vanessa Cunha', 'Leonardo Freitas', 'Mariana Cavalcanti', 'Thiago Monteiro', 'Larissa Gomes', 'Eduardo Pinto', 'Renata Correia', 'Marcelo Vieira', 'Fernanda Melo', 'Bruno Araújo'];
-    const companies = ['TechCorp', 'InovaSoft', 'DataMax', 'CloudSys', 'AI Solutions', 'NextGen Tech', 'SmartData', 'FutureCode', 'WebFlow Pro', 'DigitalFirst', 'TechHub', 'InnovateLab', 'CodeCraft', 'DataForge', 'CloudNine'];
-    const roles = ['CEO', 'CTO', 'CMO', 'Diretor', 'Gerente', 'Coordenador', 'Analista', 'Especialista'];
-    const sectors = ['saas', 'fintech', 'ecommerce', 'startup', 'consulting'];
-    const statuses = ['new', 'contacted', 'qualified', 'demo_scheduled', 'proposal_sent', 'closed_won', 'closed_lost'];
-    
-    return Array.from({ length: 247 }, (_, i) => ({
-      _id: `lead_${i + 1}`,
-      fullName: names[i % names.length],
-      email: `${names[i % names.length].toLowerCase().replace(' ', '.')}@${companies[i % companies.length].toLowerCase().replace(' ', '')}.com`,
-      company: companies[i % companies.length],
-      role: roles[i % roles.length],
-      companySector: sectors[i % sectors.length],
-      teamSize: ['1-5', '6-15', '16-50', '51+'][i % 4],
-      monthlyLeads: ['<100', '100-500', '500-1000', '1000+'][i % 4],
-      budget: ['<5k', '5k-15k', '15k-30k', '30k+'][i % 4],
-      currentChallenges: [
-        'Precisa melhorar a qualidade dos leads',
-        'Quer automatizar o processo de vendas',
-        'Busca aumentar a conversão de leads',
-        'Deseja otimizar o ROI das campanhas',
-        'Procura integrar sistemas de marketing'
-      ][i % 5],
-      timeline: ['immediate', '30days', '90days', 'planning'][i % 4],
-      gdprConsent: true,
-      marketingConsent: Math.random() > 0.3,
-      status: statuses[i % statuses.length] as any,
-      score: Math.floor(Math.random() * 100),
-      source: ['Google Ads', 'Facebook Ads', 'LinkedIn', 'Website', 'Referral'][i % 5],
-      createdAt: new Date(Date.now() - Math.random() * 90 * 24 * 60 * 60 * 1000).toISOString()
-    }));
-  };
+  // Mock data generation removed - using hybrid service
 
   const applyFilters = (leadsData: Lead[]) => {
     let filtered = [...leadsData];
@@ -144,7 +111,7 @@ const LeadsPage = () => {
     try {
       setIsLoading(true);
       
-      // Use hybrid service to load leads (tries API first, then database, then mock)
+      // Use hybrid service to load leads (handles fallbacks internally)
       const result = await hybridLeadService.getLeads({
         page: currentPage,
         limit: pagination.limit,
@@ -160,33 +127,27 @@ const LeadsPage = () => {
       if (allLeads.length === 0) {
         try {
           const stats = await hybridLeadService.getLeadStats();
-          // Update status counts based on stats
+          // Update status counts based on stats  
           const totalLeads = Object.values(stats).reduce((sum, count) => sum + count, 0);
           if (totalLeads > 0) {
             setAllLeads(result.leads); // Use current leads as reference
+          } else {
+            setAllLeads([]); // No leads available
           }
         } catch (error) {
-          console.warn('Failed to load stats, using mock data');
-          const mockLeads = generateMockLeads();
-          setAllLeads(mockLeads);
+          console.warn('Failed to load stats');
+          setAllLeads([]);
         }
       }
     } catch (error) {
       console.error('Error loading leads:', error);
-      // Fallback to mock data
-      const mockLeads = generateMockLeads();
-      setAllLeads(mockLeads);
-      const filteredLeads = applyFilters(mockLeads);
-      
-      const startIndex = (currentPage - 1) * pagination.limit;
-      const endIndex = startIndex + pagination.limit;
-      const paginatedLeads = filteredLeads.slice(startIndex, endIndex);
-      
-      setLeads(paginatedLeads);
+      // Set empty state
+      setLeads([]);
+      setAllLeads([]);
       setPagination({
-        page: currentPage,
-        pages: Math.ceil(filteredLeads.length / pagination.limit),
-        total: filteredLeads.length,
+        page: 1,
+        pages: 1,
+        total: 0,
         limit: pagination.limit
       });
     } finally {

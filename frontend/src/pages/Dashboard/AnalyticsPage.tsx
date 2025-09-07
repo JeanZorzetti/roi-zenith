@@ -89,41 +89,12 @@ const AnalyticsPage = () => {
   ];
 
   const getMainMetrics = () => {
-    const baseMetrics = {
-      '24h': {
-        leads: { value: 387, change: '+12.3%', trend: 'up' },
-        conversion: { value: 16.2, change: '+2.1%', trend: 'up' },
-        roi: { value: 298, change: '+8.4%', trend: 'up' },
-        clicks: { value: 26834, change: '-1.2%', trend: 'down' }
-      },
-      '7d': {
-        leads: { value: 12847, change: '+23.5%', trend: 'up' },
-        conversion: { value: 18.4, change: '+5.2%', trend: 'up' },
-        roi: { value: 342, change: '+15.8%', trend: 'up' },
-        clicks: { value: 89432, change: '-2.1%', trend: 'down' }
-      },
-      '30d': {
-        leads: { value: 53956, change: '+18.7%', trend: 'up' },
-        conversion: { value: 19.8, change: '+7.3%', trend: 'up' },
-        roi: { value: 389, change: '+22.1%', trend: 'up' },
-        clicks: { value: 375612, change: '+4.8%', trend: 'up' }
-      },
-      '90d': {
-        leads: { value: 160687, change: '+31.2%', trend: 'up' },
-        conversion: { value: 20.6, change: '+9.4%', trend: 'up' },
-        roi: { value: 427, change: '+28.9%', trend: 'up' },
-        clicks: { value: 1127894, change: '+12.3%', trend: 'up' }
-      }
-    };
-
-    const currentData = baseMetrics[timeRange as keyof typeof baseMetrics] || baseMetrics['7d'];
-
     return [
       {
         title: 'Total de Leads',
-        value: currentData.leads.value.toLocaleString(),
-        change: currentData.leads.change,
-        trend: currentData.leads.trend,
+        value: '0',
+        change: '0%',
+        trend: 'neutral',
         icon: Users,
         gradient: 'from-blue-500 to-cyan-500',
         bgGradient: 'from-blue-500/20 to-cyan-500/20',
@@ -131,9 +102,9 @@ const AnalyticsPage = () => {
       },
       {
         title: 'Taxa de Conversão',
-        value: `${currentData.conversion.value}%`,
-        change: currentData.conversion.change,
-        trend: currentData.conversion.trend,
+        value: '0%',
+        change: '0%',
+        trend: 'neutral',
         icon: Target,
         gradient: 'from-emerald-500 to-green-500',
         bgGradient: 'from-emerald-500/20 to-green-500/20',
@@ -141,9 +112,9 @@ const AnalyticsPage = () => {
       },
       {
         title: 'ROI Médio',
-        value: `${currentData.roi.value}%`,
-        change: currentData.roi.change,
-        trend: currentData.roi.trend,
+        value: '0%',
+        change: '0%',
+        trend: 'neutral',
         icon: TrendingUp,
         gradient: 'from-purple-500 to-pink-500',
         bgGradient: 'from-purple-500/20 to-pink-500/20',
@@ -151,9 +122,9 @@ const AnalyticsPage = () => {
       },
       {
         title: 'Cliques',
-        value: currentData.clicks.value.toLocaleString(),
-        change: currentData.clicks.change,
-        trend: currentData.clicks.trend,
+        value: '0',
+        change: '0%',
+        trend: 'neutral',
         icon: MousePointer,
         gradient: 'from-orange-500 to-red-500',
         bgGradient: 'from-orange-500/20 to-red-500/20',
@@ -166,39 +137,33 @@ const AnalyticsPage = () => {
 
   const getChartData = () => {
     const baseData = [
-      { name: 'Seg', leads: 120, conversions: 22, roi: 280 },
-      { name: 'Ter', leads: 185, conversions: 34, roi: 320 },
-      { name: 'Qua', leads: 245, conversions: 45, roi: 380 },
-      { name: 'Qui', leads: 198, conversions: 38, roi: 340 },
-      { name: 'Sex', leads: 289, conversions: 53, roi: 420 },
-      { name: 'Sáb', leads: 156, conversions: 28, roi: 290 },
-      { name: 'Dom', leads: 134, conversions: 25, roi: 310 }
+      { name: 'Seg', leads: 0, conversions: 0, roi: 0 },
+      { name: 'Ter', leads: 0, conversions: 0, roi: 0 },
+      { name: 'Qua', leads: 0, conversions: 0, roi: 0 },
+      { name: 'Qui', leads: 0, conversions: 0, roi: 0 },
+      { name: 'Sex', leads: 0, conversions: 0, roi: 0 },
+      { name: 'Sáb', leads: 0, conversions: 0, roi: 0 },
+      { name: 'Dom', leads: 0, conversions: 0, roi: 0 }
     ];
 
     if (timeRange === '24h') {
       return [
-        { name: '00h', leads: 12, conversions: 2, roi: 280 },
-        { name: '04h', leads: 8, conversions: 1, roi: 320 },
-        { name: '08h', leads: 45, conversions: 8, roi: 380 },
-        { name: '12h', leads: 78, conversions: 15, roi: 340 },
-        { name: '16h', leads: 92, conversions: 18, roi: 420 },
-        { name: '20h', leads: 67, conversions: 12, roi: 290 },
-        { name: '24h', leads: 34, conversions: 6, roi: 310 }
+        { name: '00h', leads: 0, conversions: 0, roi: 0 },
+        { name: '04h', leads: 0, conversions: 0, roi: 0 },
+        { name: '08h', leads: 0, conversions: 0, roi: 0 },
+        { name: '12h', leads: 0, conversions: 0, roi: 0 },
+        { name: '16h', leads: 0, conversions: 0, roi: 0 },
+        { name: '20h', leads: 0, conversions: 0, roi: 0 },
+        { name: '24h', leads: 0, conversions: 0, roi: 0 }
       ];
     }
 
-    return getDataForTimeRange(baseData, timeRange);
+    return baseData;
   };
 
   const chartData = getChartData();
 
-  const topSources = [
-    { name: 'Google Ads', percentage: 34, leads: 4367, color: 'blue' },
-    { name: 'Facebook Ads', percentage: 28, leads: 3597, color: 'indigo' },
-    { name: 'LinkedIn Ads', percentage: 18, leads: 2312, color: 'purple' },
-    { name: 'Organic Search', percentage: 12, leads: 1542, color: 'emerald' },
-    { name: 'Email Marketing', percentage: 8, leads: 1029, color: 'orange' }
-  ];
+  const topSources: any[] = [];
 
   return (
     <div className="p-6 lg:p-8 space-y-8 min-h-screen bg-pure-black text-pure-white">
