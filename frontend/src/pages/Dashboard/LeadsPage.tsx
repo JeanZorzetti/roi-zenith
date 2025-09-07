@@ -29,11 +29,17 @@ import {
 
 const LeadsPage = () => {
   const [leads, setLeads] = useState<Lead[]>([]);
+  const [allLeads, setAllLeads] = useState<Lead[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [selectedSector, setSelectedSector] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedLeads, setSelectedLeads] = useState<string[]>([]);
+  const [showLeadModal, setShowLeadModal] = useState(false);
+  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
   const [pagination, setPagination] = useState({
     page: 1,
     pages: 1,
@@ -61,44 +67,108 @@ const LeadsPage = () => {
     { value: 'consulting', label: 'Consultoria', count: 9 }
   ];
 
+  // Generate comprehensive mock data
+  const generateMockLeads = () => {
+    const names = ['João Silva', 'Maria Santos', 'Pedro Costa', 'Ana Oliveira', 'Carlos Lima', 'Lucia Ferreira', 'Rafael Nascimento', 'Beatriz Almeida', 'Diego Rocha', 'Camila Cardoso', 'Fernando Dias', 'Juliana Ribeiro', 'Gustavo Moreira', 'Patricia Lopes', 'Rodrigo Barbosa', 'Vanessa Cunha', 'Leonardo Freitas', 'Mariana Cavalcanti', 'Thiago Monteiro', 'Larissa Gomes', 'Eduardo Pinto', 'Renata Correia', 'Marcelo Vieira', 'Fernanda Melo', 'Bruno Araújo'];
+    const companies = ['TechCorp', 'InovaSoft', 'DataMax', 'CloudSys', 'AI Solutions', 'NextGen Tech', 'SmartData', 'FutureCode', 'WebFlow Pro', 'DigitalFirst', 'TechHub', 'InnovateLab', 'CodeCraft', 'DataForge', 'CloudNine'];
+    const roles = ['CEO', 'CTO', 'CMO', 'Diretor', 'Gerente', 'Coordenador', 'Analista', 'Especialista'];
+    const sectors = ['saas', 'fintech', 'ecommerce', 'startup', 'consulting'];
+    const statuses = ['new', 'contacted', 'qualified', 'demo_scheduled', 'proposal_sent', 'closed_won', 'closed_lost'];
+    
+    return Array.from({ length: 247 }, (_, i) => ({
+      _id: `lead_${i + 1}`,
+      fullName: names[i % names.length],
+      email: `${names[i % names.length].toLowerCase().replace(' ', '.')}@${companies[i % companies.length].toLowerCase().replace(' ', '')}.com`,
+      company: companies[i % companies.length],
+      role: roles[i % roles.length],
+      companySector: sectors[i % sectors.length],
+      teamSize: ['1-5', '6-15', '16-50', '51+'][i % 4],
+      monthlyLeads: ['<100', '100-500', '500-1000', '1000+'][i % 4],
+      budget: ['<5k', '5k-15k', '15k-30k', '30k+'][i % 4],
+      currentChallenges: [
+        'Precisa melhorar a qualidade dos leads',
+        'Quer automatizar o processo de vendas',
+        'Busca aumentar a conversão de leads',
+        'Deseja otimizar o ROI das campanhas',
+        'Procura integrar sistemas de marketing'
+      ][i % 5],
+      timeline: ['immediate', '30days', '90days', 'planning'][i % 4],
+      gdprConsent: true,
+      marketingConsent: Math.random() > 0.3,
+      status: statuses[i % statuses.length] as any,
+      score: Math.floor(Math.random() * 100),
+      source: ['Google Ads', 'Facebook Ads', 'LinkedIn', 'Website', 'Referral'][i % 5],
+      createdAt: new Date(Date.now() - Math.random() * 90 * 24 * 60 * 60 * 1000).toISOString()
+    }));
+  };
+
+  const applyFilters = (leadsData: Lead[]) => {
+    let filtered = [...leadsData];
+
+    // Apply search filter
+    if (searchTerm) {
+      filtered = filtered.filter(lead =>
+        lead.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        lead.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        lead.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        lead.role.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // Apply status filter
+    if (selectedStatus !== 'all') {
+      filtered = filtered.filter(lead => lead.status === selectedStatus);
+    }
+
+    // Apply sector filter
+    if (selectedSector !== 'all') {
+      filtered = filtered.filter(lead => lead.companySector === selectedSector);
+    }
+
+    return filtered;
+  };
+
+  const updateStatusCounts = (leadsData: Lead[]) => {
+    const counts = leadsData.reduce((acc, lead) => {
+      acc[lead.status] = (acc[lead.status] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    return statusOptions.map(option => ({
+      ...option,
+      count: option.value === 'all' ? leadsData.length : (counts[option.value] || 0)
+    }));
+  };
+
   const loadLeads = async () => {
     try {
       setIsLoading(true);
-      const params = {
-        page: currentPage,
-        limit: 25,
-        ...(selectedStatus !== 'all' && { status: selectedStatus }),
-        ...(selectedSector !== 'all' && { sector: selectedSector })
-      };
       
-      // Mock data for demonstration
-      const mockLeads: Lead[] = Array.from({ length: 25 }, (_, i) => ({
-        _id: `lead_${i + 1}`,
-        fullName: ['João Silva', 'Maria Santos', 'Pedro Costa', 'Ana Oliveira', 'Carlos Lima'][i % 5],
-        email: `lead${i + 1}@company.com`,
-        company: ['TechCorp', 'InovaSoft', 'DataMax', 'CloudSys', 'AI Solutions'][i % 5],
-        role: ['CEO', 'CTO', 'CMO', 'Diretor', 'Gerente'][i % 5],
-        companySector: ['saas', 'fintech', 'ecommerce', 'startup', 'consulting'][i % 5],
-        teamSize: ['1-5', '6-15', '16-50', '51+'][i % 4],
-        monthlyLeads: ['<100', '100-500', '500-1000', '1000+'][i % 4],
-        budget: ['<5k', '5k-15k', '15k-30k', '30k+'][i % 4],
-        currentChallenges: 'Precisa melhorar a qualidade dos leads e aumentar conversão',
-        timeline: ['immediate', '30days', '90days', 'planning'][i % 4],
-        gdprConsent: true,
-        marketingConsent: Math.random() > 0.5,
-        status: ['new', 'contacted', 'qualified', 'demo_scheduled', 'proposal_sent', 'closed_won', 'closed_lost'][i % 7] as any,
-        score: Math.floor(Math.random() * 100),
-        source: ['Google Ads', 'Facebook Ads', 'LinkedIn', 'Website', 'Referral'][i % 5],
-        createdAt: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString()
-      }));
-
-      setLeads(mockLeads);
+      // Generate or use existing mock data
+      if (allLeads.length === 0) {
+        const mockLeads = generateMockLeads();
+        setAllLeads(mockLeads);
+      }
+      
+      const leadsData = allLeads.length > 0 ? allLeads : generateMockLeads();
+      const filteredLeads = applyFilters(leadsData);
+      
+      // Pagination
+      const startIndex = (currentPage - 1) * pagination.limit;
+      const endIndex = startIndex + pagination.limit;
+      const paginatedLeads = filteredLeads.slice(startIndex, endIndex);
+      
+      setLeads(paginatedLeads);
       setPagination({
         page: currentPage,
-        pages: 10,
-        total: 247,
-        limit: 25
+        pages: Math.ceil(filteredLeads.length / pagination.limit),
+        total: filteredLeads.length,
+        limit: pagination.limit
       });
+
+      if (allLeads.length === 0) {
+        setAllLeads(leadsData);
+      }
     } catch (error) {
       console.error('Error loading leads:', error);
     } finally {
@@ -106,9 +176,71 @@ const LeadsPage = () => {
     }
   };
 
+  const handleStatusUpdate = async (leadId: string, newStatus: string) => {
+    const updatedAllLeads = allLeads.map(lead =>
+      lead._id === leadId ? { ...lead, status: newStatus as any } : lead
+    );
+    setAllLeads(updatedAllLeads);
+    loadLeads(); // Refresh current view
+  };
+
+  const handleExport = async (format: string) => {
+    setIsExporting(true);
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    const filteredData = applyFilters(allLeads);
+    const csvData = filteredData.map(lead => ({
+      Name: lead.fullName,
+      Email: lead.email,
+      Company: lead.company,
+      Role: lead.role,
+      Status: lead.status,
+      Score: lead.score,
+      Source: lead.source,
+      'Created At': new Date(lead.createdAt).toLocaleDateString('pt-BR')
+    }));
+
+    const blob = new Blob([JSON.stringify(csvData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `leads-export-${Date.now()}.${format.toLowerCase()}`;
+    a.click();
+    URL.revokeObjectURL(url);
+
+    setIsExporting(false);
+    setShowExportModal(false);
+  };
+
+  const handleLeadSelect = (leadId: string) => {
+    setSelectedLeads(prev =>
+      prev.includes(leadId)
+        ? prev.filter(id => id !== leadId)
+        : [...prev, leadId]
+    );
+  };
+
+  const handleSelectAll = () => {
+    if (selectedLeads.length === leads.length) {
+      setSelectedLeads([]);
+    } else {
+      setSelectedLeads(leads.map(lead => lead._id));
+    }
+  };
+
   useEffect(() => {
     loadLeads();
-  }, [currentPage, selectedStatus, selectedSector]);
+  }, [currentPage, selectedStatus, selectedSector, searchTerm, allLeads]);
+
+  // Initialize data on mount
+  useEffect(() => {
+    if (allLeads.length === 0) {
+      loadLeads();
+    }
+  }, []);
+
+  // Update status counts when data changes
+  const statusOptionsWithCounts = updateStatusCounts(allLeads);
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
@@ -153,7 +285,7 @@ const LeadsPage = () => {
           </h1>
           <p className="text-gray-400 mt-2 flex items-center gap-2">
             <Users className="h-4 w-4" />
-            {pagination.total.toLocaleString()} leads • {statusOptions.find(s => s.value === 'new')?.count} novos hoje
+            {allLeads.length.toLocaleString()} leads • {statusOptionsWithCounts.find(s => s.value === 'new')?.count || 0} novos hoje
           </p>
         </div>
 
@@ -166,7 +298,10 @@ const LeadsPage = () => {
             <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
           </button>
           
-          <button className="p-3 rounded-xl bg-gradient-to-r from-primary-500/20 to-secondary-500/20 border border-primary-500/40 text-primary-300 hover:from-primary-500/30 hover:to-secondary-500/30 transition-all duration-300 hover:scale-105">
+          <button 
+            onClick={() => setShowExportModal(true)}
+            className="p-3 rounded-xl bg-gradient-to-r from-primary-500/20 to-secondary-500/20 border border-primary-500/40 text-primary-300 hover:from-primary-500/30 hover:to-secondary-500/30 transition-all duration-300 hover:scale-105"
+          >
             <Download className="h-4 w-4" />
           </button>
 
@@ -220,7 +355,7 @@ const LeadsPage = () => {
 
       {/* Status Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
-        {statusOptions.filter(status => status.value !== 'all').map((status, index) => (
+        {statusOptionsWithCounts.filter(status => status.value !== 'all').map((status, index) => (
           <button
             key={status.value}
             onClick={() => setSelectedStatus(status.value)}
@@ -247,7 +382,12 @@ const LeadsPage = () => {
             <div className="flex items-center justify-between">
               <h3 className="text-xl font-black text-white flex items-center gap-2">
                 <Filter className="h-5 w-5 text-primary-400" />
-                Leads ({filteredLeads.length})
+                Leads ({pagination.total})
+                {selectedLeads.length > 0 && (
+                  <span className="text-sm font-medium text-primary-400">
+                    • {selectedLeads.length} selecionados
+                  </span>
+                )}
               </h3>
               <div className="flex items-center gap-2 px-3 py-1 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-lg border border-purple-500/40">
                 <Crown className="h-3 w-3 text-purple-400" />
@@ -261,6 +401,14 @@ const LeadsPage = () => {
             <table className="w-full">
               <thead className="bg-gray-800/50">
                 <tr>
+                  <th className="px-6 py-4">
+                    <input
+                      type="checkbox"
+                      checked={selectedLeads.length === leads.length && leads.length > 0}
+                      onChange={handleSelectAll}
+                      className="w-4 h-4 text-primary-600 bg-gray-700 border-gray-600 rounded focus:ring-primary-500 focus:ring-2"
+                    />
+                  </th>
                   <th className="text-left px-6 py-4 text-sm font-bold text-gray-300">Lead</th>
                   <th className="text-left px-6 py-4 text-sm font-bold text-gray-300">Empresa</th>
                   <th className="text-left px-6 py-4 text-sm font-bold text-gray-300">Status</th>
@@ -274,6 +422,9 @@ const LeadsPage = () => {
                 {isLoading ? (
                   Array.from({ length: 5 }).map((_, i) => (
                     <tr key={i} className="animate-pulse">
+                      <td className="px-6 py-4">
+                        <div className="w-4 h-4 bg-gray-700 rounded"></div>
+                      </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 bg-gray-700 rounded-full"></div>
@@ -304,8 +455,16 @@ const LeadsPage = () => {
                     </tr>
                   ))
                 ) : (
-                  filteredLeads.map((lead) => (
+                  leads.map((lead) => (
                     <tr key={lead._id} className="hover:bg-gray-800/30 transition-all duration-200">
+                      <td className="px-6 py-4">
+                        <input
+                          type="checkbox"
+                          checked={selectedLeads.includes(lead._id)}
+                          onChange={() => handleLeadSelect(lead._id)}
+                          className="w-4 h-4 text-primary-600 bg-gray-700 border-gray-600 rounded focus:ring-primary-500 focus:ring-2"
+                        />
+                      </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
@@ -342,15 +501,60 @@ const LeadsPage = () => {
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
-                          <button className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-700/50 transition-all duration-200">
+                          <button 
+                            onClick={() => {
+                              setSelectedLead(lead);
+                              setShowLeadModal(true);
+                            }}
+                            className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-700/50 transition-all duration-200"
+                            title="Ver detalhes"
+                          >
                             <Eye className="h-4 w-4" />
                           </button>
-                          <button className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-700/50 transition-all duration-200">
+                          <button 
+                            onClick={() => {
+                              setSelectedLead(lead);
+                              setShowLeadModal(true);
+                            }}
+                            className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-700/50 transition-all duration-200"
+                            title="Editar"
+                          >
                             <Edit3 className="h-4 w-4" />
                           </button>
-                          <button className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-700/50 transition-all duration-200">
-                            <MoreVertical className="h-4 w-4" />
-                          </button>
+                          <div className="relative group">
+                            <button 
+                              className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-700/50 transition-all duration-200"
+                              title="Mais opções"
+                            >
+                              <MoreVertical className="h-4 w-4" />
+                            </button>
+                            <div className="absolute right-0 mt-1 w-48 bg-gray-800/95 backdrop-blur-xl border border-gray-700/50 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-10">
+                              <div className="p-2 space-y-1">
+                                <button
+                                  onClick={() => handleStatusUpdate(lead._id, 'contacted')}
+                                  className="w-full text-left px-3 py-2 rounded-lg text-sm text-gray-300 hover:text-white hover:bg-gray-700/50 transition-colors"
+                                >
+                                  Marcar como Contatado
+                                </button>
+                                <button
+                                  onClick={() => handleStatusUpdate(lead._id, 'qualified')}
+                                  className="w-full text-left px-3 py-2 rounded-lg text-sm text-gray-300 hover:text-white hover:bg-gray-700/50 transition-colors"
+                                >
+                                  Qualificar Lead
+                                </button>
+                                <button
+                                  onClick={() => handleStatusUpdate(lead._id, 'demo_scheduled')}
+                                  className="w-full text-left px-3 py-2 rounded-lg text-sm text-gray-300 hover:text-white hover:bg-gray-700/50 transition-colors"
+                                >
+                                  Agendar Demo
+                                </button>
+                                <hr className="my-2 border-gray-700/50" />
+                                <button className="w-full text-left px-3 py-2 rounded-lg text-sm text-red-400 hover:text-red-300 hover:bg-red-500/20 transition-colors">
+                                  Excluir Lead
+                                </button>
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       </td>
                     </tr>
@@ -404,6 +608,161 @@ const LeadsPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Lead Detail Modal */}
+      {showLeadModal && selectedLead && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+          <div className="relative bg-gray-900/95 backdrop-blur-xl rounded-3xl border border-gray-700/50 max-w-4xl w-full max-h-[90vh] overflow-auto shadow-2xl">
+            <div className="sticky top-0 bg-gray-900/95 backdrop-blur-xl p-6 border-b border-gray-700/30 z-10">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-2xl flex items-center justify-center text-white font-bold text-xl">
+                    {selectedLead.fullName.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-white">{selectedLead.fullName}</h3>
+                    <p className="text-gray-400">{selectedLead.role} • {selectedLead.company}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowLeadModal(false)}
+                  className="p-2 rounded-xl bg-gray-800/50 text-gray-400 hover:text-white hover:bg-gray-700/50 transition-all"
+                >
+                  <XCircle className="h-6 w-6" />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6 space-y-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                  <h4 className="text-lg font-bold text-white mb-4">Informações de Contato</h4>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3 p-3 bg-gray-800/30 rounded-xl">
+                      <Mail className="h-5 w-5 text-blue-400" />
+                      <span className="text-gray-300">{selectedLead.email}</span>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 bg-gray-800/30 rounded-xl">
+                      <Building className="h-5 w-5 text-green-400" />
+                      <span className="text-gray-300">{selectedLead.company}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-lg font-bold text-white mb-4">Dados do Lead</h4>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="p-3 bg-gray-800/30 rounded-xl">
+                      <div className="text-xs text-gray-400">Setor</div>
+                      <div className="text-white font-medium">{selectedLead.companySector}</div>
+                    </div>
+                    <div className="p-3 bg-gray-800/30 rounded-xl">
+                      <div className="text-xs text-gray-400">Tamanho da Equipe</div>
+                      <div className="text-white font-medium">{selectedLead.teamSize}</div>
+                    </div>
+                    <div className="p-3 bg-gray-800/30 rounded-xl">
+                      <div className="text-xs text-gray-400">Leads/Mês</div>
+                      <div className="text-white font-medium">{selectedLead.monthlyLeads}</div>
+                    </div>
+                    <div className="p-3 bg-gray-800/30 rounded-xl">
+                      <div className="text-xs text-gray-400">Budget</div>
+                      <div className="text-white font-medium">{selectedLead.budget}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h4 className="text-lg font-bold text-white mb-4">Status e Score</h4>
+                <div className="flex items-center gap-4 mb-4">
+                  {getStatusBadge(selectedLead.status)}
+                  <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-lg text-sm font-bold border ${getScoreBadge(selectedLead.score)}`}>
+                    <Sparkles className="h-4 w-4" />
+                    {selectedLead.score} Score IA
+                  </span>
+                </div>
+              </div>
+
+              <div>
+                <h4 className="text-lg font-bold text-white mb-4">Desafios Atuais</h4>
+                <p className="text-gray-300 bg-gray-800/30 rounded-xl p-4">{selectedLead.currentChallenges}</p>
+              </div>
+
+              <div className="flex gap-4 pt-6 border-t border-gray-700/30">
+                <button
+                  onClick={() => handleStatusUpdate(selectedLead._id, 'contacted')}
+                  className="px-6 py-3 rounded-xl bg-blue-500/20 border border-blue-500/40 text-blue-300 hover:bg-blue-500/30 transition-all font-bold"
+                >
+                  Marcar como Contatado
+                </button>
+                <button
+                  onClick={() => handleStatusUpdate(selectedLead._id, 'qualified')}
+                  className="px-6 py-3 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/30 transition-all font-bold"
+                >
+                  Qualificar Lead
+                </button>
+                <button className="px-6 py-3 rounded-xl bg-gray-800/50 text-gray-300 hover:bg-gray-700/50 transition-all font-bold">
+                  Enviar Email
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Export Modal */}
+      {showExportModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+          <div className="relative bg-gray-900/95 backdrop-blur-xl rounded-3xl p-8 border border-gray-700/50 max-w-md w-full mx-4 shadow-2xl">
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <Download className="h-8 w-8 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-2">Exportar Leads</h3>
+              <p className="text-gray-400">
+                Exportando {pagination.total} leads {selectedStatus !== 'all' ? `(${statusOptionsWithCounts.find(s => s.value === selectedStatus)?.label})` : ''}
+              </p>
+            </div>
+
+            <div className="space-y-3 mb-6">
+              {['CSV', 'Excel', 'PDF'].map((format) => (
+                <button
+                  key={format}
+                  onClick={() => handleExport(format)}
+                  disabled={isExporting}
+                  className="w-full p-4 bg-gray-800/50 hover:bg-gray-700/50 border border-gray-700/50 rounded-xl text-left transition-all duration-300 hover:border-primary-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="font-bold text-white">{format}</div>
+                      <div className="text-sm text-gray-400">
+                        {format === 'CSV' ? 'Dados para planilhas' : 
+                         format === 'Excel' ? 'Planilha formatada' : 
+                         'Relatório visual'}
+                      </div>
+                    </div>
+                    {isExporting ? (
+                      <RefreshCw className="h-5 w-5 text-primary-400 animate-spin" />
+                    ) : (
+                      <Download className="h-5 w-5 text-gray-400" />
+                    )}
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowExportModal(false)}
+                disabled={isExporting}
+                className="flex-1 px-4 py-3 bg-gray-800/50 text-gray-300 rounded-xl font-bold hover:bg-gray-700/50 transition-all duration-300 disabled:opacity-50"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
