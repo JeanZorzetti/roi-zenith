@@ -17,7 +17,15 @@ export const connectDB = async (): Promise<void> => {
   try {
     await prisma.$connect();
     console.log('✅ Database connected successfully');
-    console.log('📋 Database: SQLite (development)');
+    
+    // Dynamic DATABASE_URL construction for production
+    if (process.env.NODE_ENV === 'production' && process.env.DB_HOST) {
+      const dbUrl = `mysql://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`;
+      process.env.DATABASE_URL = dbUrl;
+      console.log('📋 Database: MySQL (production)');
+    } else {
+      console.log('📋 Database: MySQL (development)');
+    }
   } catch (error: any) {
     console.error('❌ Database connection error:', error.message);
     process.exit(1);

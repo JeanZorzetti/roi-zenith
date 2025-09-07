@@ -6,8 +6,8 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "mysql"
+  url      = env("DATABASE_URL")
 }
 
 model Lead {
@@ -20,7 +20,7 @@ model Lead {
   teamSize        String   @map("team_size")
   monthlyLeads    String   @map("monthly_leads")
   budget          String
-  currentChallenges String @map("current_challenges")
+  currentChallenges String @map("current_challenges") @db.Text
   timeline        String
   gdprConsent     Boolean  @default(true) @map("gdpr_consent")
   marketingConsent Boolean @default(false) @map("marketing_consent")
@@ -80,7 +80,7 @@ model Analytics {
 model Report {
   id          String   @id @default(cuid())
   title       String
-  description String?
+  description String? @db.Text
   type        String
   data        Json
   generatedBy String   @map("generated_by")
