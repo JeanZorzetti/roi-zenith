@@ -20,11 +20,18 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  define: {
+    global: "globalThis",
+  },
+  optimizeDeps: {
+    include: ['@prisma/client'],
+  },
   build: {
     outDir: "dist",
     assetsDir: "assets",
     sourcemap: false,
     rollupOptions: {
+      external: ['.prisma/client/index-browser'],
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom'],
