@@ -9,7 +9,7 @@ import { errorHandler, notFound } from './middleware/errorMiddleware';
 
 // Route imports
 import authRoutes from './routes/authRoutes';
-// import leadRoutes from './routes/leadRoutes'; // Temporarily disabled
+import leadRoutes from './routes/leadRoutes';
 
 // Load environment variables
 dotenv.config();
@@ -77,7 +77,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use('/api/auth', authRoutes);
-// app.use('/api/leads', leadRoutes); // Temporarily disabled
+app.use('/api/leads', leadRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
