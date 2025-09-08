@@ -62,14 +62,30 @@ class HybridLeadService {
     if (this.shouldTryApi()) {
       try {
         const apiResponse = await apiLeadService.getLeads(params);
-        if (apiResponse.success && apiResponse.data) {
+        if (apiResponse.success) {
           // API is working, reset unavailable flag
           this.apiUnavailable = false;
-          return {
-            leads: apiResponse.data.leads,
-            pagination: apiResponse.data.pagination,
-            analytics: apiResponse.data.analytics
-          };
+          
+          // Handle different API response formats
+          if (apiResponse.data && Array.isArray(apiResponse.data)) {
+            // Direct array format: { success: true, data: [...], pagination: {...} }
+            return {
+              leads: apiResponse.data,
+              pagination: (apiResponse as any).pagination || {
+                page: params?.page || 1,
+                pages: 1,
+                total: apiResponse.data.length,
+                limit: params?.limit || 25
+              }
+            };
+          } else if (apiResponse.data && apiResponse.data.leads) {
+            // Nested format: { success: true, data: { leads: [...], pagination: {...} } }
+            return {
+              leads: apiResponse.data.leads,
+              pagination: apiResponse.data.pagination,
+              analytics: apiResponse.data.analytics
+            };
+          }
         }
       } catch (error) {
         this.handleApiError(error);

@@ -41,6 +41,12 @@ export const prisma = typeof window !== 'undefined'
 
 // Database connection test function
 export async function testDatabaseConnection() {
+  // In browser environment, database is not available
+  if (typeof window !== 'undefined') {
+    console.info('🌐 Browser environment - database fallback disabled, using API only');
+    return false;
+  }
+
   try {
     await prisma.$connect();
     console.log('✅ Database connected successfully');
