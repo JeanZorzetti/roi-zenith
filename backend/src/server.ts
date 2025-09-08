@@ -56,10 +56,10 @@ app.use(cors({
 // Trust proxy (needed for rate limiting behind proxy)
 app.set('trust proxy', 1);
 
-// Rate limiting
+// Rate limiting - very high limits for testing
 const limiter = rateLimit({
-  windowMs: (parseInt(process.env.RATE_LIMIT_WINDOW!) || 15) * 60 * 1000, // 15 minutes
-  max: parseInt(process.env.RATE_LIMIT_MAX!) || 1000, // limit each IP to 1000 requests per windowMs
+  windowMs: 1 * 60 * 1000, // 1 minute 
+  max: 10000, // 10000 requests per minute
   message: {
     error: 'Too many requests from this IP, please try again later.'
   }
