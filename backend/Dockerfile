@@ -34,7 +34,16 @@ RUN npm ci --only=production --ignore-scripts
 FROM base AS runner
 WORKDIR /app
 
+# Build arguments for database connection
+ARG DATABASE_URL
+ARG DB_HOST  
+ARG DB_USER
+ARG DB_PASSWORD
+ARG DB_NAME
+ARG DB_PORT
+
 ENV NODE_ENV=production
+ENV DATABASE_URL=$DATABASE_URL
 
 # Create a non-privileged user that the app will run under.
 RUN addgroup --system --gid 1001 nodejs
