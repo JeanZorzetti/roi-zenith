@@ -70,6 +70,9 @@ const LeadsPage = () => {
   // Mock data generation removed - using hybrid service
 
   const applyFilters = (leadsData: Lead[]) => {
+    if (!leadsData || !Array.isArray(leadsData)) {
+      return [];
+    }
     let filtered = [...leadsData];
 
     // Apply search filter
@@ -96,6 +99,10 @@ const LeadsPage = () => {
   };
 
   const updateStatusCounts = (leadsData: Lead[]) => {
+    if (!leadsData || !Array.isArray(leadsData)) {
+      return statusOptions.map(option => ({ ...option, count: 0 }));
+    }
+    
     const counts = leadsData.reduce((acc, lead) => {
       acc[lead.status] = (acc[lead.status] || 0) + 1;
       return acc;
@@ -195,7 +202,7 @@ const LeadsPage = () => {
     setIsExporting(true);
     await new Promise(resolve => setTimeout(resolve, 2000));
     
-    const filteredData = applyFilters(allLeads);
+    const filteredData = applyFilters(allLeads || []);
     const csvData = filteredData.map(lead => ({
       Name: lead.fullName,
       Email: lead.email,
