@@ -46,8 +46,9 @@ COPY --from=prod-deps --chown=nodejs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=nodejs:nodejs /app/prisma ./prisma
 COPY --chown=nodejs:nodejs package.json ./
 
-# Generate Prisma Client in the final image
+# Generate Prisma Client and run migrations in the final image
 RUN npx prisma generate
+RUN npx prisma migrate deploy
 
 USER nodejs
 
