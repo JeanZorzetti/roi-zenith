@@ -54,10 +54,13 @@ COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
 COPY --from=prod-deps --chown=nodejs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=nodejs:nodejs /app/prisma ./prisma
 COPY --chown=nodejs:nodejs package.json ./
+COPY --chown=nodejs:nodejs start.sh ./
 
-# Generate Prisma Client and push schema to database
+# Generate Prisma Client only (db push will run at runtime)
 RUN npx prisma generate
-RUN npx prisma db push --accept-data-loss
+
+# Make start script executable
+RUN chmod +x start.sh
 
 USER nodejs
 
@@ -67,5 +70,5 @@ EXPOSE 5000
 # Set the PORT environment variable
 ENV PORT=5000
 
-# Run the application.
-CMD ["node", "dist/server.js"]
+# Run the application with database setup
+CMD ["./start.sh"]
