@@ -242,15 +242,14 @@ const LeadsPage = () => {
     }
   };
 
+  // Load leads when filters change
   useEffect(() => {
     loadLeads();
-  }, [currentPage, selectedStatus, selectedSector, searchTerm, allLeads]);
+  }, [currentPage, selectedStatus, selectedSector, searchTerm]);
 
-  // Initialize data on mount
+  // Initialize data on mount only
   useEffect(() => {
-    if (allLeads.length === 0) {
-      loadLeads();
-    }
+    loadLeads();
   }, []);
 
   // Update status counts when data changes
