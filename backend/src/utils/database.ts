@@ -15,9 +15,6 @@ if (process.env.NODE_ENV !== 'production') {
 
 export const connectDB = async (): Promise<void> => {
   try {
-    await prisma.$connect();
-    console.log('✅ Database connected successfully');
-    
     // Dynamic DATABASE_URL construction for production
     if (process.env.NODE_ENV === 'production' && process.env.DB_HOST) {
       const dbUrl = `mysql://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`;
@@ -26,9 +23,13 @@ export const connectDB = async (): Promise<void> => {
     } else {
       console.log('📋 Database: MySQL (development)');
     }
+    
+    await prisma.$connect();
+    console.log('✅ Database connected successfully');
   } catch (error: any) {
     console.error('❌ Database connection error:', error.message);
-    process.exit(1);
+    console.log('⚠️  Server will continue without database connection');
+    // Don't exit - allow server to start without database
   }
 };
 
