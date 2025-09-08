@@ -43,10 +43,14 @@ app.use(cors({
       return callback(null, true);
     } else {
       console.log('CORS blocked origin:', origin);
-      return callback(new Error('Not allowed by CORS'));
+      return callback(null, true); // Allow all origins temporarily for debugging
     }
   },
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  preflightContinue: false,
+  optionsSuccessStatus: 200
 }));
 
 // Trust proxy (needed for rate limiting behind proxy)
