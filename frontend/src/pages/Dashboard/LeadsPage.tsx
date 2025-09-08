@@ -48,23 +48,23 @@ const LeadsPage = () => {
   });
 
   const statusOptions = [
-    { value: 'all', label: 'Todos', count: 247, color: 'gray' },
-    { value: 'new', label: 'Novos', count: 89, color: 'blue' },
-    { value: 'contacted', label: 'Contatados', count: 67, color: 'yellow' },
-    { value: 'qualified', label: 'Qualificados', count: 45, color: 'purple' },
-    { value: 'demo_scheduled', label: 'Demo Agendada', count: 23, color: 'indigo' },
-    { value: 'proposal_sent', label: 'Proposta Enviada', count: 18, color: 'orange' },
-    { value: 'closed_won', label: 'Fechados', count: 5, color: 'emerald' },
-    { value: 'closed_lost', label: 'Perdidos', count: 12, color: 'red' }
+    { value: 'all', label: 'Todos', count: 0, color: 'gray' },
+    { value: 'NEW', label: 'Novos', count: 0, color: 'blue' },
+    { value: 'CONTACTED', label: 'Contatados', count: 0, color: 'yellow' },
+    { value: 'QUALIFIED', label: 'Qualificados', count: 0, color: 'purple' },
+    { value: 'PROPOSAL', label: 'Proposta', count: 0, color: 'indigo' },
+    { value: 'NEGOTIATION', label: 'Negociação', count: 0, color: 'orange' },
+    { value: 'WON', label: 'Fechados', count: 0, color: 'emerald' },
+    { value: 'LOST', label: 'Perdidos', count: 0, color: 'red' }
   ];
 
   const sectorOptions = [
-    { value: 'all', label: 'Todos os Setores', count: 247 },
-    { value: 'saas', label: 'SaaS', count: 98 },
-    { value: 'fintech', label: 'Fintech', count: 67 },
-    { value: 'ecommerce', label: 'E-commerce', count: 45 },
-    { value: 'startup', label: 'Startup', count: 28 },
-    { value: 'consulting', label: 'Consultoria', count: 9 }
+    { value: 'all', label: 'Todos os Setores', count: 0 },
+    { value: 'saas', label: 'SaaS', count: 0 },
+    { value: 'fintech', label: 'Fintech', count: 0 },
+    { value: 'ecommerce', label: 'E-commerce', count: 0 },
+    { value: 'startup', label: 'Startup', count: 0 },
+    { value: 'consulting', label: 'Consultoria', count: 0 }
   ];
 
   // Mock data generation removed - using hybrid service
