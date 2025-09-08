@@ -46,6 +46,9 @@ COPY --from=prod-deps --chown=nodejs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=nodejs:nodejs /app/prisma ./prisma
 COPY --chown=nodejs:nodejs package.json ./
 
+# Generate Prisma Client in the final image
+RUN npx prisma generate
+
 USER nodejs
 
 # Expose the port that the application listens on.
