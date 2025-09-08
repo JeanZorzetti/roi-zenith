@@ -28,40 +28,8 @@ const DashboardLayout = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
-  const [notifications, setNotifications] = useState([
-    {
-      id: 1,
-      title: 'Novo lead qualificado',
-      message: 'João Silva da TechCorp demonstrou alto interesse',
-      time: '2 min atrás',
-      type: 'lead',
-      unread: true
-    },
-    {
-      id: 2,
-      title: 'Meta de conversão atingida',
-      message: 'Campanha Google Ads superou 25% da meta mensal',
-      time: '15 min atrás',
-      type: 'success',
-      unread: true
-    },
-    {
-      id: 3,
-      title: 'Relatório pronto',
-      message: 'Análise de ROI mensal está disponível para download',
-      time: '1h atrás',
-      type: 'report',
-      unread: false
-    },
-    {
-      id: 4,
-      title: 'Alerta de performance',
-      message: 'Taxa de conversão do LinkedIn caiu 12% esta semana',
-      time: '2h atrás',
-      type: 'warning',
-      unread: false
-    }
-  ]);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [notifications, setNotifications] = useState([]);
 
   const handleLogout = () => {
     logout();
@@ -73,12 +41,7 @@ const DashboardLayout = () => {
     { title: 'Analytics', description: 'Análises avançadas com IA', path: '/dashboard/analytics', type: 'page' },
     { title: 'Leads', description: 'Gestão completa de leads', path: '/dashboard/leads', type: 'page' },
     { title: 'Relatórios', description: 'Documentos e insights', path: '/dashboard/reports', type: 'page' },
-    { title: 'Configurações', description: 'Preferências do sistema', path: '/dashboard/settings', type: 'page' },
-    { title: 'João Silva', description: 'Lead qualificado da TechCorp', path: '/dashboard/leads', type: 'lead' },
-    { title: 'Maria Santos', description: 'Lead em negociação - InovaSoft', path: '/dashboard/leads', type: 'lead' },
-    { title: 'Relatório de Performance', description: 'Análise mensal de métricas', path: '/dashboard/reports', type: 'report' },
-    { title: 'Google Ads', description: 'Campanha com ROI de 342%', path: '/dashboard/analytics', type: 'campaign' },
-    { title: 'Meta de Conversão', description: 'Objetivo: 20% - Atual: 18.4%', path: '/dashboard/analytics', type: 'metric' }
+    { title: 'Configurações', description: 'Preferências do sistema', path: '/dashboard/settings', type: 'page' }
   ];
 
   useEffect(() => {
@@ -118,6 +81,9 @@ const DashboardLayout = () => {
       if (showNotifications && !(event.target as Element).closest('.notifications-dropdown')) {
         setShowNotifications(false);
       }
+      if (showProfileMenu && !(event.target as Element).closest('.profile-dropdown')) {
+        setShowProfileMenu(false);
+      }
       if (searchResults.length > 0 && !(event.target as Element).closest('.search-container')) {
         setSearchResults([]);
         setSearchTerm('');
@@ -126,7 +92,7 @@ const DashboardLayout = () => {
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showNotifications, searchResults]);
+  }, [showNotifications, showProfileMenu, searchResults]);
 
   const menuItems = [
     { 
@@ -468,38 +434,46 @@ const DashboardLayout = () => {
                     </div>
                     
                     <div className="max-h-80 overflow-y-auto">
-                      {notifications.map((notification) => (
-                        <button
-                          key={notification.id}
-                          onClick={() => markNotificationAsRead(notification.id)}
-                          className={`w-full text-left p-4 hover:bg-gray-800/30 transition-colors border-b border-gray-700/20 last:border-b-0 ${
-                            notification.unread ? 'bg-gray-800/10' : ''
-                          }`}
-                        >
-                          <div className="flex items-start gap-3">
-                            <div className={`w-3 h-3 rounded-full mt-1 flex-shrink-0 ${
-                              notification.type === 'lead' ? 'bg-green-500' :
-                              notification.type === 'success' ? 'bg-emerald-500' :
-                              notification.type === 'report' ? 'bg-blue-500' :
-                              notification.type === 'warning' ? 'bg-yellow-500' : 'bg-gray-500'
-                            }`}></div>
-                            <div className="flex-1 min-w-0">
-                              <div className={`font-medium ${notification.unread ? 'text-white' : 'text-gray-300'}`}>
-                                {notification.title}
+                      {notifications.length > 0 ? (
+                        notifications.map((notification) => (
+                          <button
+                            key={notification.id}
+                            onClick={() => markNotificationAsRead(notification.id)}
+                            className={`w-full text-left p-4 hover:bg-gray-800/30 transition-colors border-b border-gray-700/20 last:border-b-0 ${
+                              notification.unread ? 'bg-gray-800/10' : ''
+                            }`}
+                          >
+                            <div className="flex items-start gap-3">
+                              <div className={`w-3 h-3 rounded-full mt-1 flex-shrink-0 ${
+                                notification.type === 'lead' ? 'bg-green-500' :
+                                notification.type === 'success' ? 'bg-emerald-500' :
+                                notification.type === 'report' ? 'bg-blue-500' :
+                                notification.type === 'warning' ? 'bg-yellow-500' : 'bg-gray-500'
+                              }`}></div>
+                              <div className="flex-1 min-w-0">
+                                <div className={`font-medium ${notification.unread ? 'text-white' : 'text-gray-300'}`}>
+                                  {notification.title}
+                                </div>
+                                <div className="text-sm text-gray-400 mt-1 line-clamp-2">
+                                  {notification.message}
+                                </div>
+                                <div className="text-xs text-gray-500 mt-2">
+                                  {notification.time}
+                                </div>
                               </div>
-                              <div className="text-sm text-gray-400 mt-1 line-clamp-2">
-                                {notification.message}
-                              </div>
-                              <div className="text-xs text-gray-500 mt-2">
-                                {notification.time}
-                              </div>
+                              {notification.unread && (
+                                <div className="w-2 h-2 bg-primary-500 rounded-full flex-shrink-0 mt-2"></div>
+                              )}
                             </div>
-                            {notification.unread && (
-                              <div className="w-2 h-2 bg-primary-500 rounded-full flex-shrink-0 mt-2"></div>
-                            )}
-                          </div>
-                        </button>
-                      ))}
+                          </button>
+                        ))
+                      ) : (
+                        <div className="p-8 text-center">
+                          <Bell className="h-12 w-12 text-gray-600 mx-auto mb-3" />
+                          <div className="text-gray-400 font-medium">Nenhuma notificação</div>
+                          <div className="text-sm text-gray-500 mt-1">Você está em dia!</div>
+                        </div>
+                      )}
                     </div>
                     
                     <div className="p-4 border-t border-gray-700/30">
@@ -511,9 +485,68 @@ const DashboardLayout = () => {
                 )}
               </div>
 
-              {/* User avatar */}
-              <div className="h-8 w-8 bg-gradient-to-br from-primary-600 to-secondary-600 rounded-full flex items-center justify-center shadow-lg">
-                <User className="h-4 w-4 text-white" />
+              {/* Profile Menu */}
+              <div className="relative profile-dropdown">
+                <button 
+                  onClick={() => setShowProfileMenu(!showProfileMenu)}
+                  className="h-8 w-8 bg-gradient-to-br from-primary-600 to-secondary-600 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110"
+                >
+                  <User className="h-4 w-4 text-white" />
+                </button>
+
+                {/* Profile Dropdown */}
+                {showProfileMenu && (
+                  <div className="absolute right-0 mt-2 w-64 bg-gray-900/95 backdrop-blur-xl border border-gray-700/50 rounded-xl shadow-2xl z-50">
+                    <div className="p-4 border-b border-gray-700/30">
+                      <div className="flex items-center space-x-3">
+                        <div className="h-12 w-12 bg-gradient-to-br from-primary-600 to-secondary-600 rounded-full flex items-center justify-center">
+                          <User className="h-6 w-6 text-white" />
+                        </div>
+                        <div>
+                          <div className="font-bold text-white">{user?.name || 'Usuário'}</div>
+                          <div className="text-sm text-gray-400">{user?.email || 'user@roilabs.com'}</div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="p-2">
+                      <button
+                        onClick={() => {
+                          navigate('/dashboard/settings');
+                          setShowProfileMenu(false);
+                        }}
+                        className="w-full flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:text-white hover:bg-gray-800/50 transition-all duration-200"
+                      >
+                        <Settings className="h-4 w-4" />
+                        <span>Configurações</span>
+                      </button>
+                      
+                      <button
+                        onClick={() => {
+                          navigate('/dashboard');
+                          setShowProfileMenu(false);
+                        }}
+                        className="w-full flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:text-white hover:bg-gray-800/50 transition-all duration-200"
+                      >
+                        <LayoutDashboard className="h-4 w-4" />
+                        <span>Dashboard</span>
+                      </button>
+                      
+                      <div className="border-t border-gray-700/30 my-2"></div>
+                      
+                      <button
+                        onClick={() => {
+                          handleLogout();
+                          setShowProfileMenu(false);
+                        }}
+                        className="w-full flex items-center space-x-3 p-3 rounded-lg text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all duration-200"
+                      >
+                        <LogOut className="h-4 w-4" />
+                        <span>Sair</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
