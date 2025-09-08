@@ -61,6 +61,15 @@ export const register = async (req: Request, res: Response) => {
 
   } catch (error: any) {
     console.error('Register error:', error);
+    
+    // Check if it's a database connection error
+    if (error.message && error.message.includes("Can't reach database server")) {
+      return res.status(503).json({
+        success: false,
+        error: 'Serviço temporariamente indisponível. Sistema em manutenção.'
+      });
+    }
+    
     res.status(500).json({
       success: false,
       error: 'Server error during registration'
@@ -126,6 +135,15 @@ export const login = async (req: Request, res: Response) => {
 
   } catch (error: any) {
     console.error('Login error:', error);
+    
+    // Check if it's a database connection error
+    if (error.message && error.message.includes("Can't reach database server")) {
+      return res.status(503).json({
+        success: false,
+        error: 'Serviço temporariamente indisponível. Sistema em manutenção.'
+      });
+    }
+    
     res.status(500).json({
       success: false,
       error: 'Server error during login'
