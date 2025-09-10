@@ -1,0 +1,193 @@
+{
+  "boards": [
+    {
+      "id": "1757537285487",
+      "title": "Projeto Claude Integration",
+      "description": "Testes de integração entre Claude Code e organizador",
+      "color": {},
+      "isFavorite": false,
+      "createdAt": "2025-09-10T20:48:05.487Z",
+      "columns": [
+        {
+          "id": "todo",
+          "title": "Para Fazer",
+          "color": "bg-gray-500",
+          "tasks": []
+        },
+        {
+          "id": "doing",
+          "title": "Em Andamento",
+          "color": "bg-blue-500",
+          "tasks": []
+        },
+        {
+          "id": "done",
+          "title": "Concluído",
+          "color": "bg-green-500",
+          "tasks": []
+        },
+        {
+          "id": "1757537292666",
+          "title": "Implementar comandos avançados",
+          "color": "bg-gray-500",
+          "tasks": []
+        },
+        {
+          "id": "1757537322132",
+          "title": "Teste final de integração",
+          "color": "bg-gray-500",
+          "tasks": []
+        }
+      ]
+    },
+    {
+      "id": "1757541668972",
+      "title": "ROI Zenith - Trello Tasks",
+      "description": "Organização das tarefas para migrar ao Trello",
+      "color": {},
+      "isFavorite": false,
+      "createdAt": "2025-09-10T22:01:08.972Z",
+      "columns": [
+        {
+          "id": "todo",
+          "title": "Para Fazer",
+          "color": "bg-gray-500",
+          "tasks": []
+        },
+        {
+          "id": "doing",
+          "title": "Em Andamento",
+          "color": "bg-blue-500",
+          "tasks": []
+        },
+        {
+          "id": "done",
+          "title": "Concluído",
+          "color": "bg-green-500",
+          "tasks": []
+        },
+        {
+          "id": "1757541695471",
+          "title": "Frontend",
+          "color": "bg-blue-500",
+          "tasks": []
+        },
+        {
+          "id": "1757541696886",
+          "title": "Backend",
+          "color": "bg-green-500",
+          "tasks": []
+        },
+        {
+          "id": "1757541698405",
+          "title": "Deploy & Infra",
+          "color": "bg-purple-500",
+          "tasks": []
+        },
+        {
+          "id": "1757541699777",
+          "title": "UX/UI",
+          "color": "bg-pink-500",
+          "tasks": []
+        },
+        {
+          "id": "1757541725923",
+          "title": "Implementar autenticação e login",
+          "color": "bg-gray-500",
+          "tasks": []
+        },
+        {
+          "id": "1757541727268",
+          "title": "Otimizar Dashboard de Leads",
+          "color": "bg-gray-500",
+          "tasks": []
+        },
+        {
+          "id": "1757541728585",
+          "title": "Implementar filtros avançados em LeadsPage",
+          "color": "bg-gray-500",
+          "tasks": []
+        },
+        {
+          "id": "1757541729930",
+          "title": "Corrigir responsividade mobile",
+          "color": "bg-gray-500",
+          "tasks": []
+        },
+        {
+          "id": "1757541742754",
+          "title": "Implementar API de autenticação OAuth",
+          "color": "bg-gray-500",
+          "tasks": []
+        },
+        {
+          "id": "1757541744060",
+          "title": "Criar endpoints para gerenciamento de leads",
+          "color": "bg-gray-500",
+          "tasks": []
+        },
+        {
+          "id": "1757541745569",
+          "title": "Implementar rate limiting e segurança",
+          "color": "bg-gray-500",
+          "tasks": []
+        },
+        {
+          "id": "1757541746914",
+          "title": "Configurar banco de dados PostgreSQL",
+          "color": "bg-gray-500",
+          "tasks": []
+        },
+        {
+          "id": "1757541756604",
+          "title": "Configurar Docker e containers",
+          "color": "bg-gray-500",
+          "tasks": []
+        },
+        {
+          "id": "1757541757926",
+          "title": "Deploy em produção Easypanel",
+          "color": "bg-gray-500",
+          "tasks": []
+        },
+        {
+          "id": "1757541759252",
+          "title": "Configurar CI/CD pipeline",
+          "color": "bg-gray-500",
+          "tasks": []
+        },
+        {
+          "id": "1757541760787",
+          "title": "Monitoramento e logs",
+          "color": "bg-gray-500",
+          "tasks": []
+        },
+        {
+          "id": "1757541770315",
+          "title": "Design system e componentes",
+          "color": "bg-gray-500",
+          "tasks": []
+        },
+        {
+          "id": "1757541771722",
+          "title": "Protótipos de novas funcionalidades",
+          "color": "bg-gray-500",
+          "tasks": []
+        },
+        {
+          "id": "1757541773084",
+          "title": "Testes de usabilidade",
+          "color": "bg-gray-500",
+          "tasks": []
+        },
+        {
+          "id": "1757541774473",
+          "title": "Otimização para acessibilidade",
+          "color": "bg-gray-500",
+          "tasks": []
+        }
+      ]
+    }
+  ],
+  "lastUpdated": "2025-09-10T22:02:54.473Z"
+}
