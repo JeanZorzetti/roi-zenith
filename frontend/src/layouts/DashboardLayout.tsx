@@ -17,7 +17,8 @@ import {
   Crown,
   Sparkles,
   Zap,
-  Shield
+  Shield,
+  KanbanSquare
 } from 'lucide-react';
 
 const DashboardLayout = () => {
@@ -40,6 +41,7 @@ const DashboardLayout = () => {
     { title: 'Dashboard', description: 'Visão geral e métricas principais', path: '/dashboard', type: 'page' },
     { title: 'Analytics', description: 'Análises avançadas com IA', path: '/dashboard/analytics', type: 'page' },
     { title: 'Leads', description: 'Gestão completa de leads', path: '/dashboard/leads', type: 'page' },
+    { title: 'Tarefas', description: 'Organizador Kanban de tarefas', path: '/dashboard/tasks', type: 'page' },
     { title: 'Relatórios', description: 'Documentos e insights', path: '/dashboard/reports', type: 'page' },
     { title: 'Configurações', description: 'Preferências do sistema', path: '/dashboard/settings', type: 'page' }
   ];
@@ -118,6 +120,14 @@ const DashboardLayout = () => {
       active: location.pathname.startsWith('/dashboard/leads'),
       description: 'Gestão de leads',
       count: 0
+    },
+    { 
+      icon: KanbanSquare, 
+      label: 'Tarefas', 
+      path: '/dashboard/tasks', 
+      active: location.pathname.startsWith('/dashboard/tasks'),
+      description: 'Organizador Kanban',
+      badge: 'Novo'
     },
     { 
       icon: FileText, 
