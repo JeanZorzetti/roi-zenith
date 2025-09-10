@@ -14,8 +14,16 @@ import {
   X,
   Save,
   AlertCircle,
-  Settings
+  Settings,
+  ListChecks,
+  Minus
 } from 'lucide-react';
+
+interface ChecklistItem {
+  id: string;
+  text: string;
+  completed: boolean;
+}
 
 interface Task {
   id: string;
@@ -27,6 +35,7 @@ interface Task {
   tags: string[];
   completed: boolean;
   createdAt: string;
+  checklist: ChecklistItem[];
 }
 
 interface Column {
@@ -58,7 +67,12 @@ const TasksPage = () => {
             dueDate: '2024-12-15',
             tags: ['vendas', 'proposta'],
             completed: false,
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
+            checklist: [
+              { id: '1-1', text: 'Revisar valores propostos', completed: true },
+              { id: '1-2', text: 'Verificar margem de lucro', completed: false },
+              { id: '1-3', text: 'Ajustar condições de pagamento', completed: false }
+            ]
           },
           {
             id: '2',
@@ -69,7 +83,12 @@ const TasksPage = () => {
             dueDate: '2024-12-20',
             tags: ['técnico', 'integração'],
             completed: false,
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
+            checklist: [
+              { id: '2-1', text: 'Criar endpoint webhook', completed: false },
+              { id: '2-2', text: 'Configurar autenticação', completed: false },
+              { id: '2-3', text: 'Testar integração', completed: false }
+            ]
           }
         ]
       },
@@ -87,7 +106,13 @@ const TasksPage = () => {
             dueDate: '2024-12-18',
             tags: ['relatório', 'análise'],
             completed: false,
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
+            checklist: [
+              { id: '3-1', text: 'Coletar dados de vendas', completed: true },
+              { id: '3-2', text: 'Analisar métricas de conversão', completed: true },
+              { id: '3-3', text: 'Gerar gráficos e visualizações', completed: false },
+              { id: '3-4', text: 'Escrever conclusões', completed: false }
+            ]
           }
         ]
       },
@@ -105,7 +130,8 @@ const TasksPage = () => {
             dueDate: '2024-12-22',
             tags: ['documentação', 'api'],
             completed: false,
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
+            checklist: []
           }
         ]
       },
@@ -134,7 +160,8 @@ const TasksPage = () => {
     priority: 'medium' as Task['priority'],
     assignee: '',
     dueDate: '',
-    tags: ''
+    tags: '',
+    checklist: [] as ChecklistItem[]
   });
 
   // Save to localStorage whenever columns change
@@ -150,7 +177,8 @@ const TasksPage = () => {
       priority: 'medium',
       assignee: '',
       dueDate: '',
-      tags: ''
+      tags: '',
+      checklist: []
     });
     setEditingTask(null);
   };
@@ -164,9 +192,71 @@ const TasksPage = () => {
       priority: task.priority,
       assignee: task.assignee || '',
       dueDate: task.dueDate || '',
-      tags: task.tags.join(', ')
+      tags: task.tags.join(', '),
+      checklist: [...task.checklist]
     });
     setShowTaskModal(true);
+  };
+
+  // Checklist functions
+  const addChecklistItem = () => {
+    const newItem: ChecklistItem = {
+      id: Date.now().toString(),
+      text: '',
+      completed: false
+    };
+    setTaskForm(prev => ({
+      ...prev,
+      checklist: [...prev.checklist, newItem]
+    }));
+  };
+
+  const updateChecklistItem = (itemId: string, text: string) => {
+    setTaskForm(prev => ({
+      ...prev,
+      checklist: prev.checklist.map(item =>
+        item.id === itemId ? { ...item, text } : item
+      )
+    }));
+  };
+
+  const toggleChecklistItem = (itemId: string) => {
+    setTaskForm(prev => ({
+      ...prev,
+      checklist: prev.checklist.map(item =>
+        item.id === itemId ? { ...item, completed: !item.completed } : item
+      )
+    }));
+  };
+
+  const removeChecklistItem = (itemId: string) => {
+    setTaskForm(prev => ({
+      ...prev,
+      checklist: prev.checklist.filter(item => item.id !== itemId)
+    }));
+  };
+
+  // Toggle checklist item directly in task (without opening modal)
+  const toggleTaskChecklistItem = (taskId: string, itemId: string) => {
+    setColumns(prev => {
+      const newColumns = [...prev];
+      newColumns.forEach(col => {
+        const task = col.tasks.find(t => t.id === taskId);
+        if (task) {
+          task.checklist = task.checklist.map(item =>
+            item.id === itemId ? { ...item, completed: !item.completed } : item
+          );
+        }
+      });
+      return newColumns;
+    });
+  };
+
+  // Calculate checklist progress
+  const getChecklistProgress = (checklist: ChecklistItem[]) => {
+    if (checklist.length === 0) return 0;
+    const completed = checklist.filter(item => item.completed).length;
+    return Math.round((completed / checklist.length) * 100);
   };
 
   // Save task (create or update)
@@ -182,7 +272,8 @@ const TasksPage = () => {
       dueDate: taskForm.dueDate || undefined,
       tags: taskForm.tags ? taskForm.tags.split(',').map(tag => tag.trim()).filter(Boolean) : [],
       completed: false,
-      createdAt: editingTask?.createdAt || new Date().toISOString()
+      createdAt: editingTask?.createdAt || new Date().toISOString(),
+      checklist: taskForm.checklist.filter(item => item.text.trim())
     };
 
     setColumns(prev => {
@@ -378,7 +469,7 @@ const TasksPage = () => {
               </div>
               <div className="flex items-center space-x-1">
                 <button 
-                  onClick={() => saveTask(column.id)}
+                  onClick={() => {resetTaskForm(); setShowTaskModal(true);}}
                   className="p-1 rounded-lg text-gray-400 hover:text-green-400 hover:bg-gray-800/50 transition-colors"
                   title="Adicionar tarefa aqui"
                 >
@@ -398,99 +489,149 @@ const TasksPage = () => {
 
             {/* Tasks */}
             <div className="space-y-3 min-h-[200px]">
-              {column.tasks.map((task) => (
-                <div
-                  key={task.id}
-                  draggable
-                  onDragStart={(e) => handleDragStart(e, task.id, column.id)}
-                  className={`bg-gray-900/50 backdrop-blur-sm border border-gray-700/50 rounded-xl p-4 hover:border-gray-600/50 transition-all duration-300 cursor-move hover:shadow-lg hover:shadow-primary-500/10 ${
-                    task.completed ? 'opacity-75' : ''
-                  }`}
-                >
-                  {/* Task Header */}
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex items-center space-x-2">
-                      <button 
-                        onClick={() => toggleTaskCompletion(task.id)}
-                        className="hover:scale-110 transition-transform"
-                      >
-                        {task.completed ? (
-                          <CheckCircle2 className="h-4 w-4 text-green-400 flex-shrink-0" />
-                        ) : (
-                          <Circle className="h-4 w-4 text-gray-400 flex-shrink-0 hover:text-green-400" />
-                        )}
-                      </button>
+              {column.tasks.map((task) => {
+                const checklistProgress = getChecklistProgress(task.checklist);
+                const hasChecklist = task.checklist.length > 0;
+                
+                return (
+                  <div
+                    key={task.id}
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, task.id, column.id)}
+                    className={`bg-gray-900/50 backdrop-blur-sm border border-gray-700/50 rounded-xl p-4 hover:border-gray-600/50 transition-all duration-300 cursor-move hover:shadow-lg hover:shadow-primary-500/10 ${
+                      task.completed ? 'opacity-75' : ''
+                    }`}
+                  >
+                    {/* Task Header */}
+                    <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center space-x-2">
-                        {getPriorityIcon(task.priority)}
+                        <button 
+                          onClick={() => toggleTaskCompletion(task.id)}
+                          className="hover:scale-110 transition-transform"
+                        >
+                          {task.completed ? (
+                            <CheckCircle2 className="h-4 w-4 text-green-400 flex-shrink-0" />
+                          ) : (
+                            <Circle className="h-4 w-4 text-gray-400 flex-shrink-0 hover:text-green-400" />
+                          )}
+                        </button>
+                        <div className="flex items-center space-x-2">
+                          {getPriorityIcon(task.priority)}
+                          {hasChecklist && (
+                            <ListChecks className="h-3 w-3 text-blue-400" />
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <button 
+                          onClick={() => openEditTask(task)}
+                          className="p-1 rounded text-gray-400 hover:text-blue-400 transition-colors"
+                        >
+                          <Edit3 className="h-3 w-3" />
+                        </button>
+                        <button 
+                          onClick={() => deleteTask(task.id)}
+                          className="p-1 rounded text-gray-400 hover:text-red-400 transition-colors"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </button>
                       </div>
                     </div>
-                    <div className="flex items-center space-x-1">
-                      <button 
-                        onClick={() => openEditTask(task)}
-                        className="p-1 rounded text-gray-400 hover:text-blue-400 transition-colors"
-                      >
-                        <Edit3 className="h-3 w-3" />
-                      </button>
-                      <button 
-                        onClick={() => deleteTask(task.id)}
-                        className="p-1 rounded text-gray-400 hover:text-red-400 transition-colors"
-                      >
-                        <Trash2 className="h-3 w-3" />
-                      </button>
-                    </div>
-                  </div>
 
-                  {/* Task Content */}
-                  <div className="mb-3">
-                    <h4 className={`font-medium mb-1 ${task.completed ? 'line-through text-gray-500' : 'text-white'}`}>
-                      {task.title}
-                    </h4>
-                    {task.description && (
-                      <p className="text-sm text-gray-400 line-clamp-2">{task.description}</p>
+                    {/* Task Content */}
+                    <div className="mb-3">
+                      <h4 className={`font-medium mb-1 ${task.completed ? 'line-through text-gray-500' : 'text-white'}`}>
+                        {task.title}
+                      </h4>
+                      {task.description && (
+                        <p className="text-sm text-gray-400 line-clamp-2">{task.description}</p>
+                      )}
+                    </div>
+
+                    {/* Checklist Progress */}
+                    {hasChecklist && (
+                      <div className="mb-3">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-xs text-gray-400">
+                            Checklist ({task.checklist.filter(item => item.completed).length}/{task.checklist.length})
+                          </span>
+                          <span className="text-xs text-gray-400">{checklistProgress}%</span>
+                        </div>
+                        <div className="w-full bg-gray-700 rounded-full h-2">
+                          <div 
+                            className="bg-gradient-to-r from-primary-500 to-secondary-500 h-2 rounded-full transition-all duration-300" 
+                            style={{ width: `${checklistProgress}%` }}
+                          ></div>
+                        </div>
+                        
+                        {/* Mini Checklist Preview */}
+                        <div className="mt-2 space-y-1 max-h-20 overflow-y-auto">
+                          {task.checklist.slice(0, 3).map((item) => (
+                            <div key={item.id} className="flex items-center space-x-2">
+                              <button
+                                onClick={() => toggleTaskChecklistItem(task.id, item.id)}
+                                className="hover:scale-110 transition-transform"
+                              >
+                                {item.completed ? (
+                                  <CheckCircle2 className="h-3 w-3 text-green-400 flex-shrink-0" />
+                                ) : (
+                                  <Circle className="h-3 w-3 text-gray-400 flex-shrink-0 hover:text-green-400" />
+                                )}
+                              </button>
+                              <span className={`text-xs ${item.completed ? 'line-through text-gray-500' : 'text-gray-300'} truncate`}>
+                                {item.text}
+                              </span>
+                            </div>
+                          ))}
+                          {task.checklist.length > 3 && (
+                            <div className="text-xs text-gray-500 pl-5">
+                              +{task.checklist.length - 3} mais itens...
+                            </div>
+                          )}
+                        </div>
+                      </div>
                     )}
-                  </div>
 
-                  {/* Tags */}
-                  {task.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mb-3">
-                      {task.tags.map((tag, index) => (
-                        <span
-                          key={index}
-                          className="px-2 py-1 bg-primary-500/20 text-primary-300 text-xs rounded-lg border border-primary-500/30"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  )}
+                    {/* Tags */}
+                    {task.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mb-3">
+                        {task.tags.map((tag, index) => (
+                          <span
+                            key={index}
+                            className="px-2 py-1 bg-primary-500/20 text-primary-300 text-xs rounded-lg border border-primary-500/30"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
 
-                  {/* Task Footer */}
-                  <div className="flex items-center justify-between text-xs text-gray-400">
-                    <div className="flex items-center space-x-3">
-                      {task.assignee && (
-                        <div className="flex items-center space-x-1">
-                          <User className="h-3 w-3" />
-                          <span>{task.assignee}</span>
-                        </div>
-                      )}
-                      {task.dueDate && (
-                        <div className="flex items-center space-x-1">
-                          <Calendar className="h-3 w-3" />
-                          <span>{new Date(task.dueDate).toLocaleDateString('pt-BR')}</span>
-                        </div>
-                      )}
+                    {/* Task Footer */}
+                    <div className="flex items-center justify-between text-xs text-gray-400">
+                      <div className="flex items-center space-x-3">
+                        {task.assignee && (
+                          <div className="flex items-center space-x-1">
+                            <User className="h-3 w-3" />
+                            <span>{task.assignee}</span>
+                          </div>
+                        )}
+                        {task.dueDate && (
+                          <div className="flex items-center space-x-1">
+                            <Calendar className="h-3 w-3" />
+                            <span>{new Date(task.dueDate).toLocaleDateString('pt-BR')}</span>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
 
               {/* Add Task Button */}
               <button 
                 onClick={() => {
                   resetTaskForm();
                   setShowTaskModal(true);
-                  // Pre-select this column when modal opens
-                  setTimeout(() => saveTask(column.id), 0);
                 }}
                 className="w-full p-3 border-2 border-dashed border-gray-700/50 rounded-xl text-gray-400 hover:text-white hover:border-gray-600/50 transition-all duration-300 flex items-center justify-center space-x-2"
               >
@@ -505,7 +646,7 @@ const TasksPage = () => {
       {/* Task Modal */}
       {showTaskModal && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-gray-900 rounded-2xl border border-gray-700 p-6 w-full max-w-md">
+          <div className="bg-gray-900 rounded-2xl border border-gray-700 p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-bold text-white">
                 {editingTask ? 'Editar Tarefa' : 'Nova Tarefa'}
@@ -603,6 +744,60 @@ const TasksPage = () => {
                   className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-primary-500"
                   placeholder="vendas, urgent, cliente (separadas por vírgula)"
                 />
+              </div>
+
+              {/* Checklist */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-sm font-medium text-gray-300">
+                    Checklist ({taskForm.checklist.filter(item => item.completed).length}/{taskForm.checklist.length})
+                  </label>
+                  <button
+                    onClick={addChecklistItem}
+                    className="flex items-center space-x-1 text-xs text-primary-400 hover:text-primary-300 transition-colors"
+                  >
+                    <Plus className="h-3 w-3" />
+                    <span>Adicionar item</span>
+                  </button>
+                </div>
+                
+                <div className="space-y-2 max-h-48 overflow-y-auto">
+                  {taskForm.checklist.map((item, index) => (
+                    <div key={item.id} className="flex items-center space-x-2 group">
+                      <button
+                        onClick={() => toggleChecklistItem(item.id)}
+                        className="hover:scale-110 transition-transform"
+                      >
+                        {item.completed ? (
+                          <CheckCircle2 className="h-4 w-4 text-green-400 flex-shrink-0" />
+                        ) : (
+                          <Circle className="h-4 w-4 text-gray-400 flex-shrink-0 hover:text-green-400" />
+                        )}
+                      </button>
+                      <input
+                        type="text"
+                        value={item.text}
+                        onChange={(e) => updateChecklistItem(item.id, e.target.value)}
+                        className={`flex-1 px-2 py-1 bg-gray-800 border border-gray-700 rounded text-white text-sm focus:outline-none focus:border-primary-500 ${
+                          item.completed ? 'line-through text-gray-500' : ''
+                        }`}
+                        placeholder={`Item ${index + 1}`}
+                      />
+                      <button
+                        onClick={() => removeChecklistItem(item.id)}
+                        className="opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-red-400 transition-all"
+                      >
+                        <Minus className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ))}
+                  
+                  {taskForm.checklist.length === 0 && (
+                    <div className="text-center py-4 text-gray-500 text-sm">
+                      Nenhum item no checklist. Clique em "Adicionar item" para começar.
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -740,13 +935,13 @@ const TasksPage = () => {
         <div className="bg-gray-900/30 rounded-xl p-4 border border-gray-700/30">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-purple-500/20 rounded-xl flex items-center justify-center">
-              <ArrowRight className="h-5 w-5 text-purple-400" />
+              <ListChecks className="h-5 w-5 text-purple-400" />
             </div>
             <div>
               <div className="text-lg font-bold text-white">
-                {Math.round((columns.reduce((acc, col) => acc + col.tasks.filter(t => t.completed).length, 0) / Math.max(1, columns.reduce((acc, col) => acc + col.tasks.length, 0))) * 100) || 0}%
+                {columns.reduce((acc, col) => acc + col.tasks.reduce((taskAcc, task) => taskAcc + task.checklist.length, 0), 0)}
               </div>
-              <div className="text-sm text-gray-400">Progresso Geral</div>
+              <div className="text-sm text-gray-400">Itens Checklist</div>
             </div>
           </div>
         </div>
