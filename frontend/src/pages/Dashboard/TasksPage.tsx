@@ -50,7 +50,15 @@ const TasksPage = () => {
   const loadInitialData = (): Column[] => {
     const saved = localStorage.getItem('kanban-data');
     if (saved) {
-      return JSON.parse(saved);
+      const data = JSON.parse(saved);
+      // Ensure backward compatibility: add checklist property to existing tasks
+      return data.map((column: Column) => ({
+        ...column,
+        tasks: column.tasks.map((task: Task) => ({
+          ...task,
+          checklist: task.checklist || []
+        }))
+      }));
     }
     return [
       {
@@ -193,7 +201,7 @@ const TasksPage = () => {
       assignee: task.assignee || '',
       dueDate: task.dueDate || '',
       tags: task.tags.join(', '),
-      checklist: [...task.checklist]
+      checklist: [...(task.checklist || [])]
     });
     setShowTaskModal(true);
   };
@@ -242,7 +250,7 @@ const TasksPage = () => {
       const newColumns = [...prev];
       newColumns.forEach(col => {
         const task = col.tasks.find(t => t.id === taskId);
-        if (task) {
+        if (task && task.checklist) {
           task.checklist = task.checklist.map(item =>
             item.id === itemId ? { ...item, completed: !item.completed } : item
           );
@@ -254,7 +262,7 @@ const TasksPage = () => {
 
   // Calculate checklist progress
   const getChecklistProgress = (checklist: ChecklistItem[]) => {
-    if (checklist.length === 0) return 0;
+    if (!checklist || checklist.length === 0) return 0;
     const completed = checklist.filter(item => item.completed).length;
     return Math.round((completed / checklist.length) * 100);
   };
@@ -490,8 +498,10 @@ const TasksPage = () => {
             {/* Tasks */}
             <div className="space-y-3 min-h-[200px]">
               {column.tasks.map((task) => {
-                const checklistProgress = getChecklistProgress(task.checklist);
-                const hasChecklist = task.checklist.length > 0;
+                // Ensure checklist exists for backward compatibility
+                const checklist = task.checklist || [];
+                const checklistProgress = getChecklistProgress(checklist);
+                const hasChecklist = checklist.length > 0;
                 
                 return (
                   <div
@@ -553,7 +563,7 @@ const TasksPage = () => {
                       <div className="mb-3">
                         <div className="flex items-center justify-between mb-2">
                           <span className="text-xs text-gray-400">
-                            Checklist ({task.checklist.filter(item => item.completed).length}/{task.checklist.length})
+                            Checklist ({checklist.filter(item => item.completed).length}/{checklist.length})
                           </span>
                           <span className="text-xs text-gray-400">{checklistProgress}%</span>
                         </div>
@@ -566,7 +576,7 @@ const TasksPage = () => {
                         
                         {/* Mini Checklist Preview */}
                         <div className="mt-2 space-y-1 max-h-20 overflow-y-auto">
-                          {task.checklist.slice(0, 3).map((item) => (
+                          {checklist.slice(0, 3).map((item) => (
                             <div key={item.id} className="flex items-center space-x-2">
                               <button
                                 onClick={() => toggleTaskChecklistItem(task.id, item.id)}
@@ -583,9 +593,9 @@ const TasksPage = () => {
                               </span>
                             </div>
                           ))}
-                          {task.checklist.length > 3 && (
+                          {checklist.length > 3 && (
                             <div className="text-xs text-gray-500 pl-5">
-                              +{task.checklist.length - 3} mais itens...
+                              +{checklist.length - 3} mais itens...
                             </div>
                           )}
                         </div>
@@ -939,7 +949,7 @@ const TasksPage = () => {
             </div>
             <div>
               <div className="text-lg font-bold text-white">
-                {columns.reduce((acc, col) => acc + col.tasks.reduce((taskAcc, task) => taskAcc + task.checklist.length, 0), 0)}
+                {columns.reduce((acc, col) => acc + col.tasks.reduce((taskAcc, task) => taskAcc + (task.checklist?.length || 0), 0), 0)}
               </div>
               <div className="text-sm text-gray-400">Itens Checklist</div>
             </div>
