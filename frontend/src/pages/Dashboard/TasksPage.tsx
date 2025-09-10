@@ -16,7 +16,11 @@ import {
   AlertCircle,
   Settings,
   ListChecks,
-  Minus
+  Minus,
+  ChevronDown,
+  Grid3X3,
+  Copy,
+  Star
 } from 'lucide-react';
 
 interface ChecklistItem {
@@ -45,114 +49,184 @@ interface Column {
   tasks: Task[];
 }
 
+interface Board {
+  id: string;
+  title: string;
+  description?: string;
+  color: string;
+  isFavorite: boolean;
+  createdAt: string;
+  columns: Column[];
+}
+
 const TasksPage = () => {
   // Load initial data from localStorage or use default
-  const loadInitialData = (): Column[] => {
-    const saved = localStorage.getItem('kanban-data');
+  const loadInitialData = (): Board[] => {
+    const saved = localStorage.getItem('kanban-boards');
     if (saved) {
       const data = JSON.parse(saved);
-      // Ensure backward compatibility: add checklist property to existing tasks
-      return data.map((column: Column) => ({
-        ...column,
-        tasks: column.tasks.map((task: Task) => ({
-          ...task,
-          checklist: task.checklist || []
-        }))
+      return data.map((board: Board) => ({
+        ...board,
+        columns: board.columns?.map((column: Column) => ({
+          ...column,
+          tasks: column.tasks?.map((task: Task) => ({
+            ...task,
+            checklist: task.checklist || []
+          })) || []
+        })) || []
       }));
     }
+    
+    // Default boards
     return [
       {
-        id: 'todo',
-        title: 'Para Fazer',
-        color: 'bg-gray-500',
-        tasks: [
+        id: 'main-board',
+        title: 'Quadro Principal',
+        description: 'Quadro principal para organização geral de tarefas',
+        color: 'bg-blue-500',
+        isFavorite: true,
+        createdAt: new Date().toISOString(),
+        columns: [
           {
-            id: '1',
-            title: 'Revisar proposta comercial',
-            description: 'Analisar proposta da TechCorp e ajustar valores',
-            priority: 'high',
-            assignee: 'João Silva',
-            dueDate: '2024-12-15',
-            tags: ['vendas', 'proposta'],
-            completed: false,
-            createdAt: new Date().toISOString(),
-            checklist: [
-              { id: '1-1', text: 'Revisar valores propostos', completed: true },
-              { id: '1-2', text: 'Verificar margem de lucro', completed: false },
-              { id: '1-3', text: 'Ajustar condições de pagamento', completed: false }
+            id: 'todo',
+            title: 'Para Fazer',
+            color: 'bg-gray-500',
+            tasks: [
+              {
+                id: '1',
+                title: 'Revisar proposta comercial',
+                description: 'Analisar proposta da TechCorp e ajustar valores',
+                priority: 'high',
+                assignee: 'João Silva',
+                dueDate: '2024-12-15',
+                tags: ['vendas', 'proposta'],
+                completed: false,
+                createdAt: new Date().toISOString(),
+                checklist: [
+                  { id: '1-1', text: 'Revisar valores propostos', completed: true },
+                  { id: '1-2', text: 'Verificar margem de lucro', completed: false },
+                  { id: '1-3', text: 'Ajustar condições de pagamento', completed: false }
+                ]
+              },
+              {
+                id: '2',
+                title: 'Configurar integração webhook',
+                description: 'Implementar webhook para sincronizar leads',
+                priority: 'medium',
+                assignee: 'Maria Santos',
+                dueDate: '2024-12-20',
+                tags: ['técnico', 'integração'],
+                completed: false,
+                createdAt: new Date().toISOString(),
+                checklist: [
+                  { id: '2-1', text: 'Criar endpoint webhook', completed: false },
+                  { id: '2-2', text: 'Configurar autenticação', completed: false },
+                  { id: '2-3', text: 'Testar integração', completed: false }
+                ]
+              }
             ]
           },
           {
-            id: '2',
-            title: 'Configurar integração webhook',
-            description: 'Implementar webhook para sincronizar leads',
-            priority: 'medium',
-            assignee: 'Maria Santos',
-            dueDate: '2024-12-20',
-            tags: ['técnico', 'integração'],
-            completed: false,
-            createdAt: new Date().toISOString(),
-            checklist: [
-              { id: '2-1', text: 'Criar endpoint webhook', completed: false },
-              { id: '2-2', text: 'Configurar autenticação', completed: false },
-              { id: '2-3', text: 'Testar integração', completed: false }
+            id: 'doing',
+            title: 'Em Andamento',
+            color: 'bg-blue-500',
+            tasks: [
+              {
+                id: '3',
+                title: 'Análise de performance Q4',
+                description: 'Relatório completo de métricas do último trimestre',
+                priority: 'high',
+                assignee: 'Ana Costa',
+                dueDate: '2024-12-18',
+                tags: ['relatório', 'análise'],
+                completed: false,
+                createdAt: new Date().toISOString(),
+                checklist: [
+                  { id: '3-1', text: 'Coletar dados de vendas', completed: true },
+                  { id: '3-2', text: 'Analisar métricas de conversão', completed: true },
+                  { id: '3-3', text: 'Gerar gráficos e visualizações', completed: false },
+                  { id: '3-4', text: 'Escrever conclusões', completed: false }
+                ]
+              }
             ]
-          }
-        ]
-      },
-      {
-        id: 'doing',
-        title: 'Em Andamento',
-        color: 'bg-blue-500',
-        tasks: [
+          },
           {
-            id: '3',
-            title: 'Análise de performance Q4',
-            description: 'Relatório completo de métricas do último trimestre',
-            priority: 'high',
-            assignee: 'Ana Costa',
-            dueDate: '2024-12-18',
-            tags: ['relatório', 'análise'],
-            completed: false,
-            createdAt: new Date().toISOString(),
-            checklist: [
-              { id: '3-1', text: 'Coletar dados de vendas', completed: true },
-              { id: '3-2', text: 'Analisar métricas de conversão', completed: true },
-              { id: '3-3', text: 'Gerar gráficos e visualizações', completed: false },
-              { id: '3-4', text: 'Escrever conclusões', completed: false }
+            id: 'review',
+            title: 'Em Revisão',
+            color: 'bg-yellow-500',
+            tasks: [
+              {
+                id: '4',
+                title: 'Documentação API v2',
+                description: 'Documentar novos endpoints da API',
+                priority: 'medium',
+                assignee: 'Pedro Lima',
+                dueDate: '2024-12-22',
+                tags: ['documentação', 'api'],
+                completed: false,
+                createdAt: new Date().toISOString(),
+                checklist: []
+              }
             ]
-          }
-        ]
-      },
-      {
-        id: 'review',
-        title: 'Em Revisão',
-        color: 'bg-yellow-500',
-        tasks: [
+          },
           {
-            id: '4',
-            title: 'Documentação API v2',
-            description: 'Documentar novos endpoints da API',
-            priority: 'medium',
-            assignee: 'Pedro Lima',
-            dueDate: '2024-12-22',
-            tags: ['documentação', 'api'],
-            completed: false,
-            createdAt: new Date().toISOString(),
-            checklist: []
+            id: 'done',
+            title: 'Concluído',
+            color: 'bg-green-500',
+            tasks: []
           }
         ]
       },
       {
-        id: 'done',
-        title: 'Concluído',
-        color: 'bg-green-500',
-        tasks: []
+        id: 'marketing-board',
+        title: 'Marketing',
+        description: 'Campanhas e estratégias de marketing',
+        color: 'bg-purple-500',
+        isFavorite: false,
+        createdAt: new Date().toISOString(),
+        columns: [
+          {
+            id: 'ideas',
+            title: 'Ideias',
+            color: 'bg-yellow-500',
+            tasks: []
+          },
+          {
+            id: 'planning',
+            title: 'Planejamento',
+            color: 'bg-orange-500',
+            tasks: []
+          },
+          {
+            id: 'execution',
+            title: 'Execução',
+            color: 'bg-blue-500',
+            tasks: []
+          },
+          {
+            id: 'analysis',
+            title: 'Análise',
+            color: 'bg-green-500',
+            tasks: []
+          }
+        ]
       }
     ];
   };
 
-  const [columns, setColumns] = useState<Column[]>(loadInitialData);
+  const [boards, setBoards] = useState<Board[]>(loadInitialData);
+  const [currentBoardId, setCurrentBoardId] = useState<string>(loadInitialData()[0]?.id || 'main-board');
+  const [showBoardSelector, setShowBoardSelector] = useState(false);
+  const [showBoardModal, setShowBoardModal] = useState(false);
+  const [editingBoard, setEditingBoard] = useState<Board | null>(null);
+  
+  // Board form state
+  const [boardForm, setBoardForm] = useState({
+    title: '',
+    description: '',
+    color: 'bg-blue-500'
+  });
+
   const [draggedTask, setDraggedTask] = useState<string | null>(null);
   const [draggedFrom, setDraggedFrom] = useState<string | null>(null);
   const [showTaskModal, setShowTaskModal] = useState(false);
@@ -172,10 +246,109 @@ const TasksPage = () => {
     checklist: [] as ChecklistItem[]
   });
 
-  // Save to localStorage whenever columns change
+  // Get current board
+  const currentBoard = boards.find(board => board.id === currentBoardId) || boards[0];
+  const columns = currentBoard?.columns || [];
+
+  // Save to localStorage whenever boards change
   useEffect(() => {
-    localStorage.setItem('kanban-data', JSON.stringify(columns));
-  }, [columns]);
+    localStorage.setItem('kanban-boards', JSON.stringify(boards));
+  }, [boards]);
+
+  // Board management functions
+  const resetBoardForm = () => {
+    setBoardForm({
+      title: '',
+      description: '',
+      color: 'bg-blue-500'
+    });
+    setEditingBoard(null);
+  };
+
+  const openEditBoard = (board: Board) => {
+    setEditingBoard(board);
+    setBoardForm({
+      title: board.title,
+      description: board.description || '',
+      color: board.color
+    });
+    setShowBoardModal(true);
+  };
+
+  const saveBoard = () => {
+    if (!boardForm.title.trim()) return;
+
+    const newBoard: Board = {
+      id: editingBoard?.id || Date.now().toString(),
+      title: boardForm.title.trim(),
+      description: boardForm.description.trim() || undefined,
+      color: boardForm.color,
+      isFavorite: editingBoard?.isFavorite || false,
+      createdAt: editingBoard?.createdAt || new Date().toISOString(),
+      columns: editingBoard?.columns || [
+        { id: 'todo', title: 'Para Fazer', color: 'bg-gray-500', tasks: [] },
+        { id: 'doing', title: 'Em Andamento', color: 'bg-blue-500', tasks: [] },
+        { id: 'done', title: 'Concluído', color: 'bg-green-500', tasks: [] }
+      ]
+    };
+
+    setBoards(prev => {
+      if (editingBoard) {
+        return prev.map(board => board.id === editingBoard.id ? newBoard : board);
+      } else {
+        return [...prev, newBoard];
+      }
+    });
+
+    if (!editingBoard) {
+      setCurrentBoardId(newBoard.id);
+    }
+
+    setShowBoardModal(false);
+    resetBoardForm();
+  };
+
+  const deleteBoard = (boardId: string) => {
+    if (boards.length <= 1) {
+      alert('Você deve ter pelo menos um quadro!');
+      return;
+    }
+    
+    if (confirm('Tem certeza que deseja excluir este quadro? Todas as tarefas serão perdidas.')) {
+      setBoards(prev => prev.filter(board => board.id !== boardId));
+      if (currentBoardId === boardId) {
+        setCurrentBoardId(boards.find(board => board.id !== boardId)?.id || boards[0].id);
+      }
+    }
+  };
+
+  const duplicateBoard = (board: Board) => {
+    const newBoard: Board = {
+      ...board,
+      id: Date.now().toString(),
+      title: `${board.title} (Cópia)`,
+      createdAt: new Date().toISOString(),
+      isFavorite: false,
+      columns: board.columns.map(col => ({
+        ...col,
+        id: `${col.id}-${Date.now()}`,
+        tasks: col.tasks.map(task => ({
+          ...task,
+          id: `${task.id}-${Date.now()}`,
+          createdAt: new Date().toISOString()
+        }))
+      }))
+    };
+
+    setBoards(prev => [...prev, newBoard]);
+    setCurrentBoardId(newBoard.id);
+  };
+
+  const toggleBoardFavorite = (boardId: string) => {
+    setBoards(prev => prev.map(board => 
+      board.id === boardId ? { ...board, isFavorite: !board.isFavorite } : board
+    ));
+  };
 
   // Reset form
   const resetTaskForm = () => {
@@ -246,18 +419,22 @@ const TasksPage = () => {
 
   // Toggle checklist item directly in task (without opening modal)
   const toggleTaskChecklistItem = (taskId: string, itemId: string) => {
-    setColumns(prev => {
-      const newColumns = [...prev];
-      newColumns.forEach(col => {
-        const task = col.tasks.find(t => t.id === taskId);
-        if (task && task.checklist) {
-          task.checklist = task.checklist.map(item =>
-            item.id === itemId ? { ...item, completed: !item.completed } : item
-          );
-        }
-      });
-      return newColumns;
-    });
+    setBoards(prev => prev.map(board => 
+      board.id === currentBoardId ? {
+        ...board,
+        columns: board.columns.map(col => ({
+          ...col,
+          tasks: col.tasks.map(task => 
+            task.id === taskId && task.checklist ? {
+              ...task,
+              checklist: task.checklist.map(item =>
+                item.id === itemId ? { ...item, completed: !item.completed } : item
+              )
+            } : task
+          )
+        }))
+      } : board
+    ));
   };
 
   // Calculate checklist progress
@@ -284,27 +461,26 @@ const TasksPage = () => {
       checklist: taskForm.checklist.filter(item => item.text.trim())
     };
 
-    setColumns(prev => {
-      const newColumns = [...prev];
-      
-      if (editingTask) {
-        // Update existing task
-        newColumns.forEach(col => {
-          const taskIndex = col.tasks.findIndex(t => t.id === editingTask.id);
-          if (taskIndex >= 0) {
-            col.tasks[taskIndex] = newTask;
+    setBoards(prev => prev.map(board => 
+      board.id === currentBoardId ? {
+        ...board,
+        columns: board.columns.map(col => {
+          if (editingTask) {
+            // Update existing task
+            const taskIndex = col.tasks.findIndex(t => t.id === editingTask.id);
+            if (taskIndex >= 0) {
+              const newTasks = [...col.tasks];
+              newTasks[taskIndex] = newTask;
+              return { ...col, tasks: newTasks };
+            }
+          } else if (col.id === columnId) {
+            // Add new task to specified column
+            return { ...col, tasks: [...col.tasks, newTask] };
           }
-        });
-      } else {
-        // Add new task to specified column
-        const targetColumn = newColumns.find(col => col.id === columnId);
-        if (targetColumn) {
-          targetColumn.tasks.push(newTask);
-        }
-      }
-      
-      return newColumns;
-    });
+          return col;
+        })
+      } : board
+    ));
 
     setShowTaskModal(false);
     resetTaskForm();
@@ -313,28 +489,31 @@ const TasksPage = () => {
   // Delete task
   const deleteTask = (taskId: string) => {
     if (confirm('Tem certeza que deseja excluir esta tarefa?')) {
-      setColumns(prev => {
-        const newColumns = [...prev];
-        newColumns.forEach(col => {
-          col.tasks = col.tasks.filter(task => task.id !== taskId);
-        });
-        return newColumns;
-      });
+      setBoards(prev => prev.map(board => 
+        board.id === currentBoardId ? {
+          ...board,
+          columns: board.columns.map(col => ({
+            ...col,
+            tasks: col.tasks.filter(task => task.id !== taskId)
+          }))
+        } : board
+      ));
     }
   };
 
   // Toggle task completion
   const toggleTaskCompletion = (taskId: string) => {
-    setColumns(prev => {
-      const newColumns = [...prev];
-      newColumns.forEach(col => {
-        const task = col.tasks.find(t => t.id === taskId);
-        if (task) {
-          task.completed = !task.completed;
-        }
-      });
-      return newColumns;
-    });
+    setBoards(prev => prev.map(board => 
+      board.id === currentBoardId ? {
+        ...board,
+        columns: board.columns.map(col => ({
+          ...col,
+          tasks: col.tasks.map(task => 
+            task.id === taskId ? { ...task, completed: !task.completed } : task
+          )
+        }))
+      } : board
+    ));
   };
 
   // Add new column
@@ -348,15 +527,31 @@ const TasksPage = () => {
       tasks: []
     };
 
-    setColumns(prev => [...prev, newColumn]);
+    setBoards(prev => prev.map(board => 
+      board.id === currentBoardId ? {
+        ...board,
+        columns: [...board.columns, newColumn]
+      } : board
+    ));
+    
     setNewColumnTitle('');
     setShowColumnModal(false);
   };
 
   // Delete column
   const deleteColumn = (columnId: string) => {
+    if (columns.length <= 1) {
+      alert('Você deve ter pelo menos uma coluna!');
+      return;
+    }
+    
     if (confirm('Tem certeza que deseja excluir esta coluna? Todas as tarefas serão perdidas.')) {
-      setColumns(prev => prev.filter(col => col.id !== columnId));
+      setBoards(prev => prev.map(board => 
+        board.id === currentBoardId ? {
+          ...board,
+          columns: board.columns.filter(col => col.id !== columnId)
+        } : board
+      ));
     }
   };
 
@@ -379,22 +574,31 @@ const TasksPage = () => {
       return;
     }
 
-    setColumns(prev => {
-      const newColumns = [...prev];
-      
-      const sourceColumn = newColumns.find(col => col.id === draggedFrom);
-      const targetColumn = newColumns.find(col => col.id === targetColumnId);
-      
-      if (!sourceColumn || !targetColumn) return prev;
-      
-      const taskIndex = sourceColumn.tasks.findIndex(task => task.id === draggedTask);
-      if (taskIndex === -1) return prev;
-      
-      const [movedTask] = sourceColumn.tasks.splice(taskIndex, 1);
-      targetColumn.tasks.push(movedTask);
-      
-      return newColumns;
-    });
+    setBoards(prev => prev.map(board => 
+      board.id === currentBoardId ? {
+        ...board,
+        columns: board.columns.map(col => {
+          if (col.id === draggedFrom) {
+            // Remove from source
+            return {
+              ...col,
+              tasks: col.tasks.filter(task => task.id !== draggedTask)
+            };
+          } else if (col.id === targetColumnId) {
+            // Add to target
+            const sourceColumn = board.columns.find(c => c.id === draggedFrom);
+            const movedTask = sourceColumn?.tasks.find(t => t.id === draggedTask);
+            if (movedTask) {
+              return {
+                ...col,
+                tasks: [...col.tasks, movedTask]
+              };
+            }
+          }
+          return col;
+        })
+      } : board
+    ));
     
     setDraggedTask(null);
     setDraggedFrom(null);
@@ -430,14 +634,116 @@ const TasksPage = () => {
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-black bg-gradient-to-r from-white via-gray-100 to-primary-300 bg-clip-text text-transparent">
-              Organizador de Tarefas
-            </h1>
-            <p className="text-gray-400 mt-2">
-              Gerencie suas tarefas e projetos de forma visual e eficiente
-            </p>
+          <div className="flex items-center space-x-4">
+            <div>
+              <h1 className="text-3xl font-black bg-gradient-to-r from-white via-gray-100 to-primary-300 bg-clip-text text-transparent">
+                Organizador de Tarefas
+              </h1>
+              <p className="text-gray-400 mt-2">
+                Gerencie seus projetos com quadros Kanban personalizados
+              </p>
+            </div>
+            
+            {/* Board Selector */}
+            <div className="relative">
+              <button
+                onClick={() => setShowBoardSelector(!showBoardSelector)}
+                className="flex items-center space-x-3 bg-gray-800/50 hover:bg-gray-700/50 px-4 py-3 rounded-xl border border-gray-700/50 transition-all duration-300"
+              >
+                <div className={`w-4 h-4 rounded-full ${currentBoard?.color || 'bg-blue-500'}`}></div>
+                <div className="text-left">
+                  <div className="font-medium text-white">{currentBoard?.title || 'Selecionar Quadro'}</div>
+                  <div className="text-xs text-gray-400">{columns.length} colunas</div>
+                </div>
+                <ChevronDown className="h-4 w-4 text-gray-400" />
+              </button>
+
+              {/* Board Selector Dropdown */}
+              {showBoardSelector && (
+                <div className="absolute top-full mt-2 left-0 w-80 bg-gray-900/95 backdrop-blur-xl border border-gray-700/50 rounded-xl shadow-2xl z-50 max-h-96 overflow-y-auto">
+                  <div className="p-4 border-b border-gray-700/30">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-bold text-white">Seus Quadros</h3>
+                      <button
+                        onClick={() => {setShowBoardModal(true); setShowBoardSelector(false);}}
+                        className="flex items-center space-x-1 text-xs text-primary-400 hover:text-primary-300 transition-colors"
+                      >
+                        <Plus className="h-3 w-3" />
+                        <span>Novo</span>
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <div className="max-h-64 overflow-y-auto">
+                    {boards
+                      .sort((a, b) => (b.isFavorite ? 1 : 0) - (a.isFavorite ? 1 : 0))
+                      .map((board) => (
+                      <div
+                        key={board.id}
+                        className={`p-4 hover:bg-gray-800/30 transition-colors border-b border-gray-700/20 last:border-b-0 ${
+                          board.id === currentBoardId ? 'bg-gray-800/20' : ''
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <button
+                            onClick={() => {setCurrentBoardId(board.id); setShowBoardSelector(false);}}
+                            className="flex items-center space-x-3 flex-1 text-left"
+                          >
+                            <div className={`w-3 h-3 rounded-full ${board.color}`}></div>
+                            <div className="flex-1">
+                              <div className="flex items-center space-x-2">
+                                <span className={`font-medium ${board.id === currentBoardId ? 'text-primary-300' : 'text-white'}`}>
+                                  {board.title}
+                                </span>
+                                {board.isFavorite && (
+                                  <Star className="h-3 w-3 text-yellow-400 fill-current" />
+                                )}
+                              </div>
+                              {board.description && (
+                                <div className="text-xs text-gray-400 mt-1">{board.description}</div>
+                              )}
+                              <div className="text-xs text-gray-500 mt-1">
+                                {board.columns.reduce((acc, col) => acc + col.tasks.length, 0)} tarefas
+                              </div>
+                            </div>
+                          </button>
+                          <div className="flex items-center space-x-1">
+                            <button
+                              onClick={() => toggleBoardFavorite(board.id)}
+                              className="p-1 rounded text-gray-400 hover:text-yellow-400 transition-colors"
+                            >
+                              <Star className={`h-3 w-3 ${board.isFavorite ? 'fill-current text-yellow-400' : ''}`} />
+                            </button>
+                            <button
+                              onClick={() => duplicateBoard(board)}
+                              className="p-1 rounded text-gray-400 hover:text-blue-400 transition-colors"
+                            >
+                              <Copy className="h-3 w-3" />
+                            </button>
+                            <button
+                              onClick={() => openEditBoard(board)}
+                              className="p-1 rounded text-gray-400 hover:text-green-400 transition-colors"
+                            >
+                              <Edit3 className="h-3 w-3" />
+                            </button>
+                            {boards.length > 1 && (
+                              <button
+                                onClick={() => deleteBoard(board.id)}
+                                className="p-1 rounded text-gray-400 hover:text-red-400 transition-colors"
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
+          
           <div className="flex items-center space-x-3">
             <button 
               onClick={() => setShowColumnModal(true)}
@@ -652,6 +958,91 @@ const TasksPage = () => {
           </div>
         ))}
       </div>
+
+      {/* Board Modal */}
+      {showBoardModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-gray-900 rounded-2xl border border-gray-700 p-6 w-full max-w-md">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold text-white">
+                {editingBoard ? 'Editar Quadro' : 'Novo Quadro'}
+              </h3>
+              <button 
+                onClick={() => {setShowBoardModal(false); resetBoardForm();}}
+                className="p-1 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {/* Title */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Título *
+                </label>
+                <input
+                  type="text"
+                  value={boardForm.title}
+                  onChange={(e) => setBoardForm(prev => ({...prev, title: e.target.value}))}
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-primary-500"
+                  placeholder="Ex: Projeto Marketing"
+                />
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Descrição
+                </label>
+                <textarea
+                  value={boardForm.description}
+                  onChange={(e) => setBoardForm(prev => ({...prev, description: e.target.value}))}
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-primary-500"
+                  rows={3}
+                  placeholder="Descreva o propósito deste quadro (opcional)"
+                />
+              </div>
+
+              {/* Color */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Cor
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {colorOptions.map((color) => (
+                    <button
+                      key={color}
+                      onClick={() => setBoardForm(prev => ({...prev, color}))}
+                      className={`w-8 h-8 rounded-lg ${color} ${
+                        boardForm.color === color ? 'ring-2 ring-white' : ''
+                      } transition-all hover:scale-110`}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Buttons */}
+            <div className="flex justify-end space-x-3 mt-6">
+              <button
+                onClick={() => {setShowBoardModal(false); resetBoardForm();}}
+                className="px-4 py-2 text-gray-400 hover:text-white transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={saveBoard}
+                disabled={!boardForm.title.trim()}
+                className="flex items-center space-x-2 bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-500 hover:to-secondary-500 disabled:from-gray-600 disabled:to-gray-600 px-4 py-2 rounded-lg text-white transition-all duration-300"
+              >
+                <Save className="h-4 w-4" />
+                <span>{editingBoard ? 'Salvar' : 'Criar'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Task Modal */}
       {showTaskModal && (
@@ -945,13 +1336,13 @@ const TasksPage = () => {
         <div className="bg-gray-900/30 rounded-xl p-4 border border-gray-700/30">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-purple-500/20 rounded-xl flex items-center justify-center">
-              <ListChecks className="h-5 w-5 text-purple-400" />
+              <Grid3X3 className="h-5 w-5 text-purple-400" />
             </div>
             <div>
               <div className="text-lg font-bold text-white">
-                {columns.reduce((acc, col) => acc + col.tasks.reduce((taskAcc, task) => taskAcc + (task.checklist?.length || 0), 0), 0)}
+                {boards.length}
               </div>
-              <div className="text-sm text-gray-400">Itens Checklist</div>
+              <div className="text-sm text-gray-400">Quadros Ativos</div>
             </div>
           </div>
         </div>
