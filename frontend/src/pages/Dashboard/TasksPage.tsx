@@ -60,8 +60,34 @@ interface Board {
 }
 
 const TasksPage = () => {
+  // Load data from file asynchronously
+  const loadDataFromFile = async (): Promise<Board[] | null> => {
+    try {
+      const response = await fetch('/tasks-data.json');
+      if (response.ok) {
+        const data = await response.json();
+        if (data.boards && Array.isArray(data.boards)) {
+          return data.boards.map((board: Board) => ({
+            ...board,
+            columns: board.columns?.map((column: Column) => ({
+              ...column,
+              tasks: column.tasks?.map((task: Task) => ({
+                ...task,
+                checklist: task.checklist || []
+              })) || []
+            })) || []
+          }));
+        }
+      }
+    } catch (error) {
+      console.log('Could not load tasks-data.json, using localStorage or defaults');
+    }
+    return null;
+  };
+
   // Load initial data from localStorage or use default
   const loadInitialData = (): Board[] => {
+    // Try localStorage first
     const saved = localStorage.getItem('kanban-boards');
     if (saved) {
       const data = JSON.parse(saved);
@@ -249,6 +275,24 @@ const TasksPage = () => {
   // Get current board
   const currentBoard = boards.find(board => board.id === currentBoardId) || boards[0];
   const columns = currentBoard?.columns || [];
+
+  // Load data from file on component mount
+  useEffect(() => {
+    const loadFileData = async () => {
+      const fileData = await loadDataFromFile();
+      if (fileData && fileData.length > 0) {
+        // Only load from file if localStorage is empty or file has more recent data
+        const saved = localStorage.getItem('kanban-boards');
+        if (!saved) {
+          setBoards(fileData);
+          setCurrentBoardId(fileData[0]?.id || 'main-board');
+          // Save to localStorage for future use
+          localStorage.setItem('kanban-boards', JSON.stringify(fileData));
+        }
+      }
+    };
+    loadFileData();
+  }, []);
 
   // Save to localStorage whenever boards change
   useEffect(() => {
