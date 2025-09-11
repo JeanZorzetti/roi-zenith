@@ -187,7 +187,167 @@
           "tasks": []
         }
       ]
+    },
+    {
+      "id": "1757548887779",
+      "title": "ERP IA Orion - Sistema de Gestão Inteligente",
+      "description": "Board completo para organização do projeto ERP com IA integrada",
+      "color": "bg-indigo-600",
+      "isFavorite": false,
+      "createdAt": "2025-09-11T00:01:27.779Z",
+      "columns": [
+        {
+          "id": "todo",
+          "title": "Para Fazer",
+          "color": "bg-gray-500",
+          "tasks": []
+        },
+        {
+          "id": "doing",
+          "title": "Em Andamento",
+          "color": "bg-blue-500",
+          "tasks": []
+        },
+        {
+          "id": "done",
+          "title": "Concluído",
+          "color": "bg-green-500",
+          "tasks": []
+        },
+        {
+          "id": "1757548901001",
+          "title": "📌 BACKLOG",
+          "color": "bg-gray-400",
+          "tasks": []
+        },
+        {
+          "id": "1757548902495",
+          "title": "🔍 EM ANÁLISE",
+          "color": "bg-yellow-400",
+          "tasks": []
+        },
+        {
+          "id": "1757548903691",
+          "title": "📋 TODO",
+          "color": "bg-blue-400",
+          "tasks": []
+        },
+        {
+          "id": "1757548904989",
+          "title": "🚀 EM DESENVOLVIMENTO",
+          "color": "bg-orange-500",
+          "tasks": []
+        },
+        {
+          "id": "1757548911886",
+          "title": "🧪 EM TESTE",
+          "color": "bg-purple-500",
+          "tasks": []
+        },
+        {
+          "id": "1757548913129",
+          "title": "👀 REVIEW",
+          "color": "bg-indigo-500",
+          "tasks": []
+        },
+        {
+          "id": "1757548914400",
+          "title": "✅ CONCLUÍDO",
+          "color": "bg-green-500",
+          "tasks": []
+        },
+        {
+          "id": "1757548915610",
+          "title": "❌ BLOQUEADO",
+          "color": "bg-red-500",
+          "tasks": []
+        },
+        {
+          "id": "1757548932030",
+          "title": "🔥 Suite de Testes Completa",
+          "color": "bg-gray-500",
+          "tasks": []
+        },
+        {
+          "id": "1757548933319",
+          "title": "🐳 Ambiente de Produção",
+          "color": "bg-gray-500",
+          "tasks": []
+        },
+        {
+          "id": "1757548934596",
+          "title": "⚡ Sistema de Cache Redis",
+          "color": "bg-gray-500",
+          "tasks": []
+        },
+        {
+          "id": "1757548943614",
+          "title": "📚 Documentação API (Swagger)",
+          "color": "bg-gray-500",
+          "tasks": []
+        },
+        {
+          "id": "1757548945113",
+          "title": "📊 Sistema de Monitoramento",
+          "color": "bg-gray-500",
+          "tasks": []
+        },
+        {
+          "id": "1757548946619",
+          "title": "📄 Relatórios PDF/Excel",
+          "color": "bg-gray-500",
+          "tasks": []
+        },
+        {
+          "id": "1757548964991",
+          "title": "🔔 Sistema de Notificações",
+          "color": "bg-gray-500",
+          "tasks": []
+        },
+        {
+          "id": "1757548966258",
+          "title": "🧠 Melhorias ML",
+          "color": "bg-gray-500",
+          "tasks": []
+        },
+        {
+          "id": "1757548967574",
+          "title": "⚡ Otimização de Performance",
+          "color": "bg-gray-500",
+          "tasks": []
+        },
+        {
+          "id": "1757548974461",
+          "title": "🔧 Refatoração de Código",
+          "color": "bg-gray-500",
+          "tasks": []
+        },
+        {
+          "id": "1757548975649",
+          "title": "🎨 Melhorias de UX/UI",
+          "color": "bg-gray-500",
+          "tasks": []
+        },
+        {
+          "id": "1757548983229",
+          "title": "👥 Módulo de RH",
+          "color": "bg-gray-500",
+          "tasks": []
+        },
+        {
+          "id": "1757548984521",
+          "title": "💳 Integração Bancária",
+          "color": "bg-gray-500",
+          "tasks": []
+        },
+        {
+          "id": "1757548985795",
+          "title": "📱 App Mobile",
+          "color": "bg-gray-500",
+          "tasks": []
+        }
+      ]
     }
   ],
-  "lastUpdated": "2025-09-10T22:02:54.473Z"
+  "lastUpdated": "2025-09-11T00:03:05.795Z"
 }
