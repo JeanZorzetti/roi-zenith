@@ -25,7 +25,14 @@
       "Bash(npx prisma:*)",
       "Bash(npm config get:*)",
       "Bash(npm config:*)",
-      "Bash(npm:*)"
+      "Bash(npm:*)",
+      "Bash(node:*)",
+      "Bash(tasklist:*)",
+      "Bash(PORT=5001 node dist/server.js)",
+      "Bash(PORT=5002 node dist/server.js)",
+      "Read(//c/Users/jeanz/Downloads/**)",
+      "Bash(cp:*)",
+      "Bash(touch:*)"
     ],
     "deny": [],
     "ask": []

@@ -698,6 +698,11 @@ const TasksPage = () => {
   const [showColumnModal, setShowColumnModal] = useState(false);
   const [newColumnTitle, setNewColumnTitle] = useState('');
   const [newColumnColor, setNewColumnColor] = useState('bg-purple-500');
+  
+  // Horizontal scroll state
+  const [isScrolling, setIsScrolling] = useState(false);
+  const [scrollStartX, setScrollStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
 
   // Task form state
   const [taskForm, setTaskForm] = useState({
@@ -1069,6 +1074,35 @@ const TasksPage = () => {
     setDraggedFrom(null);
   };
 
+  // Horizontal scroll functions
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLElement;
+    // Only start scrolling if clicking on the background (not on cards or buttons)
+    if (target.closest('.kanban-card') || target.closest('button') || target.closest('input') || target.closest('textarea')) {
+      return;
+    }
+    
+    setIsScrolling(true);
+    setScrollStartX(e.pageX - (e.currentTarget.offsetLeft || 0));
+    setScrollLeft(e.currentTarget.scrollLeft);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!isScrolling) return;
+    e.preventDefault();
+    const x = e.pageX - (e.currentTarget.offsetLeft || 0);
+    const walk = (x - scrollStartX) * 2; // Scroll speed multiplier
+    e.currentTarget.scrollLeft = scrollLeft - walk;
+  };
+
+  const handleMouseUp = () => {
+    setIsScrolling(false);
+  };
+
+  const handleMouseLeave = () => {
+    setIsScrolling(false);
+  };
+
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'urgent': return 'bg-red-500';
@@ -1229,7 +1263,14 @@ const TasksPage = () => {
       </div>
 
       {/* Kanban Board */}
-      <div className="flex gap-6 overflow-x-auto pb-6">
+      <div 
+        className={`flex gap-6 overflow-x-auto pb-6 select-none ${isScrolling ? 'cursor-grabbing' : 'cursor-grab'}`}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseLeave}
+        style={{ scrollbarWidth: 'thin' }}
+      >
         {columns.map((column) => (
           <div
             key={column.id}
@@ -1279,7 +1320,13 @@ const TasksPage = () => {
                     key={task.id}
                     draggable
                     onDragStart={(e) => handleDragStart(e, task.id, column.id)}
-                    className={`bg-gray-900/50 backdrop-blur-sm border border-gray-700/50 rounded-xl p-4 hover:border-gray-600/50 transition-all duration-300 cursor-move hover:shadow-lg hover:shadow-primary-500/10 ${
+                    onClick={(e) => {
+                      // Avoid opening when clicking on buttons or when dragging
+                      if (e.target instanceof HTMLElement && !e.target.closest('button')) {
+                        openEditTask(task);
+                      }
+                    }}
+                    className={`kanban-card bg-gray-900/50 backdrop-blur-sm border border-gray-700/50 rounded-xl p-4 hover:border-gray-600/50 transition-all duration-300 cursor-pointer hover:shadow-lg hover:shadow-primary-500/10 hover:scale-[1.02] ${
                       task.completed ? 'opacity-75' : ''
                     }`}
                   >
@@ -1373,17 +1420,36 @@ const TasksPage = () => {
                       </div>
                     )}
 
-                    {/* Tags */}
+                    {/* Tags - Sistema de Etiquetas Visuais */}
                     {task.tags.length > 0 && (
                       <div className="flex flex-wrap gap-1 mb-3">
-                        {task.tags.map((tag, index) => (
-                          <span
-                            key={index}
-                            className="px-2 py-1 bg-primary-500/20 text-primary-300 text-xs rounded-lg border border-primary-500/30"
-                          >
-                            {tag}
-                          </span>
-                        ))}
+                        {task.tags.map((tag, index) => {
+                          // Cores diferentes para diferentes tipos de tags
+                          const getTagColor = (tag: string) => {
+                            const lowerTag = tag.toLowerCase();
+                            if (lowerTag.includes('crítico') || lowerTag.includes('urgente')) return 'bg-red-500/20 text-red-300 border-red-500/30';
+                            if (lowerTag.includes('alta')) return 'bg-orange-500/20 text-orange-300 border-orange-500/30';
+                            if (lowerTag.includes('média') || lowerTag.includes('medium')) return 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30';
+                            if (lowerTag.includes('baixa') || lowerTag.includes('low')) return 'bg-green-500/20 text-green-300 border-green-500/30';
+                            if (lowerTag.includes('frontend') || lowerTag.includes('ui') || lowerTag.includes('ux')) return 'bg-purple-500/20 text-purple-300 border-purple-500/30';
+                            if (lowerTag.includes('backend') || lowerTag.includes('api')) return 'bg-blue-500/20 text-blue-300 border-blue-500/30';
+                            if (lowerTag.includes('devops') || lowerTag.includes('infra')) return 'bg-gray-500/20 text-gray-300 border-gray-500/30';
+                            if (lowerTag.includes('test') || lowerTag.includes('qualidade')) return 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30';
+                            if (lowerTag.includes('doc') || lowerTag.includes('documentação')) return 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30';
+                            if (lowerTag.includes('ml') || lowerTag.includes('ia')) return 'bg-pink-500/20 text-pink-300 border-pink-500/30';
+                            return 'bg-primary-500/20 text-primary-300 border-primary-500/30'; // Default
+                          };
+                          
+                          return (
+                            <span
+                              key={index}
+                              className={`px-2 py-1 text-xs rounded-lg border transition-all duration-200 hover:scale-105 hover:shadow-sm ${getTagColor(tag)}`}
+                              title={`Tag: ${tag}`}
+                            >
+                              {tag}
+                            </span>
+                          );
+                        })}
                       </div>
                     )}
 
