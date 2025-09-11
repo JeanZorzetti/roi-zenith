@@ -60,30 +60,6 @@ interface Board {
 }
 
 const TasksPage = () => {
-  // Load data from file asynchronously
-  const loadDataFromFile = async (): Promise<Board[] | null> => {
-    try {
-      const response = await fetch('/tasks-data.json');
-      if (response.ok) {
-        const data = await response.json();
-        if (data.boards && Array.isArray(data.boards)) {
-          return data.boards.map((board: Board) => ({
-            ...board,
-            columns: board.columns?.map((column: Column) => ({
-              ...column,
-              tasks: column.tasks?.map((task: Task) => ({
-                ...task,
-                checklist: task.checklist || []
-              })) || []
-            })) || []
-          }));
-        }
-      }
-    } catch (error) {
-      console.log('Could not load tasks-data.json, using localStorage or defaults');
-    }
-    return null;
-  };
 
   // Load initial data from localStorage or use default
   const loadInitialData = (): Board[] => {
@@ -103,7 +79,7 @@ const TasksPage = () => {
       }));
     }
     
-    // Default boards
+    // Default boards including ERP IA Orion
     return [
       {
         id: 'main-board',
@@ -236,6 +212,231 @@ const TasksPage = () => {
             tasks: []
           }
         ]
+      },
+      {
+        id: 'erp-ia-orion',
+        title: 'ERP IA Orion - Sistema de Gestão Inteligente',
+        description: 'Board completo para organização do projeto ERP com IA integrada',
+        color: 'bg-indigo-600',
+        isFavorite: true,
+        createdAt: new Date().toISOString(),
+        columns: [
+          {
+            id: 'backlog',
+            title: '📌 BACKLOG',
+            color: 'bg-gray-400',
+            tasks: [
+              {
+                id: 'task-refactor',
+                title: '🔧 Refatoração de Código',
+                description: 'Limpar código e corrigir warnings ESLint',
+                priority: 'low',
+                assignee: 'Dev Team',
+                dueDate: '',
+                tags: ['refatoração', 'qualidade'],
+                completed: false,
+                createdAt: new Date().toISOString(),
+                checklist: [
+                  { id: 'ref-1', text: 'Corrigir ESLint warnings', completed: false },
+                  { id: 'ref-2', text: 'Padronizar nomenclaturas', completed: false },
+                  { id: 'ref-3', text: 'Remover código morto', completed: false }
+                ]
+              },
+              {
+                id: 'task-ux',
+                title: '🎨 Melhorias de UX/UI',
+                description: 'Aprimorar experiência do usuário',
+                priority: 'low',
+                assignee: 'Design Team',
+                dueDate: '',
+                tags: ['ux', 'frontend'],
+                completed: false,
+                createdAt: new Date().toISOString(),
+                checklist: [
+                  { id: 'ux-1', text: 'Modo escuro', completed: false },
+                  { id: 'ux-2', text: 'Navegação breadcrumb', completed: false },
+                  { id: 'ux-3', text: 'Acessibilidade (WCAG)', completed: false }
+                ]
+              },
+              {
+                id: 'task-rh',
+                title: '👥 Módulo de RH',
+                description: 'Sistema de recursos humanos completo',
+                priority: 'medium',
+                assignee: 'Future Dev',
+                dueDate: '',
+                tags: ['nova-funcionalidade', 'rh'],
+                completed: false,
+                createdAt: new Date().toISOString(),
+                checklist: [
+                  { id: 'rh-1', text: 'Cadastro de funcionários', completed: false },
+                  { id: 'rh-2', text: 'Folha de pagamento', completed: false },
+                  { id: 'rh-3', text: 'Controle de ponto', completed: false }
+                ]
+              }
+            ]
+          },
+          {
+            id: 'analise',
+            title: '🔍 EM ANÁLISE',
+            color: 'bg-yellow-400',
+            tasks: []
+          },
+          {
+            id: 'todo-erp',
+            title: '📋 TODO',
+            color: 'bg-blue-400',
+            tasks: [
+              {
+                id: 'task-tests',
+                title: '🔥 Suite de Testes Completa',
+                description: 'Implementar testes unitários, integração e E2E',
+                priority: 'urgent',
+                assignee: 'Dev Team',
+                dueDate: '2024-12-31',
+                tags: ['crítico', 'qualidade', 'testes'],
+                completed: false,
+                createdAt: new Date().toISOString(),
+                checklist: [
+                  { id: 'test-1', text: 'Configurar Jest para Backend', completed: false },
+                  { id: 'test-2', text: 'React Testing Library para Frontend', completed: false },
+                  { id: 'test-3', text: 'Cypress para testes E2E', completed: false },
+                  { id: 'test-4', text: 'Coverage reports', completed: false }
+                ]
+              },
+              {
+                id: 'task-prod',
+                title: '🐳 Ambiente de Produção',
+                description: 'Configurar Docker Compose para produção',
+                priority: 'urgent',
+                assignee: 'DevOps',
+                dueDate: '2024-12-25',
+                tags: ['crítico', 'devops', 'produção'],
+                completed: false,
+                createdAt: new Date().toISOString(),
+                checklist: [
+                  { id: 'prod-1', text: 'docker-compose.prod.yml', completed: false },
+                  { id: 'prod-2', text: 'Nginx reverse proxy', completed: false },
+                  { id: 'prod-3', text: 'SSL certificates', completed: false }
+                ]
+              },
+              {
+                id: 'task-cache',
+                title: '⚡ Sistema de Cache Redis',
+                description: 'Implementar cache para performance',
+                priority: 'urgent',
+                assignee: 'Backend Dev',
+                dueDate: '2024-12-28',
+                tags: ['alta-prioridade', 'performance'],
+                completed: false,
+                createdAt: new Date().toISOString(),
+                checklist: [
+                  { id: 'cache-1', text: 'Configurar Redis container', completed: false },
+                  { id: 'cache-2', text: 'Cache para ML predictions', completed: false },
+                  { id: 'cache-3', text: 'Invalidação automática', completed: false }
+                ]
+              }
+            ]
+          },
+          {
+            id: 'desenvolvimento',
+            title: '🚀 EM DESENVOLVIMENTO',
+            color: 'bg-orange-500',
+            tasks: [
+              {
+                id: 'task-docs',
+                title: '📚 Documentação API (Swagger)',
+                description: 'Criar documentação interativa da API',
+                priority: 'high',
+                assignee: 'Backend Dev',
+                dueDate: '',
+                tags: ['alta-prioridade', 'documentação'],
+                completed: false,
+                createdAt: new Date().toISOString(),
+                checklist: [
+                  { id: 'docs-1', text: 'Implementar OpenAPI 3.0 spec', completed: true },
+                  { id: 'docs-2', text: 'Swagger UI integration', completed: false },
+                  { id: 'docs-3', text: 'Interactive API explorer', completed: false }
+                ]
+              }
+            ]
+          },
+          {
+            id: 'teste',
+            title: '🧪 EM TESTE',
+            color: 'bg-purple-500',
+            tasks: [
+              {
+                id: 'task-monitoring',
+                title: '📊 Sistema de Monitoramento',
+                description: 'Observabilidade completa do sistema',
+                priority: 'high',
+                assignee: 'DevOps Team',
+                dueDate: '',
+                tags: ['alta-prioridade', 'monitoramento'],
+                completed: false,
+                createdAt: new Date().toISOString(),
+                checklist: [
+                  { id: 'mon-1', text: 'Prometheus + Grafana setup', completed: true },
+                  { id: 'mon-2', text: 'Application metrics', completed: true },
+                  { id: 'mon-3', text: 'Alertas automáticos', completed: false }
+                ]
+              }
+            ]
+          },
+          {
+            id: 'review',
+            title: '👀 REVIEW',
+            color: 'bg-indigo-500',
+            tasks: [
+              {
+                id: 'task-reports',
+                title: '📄 Relatórios PDF/Excel',
+                description: 'Sistema de geração de relatórios',
+                priority: 'high',
+                assignee: 'Frontend Team',
+                dueDate: '',
+                tags: ['alta-prioridade', 'funcionalidade'],
+                completed: false,
+                createdAt: new Date().toISOString(),
+                checklist: [
+                  { id: 'rep-1', text: 'Relatórios financeiros', completed: true },
+                  { id: 'rep-2', text: 'Dashboard exports', completed: true },
+                  { id: 'rep-3', text: 'Templates customizáveis', completed: false }
+                ]
+              }
+            ]
+          },
+          {
+            id: 'concluido',
+            title: '✅ CONCLUÍDO',
+            color: 'bg-green-500',
+            tasks: [
+              {
+                id: 'task-notifications',
+                title: '🔔 Sistema de Notificações',
+                description: 'Notificações multi-canal implementadas',
+                priority: 'medium',
+                assignee: 'Backend Team',
+                dueDate: '',
+                tags: ['funcionalidade', 'completo'],
+                completed: true,
+                createdAt: new Date().toISOString(),
+                checklist: [
+                  { id: 'not-1', text: 'Email notifications', completed: true },
+                  { id: 'not-2', text: 'Push notifications', completed: true },
+                  { id: 'not-3', text: 'Template management', completed: true }
+                ]
+              }
+            ]
+          },
+          {
+            id: 'bloqueado',
+            title: '❌ BLOQUEADO',
+            color: 'bg-red-500',
+            tasks: []
+          }
+        ]
       }
     ];
   };
@@ -276,23 +477,6 @@ const TasksPage = () => {
   const currentBoard = boards.find(board => board.id === currentBoardId) || boards[0];
   const columns = currentBoard?.columns || [];
 
-  // Load data from file on component mount
-  useEffect(() => {
-    const loadFileData = async () => {
-      const fileData = await loadDataFromFile();
-      if (fileData && fileData.length > 0) {
-        // Only load from file if localStorage is empty or file has more recent data
-        const saved = localStorage.getItem('kanban-boards');
-        if (!saved) {
-          setBoards(fileData);
-          setCurrentBoardId(fileData[0]?.id || 'main-board');
-          // Save to localStorage for future use
-          localStorage.setItem('kanban-boards', JSON.stringify(fileData));
-        }
-      }
-    };
-    loadFileData();
-  }, []);
 
   // Save to localStorage whenever boards change
   useEffect(() => {
