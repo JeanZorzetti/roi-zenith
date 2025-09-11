@@ -1,0 +1,115 @@
+name: Test Suite
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  backend-tests:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: backend/package-lock.json
+    
+    - name: Install backend dependencies
+      run: cd backend && npm ci
+    
+    - name: Run backend tests
+      run: cd backend && npm run test:ci
+      env:
+        DATABASE_URL: postgresql://postgres:test@localhost:5432/test
+    
+    - name: Upload backend coverage
+      uses: codecov/codecov-action@v3
+      with:
+        files: ./backend/coverage/lcov.info
+        flags: backend
+
+  frontend-tests:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+    
+    - name: Install frontend dependencies
+      run: cd frontend && npm ci
+    
+    - name: Run frontend tests
+      run: cd frontend && npm run test:coverage
+    
+    - name: Upload frontend coverage
+      uses: codecov/codecov-action@v3
+      with:
+        files: ./frontend/coverage/lcov.info
+        flags: frontend
+
+  e2e-tests:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: |
+        npm install
+        cd backend && npm ci
+        cd ../frontend && npm ci
+    
+    - name: Build frontend
+      run: cd frontend && npm run build
+    
+    - name: Start application
+      run: |
+        cd backend && npm start &
+        cd frontend && npm run preview &
+      env:
+        DATABASE_URL: file:./test.db
+    
+    - name: Wait for application
+      run: npx wait-on http://localhost:3000 http://localhost:5000
+    
+    - name: Run E2E tests
+      run: cd frontend && npm run e2e
+    
+    - name: Upload E2E artifacts
+      uses: actions/upload-artifact@v3
+      if: failure()
+      with:
+        name: cypress-screenshots
+        path: frontend/cypress/screenshots
