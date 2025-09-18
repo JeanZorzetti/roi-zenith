@@ -698,6 +698,8 @@ const TasksPage = () => {
   const [showColumnModal, setShowColumnModal] = useState(false);
   const [newColumnTitle, setNewColumnTitle] = useState('');
   const [newColumnColor, setNewColumnColor] = useState('bg-purple-500');
+  const [editingColumnId, setEditingColumnId] = useState<string | null>(null);
+  const [editingColumnTitle, setEditingColumnTitle] = useState('');
   
   // Horizontal scroll state
   const [isScrolling, setIsScrolling] = useState(false);
@@ -1014,15 +1016,47 @@ const TasksPage = () => {
       alert('Você deve ter pelo menos uma coluna!');
       return;
     }
-    
+
     if (confirm('Tem certeza que deseja excluir esta coluna? Todas as tarefas serão perdidas.')) {
-      setBoards(prev => prev.map(board => 
+      setBoards(prev => prev.map(board =>
         board.id === currentBoardId ? {
           ...board,
           columns: board.columns.filter(col => col.id !== columnId)
         } : board
       ));
     }
+  };
+
+  // Start editing column title
+  const startEditingColumn = (columnId: string, currentTitle: string) => {
+    setEditingColumnId(columnId);
+    setEditingColumnTitle(currentTitle);
+  };
+
+  // Save column title
+  const saveColumnTitle = () => {
+    if (!editingColumnTitle.trim()) return;
+
+    setBoards(prev => prev.map(board =>
+      board.id === currentBoardId ? {
+        ...board,
+        columns: board.columns.map(col =>
+          col.id === editingColumnId ? {
+            ...col,
+            title: editingColumnTitle.trim()
+          } : col
+        )
+      } : board
+    ));
+
+    setEditingColumnId(null);
+    setEditingColumnTitle('');
+  };
+
+  // Cancel editing column title
+  const cancelEditingColumn = () => {
+    setEditingColumnId(null);
+    setEditingColumnTitle('');
   };
 
   // Drag and drop handlers
@@ -1282,13 +1316,46 @@ const TasksPage = () => {
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center space-x-3">
                 <div className={`w-3 h-3 rounded-full ${column.color}`}></div>
-                <h3 className="font-bold text-white">{column.title}</h3>
+                {editingColumnId === column.id ? (
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="text"
+                      value={editingColumnTitle}
+                      onChange={(e) => setEditingColumnTitle(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          saveColumnTitle();
+                        } else if (e.key === 'Escape') {
+                          cancelEditingColumn();
+                        }
+                      }}
+                      onBlur={saveColumnTitle}
+                      className="font-bold text-white bg-gray-800 border border-gray-600 rounded px-2 py-1 text-sm focus:outline-none focus:border-primary-500"
+                      autoFocus
+                    />
+                  </div>
+                ) : (
+                  <h3
+                    className="font-bold text-white cursor-pointer hover:text-primary-300 transition-colors"
+                    onClick={() => startEditingColumn(column.id, column.title)}
+                    title="Clique para editar o título"
+                  >
+                    {column.title}
+                  </h3>
+                )}
                 <span className="bg-gray-800/50 text-gray-400 px-2 py-1 rounded-lg text-xs font-medium">
                   {column.tasks.length}
                 </span>
               </div>
               <div className="flex items-center space-x-1">
-                <button 
+                <button
+                  onClick={() => startEditingColumn(column.id, column.title)}
+                  className="p-1 rounded-lg text-gray-400 hover:text-blue-400 hover:bg-gray-800/50 transition-colors"
+                  title="Editar título da coluna"
+                >
+                  <Edit3 className="h-4 w-4" />
+                </button>
+                <button
                   onClick={() => {resetTaskForm(); setShowTaskModal(true);}}
                   className="p-1 rounded-lg text-gray-400 hover:text-green-400 hover:bg-gray-800/50 transition-colors"
                   title="Adicionar tarefa aqui"
@@ -1296,7 +1363,7 @@ const TasksPage = () => {
                   <Plus className="h-4 w-4" />
                 </button>
                 {columns.length > 1 && (
-                  <button 
+                  <button
                     onClick={() => deleteColumn(column.id)}
                     className="p-1 rounded-lg text-gray-400 hover:text-red-400 hover:bg-gray-800/50 transition-colors"
                     title="Excluir coluna"
