@@ -722,6 +722,12 @@ const TasksPage = () => {
   const currentBoard = boards.find(board => board.id === currentBoardId) || boards[0];
   const columns = currentBoard?.columns || [];
 
+  // Get the default column for new tasks - simply use the first column
+  const getDefaultTaskColumn = () => {
+    // Always use the first column since column names are dynamic
+    return columns.length > 0 ? columns[0].id : 'todo';
+  };
+
 
   // Save to localStorage whenever boards change
   useEffect(() => {
@@ -1306,7 +1312,7 @@ const TasksPage = () => {
             <button
               onClick={() => {
                 console.log('DEBUG: Nova Tarefa button clicked');
-                setTargetColumnId(columns[0]?.id || 'todo');
+                setTargetColumnId(getDefaultTaskColumn());
                 setShowTaskModal(true);
               }}
               className="flex items-center space-x-2 bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-500 hover:to-secondary-500 px-4 py-2 rounded-xl transition-all duration-300 hover:scale-105"
@@ -1837,7 +1843,7 @@ const TasksPage = () => {
               <button
                 onClick={() => {
                   console.log('DEBUG: Criar/Salvar button clicked');
-                  const columnId = targetColumnId || columns[0]?.id || 'todo';
+                  const columnId = targetColumnId || getDefaultTaskColumn();
                   console.log('DEBUG: Using columnId:', columnId);
                   saveTask(columnId);
                 }}
