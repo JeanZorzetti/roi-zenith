@@ -9,7 +9,7 @@ WORKDIR /app
 
 # Install ALL dependencies (including devDependencies for building)
 COPY package.json package-lock.json* ./
-RUN npm ci --ignore-scripts
+RUN npm install --ignore-scripts
 
 # Rebuild the source code only when needed
 FROM base AS builder
@@ -28,7 +28,7 @@ FROM base AS prod-deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 COPY package.json package-lock.json* ./
-RUN npm ci --only=production --ignore-scripts
+RUN npm install --omit=dev --ignore-scripts
 
 # Production image, copy all the files and run the app
 FROM base AS runner
