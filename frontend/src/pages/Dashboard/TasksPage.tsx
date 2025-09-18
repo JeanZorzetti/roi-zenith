@@ -918,7 +918,14 @@ const TasksPage = () => {
 
   // Save task (create or update)
   const saveTask = (columnId: string) => {
-    if (!taskForm.title.trim()) return;
+    console.log('DEBUG: saveTask called with columnId:', columnId);
+    console.log('DEBUG: taskForm.title:', taskForm.title);
+    console.log('DEBUG: currentBoardId:', currentBoardId);
+
+    if (!taskForm.title.trim()) {
+      console.log('DEBUG: Título vazio, cancelando criação');
+      return;
+    }
 
     const newTask: Task = {
       id: editingTask?.id || Date.now().toString(),
@@ -933,26 +940,35 @@ const TasksPage = () => {
       checklist: taskForm.checklist.filter(item => item.text.trim())
     };
 
-    setBoards(prev => prev.map(board => 
-      board.id === currentBoardId ? {
-        ...board,
-        columns: board.columns.map(col => {
-          if (editingTask) {
-            // Update existing task
-            const taskIndex = col.tasks.findIndex(t => t.id === editingTask.id);
-            if (taskIndex >= 0) {
-              const newTasks = [...col.tasks];
-              newTasks[taskIndex] = newTask;
-              return { ...col, tasks: newTasks };
+    console.log('DEBUG: newTask created:', newTask);
+
+    setBoards(prev => {
+      console.log('DEBUG: boards before update:', prev);
+      const updated = prev.map(board =>
+        board.id === currentBoardId ? {
+          ...board,
+          columns: board.columns.map(col => {
+            if (editingTask) {
+              // Update existing task
+              const taskIndex = col.tasks.findIndex(t => t.id === editingTask.id);
+              if (taskIndex >= 0) {
+                const newTasks = [...col.tasks];
+                newTasks[taskIndex] = newTask;
+                console.log('DEBUG: Updated task in column:', col.id);
+                return { ...col, tasks: newTasks };
+              }
+            } else if (col.id === columnId) {
+              // Add new task to specified column
+              console.log('DEBUG: Adding new task to column:', col.id);
+              return { ...col, tasks: [...col.tasks, newTask] };
             }
-          } else if (col.id === columnId) {
-            // Add new task to specified column
-            return { ...col, tasks: [...col.tasks, newTask] };
-          }
-          return col;
-        })
-      } : board
-    ));
+            return col;
+          })
+        } : board
+      );
+      console.log('DEBUG: boards after update:', updated);
+      return updated;
+    });
 
     setShowTaskModal(false);
     resetTaskForm();
@@ -1285,8 +1301,11 @@ const TasksPage = () => {
               <Plus className="h-4 w-4" />
               <span className="font-medium">Nova Coluna</span>
             </button>
-            <button 
-              onClick={() => setShowTaskModal(true)}
+            <button
+              onClick={() => {
+                console.log('DEBUG: Nova Tarefa button clicked');
+                setShowTaskModal(true);
+              }}
               className="flex items-center space-x-2 bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-500 hover:to-secondary-500 px-4 py-2 rounded-xl transition-all duration-300 hover:scale-105"
             >
               <Plus className="h-4 w-4" />
@@ -1809,7 +1828,10 @@ const TasksPage = () => {
                 Cancelar
               </button>
               <button
-                onClick={() => saveTask('todo')}
+                onClick={() => {
+                  console.log('DEBUG: Criar/Salvar button clicked');
+                  saveTask('todo');
+                }}
                 disabled={!taskForm.title.trim()}
                 className="flex items-center space-x-2 bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-500 hover:to-secondary-500 disabled:from-gray-600 disabled:to-gray-600 px-4 py-2 rounded-lg text-white transition-all duration-300"
               >
