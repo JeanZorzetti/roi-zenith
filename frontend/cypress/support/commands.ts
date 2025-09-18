@@ -24,10 +24,10 @@ declare global {
       createTask(boardId: string, columnId: string, title: string): Chainable<void>
 
       /**
-       * Custom command to clear localStorage
-       * @example cy.clearLocalStorage()
+       * Custom command to reset app state
+       * @example cy.resetAppState()
        */
-      clearLocalStorage(): Chainable<void>
+      resetAppState(): Chainable<void>
     }
   }
 }
@@ -47,7 +47,7 @@ Cypress.Commands.add('createTask', (boardId: string, columnId: string, title: st
   cy.get('[data-testid="create-task-submit"]').click()
 })
 
-Cypress.Commands.add('clearLocalStorage', () => {
+Cypress.Commands.add('resetAppState', () => {
   cy.window().then((win) => {
     win.localStorage.clear()
   })

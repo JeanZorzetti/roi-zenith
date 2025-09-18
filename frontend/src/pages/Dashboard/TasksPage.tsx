@@ -304,11 +304,12 @@ const TasksPage = () => {
         })) || []
       }));
       
-      // Check if ERP IA Orion board exists
+      // Check if ERP IA Orion board exists and wasn't intentionally deleted
       const hasERPBoard = existingBoards.some((board: Board) => board.id === 'erp-ia-orion');
-      
-      // If not, add it to existing boards
-      if (!hasERPBoard) {
+      const wasDeleted = localStorage.getItem('erp-board-deleted') === 'true';
+
+      // Only add if it doesn't exist AND wasn't intentionally deleted by user
+      if (!hasERPBoard && !wasDeleted) {
         const erpBoard = getERPBoard();
         return [...existingBoards, erpBoard];
       }
@@ -792,13 +793,25 @@ const TasksPage = () => {
       alert('Você deve ter pelo menos um quadro!');
       return;
     }
-    
+
     if (confirm('Tem certeza que deseja excluir este quadro? Todas as tarefas serão perdidas.')) {
+      // Mark ERP IA Orion board as intentionally deleted if it's being deleted
+      if (boardId === 'erp-ia-orion') {
+        localStorage.setItem('erp-board-deleted', 'true');
+      }
+
       setBoards(prev => prev.filter(board => board.id !== boardId));
       if (currentBoardId === boardId) {
         setCurrentBoardId(boards.find(board => board.id !== boardId)?.id || boards[0].id);
       }
     }
+  };
+
+  // Function to restore ERP IA Orion board if user wants it back
+  const restoreERPBoard = () => {
+    localStorage.removeItem('erp-board-deleted');
+    const erpBoard = getERPBoard();
+    setBoards(prev => [...prev, erpBoard]);
   };
 
   const duplicateBoard = (board: Board) => {
