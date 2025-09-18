@@ -700,6 +700,7 @@ const TasksPage = () => {
   const [newColumnColor, setNewColumnColor] = useState('bg-purple-500');
   const [editingColumnId, setEditingColumnId] = useState<string | null>(null);
   const [editingColumnTitle, setEditingColumnTitle] = useState('');
+  const [targetColumnId, setTargetColumnId] = useState<string | null>(null);
   
   // Horizontal scroll state
   const [isScrolling, setIsScrolling] = useState(false);
@@ -834,6 +835,7 @@ const TasksPage = () => {
       checklist: []
     });
     setEditingTask(null);
+    setTargetColumnId(null);
   };
 
   // Open task modal for editing
@@ -1304,6 +1306,7 @@ const TasksPage = () => {
             <button
               onClick={() => {
                 console.log('DEBUG: Nova Tarefa button clicked');
+                setTargetColumnId(columns[0]?.id || 'todo');
                 setShowTaskModal(true);
               }}
               className="flex items-center space-x-2 bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-500 hover:to-secondary-500 px-4 py-2 rounded-xl transition-all duration-300 hover:scale-105"
@@ -1375,7 +1378,11 @@ const TasksPage = () => {
                   <Edit3 className="h-4 w-4" />
                 </button>
                 <button
-                  onClick={() => {resetTaskForm(); setShowTaskModal(true);}}
+                  onClick={() => {
+                    resetTaskForm();
+                    setTargetColumnId(column.id);
+                    setShowTaskModal(true);
+                  }}
                   className="p-1 rounded-lg text-gray-400 hover:text-green-400 hover:bg-gray-800/50 transition-colors"
                   title="Adicionar tarefa aqui"
                 >
@@ -1830,7 +1837,9 @@ const TasksPage = () => {
               <button
                 onClick={() => {
                   console.log('DEBUG: Criar/Salvar button clicked');
-                  saveTask('todo');
+                  const columnId = targetColumnId || columns[0]?.id || 'todo';
+                  console.log('DEBUG: Using columnId:', columnId);
+                  saveTask(columnId);
                 }}
                 disabled={!taskForm.title.trim()}
                 className="flex items-center space-x-2 bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-500 hover:to-secondary-500 disabled:from-gray-600 disabled:to-gray-600 px-4 py-2 rounded-lg text-white transition-all duration-300"
