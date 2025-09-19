@@ -1587,9 +1587,10 @@ const TasksPage = () => {
               })}
 
               {/* Add Task Button */}
-              <button 
+              <button
                 onClick={() => {
                   resetTaskForm();
+                  setTargetColumnId(column.id);
                   setShowTaskModal(true);
                 }}
                 className="w-full p-3 border-2 border-dashed border-gray-700/50 rounded-xl text-gray-400 hover:text-white hover:border-gray-600/50 transition-all duration-300 flex items-center justify-center space-x-2"
