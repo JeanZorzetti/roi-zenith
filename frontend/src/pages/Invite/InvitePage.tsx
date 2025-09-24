@@ -47,7 +47,7 @@ const InvitePage = () => {
   const validateInvite = (inviteToken: string) => {
     try {
       // Buscar todos os quadros do localStorage
-      const savedData = localStorage.getItem('tasks-data');
+      const savedData = localStorage.getItem('kanban-boards');
       const boards: Board[] = savedData ? JSON.parse(savedData) : [];
 
       // Encontrar o convite válido
@@ -98,7 +98,7 @@ const InvitePage = () => {
     if (!invite.board || !invite.member) return;
 
     try {
-      const savedData = localStorage.getItem('tasks-data');
+      const savedData = localStorage.getItem('kanban-boards');
       const boards: Board[] = savedData ? JSON.parse(savedData) : [];
 
       // Atualizar o status do membro
@@ -122,7 +122,7 @@ const InvitePage = () => {
         return board;
       });
 
-      localStorage.setItem('tasks-data', JSON.stringify(updatedBoards));
+      localStorage.setItem('kanban-boards', JSON.stringify(updatedBoards));
 
       // Criar sessão simplificada para o convidado
       const guestSession = {
@@ -154,7 +154,7 @@ const InvitePage = () => {
     if (!invite.board || !invite.member) return;
 
     try {
-      const savedData = localStorage.getItem('tasks-data');
+      const savedData = localStorage.getItem('kanban-boards');
       const boards: Board[] = savedData ? JSON.parse(savedData) : [];
 
       const updatedBoards = boards.map(board => {
@@ -175,7 +175,7 @@ const InvitePage = () => {
         return board;
       });
 
-      localStorage.setItem('tasks-data', JSON.stringify(updatedBoards));
+      localStorage.setItem('kanban-boards', JSON.stringify(updatedBoards));
       setInvite(prev => ({ ...prev, message: 'Convite recusado.' }));
 
     } catch (error) {

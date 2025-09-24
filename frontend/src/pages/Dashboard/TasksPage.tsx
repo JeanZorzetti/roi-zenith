@@ -918,7 +918,7 @@ const TasksPage = () => {
       inviteToken
     };
 
-    setBoards(prev => prev.map(board => {
+    const updatedBoards = boards.map(board => {
       if (board.id === sharingBoardId) {
         const existingMember = board.members?.find(m => m.email === shareEmail);
         if (existingMember) {
@@ -933,7 +933,12 @@ const TasksPage = () => {
         };
       }
       return board;
-    }));
+    });
+
+    setBoards(updatedBoards);
+
+    // Salvar no localStorage imediatamente
+    localStorage.setItem('kanban-boards', JSON.stringify(updatedBoards));
 
     // Gerar link de convite
     const generatedInviteLink = `${window.location.origin}/invite/${inviteToken}`;
