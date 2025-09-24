@@ -738,6 +738,11 @@ const TasksPage = () => {
   const [sharePermission, setSharePermission] = useState<'view' | 'edit'>('view');
   const [sharingBoardId, setSharingBoardId] = useState<string | null>(null);
 
+  // Invite link modal state
+  const [showInviteLinkModal, setShowInviteLinkModal] = useState(false);
+  const [inviteLink, setInviteLink] = useState('');
+  const [inviteDetails, setInviteDetails] = useState({ email: '', permission: '' });
+
   // Horizontal scroll state
   const [isScrolling, setIsScrolling] = useState(false);
   const [scrollStartX, setScrollStartX] = useState(0);
@@ -931,41 +936,25 @@ const TasksPage = () => {
     }));
 
     // Gerar link de convite
-    const inviteLink = `${window.location.origin}/invite/${inviteToken}`;
+    const generatedInviteLink = `${window.location.origin}/invite/${inviteToken}`;
 
     // Simular envio de e-mail (em produção, chamar API)
     console.log(`
 🔗 CONVITE GERADO:
 📧 Para: ${shareEmail}
 🎭 Permissão: ${sharePermission}
-🔗 Link: ${inviteLink}
+🔗 Link: ${generatedInviteLink}
 
 📨 Em produção, este link seria enviado por e-mail!
     `);
 
-    // Mostrar link para o usuário (temporário, para teste)
-    const copyLink = confirm(`
-✅ Convite criado com sucesso!
-
-📧 Destinatário: ${shareEmail}
-🎭 Permissão: ${sharePermission === 'view' ? 'Visualização' : 'Edição'}
-
-🔗 Link do convite:
-${inviteLink}
-
-⚠️  Para testar: Copie o link acima e abra em uma nova aba.
-   Em produção, este link seria enviado por e-mail automaticamente.
-
-Clique OK para copiar o link para a área de transferência.
-    `);
-
-    if (copyLink) {
-      navigator.clipboard.writeText(inviteLink).then(() => {
-        alert('✅ Link copiado para a área de transferência!');
-      }).catch(() => {
-        alert('❌ Erro ao copiar link. Copie manualmente do console.');
-      });
-    }
+    // Mostrar modal customizado com link selecionável
+    setInviteLink(generatedInviteLink);
+    setInviteDetails({
+      email: shareEmail,
+      permission: sharePermission === 'view' ? 'Visualização' : 'Edição'
+    });
+    setShowInviteLinkModal(true);
 
     closeShareModal();
   };
@@ -2248,6 +2237,107 @@ Clique OK para copiar o link para a área de transferência.
               >
                 <Mail className="h-4 w-4" />
                 <span>Enviar Convite</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Invite Link Modal */}
+      {showInviteLinkModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-gray-900 rounded-2xl border border-gray-700 p-6 w-full max-w-lg">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold text-white flex items-center space-x-2">
+                <CheckCircle2 className="h-5 w-5 text-green-400" />
+                <span>Convite Enviado</span>
+              </h3>
+              <button
+                onClick={() => setShowInviteLinkModal(false)}
+                className="p-1 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4">
+                <div className="flex items-center space-x-2 mb-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-400" />
+                  <span className="text-green-400 font-medium">Convite criado com sucesso!</span>
+                </div>
+                <div className="text-sm text-gray-300">
+                  <p><strong>Destinatário:</strong> {inviteDetails.email}</p>
+                  <p><strong>Permissão:</strong> {inviteDetails.permission}</p>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Link do Convite
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={inviteLink}
+                    readOnly
+                    className="w-full px-3 py-3 bg-gray-800/50 border border-gray-600 rounded-lg text-white text-sm select-all focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
+                    onClick={(e) => {
+                      e.currentTarget.select();
+                    }}
+                  />
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(inviteLink).then(() => {
+                        alert('✅ Link copiado para a área de transferência!');
+                      }).catch(() => {
+                        alert('❌ Erro ao copiar. Tente selecionar o texto manualmente.');
+                      });
+                    }}
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 bg-primary-600 hover:bg-primary-500 rounded-lg text-white transition-colors"
+                    title="Copiar link"
+                  >
+                    <Copy className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
+                <div className="flex items-start space-x-2">
+                  <AlertCircle className="h-4 w-4 text-blue-400 mt-0.5" />
+                  <div className="text-sm text-blue-300">
+                    <p className="font-medium mb-1">Para testar:</p>
+                    <p>1. Copie o link acima</p>
+                    <p>2. Abra em uma nova aba ou janela anônima</p>
+                    <p>3. O convidado poderá aceitar e acessar o quadro</p>
+                    <p className="mt-2 text-blue-400">
+                      <strong>Em produção:</strong> Este link seria enviado automaticamente por e-mail.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end space-x-3 mt-6">
+              <button
+                onClick={() => setShowInviteLinkModal(false)}
+                className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors"
+              >
+                Fechar
+              </button>
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(inviteLink).then(() => {
+                    alert('✅ Link copiado!');
+                    setShowInviteLinkModal(false);
+                  }).catch(() => {
+                    alert('❌ Erro ao copiar.');
+                  });
+                }}
+                className="flex items-center space-x-2 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-500 hover:to-blue-500 px-4 py-2 rounded-lg text-white transition-all duration-300"
+              >
+                <Copy className="h-4 w-4" />
+                <span>Copiar e Fechar</span>
               </button>
             </div>
           </div>
