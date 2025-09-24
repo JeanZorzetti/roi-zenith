@@ -32,6 +32,7 @@ const TasksPage = lazy(() => import('@/pages/Dashboard/TasksPage'));
 const ReportsPage = lazy(() => import('@/pages/Dashboard/ReportsPage'));
 const SettingsPage = lazy(() => import('@/pages/Dashboard/SettingsPage'));
 const DatabaseTestPage = lazy(() => import('@/pages/Database/DatabaseTest'));
+const InvitePage = lazy(() => import('@/pages/Invite/InvitePage'));
 const NotFoundPage = lazy(() => import('@/pages/NotFound'));
 
 // Loading fallback component
@@ -84,6 +85,9 @@ const AppRouter = () => {
             <Route path="settings" element={<SettingsPage />} />
             <Route path="database-test" element={<DatabaseTestPage />} />
           </Route>
+
+          {/* Invite Route - Public access */}
+          <Route path="/invite/:token" element={<InvitePage />} />
 
           {/* 404 */}
           <Route path="*" element={<NotFoundPage />} />

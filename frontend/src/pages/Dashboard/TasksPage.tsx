@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { 
   Plus, 
   MoreHorizontal, 
@@ -60,6 +61,7 @@ interface BoardMember {
   invitedAt: string;
   acceptedAt?: string;
   status: 'pending' | 'accepted' | 'declined';
+  inviteToken?: string;
 }
 
 interface Board {
@@ -76,6 +78,8 @@ interface Board {
 }
 
 const TasksPage = () => {
+  const [searchParams] = useSearchParams();
+
   // Function to create ERP IA Orion board
   const getERPBoard = (): Board => ({
     id: 'erp-ia-orion',
@@ -698,6 +702,15 @@ const TasksPage = () => {
   const [boards, setBoards] = useState<Board[]>(loadInitialData);
   const [currentBoardId, setCurrentBoardId] = useState<string>(loadInitialData()[0]?.id || 'main-board');
   const [showBoardSelector, setShowBoardSelector] = useState(false);
+
+  // Guest access state
+  const [isGuest, setIsGuest] = useState(false);
+  const [guestSession, setGuestSession] = useState<{
+    email: string;
+    name: string;
+    boardAccess: { boardId: string; permission: 'view' | 'edit' }[];
+    isGuest: boolean;
+  } | null>(null);
   const [showBoardModal, setShowBoardModal] = useState(false);
   const [editingBoard, setEditingBoard] = useState<Board | null>(null);
   
@@ -741,9 +754,36 @@ const TasksPage = () => {
     checklist: [] as ChecklistItem[]
   });
 
+  // Check for guest access
+  useEffect(() => {
+    const boardParam = searchParams.get('board');
+    const guestParam = searchParams.get('guest');
+
+    if (guestParam === 'true') {
+      const savedGuestSession = localStorage.getItem('guest-session');
+      if (savedGuestSession) {
+        const session = JSON.parse(savedGuestSession);
+        setIsGuest(true);
+        setGuestSession(session);
+
+        if (boardParam) {
+          setCurrentBoardId(boardParam);
+        }
+      }
+    }
+  }, [searchParams]);
+
   // Get current board
   const currentBoard = boards.find(board => board.id === currentBoardId) || boards[0];
   const columns = currentBoard?.columns || [];
+
+  // Check if current user has permission to edit
+  const canEdit = () => {
+    if (!isGuest || !guestSession) return true; // Full access for owners
+
+    const boardAccess = guestSession.boardAccess.find(access => access.boardId === currentBoardId);
+    return boardAccess?.permission === 'edit';
+  };
 
   // Get the default column for new tasks - simply use the first column
   const getDefaultTaskColumn = () => {
@@ -863,12 +903,14 @@ const TasksPage = () => {
       return;
     }
 
+    const inviteToken = btoa(`${sharingBoardId}-${shareEmail.trim()}-${Date.now()}`);
     const newMember: BoardMember = {
       id: Date.now().toString(),
       email: shareEmail.trim(),
       permission: sharePermission,
       invitedAt: new Date().toISOString(),
-      status: 'pending'
+      status: 'pending',
+      inviteToken
     };
 
     setBoards(prev => prev.map(board => {
@@ -888,9 +930,42 @@ const TasksPage = () => {
       return board;
     }));
 
+    // Gerar link de convite
+    const inviteLink = `${window.location.origin}/invite/${inviteToken}`;
+
     // Simular envio de e-mail (em produção, chamar API)
-    console.log(`Convite enviado para ${shareEmail} com permissão ${sharePermission}`);
-    alert(`Convite enviado com sucesso para ${shareEmail}!`);
+    console.log(`
+🔗 CONVITE GERADO:
+📧 Para: ${shareEmail}
+🎭 Permissão: ${sharePermission}
+🔗 Link: ${inviteLink}
+
+📨 Em produção, este link seria enviado por e-mail!
+    `);
+
+    // Mostrar link para o usuário (temporário, para teste)
+    const copyLink = confirm(`
+✅ Convite criado com sucesso!
+
+📧 Destinatário: ${shareEmail}
+🎭 Permissão: ${sharePermission === 'view' ? 'Visualização' : 'Edição'}
+
+🔗 Link do convite:
+${inviteLink}
+
+⚠️  Para testar: Copie o link acima e abra em uma nova aba.
+   Em produção, este link seria enviado por e-mail automaticamente.
+
+Clique OK para copiar o link para a área de transferência.
+    `);
+
+    if (copyLink) {
+      navigator.clipboard.writeText(inviteLink).then(() => {
+        alert('✅ Link copiado para a área de transferência!');
+      }).catch(() => {
+        alert('❌ Erro ao copiar link. Copie manualmente do console.');
+      });
+    }
 
     closeShareModal();
   };
@@ -1317,9 +1392,17 @@ const TasksPage = () => {
             <div>
               <h1 className="text-3xl font-black bg-gradient-to-r from-white via-gray-100 to-primary-300 bg-clip-text text-transparent">
                 Organizador de Tarefas
+                {isGuest && (
+                  <span className="ml-3 px-3 py-1 bg-purple-500/20 border border-purple-500/30 rounded-full text-xs text-purple-300 font-normal">
+                    👤 Acesso Compartilhado
+                  </span>
+                )}
               </h1>
               <p className="text-gray-400 mt-2">
-                Gerencie seus projetos com quadros Kanban personalizados
+                {isGuest && guestSession ?
+                  `Bem-vindo, ${guestSession.name}! Você tem acesso ${canEdit() ? 'de edição' : 'somente leitura'} a este quadro.` :
+                  'Gerencie seus projetos com quadros Kanban personalizados'
+                }
               </p>
             </div>
             
@@ -1438,17 +1521,19 @@ const TasksPage = () => {
               <Plus className="h-4 w-4" />
               <span className="font-medium">Nova Coluna</span>
             </button>
-            <button
-              onClick={() => {
-                console.log('DEBUG: Nova Tarefa button clicked');
-                setTargetColumnId(getDefaultTaskColumn());
-                setShowTaskModal(true);
-              }}
-              className="flex items-center space-x-2 bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-500 hover:to-secondary-500 px-4 py-2 rounded-xl transition-all duration-300 hover:scale-105"
-            >
-              <Plus className="h-4 w-4" />
-              <span className="font-medium">Nova Tarefa</span>
-            </button>
+            {canEdit() && (
+              <button
+                onClick={() => {
+                  console.log('DEBUG: Nova Tarefa button clicked');
+                  setTargetColumnId(getDefaultTaskColumn());
+                  setShowTaskModal(true);
+                }}
+                className="flex items-center space-x-2 bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-500 hover:to-secondary-500 px-4 py-2 rounded-xl transition-all duration-300 hover:scale-105"
+              >
+                <Plus className="h-4 w-4" />
+                <span className="font-medium">Nova Tarefa</span>
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -1512,17 +1597,19 @@ const TasksPage = () => {
                 >
                   <Edit3 className="h-4 w-4" />
                 </button>
-                <button
-                  onClick={() => {
-                    resetTaskForm();
-                    setTargetColumnId(column.id);
-                    setShowTaskModal(true);
-                  }}
-                  className="p-1 rounded-lg text-gray-400 hover:text-green-400 hover:bg-gray-800/50 transition-colors"
-                  title="Adicionar tarefa aqui"
-                >
-                  <Plus className="h-4 w-4" />
-                </button>
+                {canEdit() && (
+                  <button
+                    onClick={() => {
+                      resetTaskForm();
+                      setTargetColumnId(column.id);
+                      setShowTaskModal(true);
+                    }}
+                    className="p-1 rounded-lg text-gray-400 hover:text-green-400 hover:bg-gray-800/50 transition-colors"
+                    title="Adicionar tarefa aqui"
+                  >
+                    <Plus className="h-4 w-4" />
+                  </button>
+                )}
                 {columns.length > 1 && (
                   <button
                     onClick={() => deleteColumn(column.id)}
@@ -1703,17 +1790,19 @@ const TasksPage = () => {
               })}
 
               {/* Add Task Button */}
-              <button
-                onClick={() => {
-                  resetTaskForm();
-                  setTargetColumnId(column.id);
-                  setShowTaskModal(true);
-                }}
-                className="w-full p-3 border-2 border-dashed border-gray-700/50 rounded-xl text-gray-400 hover:text-white hover:border-gray-600/50 transition-all duration-300 flex items-center justify-center space-x-2"
-              >
-                <Plus className="h-4 w-4" />
-                <span className="text-sm font-medium">Adicionar tarefa</span>
-              </button>
+              {canEdit() && (
+                <button
+                  onClick={() => {
+                    resetTaskForm();
+                    setTargetColumnId(column.id);
+                    setShowTaskModal(true);
+                  }}
+                  className="w-full p-3 border-2 border-dashed border-gray-700/50 rounded-xl text-gray-400 hover:text-white hover:border-gray-600/50 transition-all duration-300 flex items-center justify-center space-x-2"
+                >
+                  <Plus className="h-4 w-4" />
+                  <span className="text-sm font-medium">Adicionar tarefa</span>
+                </button>
+              )}
             </div>
           </div>
         ))}
