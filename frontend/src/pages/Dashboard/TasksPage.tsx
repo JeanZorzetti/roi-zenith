@@ -20,7 +20,10 @@ import {
   ChevronDown,
   Grid3X3,
   Copy,
-  Star
+  Star,
+  Share2,
+  Mail,
+  Users
 } from 'lucide-react';
 
 interface ChecklistItem {
@@ -49,6 +52,16 @@ interface Column {
   tasks: Task[];
 }
 
+interface BoardMember {
+  id: string;
+  email: string;
+  name?: string;
+  permission: 'view' | 'edit' | 'admin';
+  invitedAt: string;
+  acceptedAt?: string;
+  status: 'pending' | 'accepted' | 'declined';
+}
+
 interface Board {
   id: string;
   title: string;
@@ -57,6 +70,9 @@ interface Board {
   isFavorite: boolean;
   createdAt: string;
   columns: Column[];
+  owner?: string;
+  members?: BoardMember[];
+  isShared?: boolean;
 }
 
 const TasksPage = () => {
@@ -702,7 +718,13 @@ const TasksPage = () => {
   const [editingColumnId, setEditingColumnId] = useState<string | null>(null);
   const [editingColumnTitle, setEditingColumnTitle] = useState('');
   const [targetColumnId, setTargetColumnId] = useState<string | null>(null);
-  
+
+  // Board sharing state
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [shareEmail, setShareEmail] = useState('');
+  const [sharePermission, setSharePermission] = useState<'view' | 'edit'>('view');
+  const [sharingBoardId, setSharingBoardId] = useState<string | null>(null);
+
   // Horizontal scroll state
   const [isScrolling, setIsScrolling] = useState(false);
   const [scrollStartX, setScrollStartX] = useState(0);
@@ -812,6 +834,93 @@ const TasksPage = () => {
     localStorage.removeItem('erp-board-deleted');
     const erpBoard = getERPBoard();
     setBoards(prev => [...prev, erpBoard]);
+  };
+
+  // Board sharing functions
+  const openShareModal = (boardId: string) => {
+    setSharingBoardId(boardId);
+    setShowShareModal(true);
+    setShareEmail('');
+    setSharePermission('view');
+  };
+
+  const closeShareModal = () => {
+    setShowShareModal(false);
+    setSharingBoardId(null);
+    setShareEmail('');
+    setSharePermission('view');
+  };
+
+  const inviteMemberToBoard = () => {
+    if (!shareEmail.trim() || !sharingBoardId) {
+      alert('Por favor, digite um e-mail válido.');
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(shareEmail)) {
+      alert('Por favor, digite um e-mail válido.');
+      return;
+    }
+
+    const newMember: BoardMember = {
+      id: Date.now().toString(),
+      email: shareEmail.trim(),
+      permission: sharePermission,
+      invitedAt: new Date().toISOString(),
+      status: 'pending'
+    };
+
+    setBoards(prev => prev.map(board => {
+      if (board.id === sharingBoardId) {
+        const existingMember = board.members?.find(m => m.email === shareEmail);
+        if (existingMember) {
+          alert('Este e-mail já foi convidado para este quadro.');
+          return board;
+        }
+
+        return {
+          ...board,
+          isShared: true,
+          members: [...(board.members || []), newMember]
+        };
+      }
+      return board;
+    }));
+
+    // Simular envio de e-mail (em produção, chamar API)
+    console.log(`Convite enviado para ${shareEmail} com permissão ${sharePermission}`);
+    alert(`Convite enviado com sucesso para ${shareEmail}!`);
+
+    closeShareModal();
+  };
+
+  const removeMemberFromBoard = (boardId: string, memberId: string) => {
+    setBoards(prev => prev.map(board => {
+      if (board.id === boardId) {
+        const newMembers = (board.members || []).filter(m => m.id !== memberId);
+        return {
+          ...board,
+          members: newMembers,
+          isShared: newMembers.length > 0
+        };
+      }
+      return board;
+    }));
+  };
+
+  const updateMemberPermission = (boardId: string, memberId: string, newPermission: 'view' | 'edit') => {
+    setBoards(prev => prev.map(board => {
+      if (board.id === boardId) {
+        return {
+          ...board,
+          members: (board.members || []).map(member =>
+            member.id === memberId ? { ...member, permission: newPermission } : member
+          )
+        };
+      }
+      return board;
+    }));
   };
 
   const duplicateBoard = (board: Board) => {
@@ -1289,6 +1398,13 @@ const TasksPage = () => {
                               className="p-1 rounded text-gray-400 hover:text-blue-400 transition-colors"
                             >
                               <Copy className="h-3 w-3" />
+                            </button>
+                            <button
+                              onClick={() => openShareModal(board.id)}
+                              className="p-1 rounded text-gray-400 hover:text-purple-400 transition-colors"
+                              title="Compartilhar quadro"
+                            >
+                              <Share2 className="h-3 w-3" />
                             </button>
                             <button
                               onClick={() => openEditBoard(board)}
@@ -1932,6 +2048,117 @@ const TasksPage = () => {
               >
                 <Plus className="h-4 w-4" />
                 <span>Criar</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Share Board Modal */}
+      {showShareModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-gray-900 rounded-2xl border border-gray-700 p-6 w-full max-w-md">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold text-white flex items-center space-x-2">
+                <Share2 className="h-5 w-5" />
+                <span>Compartilhar Quadro</span>
+              </h3>
+              <button
+                onClick={closeShareModal}
+                className="p-1 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  E-mail do convidado *
+                </label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <input
+                    type="email"
+                    value={shareEmail}
+                    onChange={(e) => setShareEmail(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 bg-gray-800/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
+                    placeholder="exemplo@email.com"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Tipo de Permissão
+                </label>
+                <select
+                  value={sharePermission}
+                  onChange={(e) => setSharePermission(e.target.value as 'view' | 'edit')}
+                  className="w-full px-3 py-3 bg-gray-800/50 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
+                >
+                  <option value="view">👀 Visualização (apenas ver)</option>
+                  <option value="edit">✏️ Edição (criar e editar tarefas)</option>
+                </select>
+              </div>
+
+              {/* Current Board Members */}
+              {(() => {
+                const currentBoard = boards.find(b => b.id === sharingBoardId);
+                const members = currentBoard?.members || [];
+
+                if (members.length > 0) {
+                  return (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-3">
+                        <Users className="inline h-4 w-4 mr-1" />
+                        Membros do Quadro ({members.length})
+                      </label>
+                      <div className="space-y-2 max-h-40 overflow-y-auto">
+                        {members.map((member) => (
+                          <div key={member.id} className="flex items-center justify-between bg-gray-800/30 rounded-lg p-3">
+                            <div className="flex items-center space-x-3">
+                              <div className="w-8 h-8 bg-primary-500/20 rounded-full flex items-center justify-center">
+                                <Mail className="h-4 w-4 text-primary-400" />
+                              </div>
+                              <div>
+                                <div className="text-sm text-white font-medium">{member.email}</div>
+                                <div className="text-xs text-gray-400">
+                                  {member.permission === 'view' ? '👀 Visualização' : '✏️ Edição'}
+                                  {member.status === 'pending' && ' • Pendente'}
+                                </div>
+                              </div>
+                            </div>
+                            <button
+                              onClick={() => removeMemberFromBoard(sharingBoardId!, member.id)}
+                              className="p-1 rounded text-gray-400 hover:text-red-400 transition-colors"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                }
+                return null;
+              })()}
+            </div>
+
+            <div className="flex justify-end space-x-3 mt-6">
+              <button
+                onClick={closeShareModal}
+                className="px-4 py-2 text-gray-400 hover:text-white transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={inviteMemberToBoard}
+                disabled={!shareEmail.trim()}
+                className="flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 disabled:from-gray-600 disabled:to-gray-600 px-4 py-2 rounded-lg text-white transition-all duration-300"
+              >
+                <Mail className="h-4 w-4" />
+                <span>Enviar Convite</span>
               </button>
             </div>
           </div>
