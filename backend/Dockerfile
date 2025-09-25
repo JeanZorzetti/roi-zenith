@@ -5,13 +5,16 @@ WORKDIR /app
 
 # Copiar package files
 COPY package*.json ./
-RUN npm install --production
+RUN npm install
 
 # Copiar código fonte
 COPY . .
 
 # Compilar TypeScript
 RUN npm run build
+
+# Remover devDependencies após build
+RUN npm prune --production
 
 # Expor porta
 EXPOSE 5000
