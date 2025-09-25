@@ -45,7 +45,98 @@ model User {
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
+  // Relations
+  boards      Board[]
+  boardMembers BoardMember[]
+
   @@map("users")
+}
+
+model Board {
+  id          String   @id @default(cuid())
+  title       String
+  description String?  @db.Text
+  color       String   @default("bg-blue-500")
+  isPublic    Boolean  @default(false) @map("is_public")
+  isFavorite  Boolean  @default(false) @map("is_favorite")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  userId      String?  @map("user_id")
+  user        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  columns     Column[]
+  members     BoardMember[]
+
+  @@map("boards")
+}
+
+model Column {
+  id          String   @id @default(cuid())
+  title       String
+  color       String   @default("bg-gray-500")
+  position    Int      @default(0)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  boardId     String   @map("board_id")
+  board       Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  tasks       Task[]
+
+  @@map("columns")
+}
+
+model Task {
+  id          String   @id @default(cuid())
+  title       String
+  description String?  @db.Text
+  priority    TaskPriority @default(MEDIUM)
+  assignee    String?
+  dueDate     DateTime? @map("due_date")
+  tags        Json     @default("[]")
+  completed   Boolean  @default(false)
+  position    Int      @default(0)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  columnId    String   @map("column_id")
+  column      Column   @relation(fields: [columnId], references: [id], onDelete: Cascade)
+  checklist   ChecklistItem[]
+
+  @@map("tasks")
+}
+
+model ChecklistItem {
+  id          String   @id @default(cuid())
+  text        String
+  completed   Boolean  @default(false)
+  position    Int      @default(0)
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  // Relations
+  taskId      String   @map("task_id")
+  task        Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@map("checklist_items")
+}
+
+model BoardMember {
+  id          String   @id @default(cuid())
+  email       String
+  name        String
+  permission  MemberPermission @default(VIEW)
+  invitedAt   DateTime @default(now()) @map("invited_at")
+
+  // Relations
+  boardId     String   @map("board_id")
+  board       Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  userId      String?  @map("user_id")
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@unique([boardId, email])
+  @@map("board_members")
 }
 
 model Campaign {
@@ -110,4 +201,15 @@ enum CampaignStatus {
   ACTIVE
   PAUSED
   COMPLETED
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum MemberPermission {
+  VIEW
+  EDIT
 }
