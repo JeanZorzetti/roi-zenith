@@ -38,7 +38,8 @@
       "Bash(git rm:*)",
       "Bash(findstr:*)",
       "Bash(chmod:*)",
-      "Bash(dir \"C:\\Users\\jeanz\\Downloads\\roi-zenith-main\\Print\")"
+      "Bash(dir \"C:\\Users\\jeanz\\Downloads\\roi-zenith-main\\Print\")",
+      "Bash(dir C:UsersjeanzDownloadsroi-zenith-mainbackendsrcroutes)"
     ],
     "deny": [],
     "ask": []
