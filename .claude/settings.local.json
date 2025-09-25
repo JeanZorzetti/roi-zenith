@@ -36,7 +36,8 @@
       "Bash(docker build:*)",
       "Bash(docker:*)",
       "Bash(git rm:*)",
-      "Bash(findstr:*)"
+      "Bash(findstr:*)",
+      "Bash(chmod:*)"
     ],
     "deny": [],
     "ask": []

@@ -1,90 +1,20 @@
-# DOCKERFILE MYSQL DEFINITIVO - Node.js com Ubuntu base
-FROM ubuntu:22.04 AS base
+# Backend Dockerfile para produção
+FROM node:18-alpine
 
-# Install Node.js and npm
-RUN apt-get update && apt-get install -y \
-    curl \
-    ca-certificates \
-    gnupg \
-    lsb-release \
-    && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
-    && apt-get install -y nodejs \
-    && apt-get upgrade -y \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* \
-    && npm config set fund false \
-    && npm config set audit-level high
-
-# Install dependencies only when needed
-FROM base AS deps
 WORKDIR /app
-COPY package.json package-lock.json* ./
-RUN npm install --ignore-scripts --network-timeout=300000 --fetch-timeout=300000 --fetch-retries=3 --omit=optional
 
-# Rebuild the source code only when needed
-FROM base AS builder
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
+# Copiar package files
+COPY package*.json ./
+RUN npm ci --only=production
+
+# Copiar código fonte
 COPY . .
 
-# Generate Prisma Client first
-RUN npx prisma generate
-
-# Build the application
+# Compilar TypeScript
 RUN npm run build
 
-# Production dependencies only
-FROM base AS prod-deps
-WORKDIR /app
-COPY package.json package-lock.json* ./
-RUN npm install --omit=dev --ignore-scripts --network-timeout=300000 --fetch-timeout=300000 --fetch-retries=3 --omit=optional
-
-# Production image, copy all the files and run the app
-FROM base AS runner
-WORKDIR /app
-
-# Build arguments for database connection
-ARG DATABASE_URL
-ARG DB_HOST
-ARG DB_USER
-ARG DB_PASSWORD
-ARG DB_NAME
-ARG DB_PORT
-
-# Environment variables
-ENV NODE_ENV=production
-ENV DATABASE_URL=$DATABASE_URL
-ENV DB_HOST=$DB_HOST
-ENV DB_USER=$DB_USER
-ENV DB_PASSWORD=$DB_PASSWORD
-ENV DB_NAME=$DB_NAME
-ENV DB_PORT=$DB_PORT
-
-# Create app user
-RUN groupadd --system --gid 1000 appuser && \
-    useradd --system --uid 1000 --gid appuser --shell /bin/bash --create-home appuser
-
-# Copy the built application
-COPY --from=builder --chown=appuser:appuser /app/dist ./dist
-COPY --from=prod-deps --chown=appuser:appuser /app/node_modules ./node_modules
-COPY --from=builder --chown=appuser:appuser /app/prisma ./prisma
-COPY --chown=appuser:appuser package.json ./
-COPY --chown=appuser:appuser start.sh ./
-
-# Generate Prisma Client only (db push will run at runtime)
-USER appuser
-RUN npx prisma generate
-
-# Make start script executable
-USER root
-RUN chmod +x start.sh
-USER appuser
-
-# Expose the port that the application listens on
+# Expor porta
 EXPOSE 5000
 
-# Set the PORT environment variable
-ENV PORT=5000
-
-# Run the application with database setup
-CMD ["./start.sh"]
+# Comando para iniciar
+CMD ["node", "dist/server.js"]
