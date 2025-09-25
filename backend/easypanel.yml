@@ -5,7 +5,7 @@ services:
     image: roi-labs-backend
     build:
       context: .
-      dockerfile: Dockerfile.mysql
+      dockerfile: Dockerfile
     
     domains:
       - back.roilabs.com.br
