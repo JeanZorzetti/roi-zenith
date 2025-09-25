@@ -9,7 +9,7 @@ interface BoardMember {
   permission: 'view' | 'edit' | 'admin';
   invitedAt: string;
   acceptedAt?: string;
-  status: 'pending' | 'accepted' | 'declined';
+  status: 'pending' | 'accepted' | 'declined' | 'expired';
   inviteToken?: string;
 }
 
@@ -68,6 +68,11 @@ const InvitePage = () => {
 
           const member = board.members.find(m =>
             m.inviteToken === inviteToken && m.status === 'pending'
+          );
+
+          // Verificar se existe token expirado
+          const expiredMember = board.members.find(m =>
+            m.inviteToken === inviteToken && m.status === 'expired'
           );
           if (member) {
             console.log('Found matching member:', member);

@@ -60,7 +60,7 @@ interface BoardMember {
   permission: 'view' | 'edit' | 'admin';
   invitedAt: string;
   acceptedAt?: string;
-  status: 'pending' | 'accepted' | 'declined';
+  status: 'pending' | 'accepted' | 'declined' | 'expired';
   inviteToken?: string;
 }
 
@@ -908,18 +908,27 @@ const TasksPage = () => {
       return;
     }
 
-    // Gerar token URL-safe
+    // Gerar token URL-safe único
     const generateUrlSafeToken = (boardId: string, email: string, timestamp: number) => {
-      const data = `${boardId}-${email}-${timestamp}`;
+      // Adicionar componente aleatório para garantir unicidade
+      const randomComponent = Math.random().toString(36).substring(2, 15);
+      const data = `${boardId}-${email}-${timestamp}-${randomComponent}`;
       return btoa(data)
         .replace(/\+/g, '-')
         .replace(/\//g, '_')
         .replace(/=/g, '');
     };
 
-    const inviteToken = generateUrlSafeToken(sharingBoardId, shareEmail.trim(), Date.now());
+    const timestamp = Date.now();
+    const inviteToken = generateUrlSafeToken(sharingBoardId, shareEmail.trim(), timestamp);
+
+    // Gerar ID único para o membro
+    const generateUniqueId = () => {
+      return `member_${timestamp}_${Math.random().toString(36).substring(2, 15)}`;
+    };
+
     const newMember: BoardMember = {
-      id: Date.now().toString(),
+      id: generateUniqueId(),
       email: shareEmail.trim(),
       permission: sharePermission,
       invitedAt: new Date().toISOString(),
@@ -930,9 +939,27 @@ const TasksPage = () => {
     const updatedBoards = boards.map(board => {
       if (board.id === sharingBoardId) {
         const existingMember = board.members?.find(m => m.email === shareEmail);
+
         if (existingMember) {
-          alert('Este e-mail já foi convidado para este quadro.');
-          return board;
+          // Se já existe, verificar o status
+          if (existingMember.status === 'accepted') {
+            alert('Este e-mail já aceitou o convite e faz parte do quadro.');
+            return board;
+          } else {
+            // Se o convite está pendente ou foi recusado, invalida o anterior e cria novo
+            const updatedMembers = board.members?.map(m => {
+              if (m.email === shareEmail && m.status !== 'accepted') {
+                return { ...m, status: 'expired' as const };
+              }
+              return m;
+            }) || [];
+
+            return {
+              ...board,
+              isShared: true,
+              members: [...updatedMembers, newMember]
+            };
+          }
         }
 
         return {
