@@ -20,7 +20,12 @@ const ProtectedRoute = ({ children, requireAuth = true }: ProtectedRouteProps) =
     return <LoadingScreen />;
   }
 
-  if (requireAuth && !isAuthenticated) {
+  // Check if user is a guest (has guest session and guest=true param)
+  const urlParams = new URLSearchParams(location.search);
+  const isGuest = urlParams.get('guest') === 'true';
+  const hasGuestSession = localStorage.getItem('guest-session') !== null;
+
+  if (requireAuth && !isAuthenticated && !(isGuest && hasGuestSession)) {
     // Redirect to home with the attempted location
     return <Navigate to="/home" state={{ from: location }} replace />;
   }

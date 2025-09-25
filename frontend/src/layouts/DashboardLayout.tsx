@@ -32,9 +32,21 @@ const DashboardLayout = () => {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [notifications, setNotifications] = useState([]);
 
+  // Check if user is a guest
+  const urlParams = new URLSearchParams(location.search);
+  const isGuest = urlParams.get('guest') === 'true';
+  const guestSession = isGuest ? JSON.parse(localStorage.getItem('guest-session') || '{}') : null;
+
   const handleLogout = () => {
-    logout();
-    navigate('/home');
+    if (isGuest) {
+      // Para convidados, apenas limpar sessão guest e voltar para home
+      localStorage.removeItem('guest-session');
+      navigate('/home');
+    } else {
+      // Para usuários normais, fazer logout completo
+      logout();
+      navigate('/home');
+    }
   };
 
   const searchableItems = [
@@ -513,8 +525,13 @@ const DashboardLayout = () => {
                           <User className="h-6 w-6 text-white" />
                         </div>
                         <div>
-                          <div className="font-bold text-white">{user?.name || 'Usuário'}</div>
-                          <div className="text-sm text-gray-400">{user?.email || 'user@roilabs.com'}</div>
+                          <div className="font-bold text-white">
+                            {isGuest && guestSession ? guestSession.name : (user?.name || 'Usuário')}
+                            {isGuest && <span className="text-xs text-yellow-400 ml-2">(Convidado)</span>}
+                          </div>
+                          <div className="text-sm text-gray-400">
+                            {isGuest && guestSession ? guestSession.email : (user?.email || 'user@roilabs.com')}
+                          </div>
                         </div>
                       </div>
                     </div>
