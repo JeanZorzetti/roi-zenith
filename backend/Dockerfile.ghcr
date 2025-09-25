@@ -19,12 +19,7 @@ WORKDIR /app
 
 # Install ALL dependencies (including devDependencies for building)
 COPY package.json package-lock.json* ./
-RUN npm install --ignore-scripts \
-    --network-timeout 300000 \
-    --fetch-timeout 300000 \
-    --fetch-retries 5 \
-    --no-optional \
-    && npm cache clean --force
+RUN npm install --ignore-scripts --network-timeout=300000 --fetch-timeout=300000 --fetch-retries=5 --omit=optional && npm cache clean --force
 
 # Rebuild the source code only when needed
 FROM base AS builder
@@ -42,12 +37,7 @@ RUN npm run build
 FROM base AS prod-deps
 WORKDIR /app
 COPY package.json package-lock.json* ./
-RUN npm install --omit=dev --ignore-scripts \
-    --network-timeout 300000 \
-    --fetch-timeout 300000 \
-    --fetch-retries 5 \
-    --no-optional \
-    && npm cache clean --force
+RUN npm install --omit=dev --ignore-scripts --network-timeout=300000 --fetch-timeout=300000 --fetch-retries=5 --omit=optional && npm cache clean --force
 
 # Production image, copy all the files and run the app
 FROM base AS runner
