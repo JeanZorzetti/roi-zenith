@@ -700,7 +700,7 @@ const TasksPage = () => {
   };
 
   const [boards, setBoards] = useState<Board[]>(loadInitialData);
-  const [currentBoardId, setCurrentBoardId] = useState<string>(loadInitialData()[0]?.id || 'main-board');
+  const [currentBoardId, setCurrentBoardId] = useState<string>('');
   const [showBoardSelector, setShowBoardSelector] = useState(false);
 
   // Guest access state
@@ -771,10 +771,23 @@ const TasksPage = () => {
         setIsGuest(true);
         setGuestSession(session);
 
-        if (boardParam) {
+        // For guests, filter boards to only show accessible ones
+        const allBoards = loadInitialData();
+        const accessibleBoardIds = session.boardAccess.map((access: any) => access.boardId);
+        const filteredBoards = allBoards.filter(board => accessibleBoardIds.includes(board.id));
+
+        setBoards(filteredBoards);
+
+        if (boardParam && accessibleBoardIds.includes(boardParam)) {
           setCurrentBoardId(boardParam);
+        } else if (filteredBoards.length > 0) {
+          setCurrentBoardId(filteredBoards[0].id);
         }
       }
+    } else {
+      // For normal users, set default board
+      const allBoards = loadInitialData();
+      setCurrentBoardId(allBoards[0]?.id || 'main-board');
     }
   }, [searchParams]);
 

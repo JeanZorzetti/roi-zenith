@@ -93,7 +93,26 @@ const InvitePage = () => {
             color: tokenData.boardColor,
             isFavorite: false,
             createdAt: new Date().toISOString(),
-            columns: [],
+            columns: [
+              {
+                id: 'todo',
+                title: 'A Fazer',
+                color: 'bg-gray-500',
+                tasks: []
+              },
+              {
+                id: 'in-progress',
+                title: 'Em Progresso',
+                color: 'bg-blue-500',
+                tasks: []
+              },
+              {
+                id: 'done',
+                title: 'Concluído',
+                color: 'bg-green-500',
+                tasks: []
+              }
+            ],
             isShared: true
           };
 
@@ -212,6 +231,27 @@ const InvitePage = () => {
         // Board não existe (caso nova janela), criar o board com o membro
         const newBoard: Board = {
           ...invite.board!,
+          // Garantir que o board tem colunas padrão se não tiver
+          columns: invite.board!.columns?.length > 0 ? invite.board!.columns : [
+            {
+              id: 'todo',
+              title: 'A Fazer',
+              color: 'bg-gray-500',
+              tasks: []
+            },
+            {
+              id: 'in-progress',
+              title: 'Em Progresso',
+              color: 'bg-blue-500',
+              tasks: []
+            },
+            {
+              id: 'done',
+              title: 'Concluído',
+              color: 'bg-green-500',
+              tasks: []
+            }
+          ],
           members: [{
             ...invite.member!,
             status: 'accepted' as const,
