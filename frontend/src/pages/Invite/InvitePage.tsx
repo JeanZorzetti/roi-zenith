@@ -46,24 +46,37 @@ const InvitePage = () => {
 
   const validateInvite = (inviteToken: string) => {
     try {
+      console.log('Validating token:', inviteToken);
+
       // Buscar todos os quadros do localStorage
       const savedData = localStorage.getItem('kanban-boards');
       const boards: Board[] = savedData ? JSON.parse(savedData) : [];
+
+      console.log('Found boards:', boards.length);
 
       // Encontrar o convite válido
       let foundBoard: Board | null = null;
       let foundMember: BoardMember | null = null;
 
       for (const board of boards) {
+        console.log(`Checking board: ${board.title} (${board.id})`);
         if (board.members) {
+          console.log(`Board has ${board.members.length} members`);
+          board.members.forEach((member, index) => {
+            console.log(`Member ${index}: ${member.email}, token: ${member.inviteToken}, status: ${member.status}`);
+          });
+
           const member = board.members.find(m =>
             m.inviteToken === inviteToken && m.status === 'pending'
           );
           if (member) {
+            console.log('Found matching member:', member);
             foundBoard = board;
             foundMember = member;
             break;
           }
+        } else {
+          console.log('Board has no members');
         }
       }
 

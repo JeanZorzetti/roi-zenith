@@ -908,7 +908,16 @@ const TasksPage = () => {
       return;
     }
 
-    const inviteToken = btoa(`${sharingBoardId}-${shareEmail.trim()}-${Date.now()}`);
+    // Gerar token URL-safe
+    const generateUrlSafeToken = (boardId: string, email: string, timestamp: number) => {
+      const data = `${boardId}-${email}-${timestamp}`;
+      return btoa(data)
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=/g, '');
+    };
+
+    const inviteToken = generateUrlSafeToken(sharingBoardId, shareEmail.trim(), Date.now());
     const newMember: BoardMember = {
       id: Date.now().toString(),
       email: shareEmail.trim(),
@@ -949,6 +958,8 @@ const TasksPage = () => {
 📧 Para: ${shareEmail}
 🎭 Permissão: ${sharePermission}
 🔗 Link: ${generatedInviteLink}
+🎟️  Token: ${inviteToken}
+📋 BoardId: ${sharingBoardId}
 
 📨 Em produção, este link seria enviado por e-mail!
     `);
