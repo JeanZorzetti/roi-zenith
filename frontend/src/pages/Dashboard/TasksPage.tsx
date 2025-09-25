@@ -817,7 +817,7 @@ const TasksPage = () => {
   }, [boards]);
 
   // Socket.IO integration for real-time collaboration
-  const [onlineUsers, setOnlineUsers] = useState<Set<string>>(new Set());
+  const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
   const [recentActivity, setRecentActivity] = useState<any[]>([]);
 
   const handleTaskUpdated = (data: any) => {
@@ -922,7 +922,12 @@ const TasksPage = () => {
 
   const handleUserJoined = (data: any) => {
     console.log('👤 User joined:', data);
-    setOnlineUsers(prev => new Set([...prev, data.userId]));
+    setOnlineUsers(prev => {
+      if (!prev.includes(data.userId)) {
+        return [...prev, data.userId];
+      }
+      return prev;
+    });
     setRecentActivity(prev => [
       { type: 'user-joined', ...data, id: Date.now() },
       ...prev.slice(0, 9)
@@ -931,11 +936,7 @@ const TasksPage = () => {
 
   const handleUserLeft = (data: any) => {
     console.log('👋 User left:', data);
-    setOnlineUsers(prev => {
-      const newSet = new Set(prev);
-      newSet.delete(data.userId);
-      return newSet;
-    });
+    setOnlineUsers(prev => prev.filter(userId => userId !== data.userId));
     setRecentActivity(prev => [
       { type: 'user-left', ...data, id: Date.now() },
       ...prev.slice(0, 9)
@@ -1799,10 +1800,10 @@ const TasksPage = () => {
             <div className="flex-1">
               <h4 className="text-sm font-medium text-gray-300 mb-2">👥 Usuários Online</h4>
               <div className="flex flex-wrap gap-2">
-                {onlineUsers.map((user, index) => (
+                {onlineUsers.map((userId, index) => (
                   <div key={index} className="flex items-center space-x-2 bg-gray-800/50 px-3 py-1 rounded-full">
                     <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                    <span className="text-xs text-gray-300">{user.name || user.id}</span>
+                    <span className="text-xs text-gray-300">{userId}</span>
                   </div>
                 ))}
                 {onlineUsers.length === 0 && (
