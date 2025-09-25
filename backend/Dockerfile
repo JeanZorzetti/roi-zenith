@@ -22,5 +22,9 @@ RUN npm prune --production
 # Expor porta
 EXPOSE 5000
 
+# Script de inicialização para aplicar migrações e iniciar servidor
+COPY start.sh ./
+RUN chmod +x start.sh
+
 # Comando para iniciar
-CMD ["node", "dist/server.js"]
+CMD ["./start.sh"]

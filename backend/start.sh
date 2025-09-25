@@ -1,9 +1,12 @@
 #!/bin/sh
 
-# Wait for database to be ready and push schema
-echo "🔄 Setting up database schema..."
+echo "🚀 Starting ROI Labs Backend..."
+
+# Wait for database and apply schema changes
+echo "📦 Applying database schema changes..."
 npx prisma db push --accept-data-loss
 
-# Start the application
-echo "🚀 Starting ROI Labs API server..."
+echo "✅ Database schema updated successfully"
+
+echo "🌟 Starting server..."
 exec node dist/server.js
