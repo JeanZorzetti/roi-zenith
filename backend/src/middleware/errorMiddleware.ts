@@ -20,22 +20,22 @@ export const errorHandler = (
   let statusCode = err.statusCode || 500;
   let message = err.message || 'Internal Server Error';
 
-  // Mongoose bad ObjectId
-  if (err.name === 'CastError') {
-    message = 'Resource not found';
-    statusCode = 404;
-  }
-
-  // Mongoose duplicate key
-  if (err.name === 'MongoError' && (err as any).code === 11000) {
+  // Prisma errors
+  if (err.message && err.message.includes('P2002')) {
     message = 'Duplicate field value entered';
     statusCode = 400;
   }
 
-  // Mongoose validation error
-  if (err.name === 'ValidationError') {
-    message = Object.values((err as any).errors).map((val: any) => val.message).join(', ');
+  // Prisma validation error
+  if (err.message && err.message.includes('P2000')) {
+    message = 'Validation failed - data too long for field';
     statusCode = 400;
+  }
+
+  // Prisma not found error
+  if (err.message && err.message.includes('P2025')) {
+    message = 'Resource not found';
+    statusCode = 404;
   }
 
   // JWT errors
