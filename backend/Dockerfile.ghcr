@@ -1,19 +1,17 @@
-# Production Dockerfile using GitHub Container Registry (resolves Docker Hub 401 issues)
-FROM ghcr.io/linuxserver/baseimage-ubuntu:jammy AS base
+# SOLUÇÃO DEFINITIVA: GitHub Container Registry (GHCR) - Resolve Docker Hub 401
+FROM ghcr.io/linuxserver/baseimage-node:18 AS base
 
-# Install Node.js and npm with security updates
-RUN apt-get update && apt-get install -y \
-    curl \
-    ca-certificates \
-    gnupg \
-    lsb-release \
-    && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
-    && apt-get install -y nodejs \
-    && apt-get upgrade -y \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* \
-    && npm config set fund false \
-    && npm config set audit-level high
+# Set environment variables for Node.js optimization
+ENV NODE_OPTIONS="--max-old-space-size=1024"
+ENV NPM_CONFIG_LOGLEVEL=warn
+ENV NPM_CONFIG_FUND=false
+ENV NPM_CONFIG_AUDIT_LEVEL=high
+
+# Configure npm for reliability
+RUN npm config set network-timeout 300000 \
+    && npm config set fetch-timeout 300000 \
+    && npm config set fetch-retries 5 \
+    && npm config set registry https://registry.npmjs.org/
 
 # Install dependencies only when needed
 FROM base AS deps
@@ -24,8 +22,9 @@ COPY package.json package-lock.json* ./
 RUN npm install --ignore-scripts \
     --network-timeout 300000 \
     --fetch-timeout 300000 \
-    --fetch-retries 3 \
-    --no-optional
+    --fetch-retries 5 \
+    --no-optional \
+    && npm cache clean --force
 
 # Rebuild the source code only when needed
 FROM base AS builder
@@ -46,8 +45,9 @@ COPY package.json package-lock.json* ./
 RUN npm install --omit=dev --ignore-scripts \
     --network-timeout 300000 \
     --fetch-timeout 300000 \
-    --fetch-retries 3 \
-    --no-optional
+    --fetch-retries 5 \
+    --no-optional \
+    && npm cache clean --force
 
 # Production image, copy all the files and run the app
 FROM base AS runner
@@ -64,9 +64,9 @@ ARG DB_PORT
 ENV NODE_ENV=production
 ENV DATABASE_URL=$DATABASE_URL
 
-# Create a non-privileged user that the app will run under.
-RUN groupadd --system --gid 1001 nodejs || true
-RUN useradd --system --uid 1001 --gid 1001 nodejs || true
+# Create a non-privileged user that the app will run under
+RUN groupadd --system --gid 1001 nodejs 2>/dev/null || true
+RUN useradd --system --uid 1001 --gid 1001 nodejs 2>/dev/null || true
 
 # Copy the built application
 COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
@@ -83,7 +83,7 @@ RUN chmod +x start.sh
 
 USER nodejs
 
-# Expose the port that the application listens on.
+# Expose the port that the application listens on
 EXPOSE 5000
 
 # Set the PORT environment variable

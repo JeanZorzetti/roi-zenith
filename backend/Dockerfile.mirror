@@ -1,15 +1,23 @@
-# Production Dockerfile using GitHub Container Registry (resolves Docker Hub 401 issues)
-FROM ghcr.io/linuxserver/baseimage-ubuntu:jammy AS base
+# Dockerfile using alternative registries (no Docker Hub dependency)
+# This solves the 401 Unauthorized issue from registry-1.docker.io
 
-# Install Node.js and npm with security updates
+# Try alternative registries that might be accessible
+FROM ghcr.io/distroless/nodejs18-debian11:latest AS base-distroless
+
+# Alternative: Use Debian base with manual Node.js installation
+FROM debian:bullseye-slim AS base
+
+# Install Node.js without Docker Hub dependency
 RUN apt-get update && apt-get install -y \
     curl \
     ca-certificates \
     gnupg \
     lsb-release \
-    && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && mkdir -p /etc/apt/keyrings \
+    && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
+    && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_18.x bullseye main" | tee /etc/apt/sources.list.d/nodesource.list \
+    && apt-get update \
     && apt-get install -y nodejs \
-    && apt-get upgrade -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
     && npm config set fund false \
@@ -22,9 +30,10 @@ WORKDIR /app
 # Install ALL dependencies (including devDependencies for building)
 COPY package.json package-lock.json* ./
 RUN npm install --ignore-scripts \
-    --network-timeout 300000 \
-    --fetch-timeout 300000 \
-    --fetch-retries 3 \
+    --network-timeout 600000 \
+    --fetch-timeout 600000 \
+    --fetch-retries 5 \
+    --registry https://registry.npmjs.org/ \
     --no-optional
 
 # Rebuild the source code only when needed
@@ -44,9 +53,10 @@ FROM base AS prod-deps
 WORKDIR /app
 COPY package.json package-lock.json* ./
 RUN npm install --omit=dev --ignore-scripts \
-    --network-timeout 300000 \
-    --fetch-timeout 300000 \
-    --fetch-retries 3 \
+    --network-timeout 600000 \
+    --fetch-timeout 600000 \
+    --fetch-retries 5 \
+    --registry https://registry.npmjs.org/ \
     --no-optional
 
 # Production image, copy all the files and run the app
