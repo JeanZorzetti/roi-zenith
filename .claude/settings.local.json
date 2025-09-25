@@ -34,7 +34,9 @@
       "Bash(cp:*)",
       "Bash(touch:*)",
       "Bash(docker build:*)",
-      "Bash(docker:*)"
+      "Bash(docker:*)",
+      "Bash(git rm:*)",
+      "Bash(findstr:*)"
     ],
     "deny": [],
     "ask": []

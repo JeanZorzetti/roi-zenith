@@ -4,6 +4,8 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
 import { connectDB } from './utils/database';
 import { errorHandler, notFound } from './middleware/errorMiddleware';
 
@@ -29,6 +31,7 @@ const allowedOrigins = [
   'https://roilabs.com.br',
   'https://www.roilabs.com.br',
   'http://localhost:3000',
+  'http://localhost:3005',
   'http://localhost:8080',
   'http://localhost:8081',
   'http://localhost:8082'
@@ -93,10 +96,122 @@ app.get('/api/health', (req, res) => {
 app.use(notFound);
 app.use(errorHandler);
 
-const server = app.listen(PORT, () => {
+// Create HTTP server
+const server = createServer(app);
+
+// Create Socket.IO server
+const io = new Server(server, {
+  cors: {
+    origin: allowedOrigins,
+    methods: ["GET", "POST"],
+    credentials: true
+  }
+});
+
+// Socket.IO connection handling
+io.on('connection', (socket) => {
+  console.log(`🔗 User connected: ${socket.id}`);
+
+  // Join a specific board room
+  socket.on('join-board', (boardId: string) => {
+    socket.join(boardId);
+    console.log(`👤 User ${socket.id} joined board: ${boardId}`);
+
+    // Notify others in the room
+    socket.to(boardId).emit('user-joined', {
+      userId: socket.id,
+      boardId
+    });
+  });
+
+  // Leave a board room
+  socket.on('leave-board', (boardId: string) => {
+    socket.leave(boardId);
+    console.log(`👋 User ${socket.id} left board: ${boardId}`);
+
+    // Notify others in the room
+    socket.to(boardId).emit('user-left', {
+      userId: socket.id,
+      boardId
+    });
+  });
+
+  // Handle task updates
+  socket.on('task-updated', (data) => {
+    console.log(`📝 Task updated in board ${data.boardId} by ${socket.id}`);
+
+    // Broadcast to all users in the board room except sender
+    socket.to(data.boardId).emit('task-updated', {
+      ...data,
+      updatedBy: socket.id,
+      timestamp: new Date().toISOString()
+    });
+  });
+
+  // Handle task creation
+  socket.on('task-created', (data) => {
+    console.log(`✨ Task created in board ${data.boardId} by ${socket.id}`);
+
+    socket.to(data.boardId).emit('task-created', {
+      ...data,
+      createdBy: socket.id,
+      timestamp: new Date().toISOString()
+    });
+  });
+
+  // Handle task deletion
+  socket.on('task-deleted', (data) => {
+    console.log(`🗑️ Task deleted in board ${data.boardId} by ${socket.id}`);
+
+    socket.to(data.boardId).emit('task-deleted', {
+      ...data,
+      deletedBy: socket.id,
+      timestamp: new Date().toISOString()
+    });
+  });
+
+  // Handle task movement
+  socket.on('task-moved', (data) => {
+    console.log(`🔄 Task moved in board ${data.boardId} by ${socket.id}`);
+
+    socket.to(data.boardId).emit('task-moved', {
+      ...data,
+      movedBy: socket.id,
+      timestamp: new Date().toISOString()
+    });
+  });
+
+  // Handle board updates
+  socket.on('board-updated', (data) => {
+    console.log(`🏷️ Board updated: ${data.boardId} by ${socket.id}`);
+
+    socket.to(data.boardId).emit('board-updated', {
+      ...data,
+      updatedBy: socket.id,
+      timestamp: new Date().toISOString()
+    });
+  });
+
+  // Handle user cursor/activity
+  socket.on('user-activity', (data) => {
+    socket.to(data.boardId).emit('user-activity', {
+      ...data,
+      userId: socket.id,
+      timestamp: new Date().toISOString()
+    });
+  });
+
+  // Handle disconnect
+  socket.on('disconnect', () => {
+    console.log(`❌ User disconnected: ${socket.id}`);
+  });
+});
+
+server.listen(PORT, () => {
   console.log(`🚀 ROI Labs API server running on port ${PORT}`);
   console.log(`📊 Environment: ${process.env.NODE_ENV}`);
   console.log(`🔗 Frontend URL: ${process.env.FRONTEND_URL}`);
+  console.log(`⚡ Socket.IO server ready`);
 });
 
 // Handle unhandled promise rejections

@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { 
-  Plus, 
-  MoreHorizontal, 
-  Calendar, 
-  User, 
-  CheckCircle2, 
-  Circle, 
+import {
+  Plus,
+  MoreHorizontal,
+  Calendar,
+  User,
+  CheckCircle2,
+  Circle,
   Clock,
   Flag,
   Edit3,
@@ -26,6 +26,7 @@ import {
   Mail,
   Users
 } from 'lucide-react';
+import { useSocket } from '@/hooks/useSocket';
 
 interface ChecklistItem {
   id: string;
@@ -815,6 +816,151 @@ const TasksPage = () => {
     localStorage.setItem('kanban-boards', JSON.stringify(boards));
   }, [boards]);
 
+  // Socket.IO integration for real-time collaboration
+  const [onlineUsers, setOnlineUsers] = useState<Set<string>>(new Set());
+  const [recentActivity, setRecentActivity] = useState<any[]>([]);
+
+  const handleTaskUpdated = (data: any) => {
+    console.log('📝 Task updated by another user:', data);
+    setRecentActivity(prev => [
+      { type: 'task-updated', ...data, id: Date.now() },
+      ...prev.slice(0, 9) // Keep only last 10 activities
+    ]);
+
+    // Update the task in local state
+    setBoards(prevBoards =>
+      prevBoards.map(board =>
+        board.id === data.boardId ? {
+          ...board,
+          columns: board.columns?.map(column => ({
+            ...column,
+            tasks: column.tasks?.map(task =>
+              task.id === data.task?.id ? { ...task, ...data.task } : task
+            ) || []
+          })) || []
+        } : board
+      )
+    );
+  };
+
+  const handleTaskCreated = (data: any) => {
+    console.log('✨ Task created by another user:', data);
+    setRecentActivity(prev => [
+      { type: 'task-created', ...data, id: Date.now() },
+      ...prev.slice(0, 9)
+    ]);
+
+    // Add the task to local state
+    setBoards(prevBoards =>
+      prevBoards.map(board =>
+        board.id === data.boardId ? {
+          ...board,
+          columns: board.columns?.map(column =>
+            column.id === data.columnId ? {
+              ...column,
+              tasks: [...(column.tasks || []), data.task]
+            } : column
+          ) || []
+        } : board
+      )
+    );
+  };
+
+  const handleTaskDeleted = (data: any) => {
+    console.log('🗑️ Task deleted by another user:', data);
+    setRecentActivity(prev => [
+      { type: 'task-deleted', ...data, id: Date.now() },
+      ...prev.slice(0, 9)
+    ]);
+
+    // Remove the task from local state
+    setBoards(prevBoards =>
+      prevBoards.map(board =>
+        board.id === data.boardId ? {
+          ...board,
+          columns: board.columns?.map(column => ({
+            ...column,
+            tasks: column.tasks?.filter(task => task.id !== data.taskId) || []
+          })) || []
+        } : board
+      )
+    );
+  };
+
+  const handleTaskMoved = (data: any) => {
+    console.log('🔄 Task moved by another user:', data);
+    setRecentActivity(prev => [
+      { type: 'task-moved', ...data, id: Date.now() },
+      ...prev.slice(0, 9)
+    ]);
+
+    // Move the task in local state
+    setBoards(prevBoards =>
+      prevBoards.map(board =>
+        board.id === data.boardId ? {
+          ...board,
+          columns: board.columns?.map(column => {
+            // Remove task from source column
+            if (column.id === data.fromColumn) {
+              return {
+                ...column,
+                tasks: column.tasks?.filter(task => task.id !== data.taskId) || []
+              };
+            }
+            // Add task to target column
+            if (column.id === data.toColumn && data.task) {
+              const newTasks = [...(column.tasks || [])];
+              newTasks.splice(data.newIndex, 0, data.task);
+              return { ...column, tasks: newTasks };
+            }
+            return column;
+          }) || []
+        } : board
+      )
+    );
+  };
+
+  const handleUserJoined = (data: any) => {
+    console.log('👤 User joined:', data);
+    setOnlineUsers(prev => new Set([...prev, data.userId]));
+    setRecentActivity(prev => [
+      { type: 'user-joined', ...data, id: Date.now() },
+      ...prev.slice(0, 9)
+    ]);
+  };
+
+  const handleUserLeft = (data: any) => {
+    console.log('👋 User left:', data);
+    setOnlineUsers(prev => {
+      const newSet = new Set(prev);
+      newSet.delete(data.userId);
+      return newSet;
+    });
+    setRecentActivity(prev => [
+      { type: 'user-left', ...data, id: Date.now() },
+      ...prev.slice(0, 9)
+    ]);
+  };
+
+  const {
+    socket,
+    isConnected,
+    emitTaskUpdated,
+    emitTaskCreated,
+    emitTaskDeleted,
+    emitTaskMoved,
+    emitBoardUpdated
+  } = useSocket({
+    boardId: currentBoardId,
+    userId: isGuest ? guestSession?.email : 'user', // Use email or user ID
+    onTaskUpdated: handleTaskUpdated,
+    onTaskCreated: handleTaskCreated,
+    onTaskDeleted: handleTaskDeleted,
+    onTaskMoved: handleTaskMoved,
+    onUserJoined: handleUserJoined,
+    onUserLeft: handleUserLeft
+  });
+
   // Board management functions
   const resetBoardForm = () => {
     setBoardForm({
@@ -1236,6 +1382,13 @@ const TasksPage = () => {
       return updated;
     });
 
+    // Emit socket event for real-time update
+    if (editingTask) {
+      emitTaskUpdated({ ...newTask, columnId });
+    } else {
+      emitTaskCreated({ ...newTask, columnId });
+    }
+
     setShowTaskModal(false);
     resetTaskForm();
   };
@@ -1243,7 +1396,7 @@ const TasksPage = () => {
   // Delete task
   const deleteTask = (taskId: string) => {
     if (confirm('Tem certeza que deseja excluir esta tarefa?')) {
-      setBoards(prev => prev.map(board => 
+      setBoards(prev => prev.map(board =>
         board.id === currentBoardId ? {
           ...board,
           columns: board.columns.map(col => ({
@@ -1252,22 +1405,38 @@ const TasksPage = () => {
           }))
         } : board
       ));
+
+      // Emit socket event for real-time update
+      emitTaskDeleted(taskId);
     }
   };
 
   // Toggle task completion
   const toggleTaskCompletion = (taskId: string) => {
-    setBoards(prev => prev.map(board => 
+    let updatedTask: Task | null = null;
+    let taskColumnId: string | null = null;
+
+    setBoards(prev => prev.map(board =>
       board.id === currentBoardId ? {
         ...board,
         columns: board.columns.map(col => ({
           ...col,
-          tasks: col.tasks.map(task => 
-            task.id === taskId ? { ...task, completed: !task.completed } : task
-          )
+          tasks: col.tasks.map(task => {
+            if (task.id === taskId) {
+              updatedTask = { ...task, completed: !task.completed };
+              taskColumnId = col.id;
+              return updatedTask;
+            }
+            return task;
+          })
         }))
       } : board
     ));
+
+    // Emit socket event for real-time update
+    if (updatedTask && taskColumnId) {
+      emitTaskUpdated({ ...updatedTask, columnId: taskColumnId });
+    }
   };
 
   // Add new column
@@ -1355,12 +1524,18 @@ const TasksPage = () => {
 
   const handleDrop = (e: React.DragEvent, targetColumnId: string) => {
     e.preventDefault();
-    
+
     if (!draggedTask || !draggedFrom || draggedFrom === targetColumnId) {
       return;
     }
 
-    setBoards(prev => prev.map(board => 
+    // Find the moved task before updating state
+    const currentBoard = boards.find(b => b.id === currentBoardId);
+    const sourceColumn = currentBoard?.columns.find(c => c.id === draggedFrom);
+    const movedTask = sourceColumn?.tasks.find(t => t.id === draggedTask);
+    const newIndex = currentBoard?.columns.find(c => c.id === targetColumnId)?.tasks.length || 0;
+
+    setBoards(prev => prev.map(board =>
       board.id === currentBoardId ? {
         ...board,
         columns: board.columns.map(col => {
@@ -1385,7 +1560,12 @@ const TasksPage = () => {
         })
       } : board
     ));
-    
+
+    // Emit socket event for real-time update
+    if (movedTask && draggedTask && draggedFrom && targetColumnId) {
+      emitTaskMoved(draggedTask, draggedFrom, targetColumnId, newIndex);
+    }
+
     setDraggedTask(null);
     setDraggedFrom(null);
   };
@@ -1598,6 +1778,66 @@ const TasksPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Real-time Activity Panel */}
+      {isConnected && (
+        <div className="mb-6 bg-gray-900/50 backdrop-blur-sm border border-gray-700/50 rounded-xl p-4">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-white flex items-center space-x-2">
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+              <span>Colaboração em Tempo Real</span>
+            </h3>
+            <div className="flex items-center space-x-2 text-sm text-gray-400">
+              <span>🔗 Conectado</span>
+              <span>•</span>
+              <span>{onlineUsers.length} usuário(s) online</span>
+            </div>
+          </div>
+
+          <div className="flex space-x-6">
+            {/* Online Users */}
+            <div className="flex-1">
+              <h4 className="text-sm font-medium text-gray-300 mb-2">👥 Usuários Online</h4>
+              <div className="flex flex-wrap gap-2">
+                {onlineUsers.map((user, index) => (
+                  <div key={index} className="flex items-center space-x-2 bg-gray-800/50 px-3 py-1 rounded-full">
+                    <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                    <span className="text-xs text-gray-300">{user.name || user.id}</span>
+                  </div>
+                ))}
+                {onlineUsers.length === 0 && (
+                  <span className="text-xs text-gray-500">Apenas você está online</span>
+                )}
+              </div>
+            </div>
+
+            {/* Recent Activity */}
+            <div className="flex-1">
+              <h4 className="text-sm font-medium text-gray-300 mb-2">⚡ Atividade Recente</h4>
+              <div className="space-y-1 max-h-20 overflow-y-auto">
+                {recentActivity.slice(0, 3).map((activity, index) => (
+                  <div key={index} className="text-xs text-gray-400 bg-gray-800/30 px-2 py-1 rounded">
+                    <span className="text-gray-300">{activity.updatedBy || activity.createdBy || activity.movedBy || 'Alguém'}</span>
+                    {activity.type === 'task-created' && <span> criou uma tarefa</span>}
+                    {activity.type === 'task-updated' && <span> atualizou uma tarefa</span>}
+                    {activity.type === 'task-deleted' && <span> excluiu uma tarefa</span>}
+                    {activity.type === 'task-moved' && <span> moveu uma tarefa</span>}
+                    <span className="text-gray-500 ml-1">
+                      {new Date(activity.timestamp).toLocaleTimeString('pt-BR', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </span>
+                  </div>
+                ))}
+                {recentActivity.length === 0 && (
+                  <span className="text-xs text-gray-500">Nenhuma atividade recente</span>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Kanban Board */}
       <div 
