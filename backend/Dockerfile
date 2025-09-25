@@ -65,7 +65,6 @@ COPY --from=prod-deps --chown=911:1000 /app/node_modules ./node_modules
 COPY --from=builder --chown=911:1000 /app/prisma ./prisma
 COPY --chown=911:1000 package.json ./
 COPY --chown=911:1000 start.sh ./
-COPY --chown=911:1000 .env ./
 
 # Generate Prisma Client only (db push will run at runtime)
 RUN npx prisma generate
