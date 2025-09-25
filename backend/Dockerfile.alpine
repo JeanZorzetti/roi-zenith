@@ -1,31 +1,15 @@
-# Production Dockerfile using Ubuntu base (resolves Docker Hub Registry issues)
-FROM ubuntu:22.04 AS base
-
-# Install Node.js and npm with security updates
-RUN apt-get update && apt-get install -y \
-    curl \
-    ca-certificates \
-    gnupg \
-    lsb-release \
-    && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
-    && apt-get install -y nodejs \
-    && apt-get upgrade -y \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* \
-    && npm config set fund false \
-    && npm config set audit-level high
+# Use Node.js 18 LTS Alpine with specific version for stability
+FROM node:18.20.4-alpine3.20 AS base
 
 # Install dependencies only when needed
 FROM base AS deps
+# Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
+RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 # Install ALL dependencies (including devDependencies for building)
 COPY package.json package-lock.json* ./
-RUN npm install --ignore-scripts \
-    --network-timeout 300000 \
-    --fetch-timeout 300000 \
-    --fetch-retries 3 \
-    --no-optional
+RUN npm install --ignore-scripts --network-timeout 300000
 
 # Rebuild the source code only when needed
 FROM base AS builder
@@ -41,13 +25,10 @@ RUN npm run build
 
 # Production dependencies only
 FROM base AS prod-deps
+RUN apk add --no-cache libc6-compat
 WORKDIR /app
 COPY package.json package-lock.json* ./
-RUN npm install --omit=dev --ignore-scripts \
-    --network-timeout 300000 \
-    --fetch-timeout 300000 \
-    --fetch-retries 3 \
-    --no-optional
+RUN npm install --omit=dev --ignore-scripts --network-timeout 300000
 
 # Production image, copy all the files and run the app
 FROM base AS runner
@@ -55,7 +36,7 @@ WORKDIR /app
 
 # Build arguments for database connection
 ARG DATABASE_URL
-ARG DB_HOST
+ARG DB_HOST  
 ARG DB_USER
 ARG DB_PASSWORD
 ARG DB_NAME
@@ -65,8 +46,8 @@ ENV NODE_ENV=production
 ENV DATABASE_URL=$DATABASE_URL
 
 # Create a non-privileged user that the app will run under.
-RUN groupadd --system --gid 1001 nodejs || true
-RUN useradd --system --uid 1001 --gid 1001 nodejs || true
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nodejs
 
 # Copy the built application
 COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist

@@ -1,26 +1,29 @@
-# Docker Registry Authentication Error - Fix
+# Docker Registry Authentication Error - RESOLVIDO
 
-## Problema
+## ⚠️ Problema Persistente Identificado
 ```
-ERROR: unexpected status from HEAD request to https://registry-1.docker.io/v2/library/node/manifests/18-alpine: 401 Unauthorized
+ERROR: unexpected status from HEAD request to https://registry-1.docker.io/v2/library/node/manifests: 401 Unauthorized
 ```
 
-## Causa
-Este erro pode ocorrer por:
-1. **Rate limiting** do Docker Hub
-2. **Problemas de conectividade** com o Docker Registry
-3. **Autenticação necessária** devido a políticas do Docker Hub
-4. **Versão de imagem** não disponível ou movida
+## 🔍 Causa Raiz
+Este erro ocorre sistematicamente por:
+1. **Rate limiting severo** do Docker Hub para contas não autenticadas
+2. **Políticas restritivas** do Docker Hub em ambientes de CI/CD
+3. **Problemas de conectividade** persistentes com registry.docker.io
+4. **Ambiente EasyPanel** sem autenticação Docker Hub configurada
 
-## Soluções Implementadas
+## ✅ SOLUÇÃO IMPLEMENTADA (DEFINITIVA)
 
-### 1. Versão Específica do Node.js
+### 🔧 Base Ubuntu (Solução Atual)
 ```dockerfile
-# Alterado de:
-FROM node:18-alpine AS base
+# SOLUÇÃO DEFINITIVA - Ubuntu base sem dependência Docker Hub Alpine
+FROM ubuntu:22.04 AS base
 
-# Para:
-FROM node:18.20.4-alpine3.20 AS base
+# Instalação direta do Node.js via NodeSource
+RUN apt-get update && apt-get install -y \
+    curl ca-certificates gnupg lsb-release \
+    && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs
 ```
 
 ### 2. Timeout de Rede Aumentado

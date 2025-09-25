@@ -32,7 +32,9 @@
       "Bash(PORT=5002 node dist/server.js)",
       "Read(//c/Users/jeanz/Downloads/**)",
       "Bash(cp:*)",
-      "Bash(touch:*)"
+      "Bash(touch:*)",
+      "Bash(docker build:*)",
+      "Bash(docker:*)"
     ],
     "deny": [],
     "ask": []
