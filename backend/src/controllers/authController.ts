@@ -80,6 +80,17 @@ export const register = async (req: Request, res: Response) => {
 // Login user
 export const login = async (req: Request, res: Response) => {
   try {
+    // Debug environment variables (production only)
+    if (process.env.NODE_ENV === 'production') {
+      console.log('🔍 Debug - Environment check:');
+      console.log('- DB_HOST:', process.env.DB_HOST ? '✅ Set' : '❌ Missing');
+      console.log('- DB_USER:', process.env.DB_USER ? '✅ Set' : '❌ Missing');
+      console.log('- DB_PASSWORD:', process.env.DB_PASSWORD ? '✅ Set' : '❌ Missing');
+      console.log('- DB_NAME:', process.env.DB_NAME ? '✅ Set' : '❌ Missing');
+      console.log('- DB_PORT:', process.env.DB_PORT ? '✅ Set' : '❌ Missing');
+      console.log('- DATABASE_URL:', process.env.DATABASE_URL ? '✅ Set' : '❌ Missing');
+    }
+
     // Check for validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
