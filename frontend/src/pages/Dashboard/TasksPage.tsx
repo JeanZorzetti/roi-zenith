@@ -775,11 +775,26 @@ const TasksPage = () => {
         // For guests, filter boards to only show accessible ones
         const allBoards = loadInitialData();
         const accessibleBoardIds = session.boardAccess.map((access: any) => access.boardId);
-        const filteredBoards = allBoards.filter(board => accessibleBoardIds.includes(board.id));
+        let filteredBoards = allBoards.filter(board => accessibleBoardIds.includes(board.id));
+
+        // Se não encontrou boards válidos, dar acesso ao main-board
+        if (filteredBoards.length === 0) {
+          const mainBoard = allBoards.find(board => board.id === 'main-board');
+          if (mainBoard) {
+            filteredBoards = [mainBoard];
+            // Atualizar sessão para incluir acesso ao main-board
+            const updatedSession = {
+              ...session,
+              boardAccess: [{ boardId: 'main-board', permission: 'view' }]
+            };
+            setGuestSession(updatedSession);
+            localStorage.setItem('guestSession', JSON.stringify(updatedSession));
+          }
+        }
 
         setBoards(filteredBoards);
 
-        if (boardParam && accessibleBoardIds.includes(boardParam)) {
+        if (boardParam && filteredBoards.some(board => board.id === boardParam)) {
           setCurrentBoardId(boardParam);
         } else if (filteredBoards.length > 0) {
           setCurrentBoardId(filteredBoards[0].id);
