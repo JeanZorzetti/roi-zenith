@@ -908,12 +908,22 @@ const TasksPage = () => {
       return;
     }
 
-    // Gerar token URL-safe único
-    const generateUrlSafeToken = (boardId: string, email: string, timestamp: number) => {
+    // Gerar token URL-safe único com informações do board
+    const generateUrlSafeToken = (board: Board, email: string, timestamp: number, permission: string) => {
       // Adicionar componente aleatório para garantir unicidade
       const randomComponent = Math.random().toString(36).substring(2, 15);
-      // Usar separador mais seguro para evitar conflitos
-      const data = `${boardId}|${email}|${timestamp}|${randomComponent}`;
+      // Incluir informações básicas do board no token para funcionar em nova janela
+      const tokenData = {
+        boardId: board.id,
+        boardTitle: board.title,
+        boardDescription: board.description || '',
+        boardColor: board.color,
+        email,
+        permission,
+        timestamp,
+        random: randomComponent
+      };
+      const data = JSON.stringify(tokenData);
       return btoa(data)
         .replace(/\+/g, '-')
         .replace(/\//g, '_')
@@ -921,7 +931,12 @@ const TasksPage = () => {
     };
 
     const timestamp = Date.now();
-    const inviteToken = generateUrlSafeToken(sharingBoardId, shareEmail.trim(), timestamp);
+    const boardToShare = boards.find(b => b.id === sharingBoardId);
+    if (!boardToShare) {
+      alert('Quadro não encontrado.');
+      return;
+    }
+    const inviteToken = generateUrlSafeToken(boardToShare, shareEmail.trim(), timestamp, sharePermission);
 
     // Gerar ID único para o membro
     const generateUniqueId = () => {

@@ -48,13 +48,80 @@ const InvitePage = () => {
     try {
       console.log('Validating token:', inviteToken);
 
-      // Buscar todos os quadros do localStorage
+      // Primeiro tentar decodificar o token diretamente (para nova janela)
+      let tokenData: any = null;
+      try {
+        const base64Token = inviteToken
+          .replace(/-/g, '+')
+          .replace(/_/g, '/');
+        const padding = 4 - (base64Token.length % 4);
+        const paddedToken = base64Token + '='.repeat(padding % 4);
+        const decoded = atob(paddedToken);
+        tokenData = JSON.parse(decoded);
+        console.log('Token decodificado:', tokenData);
+      } catch (e) {
+        console.log('Erro ao decodificar token, tentando método antigo...');
+      }
+
+      // Se conseguiu decodificar o token, usar os dados dele
+      if (tokenData && tokenData.boardId) {
+        // Verificar no localStorage se o convite ainda está válido
+        const savedData = localStorage.getItem('kanban-boards');
+        const boards: Board[] = savedData ? JSON.parse(savedData) : [];
+
+        let foundBoard: Board | null = null;
+        let foundMember: BoardMember | null = null;
+
+        // Procurar pelo board no localStorage
+        const localBoard = boards.find(b => b.id === tokenData.boardId);
+        if (localBoard && localBoard.members) {
+          const member = localBoard.members.find(m =>
+            m.inviteToken === inviteToken && m.status === 'pending'
+          );
+          if (member) {
+            foundBoard = localBoard;
+            foundMember = member;
+          }
+        }
+
+        // Se não encontrou no localStorage mas tem o token válido, criar board temporário
+        if (!foundBoard) {
+          foundBoard = {
+            id: tokenData.boardId,
+            title: tokenData.boardTitle,
+            description: tokenData.boardDescription,
+            color: tokenData.boardColor,
+            isFavorite: false,
+            createdAt: new Date().toISOString(),
+            columns: [],
+            isShared: true
+          };
+
+          foundMember = {
+            id: `temp_member_${tokenData.timestamp}`,
+            email: tokenData.email,
+            permission: tokenData.permission,
+            invitedAt: new Date(tokenData.timestamp).toISOString(),
+            status: 'pending',
+            inviteToken
+          };
+        }
+
+        setInvite({
+          board: foundBoard,
+          member: foundMember,
+          valid: true,
+          message: 'Convite válido encontrado!'
+        });
+        return;
+      }
+
+      // Método antigo: Buscar no localStorage diretamente
       const savedData = localStorage.getItem('kanban-boards');
       const boards: Board[] = savedData ? JSON.parse(savedData) : [];
 
       console.log('Found boards:', boards.length);
 
-      // Encontrar o convite válido
       let foundBoard: Board | null = null;
       let foundMember: BoardMember | null = null;
 
@@ -70,10 +137,6 @@ const InvitePage = () => {
             m.inviteToken === inviteToken && m.status === 'pending'
           );
 
-          // Verificar se existe token expirado
-          const expiredMember = board.members.find(m =>
-            m.inviteToken === inviteToken && m.status === 'expired'
-          );
           if (member) {
             console.log('Found matching member:', member);
             foundBoard = board;
@@ -119,26 +182,45 @@ const InvitePage = () => {
       const savedData = localStorage.getItem('kanban-boards');
       const boards: Board[] = savedData ? JSON.parse(savedData) : [];
 
-      // Atualizar o status do membro
-      const updatedBoards = boards.map(board => {
-        if (board.id === invite.board!.id) {
-          return {
-            ...board,
-            members: board.members?.map(member => {
-              if (member.id === invite.member!.id) {
-                return {
-                  ...member,
-                  status: 'accepted' as const,
-                  acceptedAt: new Date().toISOString(),
-                  name: userName.trim() || undefined
-                };
-              }
-              return member;
-            })
-          };
-        }
-        return board;
-      });
+      // Verificar se o board já existe no localStorage
+      const existingBoardIndex = boards.findIndex(b => b.id === invite.board!.id);
+
+      let updatedBoards: Board[];
+
+      if (existingBoardIndex >= 0) {
+        // Board existe, atualizar o membro
+        updatedBoards = boards.map(board => {
+          if (board.id === invite.board!.id) {
+            return {
+              ...board,
+              members: board.members?.map(member => {
+                if (member.id === invite.member!.id || member.inviteToken === invite.member!.inviteToken) {
+                  return {
+                    ...member,
+                    status: 'accepted' as const,
+                    acceptedAt: new Date().toISOString(),
+                    name: userName.trim() || undefined
+                  };
+                }
+                return member;
+              })
+            };
+          }
+          return board;
+        });
+      } else {
+        // Board não existe (caso nova janela), criar o board com o membro
+        const newBoard: Board = {
+          ...invite.board!,
+          members: [{
+            ...invite.member!,
+            status: 'accepted' as const,
+            acceptedAt: new Date().toISOString(),
+            name: userName.trim() || undefined
+          }]
+        };
+        updatedBoards = [...boards, newBoard];
+      }
 
       localStorage.setItem('kanban-boards', JSON.stringify(updatedBoards));
 
