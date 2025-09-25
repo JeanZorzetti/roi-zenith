@@ -912,7 +912,8 @@ const TasksPage = () => {
     const generateUrlSafeToken = (boardId: string, email: string, timestamp: number) => {
       // Adicionar componente aleatório para garantir unicidade
       const randomComponent = Math.random().toString(36).substring(2, 15);
-      const data = `${boardId}-${email}-${timestamp}-${randomComponent}`;
+      // Usar separador mais seguro para evitar conflitos
+      const data = `${boardId}|${email}|${timestamp}|${randomComponent}`;
       return btoa(data)
         .replace(/\+/g, '-')
         .replace(/\//g, '_')
