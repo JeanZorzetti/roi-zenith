@@ -13,7 +13,7 @@
     "test:ci": "jest --coverage --watchAll=false --silent"
   },
   "prisma": {
-    "seed": "ts-node prisma/seed.ts"
+    "seed": "node dist/seed.js"
   },
   "keywords": [
     "api",
