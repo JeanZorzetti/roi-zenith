@@ -1379,7 +1379,7 @@ const TasksPage = () => {
       return `member_${timestamp}_${Math.random().toString(36).substring(2, 15)}`;
     };
 
-    const newMember: BoardMember = {
+    const memberData: BoardMember = {
       id: generateUniqueId(),
       email: shareEmail.trim(),
       permission: sharePermission,
@@ -1409,7 +1409,7 @@ const TasksPage = () => {
             return {
               ...board,
               isShared: true,
-              members: [...updatedMembers, newMember]
+              members: [...updatedMembers, memberData]
             };
           }
         }
@@ -1417,7 +1417,7 @@ const TasksPage = () => {
         return {
           ...board,
           isShared: true,
-          members: [...(board.members || []), newMember]
+          members: [...(board.members || []), memberData]
         };
       }
       return board;
