@@ -1138,36 +1138,15 @@ const TasksPage = () => {
     }
   };
 
-  // Demo: Add simulated users and activities for testing (remove in production)
-  useEffect(() => {
-    if (isConnected && onlineUsers.length === 0) {
-      // Simulate some users joining for demo purposes
-      setTimeout(() => {
-        handleUserJoined({ userId: 'demo-user-1', userName: 'Ana Silva' });
-        showNotification('info', 'Ana Silva entrou no board');
-      }, 2000);
-
-      setTimeout(() => {
-        handleUserJoined({ userId: 'demo-user-2', userName: 'Carlos Santos' });
-        showNotification('info', 'Carlos Santos entrou no board');
-      }, 4000);
-
-      // Simulate some activities
-      setTimeout(() => {
-        setRecentActivity(prev => [
-          {
-            type: 'task-created',
-            id: Date.now(),
-            timestamp: new Date(),
-            userName: 'Ana Silva',
-            taskTitle: 'Revisar documentação da API'
-          },
-          ...prev
-        ]);
-        showNotification('success', 'Ana Silva criou uma nova tarefa: "Revisar documentação da API"');
-      }, 6000);
-    }
-  }, [isConnected]);
+  // Demo disabled temporarily to fix initialization error
+  // useEffect(() => {
+  //   if (isConnected && onlineUsers.length === 0) {
+  //     setTimeout(() => {
+  //       handleUserJoined({ userId: 'demo-user-1', userName: 'Ana Silva' });
+  //       showNotification('info', 'Ana Silva entrou no board');
+  //     }, 2000);
+  //   }
+  // }, [isConnected]);
 
   const {
     socket,
