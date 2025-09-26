@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { boardService } from '../../services/boardService';
 import {
   Plus,
   MoreHorizontal,
@@ -80,6 +81,44 @@ interface Board {
 
 const TasksPage = () => {
   const [searchParams] = useSearchParams();
+
+  // Load boards from API
+  useEffect(() => {
+    const loadBoards = async () => {
+      try {
+        setLoading(true);
+        const apiBoards = await boardService.getBoards();
+        console.log('📋 Boards carregados da API:', apiBoards);
+
+        if (apiBoards.length > 0) {
+          setBoards(apiBoards);
+          if (!currentBoardId) {
+            setCurrentBoardId(apiBoards[0].id);
+          }
+        } else {
+          // Fallback para localStorage se API não retornar boards
+          console.log('📋 Nenhum board na API, usando localStorage como fallback');
+          const localBoards = loadInitialData();
+          setBoards(localBoards);
+          if (localBoards.length > 0 && !currentBoardId) {
+            setCurrentBoardId(localBoards[0].id);
+          }
+        }
+      } catch (error) {
+        console.error('❌ Erro ao carregar boards da API:', error);
+        // Fallback para localStorage em caso de erro
+        const localBoards = loadInitialData();
+        setBoards(localBoards);
+        if (localBoards.length > 0 && !currentBoardId) {
+          setCurrentBoardId(localBoards[0].id);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadBoards();
+  }, []);
 
   // Function to create ERP IA Orion board
   const getERPBoard = (): Board => ({
@@ -700,7 +739,8 @@ const TasksPage = () => {
     ];
   };
 
-  const [boards, setBoards] = useState<Board[]>(loadInitialData);
+  const [boards, setBoards] = useState<Board[]>([]);
+  const [loading, setLoading] = useState(true);
   const [currentBoardId, setCurrentBoardId] = useState<string>('');
   const [showBoardSelector, setShowBoardSelector] = useState(false);
 
@@ -997,54 +1037,102 @@ const TasksPage = () => {
     setShowBoardModal(true);
   };
 
-  const saveBoard = () => {
+  const saveBoard = async () => {
     if (!boardForm.title.trim()) return;
 
-    const newBoard: Board = {
-      id: editingBoard?.id || Date.now().toString(),
-      title: boardForm.title.trim(),
-      description: boardForm.description.trim() || undefined,
-      color: boardForm.color,
-      isFavorite: editingBoard?.isFavorite || false,
-      createdAt: editingBoard?.createdAt || new Date().toISOString(),
-      columns: editingBoard?.columns || [
-        { id: 'todo', title: 'Para Fazer', color: 'bg-gray-500', tasks: [] },
-        { id: 'doing', title: 'Em Andamento', color: 'bg-blue-500', tasks: [] },
-        { id: 'done', title: 'Concluído', color: 'bg-green-500', tasks: [] }
-      ]
-    };
+    try {
+      setLoading(true);
 
-    setBoards(prev => {
       if (editingBoard) {
-        return prev.map(board => board.id === editingBoard.id ? newBoard : board);
+        // Atualizar board existente
+        console.log('📝 Atualizando board:', editingBoard.id);
+        const success = await boardService.updateBoard(editingBoard.id, {
+          title: boardForm.title.trim(),
+          description: boardForm.description.trim() || undefined,
+          color: boardForm.color
+        });
+
+        if (success) {
+          // Atualizar estado local
+          setBoards(prev =>
+            prev.map(board =>
+              board.id === editingBoard.id
+                ? { ...board, title: boardForm.title.trim(), description: boardForm.description.trim(), color: boardForm.color }
+                : board
+            )
+          );
+          console.log('✅ Board atualizado com sucesso');
+        } else {
+          console.error('❌ Erro ao atualizar board');
+          alert('Erro ao atualizar quadro. Tente novamente.');
+          return;
+        }
       } else {
-        return [...prev, newBoard];
+        // Criar novo board
+        console.log('➕ Criando novo board');
+        const newBoard = await boardService.createBoard({
+          title: boardForm.title.trim(),
+          description: boardForm.description.trim() || undefined,
+          color: boardForm.color,
+          columns: []
+        });
+
+        if (newBoard) {
+          // Adicionar ao estado local
+          setBoards(prev => [...prev, newBoard]);
+          setCurrentBoardId(newBoard.id);
+          console.log('✅ Board criado com sucesso:', newBoard.id);
+        } else {
+          console.error('❌ Erro ao criar board');
+          alert('Erro ao criar quadro. Tente novamente.');
+          return;
+        }
       }
-    });
 
-    if (!editingBoard) {
-      setCurrentBoardId(newBoard.id);
+      setShowBoardModal(false);
+      resetBoardForm();
+    } catch (error) {
+      console.error('❌ Erro ao salvar board:', error);
+      alert('Erro ao salvar quadro. Tente novamente.');
+    } finally {
+      setLoading(false);
     }
-
-    setShowBoardModal(false);
-    resetBoardForm();
   };
 
-  const deleteBoard = (boardId: string) => {
+  const deleteBoard = async (boardId: string) => {
     if (boards.length <= 1) {
       alert('Você deve ter pelo menos um quadro!');
       return;
     }
 
     if (confirm('Tem certeza que deseja excluir este quadro? Todas as tarefas serão perdidas.')) {
-      // Mark ERP IA Orion board as intentionally deleted if it's being deleted
-      if (boardId === 'erp-ia-orion') {
-        localStorage.setItem('erp-board-deleted', 'true');
-      }
+      try {
+        setLoading(true);
+        console.log('🗑️ Deletando board:', boardId);
 
-      setBoards(prev => prev.filter(board => board.id !== boardId));
-      if (currentBoardId === boardId) {
-        setCurrentBoardId(boards.find(board => board.id !== boardId)?.id || boards[0].id);
+        const success = await boardService.deleteBoard(boardId);
+
+        if (success) {
+          // Remover do estado local
+          setBoards(prev => prev.filter(board => board.id !== boardId));
+
+          if (currentBoardId === boardId) {
+            const remainingBoards = boards.filter(board => board.id !== boardId);
+            if (remainingBoards.length > 0) {
+              setCurrentBoardId(remainingBoards[0].id);
+            }
+          }
+
+          console.log('✅ Board deletado com sucesso');
+        } else {
+          console.error('❌ Erro ao deletar board');
+          alert('Erro ao excluir quadro. Tente novamente.');
+        }
+      } catch (error) {
+        console.error('❌ Erro ao deletar board:', error);
+        alert('Erro ao excluir quadro. Tente novamente.');
+      } finally {
+        setLoading(false);
       }
     }
   };

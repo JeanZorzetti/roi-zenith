@@ -2,7 +2,7 @@ import { Board, Task, Column } from '../types/Board';
 
 const API_BASE_URL = process.env.NODE_ENV === 'production'
   ? 'https://back.roilabs.com.br/api'
-  : 'http://localhost:5001/api';
+  : 'http://localhost:5002/api';
 
 class BoardService {
   async getBoards(): Promise<Board[]> {
