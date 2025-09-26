@@ -1138,6 +1138,37 @@ const TasksPage = () => {
     }
   };
 
+  // Demo: Add simulated users and activities for testing (remove in production)
+  useEffect(() => {
+    if (isConnected && onlineUsers.length === 0) {
+      // Simulate some users joining for demo purposes
+      setTimeout(() => {
+        handleUserJoined({ userId: 'demo-user-1', userName: 'Ana Silva' });
+        showNotification('info', 'Ana Silva entrou no board');
+      }, 2000);
+
+      setTimeout(() => {
+        handleUserJoined({ userId: 'demo-user-2', userName: 'Carlos Santos' });
+        showNotification('info', 'Carlos Santos entrou no board');
+      }, 4000);
+
+      // Simulate some activities
+      setTimeout(() => {
+        setRecentActivity(prev => [
+          {
+            type: 'task-created',
+            id: Date.now(),
+            timestamp: new Date(),
+            userName: 'Ana Silva',
+            taskTitle: 'Revisar documentação da API'
+          },
+          ...prev
+        ]);
+        showNotification('success', 'Ana Silva criou uma nova tarefa: "Revisar documentação da API"');
+      }, 6000);
+    }
+  }, [isConnected]);
+
   const {
     socket,
     isConnected,
@@ -2184,59 +2215,154 @@ const TasksPage = () => {
         </div>
       </div>
 
-      {/* Real-time Activity Panel */}
+      {/* Toast Notifications */}
+      <div className="fixed top-4 right-4 z-50 space-y-2">
+        {notifications.map((notification) => (
+          <div
+            key={notification.id}
+            className={`
+              max-w-sm p-4 rounded-lg shadow-lg border transition-all duration-300 ease-in-out
+              transform animate-in slide-in-from-right-2
+              ${
+                notification.type === 'success'
+                  ? 'bg-green-900/90 border-green-500/50 text-green-100'
+                  : notification.type === 'warning'
+                  ? 'bg-yellow-900/90 border-yellow-500/50 text-yellow-100'
+                  : 'bg-blue-900/90 border-blue-500/50 text-blue-100'
+              }
+            `}
+          >
+            <div className="flex items-start space-x-3">
+              <div className="flex-shrink-0">
+                {notification.type === 'success' && <span className="text-green-400">✅</span>}
+                {notification.type === 'warning' && <span className="text-yellow-400">⚠️</span>}
+                {notification.type === 'info' && <span className="text-blue-400">ℹ️</span>}
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium">{notification.message}</p>
+                <p className="text-xs opacity-75 mt-1">
+                  {notification.timestamp.toLocaleTimeString('pt-BR', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })}
+                </p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Enhanced Real-time Collaboration Panel */}
       {isConnected && (
-        <div className="mb-6 bg-gray-900/50 backdrop-blur-sm border border-gray-700/50 rounded-xl p-4">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-white flex items-center space-x-2">
-              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+        <div className="mb-6 bg-gradient-to-r from-gray-900/80 to-gray-800/80 backdrop-blur-sm border border-gray-700/50 rounded-xl p-6 shadow-2xl collaboration-glow">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-xl font-bold text-white flex items-center space-x-3">
+              <div className="relative">
+                <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                <div className="absolute inset-0 w-3 h-3 bg-green-400 rounded-full animate-ping opacity-30"></div>
+              </div>
               <span>Colaboração em Tempo Real</span>
             </h3>
-            <div className="flex items-center space-x-2 text-sm text-gray-400">
-              <span>🔗 Conectado</span>
-              <span>•</span>
-              <span>{onlineUsers.length} usuário(s) online</span>
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2 bg-green-900/30 px-3 py-1 rounded-full border border-green-500/30">
+                <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                <span className="text-sm text-green-300 font-medium">Conectado</span>
+              </div>
+              <div className="flex items-center space-x-2 bg-blue-900/30 px-3 py-1 rounded-full border border-blue-500/30">
+                <span className="text-sm text-blue-300 font-medium">
+                  {onlineUsers.length} {onlineUsers.length === 1 ? 'usuário' : 'usuários'} online
+                </span>
+              </div>
             </div>
           </div>
 
-          <div className="flex space-x-6">
-            {/* Online Users */}
-            <div className="flex-1">
-              <h4 className="text-sm font-medium text-gray-300 mb-2">👥 Usuários Online</h4>
-              <div className="flex flex-wrap gap-2">
-                {onlineUsers.map((userId, index) => (
-                  <div key={index} className="flex items-center space-x-2 bg-gray-800/50 px-3 py-1 rounded-full">
-                    <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                    <span className="text-xs text-gray-300">{userId}</span>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Enhanced Online Users */}
+            <div className="space-y-3">
+              <h4 className="text-sm font-semibold text-gray-300 flex items-center space-x-2">
+                <span>👥</span>
+                <span>Usuários Online</span>
+              </h4>
+              <div className="space-y-2">
+                {onlineUsers.map((user, index) => (
+                  <div key={index} className={`flex items-center space-x-3 ${user.color} bg-opacity-20 px-4 py-3 rounded-lg border border-opacity-30 ${user.color?.replace('bg-', 'border-') || 'border-blue-500'} user-avatar-glow`}>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-lg">{user.avatar}</span>
+                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                    </div>
+                    <div className="flex-1">
+                      <span className="text-sm font-medium text-white">{user.name}</span>
+                      <div className="text-xs text-gray-400">
+                        Online há {Math.floor((Date.now() - user.joinedAt.getTime()) / 60000)} min
+                      </div>
+                    </div>
+                    {user.isEditing && (
+                      <div className="flex items-center space-x-1 bg-yellow-900/30 px-2 py-1 rounded text-xs text-yellow-300">
+                        <span>✏️</span>
+                        <span>Editando</span>
+                      </div>
+                    )}
                   </div>
                 ))}
                 {onlineUsers.length === 0 && (
-                  <span className="text-xs text-gray-500">Apenas você está online</span>
+                  <div className="text-center py-6 text-gray-500">
+                    <span className="text-2xl">👤</span>
+                    <p className="text-sm mt-2">Apenas você está online</p>
+                  </div>
                 )}
               </div>
             </div>
 
-            {/* Recent Activity */}
-            <div className="flex-1">
-              <h4 className="text-sm font-medium text-gray-300 mb-2">⚡ Atividade Recente</h4>
-              <div className="space-y-1 max-h-20 overflow-y-auto">
-                {recentActivity.slice(0, 3).map((activity, index) => (
-                  <div key={index} className="text-xs text-gray-400 bg-gray-800/30 px-2 py-1 rounded">
-                    <span className="text-gray-300">{activity.updatedBy || activity.createdBy || activity.movedBy || 'Alguém'}</span>
-                    {activity.type === 'task-created' && <span> criou uma tarefa</span>}
-                    {activity.type === 'task-updated' && <span> atualizou uma tarefa</span>}
-                    {activity.type === 'task-deleted' && <span> excluiu uma tarefa</span>}
-                    {activity.type === 'task-moved' && <span> moveu uma tarefa</span>}
-                    <span className="text-gray-500 ml-1">
-                      {new Date(activity.timestamp).toLocaleTimeString('pt-BR', {
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
-                    </span>
+            {/* Enhanced Recent Activity */}
+            <div className="space-y-3">
+              <h4 className="text-sm font-semibold text-gray-300 flex items-center space-x-2">
+                <span>⚡</span>
+                <span>Atividade Recente</span>
+              </h4>
+              <div className="space-y-2 max-h-48 overflow-y-auto custom-scrollbar">
+                {recentActivity.slice(0, 5).map((activity, index) => (
+                  <div key={index} className="bg-gray-800/50 backdrop-blur-sm border border-gray-700/30 px-4 py-3 rounded-lg">
+                    <div className="flex items-start space-x-3">
+                      <div className="flex-shrink-0 mt-0.5">
+                        {activity.type === 'task-created' && <span className="text-green-400">✨</span>}
+                        {activity.type === 'task-updated' && <span className="text-blue-400">📝</span>}
+                        {activity.type === 'task-deleted' && <span className="text-red-400">🗑️</span>}
+                        {activity.type === 'task-moved' && <span className="text-purple-400">🔄</span>}
+                        {activity.type === 'user-joined' && <span className="text-green-400">👋</span>}
+                        {activity.type === 'user-left' && <span className="text-gray-400">👋</span>}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm text-white">
+                          <span className="font-medium text-blue-300">{activity.userName || 'Alguém'}</span>
+                          {activity.type === 'task-created' && <span> criou</span>}
+                          {activity.type === 'task-updated' && <span> atualizou</span>}
+                          {activity.type === 'task-deleted' && <span> excluiu</span>}
+                          {activity.type === 'task-moved' && <span> moveu</span>}
+                          {activity.type === 'user-joined' && <span> entrou no board</span>}
+                          {activity.type === 'user-left' && <span> saiu do board</span>}
+                          {activity.taskTitle && (
+                            <span className="text-gray-300"> "{activity.taskTitle}"</span>
+                          )}
+                          {activity.type === 'task-moved' && activity.fromColumnName && activity.toColumnName && (
+                            <span className="text-gray-300"> de {activity.fromColumnName} para {activity.toColumnName}</span>
+                          )}
+                        </p>
+                        <p className="text-xs text-gray-400 mt-1">
+                          {activity.timestamp ? new Date(activity.timestamp).toLocaleTimeString('pt-BR', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit'
+                          }) : 'Agora'}
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 ))}
                 {recentActivity.length === 0 && (
-                  <span className="text-xs text-gray-500">Nenhuma atividade recente</span>
+                  <div className="text-center py-6 text-gray-500">
+                    <span className="text-2xl">💤</span>
+                    <p className="text-sm mt-2">Nenhuma atividade recente</p>
+                  </div>
                 )}
               </div>
             </div>
