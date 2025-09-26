@@ -1094,13 +1094,26 @@ const TasksPage = () => {
 
   const handleUserJoined = (data: any) => {
     console.log('👤 User joined:', data);
+    const userInfo = generateUserAvatar(data.userId);
 
     if (data.isMe) {
-      // This is the current user joining
+      // This is the current user joining - add self to users list
+      setOnlineUsers(prev => {
+        const existingUser = prev.find(user => user.id === data.userId);
+        if (!existingUser) {
+          return [...prev, {
+            id: data.userId,
+            name: userInfo.name + ' (Você)',
+            avatar: userInfo.avatar,
+            color: userInfo.color,
+            joinedAt: new Date()
+          }];
+        }
+        return prev;
+      });
       showNotification('success', 'Conectado ao sistema de colaboração em tempo real!');
     } else {
       // Another user joined
-      const userInfo = generateUserAvatar(data.userId);
       setOnlineUsers(prev => {
         const existingUser = prev.find(user => user.id === data.userId);
         if (!existingUser) {
@@ -1165,56 +1178,8 @@ const TasksPage = () => {
     }
   };
 
-  // Temporary mock data for testing UI
-  useEffect(() => {
-    if (onlineUsers.length === 0) {
-      // Add mock users for testing
-      setOnlineUsers([
-        {
-          id: 'mock-user-1',
-          name: 'Ana Silva (Demo)',
-          avatar: '👩‍💼',
-          color: 'bg-blue-500',
-          joinedAt: new Date(Date.now() - 300000) // 5 minutes ago
-        },
-        {
-          id: 'mock-user-2',
-          name: 'Carlos Santos (Demo)',
-          avatar: '👨‍💻',
-          color: 'bg-green-500',
-          joinedAt: new Date(Date.now() - 120000) // 2 minutes ago
-        }
-      ]);
-
-      // Add mock activities
-      setRecentActivity([
-        {
-          id: 1,
-          type: 'task-created',
-          userName: 'Ana Silva',
-          taskTitle: 'Revisar documentação da API',
-          timestamp: new Date(Date.now() - 180000)
-        },
-        {
-          id: 2,
-          type: 'task-moved',
-          userName: 'Carlos Santos',
-          taskTitle: 'Implementar autenticação',
-          fromColumnName: 'Para Fazer',
-          toColumnName: 'Em Andamento',
-          timestamp: new Date(Date.now() - 60000)
-        },
-        {
-          id: 3,
-          type: 'user-joined',
-          userName: 'Maria Oliveira',
-          timestamp: new Date(Date.now() - 30000)
-        }
-      ]);
-
-      showNotification('info', 'Dados de demonstração carregados para teste da interface');
-    }
-  }, []);
+  // Remove mock data - now using real users only
+  // Users will be populated via Socket.IO events
 
   const {
     socket,
