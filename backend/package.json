@@ -12,6 +12,9 @@
     "test:coverage": "jest --coverage",
     "test:ci": "jest --coverage --watchAll=false --silent"
   },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
+  },
   "keywords": [
     "api",
     "backend",
