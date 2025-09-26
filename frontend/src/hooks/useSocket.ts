@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 
 interface UseSocketProps {
@@ -29,6 +29,7 @@ export const useSocket = ({
   onCurrentUsers
 }: UseSocketProps) => {
   const socketRef = useRef<Socket | null>(null);
+  const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
     // Evitar múltiplas conexões se já existe uma ativa
@@ -59,24 +60,69 @@ export const useSocket = ({
     // Event listeners
     socket.on('connect', () => {
       console.log('🔗 Connected to Socket.IO server:', socket.id);
+      console.log('📊 Socket connection status:', socket.connected);
+      console.log('🏷️ Board ID for connection:', boardId);
+      console.log('👤 User ID for connection:', userId);
+      setIsConnected(true);
     });
 
     socket.on('disconnect', () => {
       console.log('❌ Disconnected from Socket.IO server');
+      setIsConnected(false);
     });
 
     // Board events
-    if (onTaskUpdated) socket.on('task-updated', onTaskUpdated);
-    if (onTaskCreated) socket.on('task-created', onTaskCreated);
-    if (onTaskDeleted) socket.on('task-deleted', onTaskDeleted);
-    if (onTaskMoved) socket.on('task-moved', onTaskMoved);
+    if (onTaskUpdated) {
+      socket.on('task-updated', (data) => {
+        console.log('📝 Received task-updated event:', data);
+        onTaskUpdated(data);
+      });
+    }
+    if (onTaskCreated) {
+      socket.on('task-created', (data) => {
+        console.log('✨ Received task-created event:', data);
+        onTaskCreated(data);
+      });
+    }
+    if (onTaskDeleted) {
+      socket.on('task-deleted', (data) => {
+        console.log('🗑️ Received task-deleted event:', data);
+        onTaskDeleted(data);
+      });
+    }
+    if (onTaskMoved) {
+      socket.on('task-moved', (data) => {
+        console.log('🔄 Received task-moved event:', data);
+        onTaskMoved(data);
+      });
+    }
     if (onBoardUpdated) socket.on('board-updated', onBoardUpdated);
 
     // User events
-    if (onUserJoined) socket.on('user-joined', onUserJoined);
-    if (onUserLeft) socket.on('user-left', onUserLeft);
-    if (onUserActivity) socket.on('user-activity', onUserActivity);
-    if (onCurrentUsers) socket.on('current-users', onCurrentUsers);
+    if (onUserJoined) {
+      socket.on('user-joined', (data) => {
+        console.log('👤 Received user-joined event:', data);
+        onUserJoined(data);
+      });
+    }
+    if (onUserLeft) {
+      socket.on('user-left', (data) => {
+        console.log('👋 Received user-left event:', data);
+        onUserLeft(data);
+      });
+    }
+    if (onUserActivity) {
+      socket.on('user-activity', (data) => {
+        console.log('⚡ Received user-activity event:', data);
+        onUserActivity(data);
+      });
+    }
+    if (onCurrentUsers) {
+      socket.on('current-users', (data) => {
+        console.log('👥 Received current-users event:', data);
+        onCurrentUsers(data);
+      });
+    }
 
     // Cleanup na desmontagem do componente
     return () => {
@@ -90,18 +136,30 @@ export const useSocket = ({
     };
   }, []); // Remover dependências para evitar reconexões desnecessárias
 
-  // Efeito separado para gerenciar mudanças de board
+  // Efeito para gerenciar a entrada no board quando a conexão e boardId estão prontos
   useEffect(() => {
-    if (socketRef.current?.connected && boardId) {
-      socketRef.current.emit('join-board', boardId);
+    if (isConnected && boardId && socketRef.current) {
+      console.log('🚪 Socket connected and boardId available, joining board:', boardId, 'with user:', userId);
+
+      // Pequeno delay para garantir que a conexão está completamente estabelecida
+      const timeoutId = setTimeout(() => {
+        if (socketRef.current?.connected) {
+          console.log('🚪 Actually joining board:', boardId);
+          socketRef.current.emit('join-board', boardId);
+        }
+      }, 100);
 
       return () => {
+        clearTimeout(timeoutId);
         if (socketRef.current?.connected && boardId) {
+          console.log('🚪 Leaving board:', boardId);
           socketRef.current.emit('leave-board', boardId);
         }
       };
+    } else {
+      console.log('⚠️ Not joining board - Connected:', isConnected, 'BoardId:', boardId, 'Socket exists:', !!socketRef.current);
     }
-  }, [boardId]);
+  }, [isConnected, boardId, userId]);
 
   // Métodos para emitir eventos
   const emitTaskUpdated = (taskData: any) => {
@@ -141,7 +199,7 @@ export const useSocket = ({
 
   return {
     socket: socketRef.current,
-    isConnected: socketRef.current?.connected || false,
+    isConnected,
     emitTaskUpdated,
     emitTaskCreated,
     emitTaskDeleted,

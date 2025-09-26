@@ -872,6 +872,16 @@ const TasksPage = () => {
   }, [boards]);
 
   // Socket.IO integration for real-time collaboration
+  const [sessionId] = useState(() => {
+    // Generate a unique session ID for this browser tab
+    const saved = sessionStorage.getItem('tab-session-id');
+    if (saved) return saved;
+
+    const newId = `tab_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    sessionStorage.setItem('tab-session-id', newId);
+    return newId;
+  });
+
   const [onlineUsers, setOnlineUsers] = useState<{
     id: string;
     name: string;
@@ -1192,7 +1202,7 @@ const TasksPage = () => {
     emitUserActivity
   } = useSocket({
     boardId: currentBoardId,
-    userId: isGuest ? guestSession?.email : 'user', // Use email or user ID
+    userId: isGuest ? `guest_${guestSession?.email || sessionId}` : sessionId, // Use unique session ID for each tab
     onTaskUpdated: handleTaskUpdated,
     onTaskCreated: handleTaskCreated,
     onTaskDeleted: handleTaskDeleted,
@@ -1673,6 +1683,22 @@ const TasksPage = () => {
             } : board
           ));
           emitTaskUpdated({ ...taskData, id: editingTask.id, columnId });
+
+          // Add to local activity tracking
+          const userInfo = generateUserAvatar(sessionId);
+          setRecentActivity(prev => [
+            {
+              type: 'task-updated',
+              taskId: editingTask.id,
+              taskTitle: taskData.title,
+              columnId,
+              id: Date.now(),
+              timestamp: new Date(),
+              userName: userInfo.name + ' (Você)',
+              updatedBy: sessionId
+            },
+            ...prev.slice(0, 9)
+          ]);
         }
       } else {
         // Create new task
@@ -1694,6 +1720,22 @@ const TasksPage = () => {
             } : board
           ));
           emitTaskCreated({ ...createdTask, columnId });
+
+          // Add to local activity tracking
+          const userInfo = generateUserAvatar(sessionId);
+          setRecentActivity(prev => [
+            {
+              type: 'task-created',
+              taskId: createdTask.id,
+              taskTitle: createdTask.title,
+              columnId,
+              id: Date.now(),
+              timestamp: new Date(),
+              userName: userInfo.name + ' (Você)',
+              createdBy: sessionId
+            },
+            ...prev.slice(0, 9)
+          ]);
         }
       }
     } catch (error) {
@@ -1926,6 +1968,29 @@ const TasksPage = () => {
 
         // Emit socket event for real-time update
         emitTaskMoved(draggedTask, draggedFrom, targetColumnId, newIndex);
+
+        // Add to local activity tracking
+        const userInfo = generateUserAvatar(sessionId);
+        const movedTask = boards.find(b => b.id === currentBoardId)
+          ?.columns.find(col => col.id === draggedFrom)
+          ?.tasks.find(t => t.id === draggedTask);
+
+        if (movedTask) {
+          setRecentActivity(prev => [
+            {
+              type: 'task-moved',
+              taskId: draggedTask,
+              taskTitle: movedTask.title,
+              fromColumn: draggedFrom,
+              toColumn: targetColumnId,
+              id: Date.now(),
+              timestamp: new Date(),
+              userName: userInfo.name + ' (Você)',
+              movedBy: sessionId
+            },
+            ...prev.slice(0, 9)
+          ]);
+        }
       }
     } catch (error) {
       console.error('❌ Erro ao mover task:', error);
