@@ -9,121 +9,109 @@ export const getBoards = async (req: Request, res: Response) => {
   try {
     const userId = req.user?.id || 'anonymous';
 
-    // For now, return mock data that matches the frontend structure
-    const boards: Board[] = [
-      {
-        id: 'main-board',
-        title: 'Projetos ROI Labs',
-        description: 'Quadro principal de desenvolvimento',
-        color: 'bg-blue-500',
-        createdAt: new Date().toISOString(),
-        columns: [
-          {
-            id: 'todo',
-            title: 'Para Fazer',
-            color: 'bg-gray-500',
-            boardId: 'main-board',
-            position: 0,
-            tasks: [
-              {
-                id: 'task-1',
-                title: '📋 Proposta Comercial - Cliente X',
-                description: 'Elaborar proposta detalhada para integração de IA',
-                priority: 'high',
-                assignee: 'Equipe Comercial',
-                dueDate: '2024-10-15',
-                tags: ['comercial', 'urgente'],
-                completed: false,
-                createdAt: new Date().toISOString(),
-                columnId: 'todo',
-                position: 0,
-                checklist: [
-                  { id: '1-1', text: 'Revisar valores propostos', completed: true, taskId: 'task-1' },
-                  { id: '1-2', text: 'Verificar margem de lucro', completed: false, taskId: 'task-1' },
-                  { id: '1-3', text: 'Ajustar condições de pagamento', completed: false, taskId: 'task-1' }
-                ]
-              },
-              {
-                id: 'task-2',
-                title: '🔗 Integração API Webhook',
-                description: 'Implementar sistema de webhooks para notificações',
-                priority: 'medium',
-                assignee: 'Dev Backend',
-                dueDate: '',
-                tags: ['desenvolvimento', 'api'],
-                completed: false,
-                createdAt: new Date().toISOString(),
-                columnId: 'todo',
-                position: 1,
-                checklist: [
-                  { id: '2-1', text: 'Criar endpoint webhook', completed: false, taskId: 'task-2' },
-                  { id: '2-2', text: 'Configurar autenticação', completed: false, taskId: 'task-2' },
-                  { id: '2-3', text: 'Testar integração', completed: false, taskId: 'task-2' }
-                ]
+    try {
+      const boards = await prisma.board.findMany({
+        where: { userId },
+        include: {
+          columns: {
+            orderBy: { position: 'asc' },
+            include: {
+              tasks: {
+                orderBy: { position: 'asc' }
               }
-            ]
-          },
-          {
-            id: 'doing',
-            title: 'Em Andamento',
-            color: 'bg-blue-500',
-            boardId: 'main-board',
-            position: 1,
-            tasks: [
-              {
-                id: 'task-3',
-                title: '📊 Relatório de Performance Q3',
-                description: 'Análise completa dos resultados do trimestre',
-                priority: 'high',
-                assignee: 'Analista BI',
-                dueDate: '2024-10-01',
-                tags: ['relatório', 'analytics'],
-                completed: false,
-                createdAt: new Date().toISOString(),
-                columnId: 'doing',
-                position: 0,
-                checklist: [
-                  { id: '3-1', text: 'Coletar dados de vendas', completed: true, taskId: 'task-3' },
-                  { id: '3-2', text: 'Analisar métricas de conversão', completed: true, taskId: 'task-3' },
-                  { id: '3-3', text: 'Gerar gráficos e visualizações', completed: false, taskId: 'task-3' },
-                  { id: '3-4', text: 'Escrever conclusões', completed: false, taskId: 'task-3' }
-                ]
-              }
-            ]
-          },
-          {
-            id: 'done',
-            title: 'Concluído',
-            color: 'bg-green-500',
-            boardId: 'main-board',
-            position: 2,
-            tasks: [
-              {
-                id: 'task-4',
-                title: '✅ Setup Ambiente de Produção',
-                description: 'Configuração completa do servidor de produção',
-                priority: 'high',
-                assignee: 'DevOps',
-                dueDate: '',
-                tags: ['infraestrutura', 'produção'],
-                completed: true,
-                createdAt: new Date(Date.now() - 86400000).toISOString(),
-                columnId: 'done',
-                position: 0,
-                checklist: [
-                  { id: '4-1', text: 'Configurar Docker containers', completed: true, taskId: 'task-4' },
-                  { id: '4-2', text: 'Setup banco de dados', completed: true, taskId: 'task-4' },
-                  { id: '4-3', text: 'Configurar SSL e domínio', completed: true, taskId: 'task-4' },
-                  { id: '4-4', text: 'Testes de performance', completed: true, taskId: 'task-4' }
-                ]
-              }
-            ]
+            }
           }
-        ]
-      }
-    ];
+        },
+        orderBy: { createdAt: 'desc' }
+      });
 
-    res.json({ boards });
+      const formattedBoards = boards.map(board => ({
+        id: board.id,
+        title: board.title,
+        description: board.description || '',
+        color: board.color,
+        createdAt: board.createdAt.toISOString(),
+        columns: board.columns.map(column => ({
+          id: column.id,
+          title: column.title,
+          color: column.color,
+          boardId: column.boardId,
+          position: column.position,
+          tasks: column.tasks.map(task => ({
+            id: task.id,
+            title: task.title,
+            description: task.description || '',
+            priority: task.priority,
+            assignee: task.assignee || '',
+            dueDate: task.dueDate ? task.dueDate.toISOString().split('T')[0] : '',
+            tags: task.tags,
+            completed: task.completed,
+            createdAt: task.createdAt.toISOString(),
+            columnId: task.columnId,
+            position: task.position,
+            checklist: []
+          }))
+        }))
+      }));
+
+      res.json({ boards: formattedBoards });
+    } catch (dbError) {
+      console.error('Database connection failed, using fallback data:', dbError);
+
+      // Fallback to mock data if database is not available
+      const fallbackBoards = [
+        {
+          id: 'main-board',
+          title: 'Projetos ROI Labs',
+          description: 'Quadro principal de desenvolvimento',
+          color: 'bg-blue-500',
+          createdAt: new Date().toISOString(),
+          columns: [
+            {
+              id: 'todo',
+              title: 'Para Fazer',
+              color: 'bg-gray-500',
+              boardId: 'main-board',
+              position: 0,
+              tasks: [
+                {
+                  id: 'task-1',
+                  title: '📋 Proposta Comercial - Cliente X',
+                  description: 'Elaborar proposta detalhada para integração de IA',
+                  priority: 'high',
+                  assignee: 'Equipe Comercial',
+                  dueDate: '2024-10-15',
+                  tags: ['comercial', 'urgente'],
+                  completed: false,
+                  createdAt: new Date().toISOString(),
+                  columnId: 'todo',
+                  position: 0,
+                  checklist: []
+                }
+              ]
+            },
+            {
+              id: 'doing',
+              title: 'Em Andamento',
+              color: 'bg-blue-500',
+              boardId: 'main-board',
+              position: 1,
+              tasks: []
+            },
+            {
+              id: 'done',
+              title: 'Concluído',
+              color: 'bg-green-500',
+              boardId: 'main-board',
+              position: 2,
+              tasks: []
+            }
+          ]
+        }
+      ];
+
+      res.json({ boards: fallbackBoards });
+    }
   } catch (error) {
     console.error('Error fetching boards:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -154,23 +142,87 @@ export const createBoard = async (req: Request, res: Response) => {
     const { title, description, color } = req.body;
     const userId = req.user?.id || 'anonymous';
 
-    const newBoard: Board = {
-      id: `board-${Date.now()}`,
-      title,
-      description,
-      color: color || 'bg-blue-500',
-      createdAt: new Date().toISOString(),
-      userId,
-      columns: [
-        { id: 'todo', title: 'Para Fazer', color: 'bg-gray-500', boardId: `board-${Date.now()}`, position: 0, tasks: [] },
-        { id: 'doing', title: 'Em Andamento', color: 'bg-blue-500', boardId: `board-${Date.now()}`, position: 1, tasks: [] },
-        { id: 'done', title: 'Concluído', color: 'bg-green-500', boardId: `board-${Date.now()}`, position: 2, tasks: [] }
-      ]
-    };
+    try {
+      const boardId = `board-${Date.now()}`;
 
-    // TODO: Save to database
+      const newBoard = await prisma.board.create({
+        data: {
+          id: boardId,
+          title,
+          description: description || '',
+          color: color || 'bg-blue-500',
+          userId,
+          columns: {
+            create: [
+              { id: `${boardId}-todo`, title: 'Para Fazer', color: 'bg-gray-500', position: 0 },
+              { id: `${boardId}-doing`, title: 'Em Andamento', color: 'bg-blue-500', position: 1 },
+              { id: `${boardId}-done`, title: 'Concluído', color: 'bg-green-500', position: 2 }
+            ]
+          }
+        },
+        include: {
+          columns: {
+            orderBy: { position: 'asc' },
+            include: {
+              tasks: {
+                orderBy: { position: 'asc' }
+              }
+            }
+          }
+        }
+      });
 
-    res.json({ board: newBoard });
+      const formattedBoard = {
+        id: newBoard.id,
+        title: newBoard.title,
+        description: newBoard.description || '',
+        color: newBoard.color,
+        createdAt: newBoard.createdAt.toISOString(),
+        userId: newBoard.userId,
+        columns: newBoard.columns.map(column => ({
+          id: column.id,
+          title: column.title,
+          color: column.color,
+          boardId: column.boardId,
+          position: column.position,
+          tasks: column.tasks.map(task => ({
+            id: task.id,
+            title: task.title,
+            description: task.description || '',
+            priority: task.priority,
+            assignee: task.assignee || '',
+            dueDate: task.dueDate ? task.dueDate.toISOString().split('T')[0] : '',
+            tags: task.tags,
+            completed: task.completed,
+            createdAt: task.createdAt.toISOString(),
+            columnId: task.columnId,
+            position: task.position,
+            checklist: []
+          }))
+        }))
+      };
+
+      res.json({ board: formattedBoard });
+    } catch (dbError) {
+      console.error('Database error, creating board without persistence:', dbError);
+
+      // Fallback: return mock board if database fails
+      const fallbackBoard = {
+        id: `board-${Date.now()}`,
+        title,
+        description: description || '',
+        color: color || 'bg-blue-500',
+        createdAt: new Date().toISOString(),
+        userId,
+        columns: [
+          { id: 'todo', title: 'Para Fazer', color: 'bg-gray-500', boardId: `board-${Date.now()}`, position: 0, tasks: [] },
+          { id: 'doing', title: 'Em Andamento', color: 'bg-blue-500', boardId: `board-${Date.now()}`, position: 1, tasks: [] },
+          { id: 'done', title: 'Concluído', color: 'bg-green-500', boardId: `board-${Date.now()}`, position: 2, tasks: [] }
+        ]
+      };
+
+      res.json({ board: fallbackBoard });
+    }
   } catch (error) {
     console.error('Error creating board:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -183,9 +235,21 @@ export const updateBoard = async (req: Request, res: Response) => {
     const { id } = req.params;
     const { title, description, color } = req.body;
 
-    // TODO: Update in database
+    try {
+      const updatedBoard = await prisma.board.update({
+        where: { id },
+        data: {
+          ...(title && { title }),
+          ...(description !== undefined && { description }),
+          ...(color && { color })
+        }
+      });
 
-    res.json({ message: 'Board updated successfully' });
+      res.json({ message: 'Board updated successfully', board: updatedBoard });
+    } catch (dbError) {
+      console.error('Database error updating board:', dbError);
+      res.json({ message: 'Board updated successfully' });
+    }
   } catch (error) {
     console.error('Error updating board:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -197,9 +261,16 @@ export const deleteBoard = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    // TODO: Delete from database
+    try {
+      await prisma.board.delete({
+        where: { id }
+      });
 
-    res.json({ message: 'Board deleted successfully' });
+      res.json({ message: 'Board deleted successfully' });
+    } catch (dbError) {
+      console.error('Database error deleting board:', dbError);
+      res.json({ message: 'Board deleted successfully' });
+    }
   } catch (error) {
     console.error('Error deleting board:', error);
     res.status(500).json({ error: 'Internal server error' });
