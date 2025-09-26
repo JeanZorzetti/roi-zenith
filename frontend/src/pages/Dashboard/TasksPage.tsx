@@ -1165,15 +1165,56 @@ const TasksPage = () => {
     }
   };
 
-  // Demo disabled temporarily to fix initialization error
-  // useEffect(() => {
-  //   if (isConnected && onlineUsers.length === 0) {
-  //     setTimeout(() => {
-  //       handleUserJoined({ userId: 'demo-user-1', userName: 'Ana Silva' });
-  //       showNotification('info', 'Ana Silva entrou no board');
-  //     }, 2000);
-  //   }
-  // }, [isConnected]);
+  // Temporary mock data for testing UI
+  useEffect(() => {
+    if (onlineUsers.length === 0) {
+      // Add mock users for testing
+      setOnlineUsers([
+        {
+          id: 'mock-user-1',
+          name: 'Ana Silva (Demo)',
+          avatar: '👩‍💼',
+          color: 'bg-blue-500',
+          joinedAt: new Date(Date.now() - 300000) // 5 minutes ago
+        },
+        {
+          id: 'mock-user-2',
+          name: 'Carlos Santos (Demo)',
+          avatar: '👨‍💻',
+          color: 'bg-green-500',
+          joinedAt: new Date(Date.now() - 120000) // 2 minutes ago
+        }
+      ]);
+
+      // Add mock activities
+      setRecentActivity([
+        {
+          id: 1,
+          type: 'task-created',
+          userName: 'Ana Silva',
+          taskTitle: 'Revisar documentação da API',
+          timestamp: new Date(Date.now() - 180000)
+        },
+        {
+          id: 2,
+          type: 'task-moved',
+          userName: 'Carlos Santos',
+          taskTitle: 'Implementar autenticação',
+          fromColumnName: 'Para Fazer',
+          toColumnName: 'Em Andamento',
+          timestamp: new Date(Date.now() - 60000)
+        },
+        {
+          id: 3,
+          type: 'user-joined',
+          userName: 'Maria Oliveira',
+          timestamp: new Date(Date.now() - 30000)
+        }
+      ]);
+
+      showNotification('info', 'Dados de demonstração carregados para teste da interface');
+    }
+  }, []);
 
   const {
     socket,
@@ -2260,7 +2301,18 @@ const TasksPage = () => {
       </div>
 
       {/* Enhanced Real-time Collaboration Panel */}
-      {isConnected && (
+      {/* DEBUG: Temporarily always show panel */}
+      {true && (
+        <div className="mb-4 p-3 bg-yellow-900/50 border border-yellow-500/50 rounded-lg">
+          <div className="text-sm text-yellow-200">
+            <strong>DEBUG Info:</strong> isConnected: {isConnected ? 'true' : 'false'},
+            onlineUsers: {onlineUsers.length},
+            recentActivity: {recentActivity.length},
+            socket: {socket ? 'exists' : 'null'}
+          </div>
+        </div>
+      )}
+      {(isConnected || true) && (
         <div className="mb-6 bg-gradient-to-r from-gray-900/80 to-gray-800/80 backdrop-blur-sm border border-gray-700/50 rounded-xl p-6 shadow-2xl collaboration-glow">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-xl font-bold text-white flex items-center space-x-3">
@@ -2271,9 +2323,19 @@ const TasksPage = () => {
               <span>Colaboração em Tempo Real</span>
             </h3>
             <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2 bg-green-900/30 px-3 py-1 rounded-full border border-green-500/30">
-                <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                <span className="text-sm text-green-300 font-medium">Conectado</span>
+              <div className={`flex items-center space-x-2 px-3 py-1 rounded-full border ${
+                isConnected
+                  ? 'bg-green-900/30 border-green-500/30'
+                  : 'bg-red-900/30 border-red-500/30'
+              }`}>
+                <div className={`w-2 h-2 rounded-full ${
+                  isConnected ? 'bg-green-400' : 'bg-red-400'
+                }`}></div>
+                <span className={`text-sm font-medium ${
+                  isConnected ? 'text-green-300' : 'text-red-300'
+                }`}>
+                  {isConnected ? 'Conectado' : 'Desconectado'}
+                </span>
               </div>
               <div className="flex items-center space-x-2 bg-blue-900/30 px-3 py-1 rounded-full border border-blue-500/30">
                 <span className="text-sm text-blue-300 font-medium">
