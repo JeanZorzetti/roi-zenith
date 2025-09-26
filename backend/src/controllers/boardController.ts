@@ -7,11 +7,13 @@ const prisma = new PrismaClient();
 // Get all boards for a user
 export const getBoards = async (req: Request, res: Response) => {
   try {
-    const userId = req.user?.id || 'anonymous';
+    const userId = req.user?.id;
 
     try {
+      // Se tem userId específico, busca boards do usuário
+      // Se não tem, busca boards sem usuário (anonymous)
       const boards = await prisma.board.findMany({
-        where: { userId },
+        where: userId ? { userId } : { userId: null },
         include: {
           columns: {
             orderBy: { position: 'asc' },
@@ -140,7 +142,7 @@ export const getBoard = async (req: Request, res: Response) => {
 export const createBoard = async (req: Request, res: Response) => {
   try {
     const { title, description, color } = req.body;
-    const userId = req.user?.id || 'anonymous';
+    const userId = req.user?.id;
 
     try {
       const boardId = `board-${Date.now()}`;
@@ -151,7 +153,7 @@ export const createBoard = async (req: Request, res: Response) => {
           title,
           description: description || '',
           color: color || 'bg-blue-500',
-          userId,
+          ...(userId && { userId }),
           columns: {
             create: [
               { id: `${boardId}-todo`, title: 'Para Fazer', color: 'bg-gray-500', position: 0 },
