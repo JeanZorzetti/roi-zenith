@@ -1433,7 +1433,7 @@ const TasksPage = () => {
   };
 
   // Save task (create or update)
-  const saveTask = (columnId: string) => {
+  const saveTask = async (columnId: string) => {
     console.log('DEBUG: saveTask called with columnId:', columnId);
     console.log('DEBUG: taskForm.title:', taskForm.title);
     console.log('DEBUG: currentBoardId:', currentBoardId);
@@ -1443,54 +1443,73 @@ const TasksPage = () => {
       return;
     }
 
-    const newTask: Task = {
-      id: editingTask?.id || Date.now().toString(),
+    const taskData = {
       title: taskForm.title.trim(),
       description: taskForm.description.trim() || undefined,
       priority: taskForm.priority,
       assignee: taskForm.assignee.trim() || undefined,
       dueDate: taskForm.dueDate || undefined,
       tags: taskForm.tags ? taskForm.tags.split(',').map(tag => tag.trim()).filter(Boolean) : [],
-      completed: false,
-      createdAt: editingTask?.createdAt || new Date().toISOString(),
-      checklist: taskForm.checklist.filter(item => item.text.trim())
+      columnId,
+      completed: false
     };
 
-    console.log('DEBUG: newTask created:', newTask);
+    try {
+      setLoading(true);
 
-    setBoards(prev => {
-      console.log('DEBUG: boards before update:', prev);
-      const updated = prev.map(board =>
-        board.id === currentBoardId ? {
-          ...board,
-          columns: board.columns.map(col => {
-            if (editingTask) {
-              // Update existing task
-              const taskIndex = col.tasks.findIndex(t => t.id === editingTask.id);
-              if (taskIndex >= 0) {
-                const newTasks = [...col.tasks];
-                newTasks[taskIndex] = newTask;
-                console.log('DEBUG: Updated task in column:', col.id);
-                return { ...col, tasks: newTasks };
-              }
-            } else if (col.id === columnId) {
-              // Add new task to specified column
-              console.log('DEBUG: Adding new task to column:', col.id);
-              return { ...col, tasks: [...col.tasks, newTask] };
-            }
-            return col;
-          })
-        } : board
-      );
-      console.log('DEBUG: boards after update:', updated);
-      return updated;
-    });
-
-    // Emit socket event for real-time update
-    if (editingTask) {
-      emitTaskUpdated({ ...newTask, columnId });
-    } else {
-      emitTaskCreated({ ...newTask, columnId });
+      if (editingTask) {
+        // Update existing task
+        const success = await boardService.updateTask(currentBoardId, editingTask.id, taskData);
+        if (success) {
+          // Update local state
+          setBoards(prev => prev.map(board =>
+            board.id === currentBoardId ? {
+              ...board,
+              columns: board.columns.map(col => {
+                const taskIndex = col.tasks.findIndex(t => t.id === editingTask.id);
+                if (taskIndex >= 0) {
+                  const updatedTask = {
+                    ...editingTask,
+                    ...taskData,
+                    checklist: taskForm.checklist.filter(item => item.text.trim())
+                  };
+                  const newTasks = [...col.tasks];
+                  newTasks[taskIndex] = updatedTask;
+                  return { ...col, tasks: newTasks };
+                }
+                return col;
+              })
+            } : board
+          ));
+          emitTaskUpdated({ ...taskData, id: editingTask.id, columnId });
+        }
+      } else {
+        // Create new task
+        const createdTask = await boardService.createTask(currentBoardId, taskData);
+        if (createdTask) {
+          // Update local state
+          setBoards(prev => prev.map(board =>
+            board.id === currentBoardId ? {
+              ...board,
+              columns: board.columns.map(col =>
+                col.id === columnId ? {
+                  ...col,
+                  tasks: [...col.tasks, {
+                    ...createdTask,
+                    checklist: taskForm.checklist.filter(item => item.text.trim())
+                  }]
+                } : col
+              )
+            } : board
+          ));
+          emitTaskCreated({ ...createdTask, columnId });
+        }
+      }
+    } catch (error) {
+      console.error('❌ Erro ao salvar task:', error);
+      alert('Erro ao salvar tarefa. Tente novamente.');
+    } finally {
+      setLoading(false);
     }
 
     setShowTaskModal(false);
@@ -1498,48 +1517,85 @@ const TasksPage = () => {
   };
 
   // Delete task
-  const deleteTask = (taskId: string) => {
+  const deleteTask = async (taskId: string) => {
     if (confirm('Tem certeza que deseja excluir esta tarefa?')) {
-      setBoards(prev => prev.map(board =>
-        board.id === currentBoardId ? {
-          ...board,
-          columns: board.columns.map(col => ({
-            ...col,
-            tasks: col.tasks.filter(task => task.id !== taskId)
-          }))
-        } : board
-      ));
+      try {
+        setLoading(true);
+        const success = await boardService.deleteTask(currentBoardId, taskId);
 
-      // Emit socket event for real-time update
-      emitTaskDeleted(taskId);
+        if (success) {
+          // Update local state
+          setBoards(prev => prev.map(board =>
+            board.id === currentBoardId ? {
+              ...board,
+              columns: board.columns.map(col => ({
+                ...col,
+                tasks: col.tasks.filter(task => task.id !== taskId)
+              }))
+            } : board
+          ));
+
+          // Emit socket event for real-time update
+          emitTaskDeleted(taskId);
+        }
+      } catch (error) {
+        console.error('❌ Erro ao deletar task:', error);
+        alert('Erro ao deletar tarefa. Tente novamente.');
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
   // Toggle task completion
-  const toggleTaskCompletion = (taskId: string) => {
+  const toggleTaskCompletion = async (taskId: string) => {
     let updatedTask: Task | null = null;
     let taskColumnId: string | null = null;
 
-    setBoards(prev => prev.map(board =>
-      board.id === currentBoardId ? {
-        ...board,
-        columns: board.columns.map(col => ({
-          ...col,
-          tasks: col.tasks.map(task => {
-            if (task.id === taskId) {
-              updatedTask = { ...task, completed: !task.completed };
-              taskColumnId = col.id;
-              return updatedTask;
-            }
-            return task;
-          })
-        }))
-      } : board
-    ));
+    // Find the task to update
+    const currentBoard = boards.find(b => b.id === currentBoardId);
+    const taskColumn = currentBoard?.columns.find(col =>
+      col.tasks.some(task => task.id === taskId)
+    );
+    const existingTask = taskColumn?.tasks.find(task => task.id === taskId);
 
-    // Emit socket event for real-time update
-    if (updatedTask && taskColumnId) {
-      emitTaskUpdated({ ...updatedTask, columnId: taskColumnId });
+    if (!existingTask || !taskColumn) return;
+
+    try {
+      setLoading(true);
+
+      const success = await boardService.updateTask(currentBoardId, taskId, {
+        completed: !existingTask.completed
+      });
+
+      if (success) {
+        // Update local state
+        setBoards(prev => prev.map(board =>
+          board.id === currentBoardId ? {
+            ...board,
+            columns: board.columns.map(col => ({
+              ...col,
+              tasks: col.tasks.map(task => {
+                if (task.id === taskId) {
+                  updatedTask = { ...task, completed: !task.completed };
+                  taskColumnId = col.id;
+                  return updatedTask;
+                }
+                return task;
+              })
+            }))
+          } : board
+        ));
+
+        // Emit socket event for real-time update
+        if (updatedTask && taskColumnId) {
+          emitTaskUpdated({ ...updatedTask, columnId: taskColumnId });
+        }
+      }
+    } catch (error) {
+      console.error('❌ Erro ao atualizar tarefa:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -1626,7 +1682,7 @@ const TasksPage = () => {
     e.dataTransfer.dropEffect = 'move';
   };
 
-  const handleDrop = (e: React.DragEvent, targetColumnId: string) => {
+  const handleDrop = async (e: React.DragEvent, targetColumnId: string) => {
     e.preventDefault();
 
     if (!draggedTask || !draggedFrom || draggedFrom === targetColumnId) {
@@ -1639,35 +1695,52 @@ const TasksPage = () => {
     const movedTask = sourceColumn?.tasks.find(t => t.id === draggedTask);
     const newIndex = currentBoard?.columns.find(c => c.id === targetColumnId)?.tasks.length || 0;
 
-    setBoards(prev => prev.map(board =>
-      board.id === currentBoardId ? {
-        ...board,
-        columns: board.columns.map(col => {
-          if (col.id === draggedFrom) {
-            // Remove from source
-            return {
-              ...col,
-              tasks: col.tasks.filter(task => task.id !== draggedTask)
-            };
-          } else if (col.id === targetColumnId) {
-            // Add to target
-            const sourceColumn = board.columns.find(c => c.id === draggedFrom);
-            const movedTask = sourceColumn?.tasks.find(t => t.id === draggedTask);
-            if (movedTask) {
-              return {
-                ...col,
-                tasks: [...col.tasks, movedTask]
-              };
-            }
-          }
-          return col;
-        })
-      } : board
-    ));
+    if (!movedTask) {
+      setDraggedTask(null);
+      setDraggedFrom(null);
+      return;
+    }
 
-    // Emit socket event for real-time update
-    if (movedTask && draggedTask && draggedFrom && targetColumnId) {
-      emitTaskMoved(draggedTask, draggedFrom, targetColumnId, newIndex);
+    try {
+      setLoading(true);
+
+      // Update task's columnId via API
+      const success = await boardService.updateTask(currentBoardId, draggedTask, {
+        columnId: targetColumnId
+      });
+
+      if (success) {
+        // Update local state
+        setBoards(prev => prev.map(board =>
+          board.id === currentBoardId ? {
+            ...board,
+            columns: board.columns.map(col => {
+              if (col.id === draggedFrom) {
+                // Remove from source
+                return {
+                  ...col,
+                  tasks: col.tasks.filter(task => task.id !== draggedTask)
+                };
+              } else if (col.id === targetColumnId) {
+                // Add to target
+                return {
+                  ...col,
+                  tasks: [...col.tasks, { ...movedTask, columnId: targetColumnId }]
+                };
+              }
+              return col;
+            })
+          } : board
+        ));
+
+        // Emit socket event for real-time update
+        emitTaskMoved(draggedTask, draggedFrom, targetColumnId, newIndex);
+      }
+    } catch (error) {
+      console.error('❌ Erro ao mover task:', error);
+      alert('Erro ao mover tarefa. Tente novamente.');
+    } finally {
+      setLoading(false);
     }
 
     setDraggedTask(null);
