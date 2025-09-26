@@ -306,7 +306,7 @@ export const createTask = async (req: Request, res: Response) => {
           id: `task-${Date.now()}`,
           title,
           description: description || '',
-          priority: priority || 'MEDIUM',
+          priority: (priority || 'medium').toUpperCase() as any,
           assignee: assignee || '',
           dueDate: dueDate ? new Date(dueDate) : null,
           tags: tags || [],
