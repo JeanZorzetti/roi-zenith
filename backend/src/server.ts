@@ -119,10 +119,29 @@ io.on('connection', (socket) => {
     socket.join(boardId);
     console.log(`👤 User ${socket.id} joined board: ${boardId}`);
 
-    // Notify others in the room
+    // Get current users in the room (excluding the joining user)
+    const room = io.sockets.adapter.rooms.get(boardId);
+    const currentUsers = room ? Array.from(room).filter(id => id !== socket.id) : [];
+
+    // Send current users list to the joining user
+    if (currentUsers.length > 0) {
+      socket.emit('current-users', {
+        boardId,
+        users: currentUsers.map(id => ({ userId: id }))
+      });
+    }
+
+    // Notify existing users about the new user
     socket.to(boardId).emit('user-joined', {
       userId: socket.id,
       boardId
+    });
+
+    // Also emit to the joining user so they know they're connected
+    socket.emit('user-joined', {
+      userId: socket.id,
+      boardId,
+      isMe: true
     });
   });
 

@@ -1059,41 +1059,68 @@ const TasksPage = () => {
     );
   };
 
-  const handleUserJoined = (data: any) => {
-    console.log('👤 User joined:', data);
-
-    // Generate consistent avatar and color for user
-    const generateUserAvatar = (userId: string) => {
-      const colors = ['bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-pink-500', 'bg-indigo-500', 'bg-yellow-500', 'bg-red-500'];
-      const avatars = ['👤', '🧑‍💻', '👨‍💼', '👩‍💼', '🧑‍🎨', '👨‍🔧', '👩‍🔬', '🧑‍🚀'];
-      const colorIndex = userId.length % colors.length;
-      const avatarIndex = userId.charCodeAt(0) % avatars.length;
-      return {
-        color: colors[colorIndex],
-        avatar: avatars[avatarIndex],
-        name: data.userName || `Usuário ${userId.slice(-4)}`
-      };
+  // Generate consistent avatar and color for user
+  const generateUserAvatar = (userId: string) => {
+    const colors = ['bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-pink-500', 'bg-indigo-500', 'bg-yellow-500', 'bg-red-500'];
+    const avatars = ['👤', '🧑‍💻', '👨‍💼', '👩‍💼', '🧑‍🎨', '👨‍🔧', '👩‍🔬', '🧑‍🚀'];
+    const colorIndex = userId.length % colors.length;
+    const avatarIndex = userId.charCodeAt(0) % avatars.length;
+    return {
+      color: colors[colorIndex],
+      avatar: avatars[avatarIndex],
+      name: `Usuário ${userId.slice(-4)}`
     };
+  };
 
-    setOnlineUsers(prev => {
-      const existingUser = prev.find(user => user.id === data.userId);
-      if (!existingUser) {
-        const userInfo = generateUserAvatar(data.userId);
-        return [...prev, {
-          id: data.userId,
+  const handleCurrentUsers = (data: any) => {
+    console.log('👥 Current users received:', data);
+    if (data.users && data.users.length > 0) {
+      const users = data.users.map((user: any) => {
+        const userInfo = generateUserAvatar(user.userId);
+        return {
+          id: user.userId,
           name: userInfo.name,
           avatar: userInfo.avatar,
           color: userInfo.color,
           joinedAt: new Date()
-        }];
-      }
-      return prev;
-    });
+        };
+      });
+      setOnlineUsers(prev => {
+        const newUsers = users.filter((user: any) => !prev.find(p => p.id === user.id));
+        return [...prev, ...newUsers];
+      });
+    }
+  };
 
-    setRecentActivity(prev => [
-      { type: 'user-joined', ...data, id: Date.now(), timestamp: new Date() },
-      ...prev.slice(0, 9)
-    ]);
+  const handleUserJoined = (data: any) => {
+    console.log('👤 User joined:', data);
+
+    if (data.isMe) {
+      // This is the current user joining
+      showNotification('success', 'Conectado ao sistema de colaboração em tempo real!');
+    } else {
+      // Another user joined
+      const userInfo = generateUserAvatar(data.userId);
+      setOnlineUsers(prev => {
+        const existingUser = prev.find(user => user.id === data.userId);
+        if (!existingUser) {
+          return [...prev, {
+            id: data.userId,
+            name: userInfo.name,
+            avatar: userInfo.avatar,
+            color: userInfo.color,
+            joinedAt: new Date()
+          }];
+        }
+        return prev;
+      });
+
+      showNotification('info', `${userInfo.name} entrou no board`);
+      setRecentActivity(prev => [
+        { type: 'user-joined', ...data, id: Date.now(), timestamp: new Date(), userName: userInfo.name },
+        ...prev.slice(0, 9)
+      ]);
+    }
   };
 
   const handleUserLeft = (data: any) => {
@@ -1166,7 +1193,8 @@ const TasksPage = () => {
     onTaskMoved: handleTaskMoved,
     onUserJoined: handleUserJoined,
     onUserLeft: handleUserLeft,
-    onUserActivity: handleUserActivity
+    onUserActivity: handleUserActivity,
+    onCurrentUsers: handleCurrentUsers
   });
 
   // Board management functions

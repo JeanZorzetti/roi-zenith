@@ -12,6 +12,7 @@ interface UseSocketProps {
   onUserJoined?: (data: any) => void;
   onUserLeft?: (data: any) => void;
   onUserActivity?: (data: any) => void;
+  onCurrentUsers?: (data: any) => void;
 }
 
 export const useSocket = ({
@@ -24,7 +25,8 @@ export const useSocket = ({
   onBoardUpdated,
   onUserJoined,
   onUserLeft,
-  onUserActivity
+  onUserActivity,
+  onCurrentUsers
 }: UseSocketProps) => {
   const socketRef = useRef<Socket | null>(null);
 
@@ -74,6 +76,7 @@ export const useSocket = ({
     if (onUserJoined) socket.on('user-joined', onUserJoined);
     if (onUserLeft) socket.on('user-left', onUserLeft);
     if (onUserActivity) socket.on('user-activity', onUserActivity);
+    if (onCurrentUsers) socket.on('current-users', onCurrentUsers);
 
     // Cleanup na desmontagem do componente
     return () => {
