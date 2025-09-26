@@ -1,8 +1,15 @@
 import { Board, Task, Column } from '../types/Board';
 
-const API_BASE_URL = process.env.NODE_ENV === 'production'
+// Detectar ambiente: se a URL contém 'roilabs.com.br', é produção
+const isProduction = process.env.NODE_ENV === 'production' ||
+  (typeof window !== 'undefined' && window.location.hostname.includes('roilabs.com'));
+
+const API_BASE_URL = isProduction
   ? 'https://back.roilabs.com.br/api'
   : 'http://localhost:5002/api';
+
+console.log(`🌍 API Environment: ${isProduction ? 'PRODUCTION' : 'DEVELOPMENT'}`);
+console.log(`🔗 API Base URL: ${API_BASE_URL}`);
 
 class BoardService {
   async getBoards(): Promise<Board[]> {

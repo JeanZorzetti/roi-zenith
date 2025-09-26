@@ -35,9 +35,15 @@ export const useSocket = ({
     }
 
     // Conectar ao servidor Socket.IO
-    const serverUrl = process.env.NODE_ENV === 'production'
+    // Detectar ambiente: se a URL contém 'roilabs.com.br', é produção
+    const isProduction = process.env.NODE_ENV === 'production' || window.location.hostname.includes('roilabs.com');
+
+    const serverUrl = isProduction
       ? 'https://back.roilabs.com.br'
       : 'http://localhost:5002';
+
+    console.log(`🌍 Environment: ${isProduction ? 'PRODUCTION' : 'DEVELOPMENT'}`);
+    console.log(`🔗 Socket URL: ${serverUrl}`);
 
     socketRef.current = io(serverUrl, {
       transports: ['websocket', 'polling'],
