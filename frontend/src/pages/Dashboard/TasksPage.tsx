@@ -872,14 +872,63 @@ const TasksPage = () => {
   }, [boards]);
 
   // Socket.IO integration for real-time collaboration
-  const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
+  const [onlineUsers, setOnlineUsers] = useState<{
+    id: string;
+    name: string;
+    avatar: string;
+    color: string;
+    joinedAt: Date;
+    isEditing?: string; // taskId being edited
+  }[]>([]);
   const [recentActivity, setRecentActivity] = useState<any[]>([]);
+  const [taskBeingEdited, setTaskBeingEdited] = useState<string | null>(null);
+  const [editingUsers, setEditingUsers] = useState<Record<string, {
+    userId: string;
+    userName: string;
+    color: string;
+  }>>({});
+
+  // Toast notification system
+  const [notifications, setNotifications] = useState<{
+    id: number;
+    type: 'success' | 'info' | 'warning';
+    message: string;
+    userName?: string;
+    timestamp: Date;
+  }[]>([]);
+
+  const showNotification = (type: 'success' | 'info' | 'warning', message: string, userName?: string) => {
+    const notification = {
+      id: Date.now(),
+      type,
+      message,
+      userName,
+      timestamp: new Date()
+    };
+    setNotifications(prev => [notification, ...prev.slice(0, 4)]);
+
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+      setNotifications(prev => prev.filter(n => n.id !== notification.id));
+    }, 5000);
+  };
 
   const handleTaskUpdated = (data: any) => {
     console.log('📝 Task updated by another user:', data);
+    const userName = onlineUsers.find(user => user.id === data.updatedBy)?.name || data.updatedBy || 'Alguém';
+
+    showNotification('info', `${userName} atualizou uma tarefa`, userName);
+
     setRecentActivity(prev => [
-      { type: 'task-updated', ...data, id: Date.now() },
-      ...prev.slice(0, 9) // Keep only last 10 activities
+      {
+        type: 'task-updated',
+        ...data,
+        id: Date.now(),
+        timestamp: new Date(),
+        userName,
+        taskTitle: data.task?.title || 'Tarefa'
+      },
+      ...prev.slice(0, 9)
     ]);
 
     // Update the task in local state
@@ -900,8 +949,19 @@ const TasksPage = () => {
 
   const handleTaskCreated = (data: any) => {
     console.log('✨ Task created by another user:', data);
+    const userName = onlineUsers.find(user => user.id === data.createdBy)?.name || data.createdBy || 'Alguém';
+
+    showNotification('success', `${userName} criou uma nova tarefa: "${data.task?.title || 'Nova tarefa'}"`, userName);
+
     setRecentActivity(prev => [
-      { type: 'task-created', ...data, id: Date.now() },
+      {
+        type: 'task-created',
+        ...data,
+        id: Date.now(),
+        timestamp: new Date(),
+        userName,
+        taskTitle: data.task?.title || 'Nova tarefa'
+      },
       ...prev.slice(0, 9)
     ]);
 
@@ -923,8 +983,19 @@ const TasksPage = () => {
 
   const handleTaskDeleted = (data: any) => {
     console.log('🗑️ Task deleted by another user:', data);
+    const userName = onlineUsers.find(user => user.id === data.deletedBy)?.name || data.deletedBy || 'Alguém';
+
+    showNotification('warning', `${userName} excluiu uma tarefa`, userName);
+
     setRecentActivity(prev => [
-      { type: 'task-deleted', ...data, id: Date.now() },
+      {
+        type: 'task-deleted',
+        ...data,
+        id: Date.now(),
+        timestamp: new Date(),
+        userName,
+        taskTitle: data.taskTitle || 'Tarefa'
+      },
       ...prev.slice(0, 9)
     ]);
 
@@ -944,8 +1015,21 @@ const TasksPage = () => {
 
   const handleTaskMoved = (data: any) => {
     console.log('🔄 Task moved by another user:', data);
+    const userName = onlineUsers.find(user => user.id === data.movedBy)?.name || data.movedBy || 'Alguém';
+
+    showNotification('info', `${userName} moveu uma tarefa`, userName);
+
     setRecentActivity(prev => [
-      { type: 'task-moved', ...data, id: Date.now() },
+      {
+        type: 'task-moved',
+        ...data,
+        id: Date.now(),
+        timestamp: new Date(),
+        userName,
+        taskTitle: data.task?.title || 'Tarefa',
+        fromColumnName: data.fromColumnName || data.fromColumn,
+        toColumnName: data.toColumnName || data.toColumn
+      },
       ...prev.slice(0, 9)
     ]);
 
@@ -977,25 +1061,81 @@ const TasksPage = () => {
 
   const handleUserJoined = (data: any) => {
     console.log('👤 User joined:', data);
+
+    // Generate consistent avatar and color for user
+    const generateUserAvatar = (userId: string) => {
+      const colors = ['bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-pink-500', 'bg-indigo-500', 'bg-yellow-500', 'bg-red-500'];
+      const avatars = ['👤', '🧑‍💻', '👨‍💼', '👩‍💼', '🧑‍🎨', '👨‍🔧', '👩‍🔬', '🧑‍🚀'];
+      const colorIndex = userId.length % colors.length;
+      const avatarIndex = userId.charCodeAt(0) % avatars.length;
+      return {
+        color: colors[colorIndex],
+        avatar: avatars[avatarIndex],
+        name: data.userName || `Usuário ${userId.slice(-4)}`
+      };
+    };
+
     setOnlineUsers(prev => {
-      if (!prev.includes(data.userId)) {
-        return [...prev, data.userId];
+      const existingUser = prev.find(user => user.id === data.userId);
+      if (!existingUser) {
+        const userInfo = generateUserAvatar(data.userId);
+        return [...prev, {
+          id: data.userId,
+          name: userInfo.name,
+          avatar: userInfo.avatar,
+          color: userInfo.color,
+          joinedAt: new Date()
+        }];
       }
       return prev;
     });
+
     setRecentActivity(prev => [
-      { type: 'user-joined', ...data, id: Date.now() },
+      { type: 'user-joined', ...data, id: Date.now(), timestamp: new Date() },
       ...prev.slice(0, 9)
     ]);
   };
 
   const handleUserLeft = (data: any) => {
     console.log('👋 User left:', data);
-    setOnlineUsers(prev => prev.filter(userId => userId !== data.userId));
+    setOnlineUsers(prev => prev.filter(user => user.id !== data.userId));
+    setEditingUsers(prev => {
+      const newEditing = { ...prev };
+      Object.keys(newEditing).forEach(taskId => {
+        if (newEditing[taskId].userId === data.userId) {
+          delete newEditing[taskId];
+        }
+      });
+      return newEditing;
+    });
     setRecentActivity(prev => [
-      { type: 'user-left', ...data, id: Date.now() },
+      { type: 'user-left', ...data, id: Date.now(), timestamp: new Date() },
       ...prev.slice(0, 9)
     ]);
+  };
+
+  // Enhanced Socket.IO user activity tracking
+  const handleUserActivity = (data: any) => {
+    console.log('🎯 User activity:', data);
+    if (data.activity === 'editing-task') {
+      setEditingUsers(prev => ({
+        ...prev,
+        [data.data.taskId]: {
+          userId: data.userId,
+          userName: onlineUsers.find(user => user.id === data.userId)?.name || `Usuário ${data.userId.slice(-4)}`,
+          color: onlineUsers.find(user => user.id === data.userId)?.color || 'bg-blue-500'
+        }
+      }));
+
+      // Remove editing indicator after 3 seconds of inactivity
+      setTimeout(() => {
+        setEditingUsers(prev => {
+          const newEditing = { ...prev };
+          delete newEditing[data.data.taskId];
+          return newEditing;
+        });
+      }, 3000);
+    }
   };
 
   const {
@@ -1005,7 +1145,8 @@ const TasksPage = () => {
     emitTaskCreated,
     emitTaskDeleted,
     emitTaskMoved,
-    emitBoardUpdated
+    emitBoardUpdated,
+    emitUserActivity
   } = useSocket({
     boardId: currentBoardId,
     userId: isGuest ? guestSession?.email : 'user', // Use email or user ID
@@ -1014,7 +1155,8 @@ const TasksPage = () => {
     onTaskDeleted: handleTaskDeleted,
     onTaskMoved: handleTaskMoved,
     onUserJoined: handleUserJoined,
-    onUserLeft: handleUserLeft
+    onUserLeft: handleUserLeft,
+    onUserActivity: handleUserActivity
   });
 
   // Board management functions
@@ -1364,6 +1506,11 @@ const TasksPage = () => {
       tags: task.tags.join(', '),
       checklist: [...(task.checklist || [])]
     });
+
+    // Emit user activity for real-time collaboration
+    if (emitUserActivity) {
+      emitUserActivity('editing-task', { taskId: task.id, taskTitle: task.title });
+    }
     setShowTaskModal(true);
   };
 
@@ -1803,6 +1950,87 @@ const TasksPage = () => {
 
   return (
     <div className="p-6 min-h-screen bg-pure-black text-pure-white">
+      <style>{`
+        .custom-scrollbar {
+          scrollbar-width: thin;
+          scrollbar-color: rgba(99, 102, 241, 0.5) transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(99, 102, 241, 0.5);
+          border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgba(99, 102, 241, 0.7);
+        }
+
+        @keyframes animate-in {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes slide-in-from-right-2 {
+          from {
+            transform: translateX(8px);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+
+        .animate-in {
+          animation: animate-in 0.3s ease-out;
+        }
+
+        .slide-in-from-right-2 {
+          animation: slide-in-from-right-2 0.3s ease-out;
+        }
+
+        .collaboration-glow {
+          box-shadow: 0 0 20px rgba(59, 130, 246, 0.3), 0 0 40px rgba(59, 130, 246, 0.1);
+        }
+
+        .user-avatar-glow {
+          box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+        }
+
+        .notification-slide {
+          transform: translateX(100%);
+          animation: slideInFromRight 0.3s ease-out forwards;
+        }
+
+        @keyframes slideInFromRight {
+          to {
+            transform: translateX(0);
+          }
+        }
+
+        .task-editing-pulse {
+          animation: editingPulse 2s infinite;
+        }
+
+        @keyframes editingPulse {
+          0%, 100% {
+            box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.7);
+          }
+          50% {
+            box-shadow: 0 0 0 8px rgba(251, 191, 36, 0);
+          }
+        }
+      `}</style>
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center justify-between">
@@ -2209,6 +2437,21 @@ const TasksPage = () => {
                               +{checklist.length - 3} mais itens...
                             </div>
                           )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Real-time editing indicator */}
+                    {editingUsers[task.id] && (
+                      <div className="mb-3 flex items-center space-x-2 bg-yellow-900/20 border border-yellow-500/30 px-3 py-2 rounded-lg">
+                        <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+                        <span className="text-yellow-300 text-xs font-medium">
+                          {editingUsers[task.id].userName} está editando esta tarefa...
+                        </span>
+                        <div className="flex space-x-0.5">
+                          <div className="w-1 h-1 bg-yellow-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                          <div className="w-1 h-1 bg-yellow-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                          <div className="w-1 h-1 bg-yellow-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
                         </div>
                       </div>
                     )}
