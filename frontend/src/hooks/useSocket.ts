@@ -29,15 +29,21 @@ export const useSocket = ({
   const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
+    // Evitar múltiplas conexões se já existe uma ativa
+    if (socketRef.current?.connected) {
+      return;
+    }
+
     // Conectar ao servidor Socket.IO
     const serverUrl = process.env.NODE_ENV === 'production'
       ? 'https://back.roilabs.com.br'
-      : 'http://localhost:5001';
+      : 'http://localhost:5002';
 
     socketRef.current = io(serverUrl, {
       transports: ['websocket', 'polling'],
       timeout: 20000,
-      forceNew: true
+      forceNew: false,
+      autoConnect: true
     });
 
     const socket = socketRef.current;
@@ -45,11 +51,6 @@ export const useSocket = ({
     // Event listeners
     socket.on('connect', () => {
       console.log('🔗 Connected to Socket.IO server:', socket.id);
-
-      // Entrar no room do board se especificado
-      if (boardId) {
-        socket.emit('join-board', boardId);
-      }
     });
 
     socket.on('disconnect', () => {
@@ -68,15 +69,30 @@ export const useSocket = ({
     if (onUserLeft) socket.on('user-left', onUserLeft);
     if (onUserActivity) socket.on('user-activity', onUserActivity);
 
-    // Cleanup na desmontagem
+    // Cleanup na desmontagem do componente
     return () => {
-      if (boardId) {
-        socket.emit('leave-board', boardId);
+      if (socketRef.current) {
+        if (boardId) {
+          socketRef.current.emit('leave-board', boardId);
+        }
+        socketRef.current.disconnect();
+        socketRef.current = null;
       }
-      socket.disconnect();
-      socketRef.current = null;
     };
-  }, [boardId, userId]);
+  }, []); // Remover dependências para evitar reconexões desnecessárias
+
+  // Efeito separado para gerenciar mudanças de board
+  useEffect(() => {
+    if (socketRef.current?.connected && boardId) {
+      socketRef.current.emit('join-board', boardId);
+
+      return () => {
+        if (socketRef.current?.connected && boardId) {
+          socketRef.current.emit('leave-board', boardId);
+        }
+      };
+    }
+  }, [boardId]);
 
   // Métodos para emitir eventos
   const emitTaskUpdated = (taskData: any) => {
