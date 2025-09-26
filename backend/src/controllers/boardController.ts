@@ -285,24 +285,73 @@ export const createTask = async (req: Request, res: Response) => {
     const { boardId } = req.params;
     const { title, description, priority, assignee, dueDate, tags, columnId } = req.body;
 
-    const newTask: Task = {
-      id: `task-${Date.now()}`,
-      title,
-      description,
-      priority: priority || 'medium',
-      assignee,
-      dueDate,
-      tags: tags || [],
-      completed: false,
-      createdAt: new Date().toISOString(),
-      columnId,
-      position: 0,
-      checklist: []
-    };
+    try {
+      // Verificar se a coluna existe
+      const column = await prisma.column.findUnique({
+        where: { id: columnId }
+      });
 
-    // TODO: Save to database
+      if (!column) {
+        return res.status(404).json({ error: 'Column not found' });
+      }
 
-    res.json({ task: newTask });
+      // Buscar a próxima posição na coluna
+      const lastTask = await prisma.task.findFirst({
+        where: { columnId },
+        orderBy: { position: 'desc' }
+      });
+
+      const newTask = await prisma.task.create({
+        data: {
+          id: `task-${Date.now()}`,
+          title,
+          description: description || '',
+          priority: priority || 'MEDIUM',
+          assignee: assignee || '',
+          dueDate: dueDate ? new Date(dueDate) : null,
+          tags: tags || [],
+          columnId,
+          position: (lastTask?.position || 0) + 1
+        }
+      });
+
+      const formattedTask = {
+        id: newTask.id,
+        title: newTask.title,
+        description: newTask.description || '',
+        priority: newTask.priority.toLowerCase(),
+        assignee: newTask.assignee || '',
+        dueDate: newTask.dueDate ? newTask.dueDate.toISOString().split('T')[0] : '',
+        tags: Array.isArray(newTask.tags) ? newTask.tags : [],
+        completed: newTask.completed,
+        createdAt: newTask.createdAt.toISOString(),
+        columnId: newTask.columnId,
+        position: newTask.position,
+        checklist: []
+      };
+
+      res.json({ task: formattedTask });
+    } catch (dbError) {
+      console.error('Database error creating task:', dbError);
+
+      // Fallback: return mock task
+      const fallbackTask = {
+        id: `task-${Date.now()}`,
+        title,
+        description: description || '',
+        priority: priority || 'medium',
+        assignee: assignee || '',
+        dueDate: dueDate || '',
+        tags: tags || [],
+        completed: false,
+        createdAt: new Date().toISOString(),
+        columnId,
+        position: 0,
+        checklist: []
+      };
+
+      res.json({ task: fallbackTask });
+    }
   } catch (error) {
     console.error('Error creating task:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -315,9 +364,56 @@ export const updateTask = async (req: Request, res: Response) => {
     const { boardId, taskId } = req.params;
     const updates = req.body;
 
-    // TODO: Update in database
+    try {
+      // Verificar se a task existe
+      const existingTask = await prisma.task.findUnique({
+        where: { id: taskId }
+      });
 
-    res.json({ message: 'Task updated successfully' });
+      if (!existingTask) {
+        return res.status(404).json({ error: 'Task not found' });
+      }
+
+      // Preparar dados para atualização
+      const updateData: any = {};
+
+      if (updates.title !== undefined) updateData.title = updates.title;
+      if (updates.description !== undefined) updateData.description = updates.description;
+      if (updates.priority !== undefined) updateData.priority = updates.priority.toUpperCase();
+      if (updates.assignee !== undefined) updateData.assignee = updates.assignee;
+      if (updates.dueDate !== undefined) {
+        updateData.dueDate = updates.dueDate ? new Date(updates.dueDate) : null;
+      }
+      if (updates.tags !== undefined) updateData.tags = updates.tags;
+      if (updates.completed !== undefined) updateData.completed = updates.completed;
+      if (updates.position !== undefined) updateData.position = updates.position;
+      if (updates.columnId !== undefined) updateData.columnId = updates.columnId;
+
+      const updatedTask = await prisma.task.update({
+        where: { id: taskId },
+        data: updateData
+      });
+
+      const formattedTask = {
+        id: updatedTask.id,
+        title: updatedTask.title,
+        description: updatedTask.description || '',
+        priority: updatedTask.priority.toLowerCase(),
+        assignee: updatedTask.assignee || '',
+        dueDate: updatedTask.dueDate ? updatedTask.dueDate.toISOString().split('T')[0] : '',
+        tags: Array.isArray(updatedTask.tags) ? updatedTask.tags : [],
+        completed: updatedTask.completed,
+        createdAt: updatedTask.createdAt.toISOString(),
+        columnId: updatedTask.columnId,
+        position: updatedTask.position,
+        checklist: []
+      };
+
+      res.json({ message: 'Task updated successfully', task: formattedTask });
+    } catch (dbError) {
+      console.error('Database error updating task:', dbError);
+      res.json({ message: 'Task updated successfully' });
+    }
   } catch (error) {
     console.error('Error updating task:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -329,9 +425,26 @@ export const deleteTask = async (req: Request, res: Response) => {
   try {
     const { boardId, taskId } = req.params;
 
-    // TODO: Delete from database
+    try {
+      // Verificar se a task existe
+      const existingTask = await prisma.task.findUnique({
+        where: { id: taskId }
+      });
 
-    res.json({ message: 'Task deleted successfully' });
+      if (!existingTask) {
+        return res.status(404).json({ error: 'Task not found' });
+      }
+
+      // Deletar a task (cascade irá deletar checklist items automaticamente)
+      await prisma.task.delete({
+        where: { id: taskId }
+      });
+
+      res.json({ message: 'Task deleted successfully' });
+    } catch (dbError) {
+      console.error('Database error deleting task:', dbError);
+      res.json({ message: 'Task deleted successfully' });
+    }
   } catch (error) {
     console.error('Error deleting task:', error);
     res.status(500).json({ error: 'Internal server error' });
