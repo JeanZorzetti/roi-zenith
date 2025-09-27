@@ -28,6 +28,8 @@ import {
   Users
 } from 'lucide-react';
 import { useSocket } from '@/hooks/useSocket';
+import { ActivityFeed } from '@/components/ActivityFeed';
+import { ToastContainer } from '@/components/Notifications';
 
 interface ChecklistItem {
   id: string;
@@ -2412,59 +2414,16 @@ const TasksPage = () => {
               </div>
             </div>
 
-            {/* Enhanced Recent Activity */}
-            <div className="space-y-3">
-              <h4 className="text-sm font-semibold text-gray-300 flex items-center space-x-2">
-                <span>⚡</span>
-                <span>Atividade Recente</span>
-              </h4>
-              <div className="space-y-2 max-h-48 overflow-y-auto custom-scrollbar">
-                {recentActivity.slice(0, 5).map((activity, index) => (
-                  <div key={index} className="bg-gray-800/50 backdrop-blur-sm border border-gray-700/30 px-4 py-3 rounded-lg">
-                    <div className="flex items-start space-x-3">
-                      <div className="flex-shrink-0 mt-0.5">
-                        {activity.type === 'task-created' && <span className="text-green-400">✨</span>}
-                        {activity.type === 'task-updated' && <span className="text-blue-400">📝</span>}
-                        {activity.type === 'task-deleted' && <span className="text-red-400">🗑️</span>}
-                        {activity.type === 'task-moved' && <span className="text-purple-400">🔄</span>}
-                        {activity.type === 'user-joined' && <span className="text-green-400">👋</span>}
-                        {activity.type === 'user-left' && <span className="text-gray-400">👋</span>}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm text-white">
-                          <span className="font-medium text-blue-300">{activity.userName || 'Alguém'}</span>
-                          {activity.type === 'task-created' && <span> criou</span>}
-                          {activity.type === 'task-updated' && <span> atualizou</span>}
-                          {activity.type === 'task-deleted' && <span> excluiu</span>}
-                          {activity.type === 'task-moved' && <span> moveu</span>}
-                          {activity.type === 'user-joined' && <span> entrou no board</span>}
-                          {activity.type === 'user-left' && <span> saiu do board</span>}
-                          {activity.taskTitle && (
-                            <span className="text-gray-300"> "{activity.taskTitle}"</span>
-                          )}
-                          {activity.type === 'task-moved' && activity.fromColumnName && activity.toColumnName && (
-                            <span className="text-gray-300"> de {activity.fromColumnName} para {activity.toColumnName}</span>
-                          )}
-                        </p>
-                        <p className="text-xs text-gray-400 mt-1">
-                          {activity.timestamp ? new Date(activity.timestamp).toLocaleTimeString('pt-BR', {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            second: '2-digit'
-                          }) : 'Agora'}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-                {recentActivity.length === 0 && (
-                  <div className="text-center py-6 text-gray-500">
-                    <span className="text-2xl">💤</span>
-                    <p className="text-sm mt-2">Nenhuma atividade recente</p>
-                  </div>
-                )}
-              </div>
-            </div>
+            {/* Sistema de Atividades Robusto */}
+            <ActivityFeed
+              boardId={currentBoardId}
+              showFilters={true}
+              maxHeight="400px"
+              enableRealTime={true}
+              enableSearch={true}
+              enableNotifications={true}
+              compact={true}
+            />
           </div>
         </div>
       )}
@@ -3359,6 +3318,9 @@ const TasksPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Container de Notificações Globais */}
+      <ToastContainer />
     </div>
   );
 };
