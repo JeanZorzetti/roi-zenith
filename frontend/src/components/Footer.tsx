@@ -5,13 +5,20 @@ const footerLinks = [
   { label: 'Blog', href: '#blog' },
   { label: 'Carreiras', href: '#carreiras' },
   { label: 'Contato', href: '#contato' },
+  { label: 'Política de Privacidade', href: '/privacidade' },
 ];
 
 export default function Footer() {
   const handleLinkClick = (href: string) => {
-    const element = document.querySelector(href);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+    // Check if it's a hash link (anchor) or a route
+    if (href.startsWith('#')) {
+      const element = document.querySelector(href);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    } else {
+      // Navigate to the route
+      window.location.href = href;
     }
   };
 

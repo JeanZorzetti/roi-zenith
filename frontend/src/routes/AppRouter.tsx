@@ -25,6 +25,7 @@ const DocPage = lazy(() => import('@/pages/Resources/DocPage'));
 const WhitepapersPage = lazy(() => import('@/pages/Resources/WhitepapersPage'));
 const ContactPage = lazy(() => import('@/pages/Contact/ContactPage'));
 const CalculatorPage = lazy(() => import('@/pages/Calculator/CalculatorPage'));
+const PrivacyPolicyPage = lazy(() => import('@/pages/PrivacyPolicy/PrivacyPolicyPage'));
 const DashboardPage = lazy(() => import('@/pages/Dashboard/DashboardPage'));
 const AnalyticsPage = lazy(() => import('@/pages/Dashboard/AnalyticsPage'));
 const LeadsPage = lazy(() => import('@/pages/Dashboard/LeadsPage'));
@@ -69,6 +70,7 @@ const AppRouter = () => {
             <Route path="resources/whitepapers" element={<WhitepapersPage />} />
             <Route path="calculator" element={<CalculatorPage />} />
             <Route path="contact" element={<ContactPage />} />
+            <Route path="privacidade" element={<PrivacyPolicyPage />} />
           </Route>
 
           {/* Protected routes */}
