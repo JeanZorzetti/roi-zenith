@@ -1354,35 +1354,36 @@ const TasksPage = () => {
         });
       }
 
-      // Se tem colunas, adiciona elas ao estado local (não precisa criar via API)
+      // Se tem colunas, cria elas no banco via API
       if (data.columns && Array.isArray(data.columns)) {
-        const newColumns = data.columns.map((col: any) => ({
-          id: col.id || `column-${Date.now()}-${Math.random()}`,
-          title: col.title,
-          color: col.color || 'bg-gray-500',
-          tasks: []
-        }));
+        for (const colData of data.columns) {
+          try {
+            const created = await boardService.createColumn(currentBoardId, {
+              id: colData.id,
+              title: colData.title,
+              color: colData.color || "bg-gray-500",
+              boardId: currentBoardId,
+              position: 0
+            });
 
-        // Atualiza estado local adicionando novas colunas
-        setBoards(prev => prev.map(board =>
-          board.id === currentBoardId ? {
-            ...board,
-            columns: [...board.columns, ...newColumns]
-          } : board
-        ));
+            if (created) {
+              console.log("✅ Coluna criada no banco:", created.id);
 
-        columnsCreated = newColumns.length;
+              // Atualiza estado local
+              setBoards(prev => prev.map(board =>
+                board.id === currentBoardId ? {
+                  ...board,
+                  columns: [...board.columns, created]
+                } : board
+              ));
 
-        // Salva no localStorage
-        const currentBoard = boards.find(b => b.id === currentBoardId);
-        if (currentBoard) {
-          const updatedBoard = {
-            ...currentBoard,
-            columns: [...currentBoard.columns, ...newColumns]
-          };
-          localStorage.setItem('kanban-boards', JSON.stringify(
-            boards.map(b => b.id === currentBoardId ? updatedBoard : b)
-          ));
+              columnsCreated++;
+            } else {
+              console.error("❌ Falha ao criar coluna no banco:", colData.title);
+            }
+          } catch (error) {
+            console.error("❌ Erro ao criar coluna:", error);
+          }
         }
       }
 

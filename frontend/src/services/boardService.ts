@@ -124,6 +124,31 @@ class BoardService {
     }
   }
 
+  async createColumn(boardId: string, column: Omit<Column, 'tasks'>): Promise<Column | null> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/boards/${boardId}/columns`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(column),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('❌ API Error Response:', errorText);
+        throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
+      }
+
+      const data = await response.json();
+      return data.column || null;
+    } catch (error) {
+      console.error('❌ Error creating column via API:', error);
+      return null;
+    }
+  }
+
   async createTask(boardId: string, task: Omit<Task, 'id' | 'createdAt'>): Promise<Task | null> {
     try {
       console.log('📡 API Request:', {

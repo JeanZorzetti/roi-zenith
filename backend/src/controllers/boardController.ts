@@ -279,6 +279,58 @@ export const deleteBoard = async (req: Request, res: Response) => {
   }
 };
 
+// Create column
+export const createColumn = async (req: Request, res: Response) => {
+  try {
+    const { boardId } = req.params;
+    const { id, title, color } = req.body;
+
+    try {
+      // Verificar se o board existe
+      const board = await prisma.board.findUnique({
+        where: { id: boardId }
+      });
+
+      if (!board) {
+        return res.status(404).json({ error: "Board not found" });
+      }
+
+      // Buscar a próxima posição no board
+      const lastColumn = await prisma.column.findFirst({
+        where: { boardId },
+        orderBy: { position: "desc" }
+      });
+
+      const newColumn = await prisma.column.create({
+        data: {
+          id: id || `column-${Date.now()}`,
+          title,
+          color: color || "bg-gray-500",
+          boardId,
+          position: (lastColumn?.position || 0) + 1
+        }
+      });
+
+      const formattedColumn = {
+        id: newColumn.id,
+        title: newColumn.title,
+        color: newColumn.color,
+        boardId: newColumn.boardId,
+        position: newColumn.position,
+        tasks: []
+      };
+
+      res.json({ column: formattedColumn });
+    } catch (dbError) {
+      console.error("Database error creating column:", dbError);
+      res.status(500).json({ error: "Failed to create column in database" });
+    }
+  } catch (error) {
+    console.error("Error creating column:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 // Create task
 export const createTask = async (req: Request, res: Response) => {
   try {
