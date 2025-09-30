@@ -1405,13 +1405,19 @@ const TasksPage = () => {
               }))
             };
 
-            console.log('🔄 Criando task via API:', taskToCreate);
+            console.log('🔄 Criando task via API:', {
+              boardId: currentBoardId,
+              task: taskToCreate,
+              columnDestino: taskData.column
+            });
 
             // Cria no banco via API
             const created = await boardService.createTask(currentBoardId, taskToCreate);
 
+            console.log('📦 Retorno do boardService.createTask:', created);
+
             if (created) {
-              console.log('✅ Task criada no banco:', created);
+              console.log('✅ Task criada no banco com ID:', created.id);
 
               // Atualiza estado local
               setBoards(prev => prev.map(board =>

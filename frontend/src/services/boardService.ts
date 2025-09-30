@@ -126,6 +126,12 @@ class BoardService {
 
   async createTask(boardId: string, task: Omit<Task, 'id' | 'createdAt'>): Promise<Task | null> {
     try {
+      console.log('📡 API Request:', {
+        url: `${API_BASE_URL}/boards/${boardId}/tasks`,
+        method: 'POST',
+        body: task
+      });
+
       const response = await fetch(`${API_BASE_URL}/boards/${boardId}/tasks`, {
         method: 'POST',
         headers: {
@@ -135,14 +141,23 @@ class BoardService {
         body: JSON.stringify(task),
       });
 
+      console.log('📡 API Response:', {
+        status: response.status,
+        ok: response.ok,
+        statusText: response.statusText
+      });
+
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorText = await response.text();
+        console.error('❌ API Error Response:', errorText);
+        throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
       }
 
       const data = await response.json();
+      console.log('✅ API Success Data:', data);
       return data.task || null;
     } catch (error) {
-      console.error('Error creating task:', error);
+      console.error('❌ Error creating task via API:', error);
       return null;
     }
   }
