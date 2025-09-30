@@ -1389,40 +1389,51 @@ const TasksPage = () => {
       // Importa tasks
       if (data.tasks && Array.isArray(data.tasks)) {
         for (const taskData of data.tasks) {
-          const task = {
-            id: `task-${Date.now()}-${Math.random()}`,
-            title: taskData.title,
-            description: taskData.description || '',
-            priority: taskData.priority || 'medium',
-            dueDate: taskData.dueDate || null,
-            assignee: taskData.assignee || null,
-            tags: taskData.tags || [],
-            checklist: (taskData.checklist || []).map((item: string) => ({
-              id: `check-${Date.now()}-${Math.random()}`,
-              text: item,
-              completed: false
-            })),
-            createdAt: new Date(),
-            updatedAt: new Date()
-          };
+          try {
+            // Prepara a task sem ID e timestamps (o backend vai gerar)
+            const taskToCreate = {
+              title: taskData.title,
+              description: taskData.description || '',
+              priority: taskData.priority || 'medium',
+              dueDate: taskData.dueDate || null,
+              assignee: taskData.assignee || null,
+              tags: taskData.tags || [],
+              checklist: (taskData.checklist || []).map((item: string) => ({
+                id: `check-${Date.now()}-${Math.random()}`,
+                text: item,
+                completed: false
+              }))
+            };
 
-          const created = await boardService.createTask(currentBoardId, task);
+            console.log('🔄 Criando task via API:', taskToCreate);
 
-          if (created) {
-            setBoards(prev => prev.map(board =>
-              board.id === currentBoardId ? {
-                ...board,
-                columns: board.columns.map(col =>
-                  col.id === taskData.column ? {
-                    ...col,
-                    tasks: [...col.tasks, created]
-                  } : col
-                )
-              } : board
-            ));
+            // Cria no banco via API
+            const created = await boardService.createTask(currentBoardId, taskToCreate);
 
-            emitTaskCreated({ ...created, columnId: taskData.column });
-            importedCount++;
+            if (created) {
+              console.log('✅ Task criada no banco:', created);
+
+              // Atualiza estado local
+              setBoards(prev => prev.map(board =>
+                board.id === currentBoardId ? {
+                  ...board,
+                  columns: board.columns.map(col =>
+                    col.id === taskData.column ? {
+                      ...col,
+                      tasks: [...col.tasks, created]
+                    } : col
+                  )
+                } : board
+              ));
+
+              // Emite evento Socket.IO
+              emitTaskCreated({ ...created, columnId: taskData.column });
+              importedCount++;
+            } else {
+              console.error('❌ Falha ao criar task no banco:', taskData.title);
+            }
+          } catch (error) {
+            console.error('❌ Erro ao criar task:', taskData.title, error);
           }
         }
       }
