@@ -1398,6 +1398,7 @@ const TasksPage = () => {
               dueDate: taskData.dueDate || null,
               assignee: taskData.assignee || null,
               tags: taskData.tags || [],
+              columnId: taskData.column,  // ✅ Backend espera "columnId"
               checklist: (taskData.checklist || []).map((item: string) => ({
                 id: `check-${Date.now()}-${Math.random()}`,
                 text: item,
