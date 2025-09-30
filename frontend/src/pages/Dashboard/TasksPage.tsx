@@ -25,11 +25,13 @@ import {
   Star,
   Share2,
   Mail,
-  Users
+  Users,
+  Upload
 } from 'lucide-react';
 import { useSocket } from '@/hooks/useSocket';
 import { ActivityFeed } from '@/components/ActivityFeed';
 import { ToastContainer } from '@/components/Notifications';
+import { ImportModal } from '@/components/ImportModal';
 
 interface ChecklistItem {
   id: string;
@@ -756,6 +758,7 @@ const TasksPage = () => {
   } | null>(null);
   const [showBoardModal, setShowBoardModal] = useState(false);
   const [editingBoard, setEditingBoard] = useState<Board | null>(null);
+  const [showImportModal, setShowImportModal] = useState(false);
   
   // Board form state
   const [boardForm, setBoardForm] = useState({
@@ -1332,6 +1335,90 @@ const TasksPage = () => {
       } finally {
         setLoading(false);
       }
+    }
+  };
+
+  // Import function
+  const handleImport = async (data: any) => {
+    try {
+      setLoading(true);
+
+      // Se tem board info, atualiza o board atual
+      if (data.board && data.board.title) {
+        await boardService.updateBoard(currentBoardId, {
+          title: data.board.title,
+          description: data.board.description || '',
+          color: boardForm.color
+        });
+      }
+
+      // Se tem colunas, cria elas
+      if (data.columns && Array.isArray(data.columns)) {
+        for (const col of data.columns) {
+          const newColumn = {
+            id: col.id || `column-${Date.now()}-${Math.random()}`,
+            title: col.title,
+            color: col.color || 'bg-gray-500',
+            tasks: []
+          };
+
+          await boardService.createColumn(currentBoardId, newColumn);
+
+          setBoards(prev => prev.map(board =>
+            board.id === currentBoardId ? {
+              ...board,
+              columns: [...board.columns, newColumn]
+            } : board
+          ));
+        }
+      }
+
+      // Importa tasks
+      if (data.tasks && Array.isArray(data.tasks)) {
+        for (const taskData of data.tasks) {
+          const task = {
+            id: `task-${Date.now()}-${Math.random()}`,
+            title: taskData.title,
+            description: taskData.description || '',
+            priority: taskData.priority || 'medium',
+            dueDate: taskData.dueDate || null,
+            assignee: taskData.assignee || null,
+            tags: taskData.tags || [],
+            checklist: (taskData.checklist || []).map((item: string) => ({
+              id: `check-${Date.now()}-${Math.random()}`,
+              text: item,
+              completed: false
+            })),
+            createdAt: new Date(),
+            updatedAt: new Date()
+          };
+
+          const created = await boardService.createTask(currentBoardId, task);
+
+          if (created) {
+            setBoards(prev => prev.map(board =>
+              board.id === currentBoardId ? {
+                ...board,
+                columns: board.columns.map(col =>
+                  col.id === taskData.column ? {
+                    ...col,
+                    tasks: [...col.tasks, created]
+                  } : col
+                )
+              } : board
+            ));
+
+            emitTaskCreated({ ...created, columnId: taskData.column });
+          }
+        }
+      }
+
+      alert(`✅ Importação concluída! ${data.tasks?.length || 0} tarefas importadas.`);
+    } catch (error) {
+      console.error('Erro ao importar:', error);
+      alert('❌ Erro ao importar. Verifique o formato do JSON.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -2183,13 +2270,23 @@ const TasksPage = () => {
                   <div className="p-4 border-b border-gray-700/30">
                     <div className="flex items-center justify-between">
                       <h3 className="font-bold text-white">Seus Quadros</h3>
-                      <button
-                        onClick={() => {setShowBoardModal(true); setShowBoardSelector(false);}}
-                        className="flex items-center space-x-1 text-xs text-primary-400 hover:text-primary-300 transition-colors"
-                      >
-                        <Plus className="h-3 w-3" />
-                        <span>Novo</span>
-                      </button>
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => {setShowImportModal(true); setShowBoardSelector(false);}}
+                          className="flex items-center space-x-1 text-xs text-green-400 hover:text-green-300 transition-colors"
+                          title="Importar JSON"
+                        >
+                          <Upload className="h-3 w-3" />
+                          <span>Importar</span>
+                        </button>
+                        <button
+                          onClick={() => {setShowBoardModal(true); setShowBoardSelector(false);}}
+                          className="flex items-center space-x-1 text-xs text-primary-400 hover:text-primary-300 transition-colors"
+                        >
+                          <Plus className="h-3 w-3" />
+                          <span>Novo</span>
+                        </button>
+                      </div>
                     </div>
                   </div>
                   
@@ -3225,6 +3322,14 @@ const TasksPage = () => {
 
       {/* Container de Notificações Globais */}
       <ToastContainer />
+
+      {/* Import Modal */}
+      <ImportModal
+        isOpen={showImportModal}
+        onClose={() => setShowImportModal(false)}
+        onImport={handleImport}
+        currentBoardId={currentBoardId}
+      />
     </div>
   );
 };
