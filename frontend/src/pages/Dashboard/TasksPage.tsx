@@ -1342,6 +1342,8 @@ const TasksPage = () => {
   const handleImport = async (data: any) => {
     try {
       setLoading(true);
+      let importedCount = 0;
+      let columnsCreated = 0;
 
       // Se tem board info, atualiza o board atual
       if (data.board && data.board.title) {
@@ -1352,23 +1354,34 @@ const TasksPage = () => {
         });
       }
 
-      // Se tem colunas, cria elas
+      // Se tem colunas, adiciona elas ao estado local (não precisa criar via API)
       if (data.columns && Array.isArray(data.columns)) {
-        for (const col of data.columns) {
-          const newColumn = {
-            id: col.id || `column-${Date.now()}-${Math.random()}`,
-            title: col.title,
-            color: col.color || 'bg-gray-500',
-            tasks: []
+        const newColumns = data.columns.map((col: any) => ({
+          id: col.id || `column-${Date.now()}-${Math.random()}`,
+          title: col.title,
+          color: col.color || 'bg-gray-500',
+          tasks: []
+        }));
+
+        // Atualiza estado local adicionando novas colunas
+        setBoards(prev => prev.map(board =>
+          board.id === currentBoardId ? {
+            ...board,
+            columns: [...board.columns, ...newColumns]
+          } : board
+        ));
+
+        columnsCreated = newColumns.length;
+
+        // Salva no localStorage
+        const currentBoard = boards.find(b => b.id === currentBoardId);
+        if (currentBoard) {
+          const updatedBoard = {
+            ...currentBoard,
+            columns: [...currentBoard.columns, ...newColumns]
           };
-
-          await boardService.createColumn(currentBoardId, newColumn);
-
-          setBoards(prev => prev.map(board =>
-            board.id === currentBoardId ? {
-              ...board,
-              columns: [...board.columns, newColumn]
-            } : board
+          localStorage.setItem('kanban-boards', JSON.stringify(
+            boards.map(b => b.id === currentBoardId ? updatedBoard : b)
           ));
         }
       }
@@ -1409,11 +1422,18 @@ const TasksPage = () => {
             ));
 
             emitTaskCreated({ ...created, columnId: taskData.column });
+            importedCount++;
           }
         }
       }
 
-      alert(`✅ Importação concluída! ${data.tasks?.length || 0} tarefas importadas.`);
+      const message = [
+        `✅ Importação concluída!`,
+        columnsCreated > 0 && `${columnsCreated} coluna(s) criada(s)`,
+        importedCount > 0 && `${importedCount} tarefa(s) importada(s)`
+      ].filter(Boolean).join('\n');
+
+      alert(message);
     } catch (error) {
       console.error('Erro ao importar:', error);
       alert('❌ Erro ao importar. Verifique o formato do JSON.');
