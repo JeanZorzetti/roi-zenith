@@ -1372,39 +1372,56 @@ const TasksPage = () => {
         });
       }
 
+      // Aceita columns no nível raiz OU dentro de board
+      const columnsData = data.columns || data.board?.columns;
+
       // Se tem colunas, processa elas
-      if (data.columns && Array.isArray(data.columns)) {
-        for (const colData of data.columns) {
-          let columnId = colData.id;
+      if (columnsData && Array.isArray(columnsData)) {
+        for (const colData of columnsData) {
+          // Busca coluna existente pelo título OU ID
+          const currentBoard = boards.find(b => b.id === currentBoardId);
+          const existingColumn = currentBoard?.columns.find(c =>
+            c.title === colData.title || c.id === colData.id
+          );
 
-          // Tenta criar a coluna (ou pega a existente)
-          try {
-            const created = await boardService.createColumn(currentBoardId, {
-              id: colData.id,
-              title: colData.title,
-              color: colData.color || "bg-gray-500",
-              boardId: currentBoardId,
-              position: 0
-            });
+          let columnId: string;
 
-            if (created) {
-              console.log("✅ Coluna criada no banco:", created.id);
-              columnId = created.id;
+          if (existingColumn) {
+            // Usa coluna existente
+            console.log("✅ Usando coluna existente:", existingColumn.title, existingColumn.id);
+            columnId = existingColumn.id;
+          } else {
+            // Cria nova coluna
+            try {
+              const created = await boardService.createColumn(currentBoardId, {
+                id: colData.id,
+                title: colData.title,
+                color: colData.color || "bg-gray-500",
+                boardId: currentBoardId,
+                position: 0
+              });
 
-              // Atualiza estado local
-              setBoards(prev => prev.map(board =>
-                board.id === currentBoardId ? {
-                  ...board,
-                  columns: [...board.columns, created]
-                } : board
-              ));
+              if (created) {
+                console.log("✅ Coluna criada no banco:", created.id);
+                columnId = created.id;
 
-              columnsCreated++;
-            } else {
-              console.log("⚠️ Coluna já existe ou falha ao criar:", colData.title);
+                // Atualiza estado local
+                setBoards(prev => prev.map(board =>
+                  board.id === currentBoardId ? {
+                    ...board,
+                    columns: [...board.columns, created]
+                  } : board
+                ));
+
+                columnsCreated++;
+              } else {
+                console.log("❌ Falha ao criar coluna:", colData.title);
+                continue;
+              }
+            } catch (error) {
+              console.error("❌ Erro ao criar coluna:", error);
+              continue;
             }
-          } catch (error) {
-            console.log("⚠️ Coluna já existe, usando ID:", colData.id);
           }
 
           // Processa subcolunas se existirem
