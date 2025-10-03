@@ -785,6 +785,8 @@ const TasksPage = () => {
 
   const [draggedTask, setDraggedTask] = useState<string | null>(null);
   const [draggedFrom, setDraggedFrom] = useState<string | null>(null);
+  const [draggedSubColumn, setDraggedSubColumn] = useState<string | null>(null);
+  const [draggedSubColumnFrom, setDraggedSubColumnFrom] = useState<string | null>(null);
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [showColumnModal, setShowColumnModal] = useState(false);
@@ -2149,7 +2151,8 @@ const TasksPage = () => {
       const success = await boardService.createSubColumn(columnId, title.trim());
 
       if (success) {
-        await loadBoards();
+        const reloadedBoards = await boardService.getBoards();
+        setBoards(reloadedBoards);
       }
     } catch (error) {
       console.error('❌ Erro ao criar subcoluna:', error);
@@ -2168,7 +2171,8 @@ const TasksPage = () => {
       const success = await boardService.updateSubColumn(subColumnId, { title: title.trim() });
 
       if (success) {
-        await loadBoards();
+        const reloadedBoards = await boardService.getBoards();
+        setBoards(reloadedBoards);
       }
     } catch (error) {
       console.error('❌ Erro ao atualizar subcoluna:', error);
@@ -2188,7 +2192,8 @@ const TasksPage = () => {
       const success = await boardService.deleteSubColumn(subColumnId);
 
       if (success) {
-        await loadBoards();
+        const reloadedBoards = await boardService.getBoards();
+        setBoards(reloadedBoards);
       }
     } catch (error) {
       console.error('❌ Erro ao deletar subcoluna:', error);
@@ -2198,7 +2203,7 @@ const TasksPage = () => {
     }
   };
 
-  // Drag and drop handlers
+  // Drag and drop handlers for tasks
   const handleDragStart = (e: React.DragEvent, taskId: string, columnId: string) => {
     setDraggedTask(taskId);
     setDraggedFrom(columnId);
@@ -2208,6 +2213,48 @@ const TasksPage = () => {
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
+  };
+
+  // Drag and drop handlers for subcolumns
+  const handleSubColumnDragStart = (e: React.DragEvent, subColumnId: string, columnId: string) => {
+    setDraggedSubColumn(subColumnId);
+    setDraggedSubColumnFrom(columnId);
+    e.dataTransfer.effectAllowed = 'move';
+    e.stopPropagation();
+  };
+
+  const handleSubColumnDrop = async (e: React.DragEvent, targetColumnId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!draggedSubColumn || !draggedSubColumnFrom || draggedSubColumnFrom === targetColumnId) {
+      setDraggedSubColumn(null);
+      setDraggedSubColumnFrom(null);
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      // Update subcolumn's columnId via API
+      const success = await boardService.updateSubColumn(draggedSubColumn, {
+        columnId: targetColumnId
+      });
+
+      if (success) {
+        const reloadedBoards = await boardService.getBoards();
+        setBoards(reloadedBoards);
+      } else {
+        alert('Erro ao mover subcoluna. Tente novamente.');
+      }
+    } catch (error) {
+      console.error('❌ Erro ao mover subcoluna:', error);
+      alert('Erro ao mover subcoluna. Tente novamente.');
+    } finally {
+      setLoading(false);
+      setDraggedSubColumn(null);
+      setDraggedSubColumnFrom(null);
+    }
   };
 
   const handleDrop = async (e: React.DragEvent, targetColumnId: string) => {
@@ -2346,7 +2393,8 @@ const TasksPage = () => {
 
       if (success) {
         // Reload boards to get fresh data
-        await loadBoards();
+        const reloadedBoards = await boardService.getBoards();
+        setBoards(reloadedBoards);
       }
     } catch (error) {
       console.error('❌ Erro ao mover task para subcoluna:', error);
@@ -2710,7 +2758,14 @@ const TasksPage = () => {
             key={column.id}
             className="flex-shrink-0 w-80"
             onDragOver={handleDragOver}
-            onDrop={(e) => handleDrop(e, column.id)}
+            onDrop={(e) => {
+              // Handle both task drops and subcolumn drops
+              if (draggedSubColumn) {
+                handleSubColumnDrop(e, column.id);
+              } else {
+                handleDrop(e, column.id);
+              }
+            }}
           >
             {/* Column Header */}
             <div className="flex items-center justify-between mb-4">
@@ -2801,7 +2856,11 @@ const TasksPage = () => {
                     return (
                     <div key={subColumn.id} className="border border-gray-700/50 rounded-xl overflow-hidden">
                       {/* SubColumn Header */}
-                      <div className="bg-gray-800/50 p-3 flex items-center justify-between hover:bg-gray-800/70 transition-colors">
+                      <div
+                        className="bg-gray-800/50 p-3 flex items-center justify-between hover:bg-gray-800/70 transition-colors cursor-move"
+                        draggable
+                        onDragStart={(e) => handleSubColumnDragStart(e, subColumn.id, column.id)}
+                      >
                         <div
                           className="flex items-center space-x-3 flex-1 cursor-pointer"
                           onClick={() => toggleSubColumnExpanded(subColumn.id)}

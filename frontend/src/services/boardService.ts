@@ -241,7 +241,7 @@ class BoardService {
     }
   }
 
-  async updateSubColumn(subColumnId: string, updates: { title?: string; position?: number }): Promise<boolean> {
+  async updateSubColumn(subColumnId: string, updates: { title?: string; position?: number; columnId?: string }): Promise<boolean> {
     try {
       const response = await fetch(`${API_BASE_URL}/sub-columns/${subColumnId}`, {
         method: 'PUT',

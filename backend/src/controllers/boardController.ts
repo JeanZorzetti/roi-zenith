@@ -619,7 +619,7 @@ export const createSubColumn = async (req: Request, res: Response) => {
 export const updateSubColumn = async (req: Request, res: Response) => {
   try {
     const { subColumnId } = req.params;
-    const { title, position } = req.body;
+    const { title, position, columnId } = req.body;
 
     try {
       const existingSubColumn = await prisma.subColumn.findUnique({
@@ -633,6 +633,7 @@ export const updateSubColumn = async (req: Request, res: Response) => {
       const updateData: any = {};
       if (title !== undefined) updateData.title = title;
       if (position !== undefined) updateData.position = position;
+      if (columnId !== undefined) updateData.columnId = columnId;
 
       const updatedSubColumn = await prisma.subColumn.update({
         where: { id: subColumnId },
