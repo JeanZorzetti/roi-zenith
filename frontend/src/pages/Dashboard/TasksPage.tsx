@@ -1420,8 +1420,8 @@ const TasksPage = () => {
                   // Processa tasks da subcoluna
                   if (subColData.tasks && Array.isArray(subColData.tasks)) {
                     // Precisa recarregar para pegar o ID da subcoluna criada
-                    await loadBoards();
-                    const currentBoard = boards.find(b => b.id === currentBoardId);
+                    const updatedBoards = await boardService.getBoards();
+                    const currentBoard = updatedBoards.find(b => b.id === currentBoardId);
                     const column = currentBoard?.columns.find(c => c.id === columnId);
                     const subColumn = column?.subColumns?.find(sc => sc.title === subColData.title);
 
@@ -1525,7 +1525,8 @@ const TasksPage = () => {
       }
 
       // Recarrega os boards para mostrar as mudanças
-      await loadBoards();
+      const reloadedBoards = await boardService.getBoards();
+      setBoards(reloadedBoards);
 
       const message = [
         `✅ Importação concluída!`,
