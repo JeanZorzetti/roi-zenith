@@ -331,6 +331,35 @@ export const createColumn = async (req: Request, res: Response) => {
   }
 };
 
+// Delete column
+export const deleteColumn = async (req: Request, res: Response) => {
+  try {
+    const { columnId } = req.params;
+
+    try {
+      const existingColumn = await prisma.column.findUnique({
+        where: { id: columnId }
+      });
+
+      if (!existingColumn) {
+        return res.status(404).json({ error: "Column not found" });
+      }
+
+      await prisma.column.delete({
+        where: { id: columnId }
+      });
+
+      res.json({ message: "Column deleted successfully" });
+    } catch (dbError) {
+      console.error("Database error deleting column:", dbError);
+      res.status(500).json({ error: "Failed to delete column from database" });
+    }
+  } catch (error) {
+    console.error("Error deleting column:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 // Create task
 export const createTask = async (req: Request, res: Response) => {
   try {

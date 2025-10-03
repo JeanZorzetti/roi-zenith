@@ -44,7 +44,8 @@
       "Bash(PORT=5002 node backend/dist/server.js)",
       "WebFetch(domain:roilabs.com.br)",
       "Bash(awk:*)",
-      "Bash(git log:*)"
+      "Bash(git log:*)",
+      "Bash(python:*)"
     ],
     "deny": [],
     "ask": []

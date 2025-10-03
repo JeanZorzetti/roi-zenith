@@ -6,6 +6,7 @@ import {
   updateBoard,
   deleteBoard,
   createColumn,
+  deleteColumn,
   createTask,
   updateTask,
   deleteTask
@@ -22,6 +23,7 @@ router.delete('/boards/:id', deleteBoard);
 
 // Column routes
 router.post('/boards/:boardId/columns', createColumn);
+router.delete('/boards/:boardId/columns/:columnId', deleteColumn);
 
 // Task routes
 router.post('/boards/:boardId/tasks', createTask);

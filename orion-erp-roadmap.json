@@ -1,0 +1,313 @@
+{
+  "board": {
+    "title": "Orion ERP - Lançamento 90 Dias",
+    "description": "Roadmap completo de lançamento do Orion ERP dividido em 4 quadros funcionais"
+  },
+  "columns": [
+    {
+      "id": "a-fazer",
+      "title": "A Fazer",
+      "color": "bg-red-500"
+    },
+    {
+      "id": "em-andamento",
+      "title": "Em Andamento",
+      "color": "bg-yellow-500"
+    },
+    {
+      "id": "concluido",
+      "title": "Concluído",
+      "color": "bg-green-500"
+    }
+  ],
+  "tasks": [
+    {
+      "title": "Pesquisar e contratar contabilidade online",
+      "description": "Essencial para iniciar a formalização. Muitos serviços oferecem a abertura do CNPJ gratuitamente no plano mensal, reduzindo o custo inicial.",
+      "column": "a-fazer",
+      "priority": "high",
+      "dueDate": "2025-10-09",
+      "assignee": "Fundador(a)",
+      "tags": ["fundação", "finanças", "semana-1"]
+    },
+    {
+      "title": "Iniciar processo de abertura da SLU (CNPJ)",
+      "description": "A Sociedade Limitada Unipessoal (SLU) é ideal por proteger o patrimônio pessoal sem exigir sócio ou capital social mínimo.",
+      "column": "a-fazer",
+      "priority": "high",
+      "dueDate": "2025-10-16",
+      "assignee": "Fundador(a)",
+      "tags": ["fundação", "finanças", "semana-2"]
+    },
+    {
+      "title": "Realizar busca de anterioridade da marca no INPI",
+      "description": "Passo crítico antes de investir no nome. Pode ser feito gratuitamente no portal do INPI para verificar a disponibilidade.",
+      "column": "a-fazer",
+      "priority": "high",
+      "dueDate": "2025-10-09",
+      "assignee": "Fundador(a)",
+      "tags": ["fundação", "finanças", "semana-1", "marca"]
+    },
+    {
+      "title": "Pagar GRU e protocolar pedido de registro da marca",
+      "description": "O custo inicial para MEI/Pessoa Física é reduzido (a partir de R$ 142,00). O processo pode ser feito online sem intermediários.",
+      "column": "a-fazer",
+      "priority": "medium",
+      "dueDate": "2025-11-02",
+      "assignee": "Fundador(a)",
+      "tags": ["fundação", "finanças", "mês-2", "marca"]
+    },
+    {
+      "title": "Criar modelo financeiro (DRE e Fluxo de Caixa)",
+      "description": "Utilizar modelos de planilhas para projetar custos, o 'vale do fluxo de caixa' e definir a necessidade de capital.",
+      "column": "a-fazer",
+      "priority": "high",
+      "dueDate": "2025-10-31",
+      "assignee": "Fundador(a)",
+      "tags": ["fundação", "finanças", "mês-1"]
+    },
+    {
+      "title": "Abrir conta bancária PJ",
+      "description": "Depende da obtenção do CNPJ. Bancos digitais costumam oferecer opções de baixo custo ou gratuitas.",
+      "column": "a-fazer",
+      "priority": "medium",
+      "dueDate": "2025-12-31",
+      "assignee": "Fundador(a)",
+      "tags": ["fundação", "finanças", "mês-3"]
+    },
+    {
+      "title": "Organizar documentação legal em nuvem",
+      "description": "Manter Contrato Social, CNPJ e comprovante do INPI em local seguro e acessível.",
+      "column": "a-fazer",
+      "priority": "low",
+      "dueDate": "2025-12-31",
+      "assignee": "Fundador(a)",
+      "tags": ["fundação", "finanças", "mês-3"]
+    },
+    {
+      "title": "Definir escopo detalhado e métricas do MVP",
+      "description": "Foco nos módulos de Finanças e Vendas/Estoque, com IA para previsão de demanda e automação de contas a pagar.",
+      "column": "a-fazer",
+      "priority": "high",
+      "dueDate": "2025-10-09",
+      "assignee": "Fundador(a)",
+      "tags": ["produto", "tecnologia", "semana-1", "mvp"]
+    },
+    {
+      "title": "Definir stack tecnológica e configurar ambiente",
+      "description": "Escolher tecnologias com planos gratuitos robustos (AWS Free Tier, Vercel, etc.). Configurar repositório e ambiente de dev.",
+      "column": "a-fazer",
+      "priority": "high",
+      "dueDate": "2025-10-09",
+      "assignee": "Fundador(a)",
+      "tags": ["produto", "tecnologia", "semana-1"]
+    },
+    {
+      "title": "Desenvolver arquitetura central do sistema",
+      "description": "Construir a base: autenticação, estrutura do banco de dados e APIs principais.",
+      "column": "a-fazer",
+      "priority": "high",
+      "dueDate": "2025-10-31",
+      "assignee": "Fundador(a)",
+      "tags": ["produto", "tecnologia", "mês-1", "desenvolvimento"]
+    },
+    {
+      "title": "Desenvolver Módulo Financeiro (Core do MVP)",
+      "description": "Implementar a automação de contas a pagar com PLN para extração de dados de faturas.",
+      "column": "a-fazer",
+      "priority": "high",
+      "dueDate": "2025-11-30",
+      "assignee": "Fundador(a)",
+      "tags": ["produto", "tecnologia", "mês-2", "ia", "desenvolvimento"]
+    },
+    {
+      "title": "Desenvolver Módulo Vendas/Estoque (Core do MVP)",
+      "description": "Implementar o modelo básico de Machine Learning para previsão de demanda.",
+      "column": "a-fazer",
+      "priority": "high",
+      "dueDate": "2025-11-30",
+      "assignee": "Fundador(a)",
+      "tags": ["produto", "tecnologia", "mês-2", "ia", "desenvolvimento"]
+    },
+    {
+      "title": "Construir a Interface de Usuário (UI) principal",
+      "description": "Focar nas telas essenciais para as funcionalidades do MVP, priorizando a usabilidade.",
+      "column": "a-fazer",
+      "priority": "medium",
+      "dueDate": "2025-11-30",
+      "assignee": "Fundador(a)",
+      "tags": ["produto", "tecnologia", "mês-2", "ui-ux"]
+    },
+    {
+      "title": "Finalizar funcionalidades e fluxo de onboarding",
+      "description": "Concluir o desenvolvimento e criar a experiência inicial do usuário, do cadastro aos primeiros passos.",
+      "column": "a-fazer",
+      "priority": "high",
+      "dueDate": "2025-12-07",
+      "assignee": "Fundador(a)",
+      "tags": ["produto", "tecnologia", "semana-9-10", "desenvolvimento"]
+    },
+    {
+      "title": "Realizar testes e corrigir bugs",
+      "description": "Testar exaustivamente o MVP para garantir estabilidade para as demonstrações.",
+      "column": "a-fazer",
+      "priority": "high",
+      "dueDate": "2025-12-14",
+      "assignee": "Fundador(a)",
+      "tags": ["produto", "tecnologia", "semana-11", "qa"]
+    },
+    {
+      "title": "Implantar MVP em ambiente de teste (Staging)",
+      "description": "Publicar a aplicação em um ambiente online privado, pronto para as demos com os 'design partners'.",
+      "column": "a-fazer",
+      "priority": "medium",
+      "dueDate": "2025-12-21",
+      "assignee": "Fundador(a)",
+      "tags": ["produto", "tecnologia", "semana-12", "deploy"]
+    },
+    {
+      "title": "Definir o Perfil de Cliente Ideal (ICP)",
+      "description": "Detalhar o nicho inicial (ex: varejistas de médio porte) para focar os esforços de validação.",
+      "column": "a-fazer",
+      "priority": "high",
+      "dueDate": "2025-10-09",
+      "assignee": "Fundador(a)",
+      "tags": ["marketing", "vendas", "semana-1"]
+    },
+    {
+      "title": "Criar landing page de 'em breve'",
+      "description": "Usar ferramentas de baixo custo para criar uma página que explique a proposta de valor e capture e-mails de interessados.",
+      "column": "a-fazer",
+      "priority": "high",
+      "dueDate": "2025-10-16",
+      "assignee": "Fundador(a)",
+      "tags": ["marketing", "vendas", "semana-2"]
+    },
+    {
+      "title": "Mapear e listar potenciais 'Design Partners'",
+      "description": "Criar uma lista de 20-30 empresas que se encaixam no ICP para serem os primeiros testadores.",
+      "column": "a-fazer",
+      "priority": "high",
+      "dueDate": "2025-10-31",
+      "assignee": "Fundador(a)",
+      "tags": ["marketing", "vendas", "mês-1"]
+    },
+    {
+      "title": "Iniciar contato para validação de problema",
+      "description": "Contatar a lista não para vender, mas para validar as dores de mercado que o produto se propõe a resolver.",
+      "column": "a-fazer",
+      "priority": "medium",
+      "dueDate": "2025-11-30",
+      "assignee": "Fundador(a)",
+      "tags": ["marketing", "vendas", "mês-2", "validação"]
+    },
+    {
+      "title": "Criar um Pitch Deck inicial",
+      "description": "Desenvolver uma apresentação curta e impactante sobre o problema, a solução e a visão da Orion ERP.",
+      "column": "a-fazer",
+      "priority": "medium",
+      "dueDate": "2025-11-30",
+      "assignee": "Fundador(a)",
+      "tags": ["marketing", "vendas", "mês-2"]
+    },
+    {
+      "title": "Iniciar marketing de conteúdo sutil",
+      "description": "Publicar 1-2 artigos no LinkedIn sobre os problemas que o ERP resolve, para começar a construir autoridade.",
+      "column": "a-fazer",
+      "priority": "low",
+      "dueDate": "2025-11-30",
+      "assignee": "Fundador(a)",
+      "tags": ["marketing", "vendas", "mês-2", "conteúdo"]
+    },
+    {
+      "title": "Agendar demonstrações do MVP",
+      "description": "Com o MVP em staging, agendar demos ao vivo para os 'design partners' mais engajados.",
+      "column": "a-fazer",
+      "priority": "high",
+      "dueDate": "2025-12-21",
+      "assignee": "Fundador(a)",
+      "tags": ["marketing", "vendas", "semana-12"]
+    },
+    {
+      "title": "Garantir compromisso para o Beta Fechado",
+      "description": "Obter o 'sim' de 3 a 5 empresas para participarem do programa de testes que iniciará no Mês 4.",
+      "column": "a-fazer",
+      "priority": "high",
+      "dueDate": "2025-12-31",
+      "assignee": "Fundador(a)",
+      "tags": ["marketing", "vendas", "mês-3", "beta"]
+    },
+    {
+      "title": "Pesquisar e adaptar modelos de documentos legais",
+      "description": "Utilizar modelos gratuitos de Termos de Serviço e Política de Privacidade como ponto de partida, adaptando-os para a Orion ERP.",
+      "column": "a-fazer",
+      "priority": "high",
+      "dueDate": "2025-10-16",
+      "assignee": "Fundador(a)",
+      "tags": ["grc", "lgpd", "semana-2"]
+    },
+    {
+      "title": "Estudar os princípios da LGPD ('Privacy by Design')",
+      "description": "Entender os conceitos de finalidade, necessidade e transparência para guiar o desenvolvimento do produto.",
+      "column": "a-fazer",
+      "priority": "high",
+      "dueDate": "2025-10-31",
+      "assignee": "Fundador(a)",
+      "tags": ["grc", "lgpd", "mês-1"]
+    },
+    {
+      "title": "Auto-designar-se como DPO interino",
+      "description": "Documentar internamente que o fundador assume a responsabilidade de Encarregado de Proteção de Dados (DPO).",
+      "column": "a-fazer",
+      "priority": "medium",
+      "dueDate": "2025-10-31",
+      "assignee": "Fundador(a)",
+      "tags": ["grc", "lgpd", "mês-1"]
+    },
+    {
+      "title": "Refinar documentos com cláusulas de SaaS e IA",
+      "description": "Incluir cláusulas específicas sobre o uso de dados anonimizados para treino de IA e sobre o modelo de assinatura.",
+      "column": "a-fazer",
+      "priority": "medium",
+      "dueDate": "2025-11-30",
+      "assignee": "Fundador(a)",
+      "tags": ["grc", "lgpd", "mês-2"]
+    },
+    {
+      "title": "Mapear o fluxo de dados pessoais do MVP",
+      "description": "Documentar quais dados são coletados, por quê, onde são armazenados e quem tem acesso.",
+      "column": "a-fazer",
+      "priority": "medium",
+      "dueDate": "2025-11-30",
+      "assignee": "Fundador(a)",
+      "tags": ["grc", "lgpd", "mês-2"]
+    },
+    {
+      "title": "Implementar ToS e Política de Privacidade no MVP",
+      "description": "Integrar os documentos no fluxo de cadastro do produto, garantindo o aceite explícito do usuário.",
+      "column": "a-fazer",
+      "priority": "high",
+      "dueDate": "2025-12-14",
+      "assignee": "Fundador(a)",
+      "tags": ["grc", "lgpd", "semana-11"]
+    },
+    {
+      "title": "Definir canal para requisições de titulares de dados",
+      "description": "Criar um e-mail simples (ex: privacidade@orionerp.com.br) como canal oficial para solicitações relacionadas à LGPD.",
+      "column": "a-fazer",
+      "priority": "low",
+      "dueDate": "2025-12-21",
+      "assignee": "Fundador(a)",
+      "tags": ["grc", "lgpd", "semana-12"]
+    },
+    {
+      "title": "Realizar diagnóstico inicial de conformidade",
+      "description": "Utilizar ferramentas gratuitas de diagnóstico LGPD para uma autoavaliação preliminar do MVP.",
+      "column": "a-fazer",
+      "priority": "low",
+      "dueDate": "2025-12-31",
+      "assignee": "Fundador(a)",
+      "tags": ["grc", "lgpd", "mês-3"]
+    }
+  ]
+}
