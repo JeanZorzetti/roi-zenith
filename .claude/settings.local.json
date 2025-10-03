@@ -45,7 +45,8 @@
       "WebFetch(domain:roilabs.com.br)",
       "Bash(awk:*)",
       "Bash(git log:*)",
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "Bash(cat:*)"
     ],
     "deny": [],
     "ask": []
