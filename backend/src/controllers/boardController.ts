@@ -531,3 +531,148 @@ export const deleteTask = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 };
+
+// Create sub-column
+export const createSubColumn = async (req: Request, res: Response) => {
+  try {
+    const { columnId } = req.params;
+    const { id, title, position } = req.body;
+
+    try {
+      // Verify column exists
+      const column = await prisma.column.findUnique({
+        where: { id: columnId }
+      });
+
+      if (!column) {
+        return res.status(404).json({ error: 'Column not found' });
+      }
+
+      // Get next position if not provided
+      const lastSubColumn = await prisma.subColumn.findFirst({
+        where: { columnId },
+        orderBy: { position: 'desc' }
+      });
+
+      const newSubColumn = await prisma.subColumn.create({
+        data: {
+          id: id || `subcolumn-${Date.now()}`,
+          title,
+          columnId,
+          position: position ?? ((lastSubColumn?.position || 0) + 1)
+        }
+      });
+
+      const formattedSubColumn = {
+        id: newSubColumn.id,
+        title: newSubColumn.title,
+        position: newSubColumn.position,
+        columnId: newSubColumn.columnId,
+        tasks: []
+      };
+
+      res.json({ subColumn: formattedSubColumn });
+    } catch (dbError) {
+      console.error('Database error creating sub-column:', dbError);
+      res.status(500).json({ error: 'Failed to create sub-column in database' });
+    }
+  } catch (error) {
+    console.error('Error creating sub-column:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+// Update sub-column
+export const updateSubColumn = async (req: Request, res: Response) => {
+  try {
+    const { subColumnId } = req.params;
+    const { title, position } = req.body;
+
+    try {
+      const existingSubColumn = await prisma.subColumn.findUnique({
+        where: { id: subColumnId }
+      });
+
+      if (!existingSubColumn) {
+        return res.status(404).json({ error: 'Sub-column not found' });
+      }
+
+      const updateData: any = {};
+      if (title !== undefined) updateData.title = title;
+      if (position !== undefined) updateData.position = position;
+
+      const updatedSubColumn = await prisma.subColumn.update({
+        where: { id: subColumnId },
+        data: updateData
+      });
+
+      res.json({ message: 'Sub-column updated successfully', subColumn: updatedSubColumn });
+    } catch (dbError) {
+      console.error('Database error updating sub-column:', dbError);
+      res.status(500).json({ error: 'Failed to update sub-column in database' });
+    }
+  } catch (error) {
+    console.error('Error updating sub-column:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+// Delete sub-column
+export const deleteSubColumn = async (req: Request, res: Response) => {
+  try {
+    const { subColumnId } = req.params;
+
+    try {
+      const existingSubColumn = await prisma.subColumn.findUnique({
+        where: { id: subColumnId }
+      });
+
+      if (!existingSubColumn) {
+        return res.status(404).json({ error: 'Sub-column not found' });
+      }
+
+      await prisma.subColumn.delete({
+        where: { id: subColumnId }
+      });
+
+      res.json({ message: 'Sub-column deleted successfully' });
+    } catch (dbError) {
+      console.error('Database error deleting sub-column:', dbError);
+      res.status(500).json({ error: 'Failed to delete sub-column from database' });
+    }
+  } catch (error) {
+    console.error('Error deleting sub-column:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+// Toggle column expanded state
+export const toggleColumnExpanded = async (req: Request, res: Response) => {
+  try {
+    const { columnId } = req.params;
+    const { isExpanded } = req.body;
+
+    try {
+      const column = await prisma.column.findUnique({
+        where: { id: columnId }
+      });
+
+      if (!column) {
+        return res.status(404).json({ error: 'Column not found' });
+      }
+
+      const updatedColumn = await prisma.column.update({
+        where: { id: columnId },
+        data: { isExpanded: isExpanded ?? !column.isExpanded }
+      });
+
+      res.json({ message: 'Column state toggled', column: updatedColumn });
+    } catch (dbError) {
+      console.error('Database error toggling column:', dbError);
+      res.status(500).json({ error: 'Failed to toggle column state' });
+    }
+  } catch (error) {
+    console.error('Error toggling column:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
