@@ -89,9 +89,12 @@ export const ImportModal = ({ isOpen, onClose, onImport, currentBoardId }: Impor
       let taskCount = 0;
       let subColumnCount = 0;
 
+      // Aceita columns no nível raiz OU dentro de board
+      const columns = parsed.columns || parsed.board?.columns;
+
       // Formato novo: columns com subColumns
-      if (parsed.columns && Array.isArray(parsed.columns)) {
-        parsed.columns.forEach((column: any, colIdx: number) => {
+      if (columns && Array.isArray(columns)) {
+        columns.forEach((column: any, colIdx: number) => {
           if (column.subColumns && Array.isArray(column.subColumns)) {
             column.subColumns.forEach((subCol: any, subIdx: number) => {
               subColumnCount++;
@@ -125,7 +128,7 @@ export const ImportModal = ({ isOpen, onClose, onImport, currentBoardId }: Impor
       }
 
       if (taskCount === 0 && subColumnCount === 0) {
-        throw new Error('JSON deve conter tarefas em "tasks" ou em "columns[].subColumns[].tasks"');
+        throw new Error('JSON deve conter tarefas em "tasks" ou em "board.columns[].subColumns[].tasks"');
       }
 
       setPreview(parsed);
@@ -267,13 +270,13 @@ export const ImportModal = ({ isOpen, onClose, onImport, currentBoardId }: Impor
               )}
 
               {/* Columns with SubColumns */}
-              {preview.columns && preview.columns.length > 0 && (
+              {((preview.columns && preview.columns.length > 0) || (preview.board?.columns && preview.board.columns.length > 0)) && (
                 <div className="mb-4">
                   <p className="text-sm text-gray-400 mb-2">
-                    {preview.columns.length} coluna(s) a processar:
+                    {(preview.columns || preview.board?.columns).length} coluna(s) a processar:
                   </p>
                   <div className="space-y-3">
-                    {preview.columns.map((col: any, idx: number) => (
+                    {(preview.columns || preview.board?.columns).map((col: any, idx: number) => (
                       <div key={idx} className="border border-gray-700 rounded-lg p-3">
                         <div className={`inline-flex items-center px-3 py-1 ${col.color || 'bg-gray-500'} bg-opacity-20 border border-gray-600 rounded-lg text-sm text-white mb-2`}>
                           {col.title}
