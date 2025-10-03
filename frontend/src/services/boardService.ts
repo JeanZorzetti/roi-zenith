@@ -222,6 +222,25 @@ class BoardService {
     }
   }
 
+  // Column methods
+  async updateColumn(columnId: string, updates: { title?: string; color?: string; position?: number }): Promise<boolean> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/columns/${columnId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(updates),
+      });
+
+      return response.ok;
+    } catch (error) {
+      console.error('Error updating column:', error);
+      return false;
+    }
+  }
+
   // SubColumn methods
   async createSubColumn(columnId: string, title: string): Promise<boolean> {
     try {

@@ -565,6 +565,42 @@ export const deleteTask = async (req: Request, res: Response) => {
   }
 };
 
+// Update column
+export const updateColumn = async (req: Request, res: Response) => {
+  try {
+    const { columnId } = req.params;
+    const { title, color, position } = req.body;
+
+    try {
+      const existingColumn = await prisma.column.findUnique({
+        where: { id: columnId }
+      });
+
+      if (!existingColumn) {
+        return res.status(404).json({ error: 'Column not found' });
+      }
+
+      const updateData: any = {};
+      if (title !== undefined) updateData.title = title;
+      if (color !== undefined) updateData.color = color;
+      if (position !== undefined) updateData.position = position;
+
+      const updatedColumn = await prisma.column.update({
+        where: { id: columnId },
+        data: updateData
+      });
+
+      res.json({ message: 'Column updated successfully', column: updatedColumn });
+    } catch (dbError) {
+      console.error('Database error updating column:', dbError);
+      res.status(500).json({ error: 'Failed to update column in database' });
+    }
+  } catch (error) {
+    console.error('Error updating column:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
 // Create sub-column
 export const createSubColumn = async (req: Request, res: Response) => {
   try {

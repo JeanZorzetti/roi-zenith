@@ -6,6 +6,7 @@ import {
   updateBoard,
   deleteBoard,
   createColumn,
+  updateColumn,
   deleteColumn,
   toggleColumnExpanded,
   createSubColumn,
@@ -27,6 +28,7 @@ router.delete('/boards/:id', deleteBoard);
 
 // Column routes
 router.post('/boards/:boardId/columns', createColumn);
+router.put('/columns/:columnId', updateColumn);
 router.delete('/boards/:boardId/columns/:columnId', deleteColumn);
 router.patch('/columns/:columnId/toggle', toggleColumnExpanded);
 

@@ -787,6 +787,7 @@ const TasksPage = () => {
   const [draggedFrom, setDraggedFrom] = useState<string | null>(null);
   const [draggedSubColumn, setDraggedSubColumn] = useState<string | null>(null);
   const [draggedSubColumnFrom, setDraggedSubColumnFrom] = useState<string | null>(null);
+  const [draggedColumn, setDraggedColumn] = useState<string | null>(null);
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [showColumnModal, setShowColumnModal] = useState(false);
@@ -2215,6 +2216,67 @@ const TasksPage = () => {
     e.dataTransfer.dropEffect = 'move';
   };
 
+  // Drag and drop handlers for columns
+  const handleColumnDragStart = (e: React.DragEvent, columnId: string) => {
+    setDraggedColumn(columnId);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleColumnDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleColumnDrop = async (e: React.DragEvent, targetColumnId: string) => {
+    e.preventDefault();
+
+    if (!draggedColumn || draggedColumn === targetColumnId) {
+      setDraggedColumn(null);
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const currentBoard = boards.find(b => b.id === currentBoardId);
+      if (!currentBoard) return;
+
+      const draggedIndex = currentBoard.columns.findIndex(c => c.id === draggedColumn);
+      const targetIndex = currentBoard.columns.findIndex(c => c.id === targetColumnId);
+
+      if (draggedIndex === -1 || targetIndex === -1) {
+        setDraggedColumn(null);
+        return;
+      }
+
+      // Reorder columns locally
+      const newColumns = [...currentBoard.columns];
+      const [movedColumn] = newColumns.splice(draggedIndex, 1);
+      newColumns.splice(targetIndex, 0, movedColumn);
+
+      // Update positions
+      const updates = newColumns.map((col, idx) => ({
+        columnId: col.id,
+        position: idx
+      }));
+
+      // Send updates to backend
+      for (const update of updates) {
+        await boardService.updateColumn(update.columnId, { position: update.position });
+      }
+
+      // Reload boards
+      const reloadedBoards = await boardService.getBoards();
+      setBoards(reloadedBoards);
+    } catch (error) {
+      console.error('❌ Erro ao reordenar colunas:', error);
+      alert('Erro ao reordenar colunas. Tente novamente.');
+    } finally {
+      setLoading(false);
+      setDraggedColumn(null);
+    }
+  };
+
   // Drag and drop handlers for subcolumns
   const handleSubColumnDragStart = (e: React.DragEvent, subColumnId: string, columnId: string) => {
     setDraggedSubColumn(subColumnId);
@@ -2757,10 +2819,18 @@ const TasksPage = () => {
           <div
             key={column.id}
             className="flex-shrink-0 w-80"
-            onDragOver={handleDragOver}
+            onDragOver={(e) => {
+              if (draggedColumn) {
+                handleColumnDragOver(e);
+              } else {
+                handleDragOver(e);
+              }
+            }}
             onDrop={(e) => {
-              // Handle both task drops and subcolumn drops
-              if (draggedSubColumn) {
+              // Handle column drops, task drops, and subcolumn drops
+              if (draggedColumn) {
+                handleColumnDrop(e, column.id);
+              } else if (draggedSubColumn) {
                 handleSubColumnDrop(e, column.id);
               } else {
                 handleDrop(e, column.id);
@@ -2768,7 +2838,11 @@ const TasksPage = () => {
             }}
           >
             {/* Column Header */}
-            <div className="flex items-center justify-between mb-4">
+            <div
+              className="flex items-center justify-between mb-4 cursor-move"
+              draggable
+              onDragStart={(e) => handleColumnDragStart(e, column.id)}
+            >
               <div className="flex items-center space-x-3">
                 <div className={`w-3 h-3 rounded-full ${column.color}`}></div>
                 {editingColumnId === column.id ? (
