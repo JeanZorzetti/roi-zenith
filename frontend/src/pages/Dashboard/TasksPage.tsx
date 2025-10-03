@@ -1361,6 +1361,7 @@ const TasksPage = () => {
       setLoading(true);
       let importedCount = 0;
       let columnsCreated = 0;
+      let subColumnsCreated = 0;
 
       // Se tem board info, atualiza o board atual
       if (data.board && data.board.title) {
@@ -1371,9 +1372,12 @@ const TasksPage = () => {
         });
       }
 
-      // Se tem colunas, cria elas no banco via API
+      // Se tem colunas, processa elas
       if (data.columns && Array.isArray(data.columns)) {
         for (const colData of data.columns) {
+          let columnId = colData.id;
+
+          // Tenta criar a coluna (ou pega a existente)
           try {
             const created = await boardService.createColumn(currentBoardId, {
               id: colData.id,
@@ -1385,6 +1389,7 @@ const TasksPage = () => {
 
             if (created) {
               console.log("✅ Coluna criada no banco:", created.id);
+              columnId = created.id;
 
               // Atualiza estado local
               setBoards(prev => prev.map(board =>
@@ -1396,10 +1401,66 @@ const TasksPage = () => {
 
               columnsCreated++;
             } else {
-              console.error("❌ Falha ao criar coluna no banco:", colData.title);
+              console.log("⚠️ Coluna já existe ou falha ao criar:", colData.title);
             }
           } catch (error) {
-            console.error("❌ Erro ao criar coluna:", error);
+            console.log("⚠️ Coluna já existe, usando ID:", colData.id);
+          }
+
+          // Processa subcolunas se existirem
+          if (colData.subColumns && Array.isArray(colData.subColumns)) {
+            for (const subColData of colData.subColumns) {
+              try {
+                const subColCreated = await boardService.createSubColumn(columnId, subColData.title);
+
+                if (subColCreated) {
+                  console.log("✅ Subcoluna criada:", subColData.title);
+                  subColumnsCreated++;
+
+                  // Processa tasks da subcoluna
+                  if (subColData.tasks && Array.isArray(subColData.tasks)) {
+                    // Precisa recarregar para pegar o ID da subcoluna criada
+                    await loadBoards();
+                    const currentBoard = boards.find(b => b.id === currentBoardId);
+                    const column = currentBoard?.columns.find(c => c.id === columnId);
+                    const subColumn = column?.subColumns?.find(sc => sc.title === subColData.title);
+
+                    if (subColumn) {
+                      for (const taskData of subColData.tasks) {
+                        try {
+                          const taskToCreate = {
+                            title: taskData.title,
+                            description: taskData.description || '',
+                            priority: taskData.priority || 'medium',
+                            dueDate: taskData.dueDate || null,
+                            assignee: taskData.assignee || null,
+                            tags: taskData.tags || [],
+                            columnId: columnId,
+                            subColumnId: subColumn.id,
+                            checklist: (taskData.checklist || []).map((item: string) => ({
+                              id: `check-${Date.now()}-${Math.random()}`,
+                              text: item,
+                              completed: false
+                            }))
+                          };
+
+                          const created = await boardService.createTask(currentBoardId, taskToCreate);
+
+                          if (created) {
+                            console.log('✅ Task criada na subcoluna:', created.id);
+                            importedCount++;
+                          }
+                        } catch (error) {
+                          console.error('❌ Erro ao criar task na subcoluna:', error);
+                        }
+                      }
+                    }
+                  }
+                }
+              } catch (error) {
+                console.error("❌ Erro ao criar subcoluna:", error);
+              }
+            }
           }
         }
       }
@@ -1463,9 +1524,13 @@ const TasksPage = () => {
         }
       }
 
+      // Recarrega os boards para mostrar as mudanças
+      await loadBoards();
+
       const message = [
         `✅ Importação concluída!`,
         columnsCreated > 0 && `${columnsCreated} coluna(s) criada(s)`,
+        subColumnsCreated > 0 && `${subColumnsCreated} subcoluna(s) criada(s)`,
         importedCount > 0 && `${importedCount} tarefa(s) importada(s)`
       ].filter(Boolean).join('\n');
 

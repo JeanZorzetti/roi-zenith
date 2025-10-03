@@ -17,7 +17,45 @@ const EXAMPLE_JSON = {
     {
       id: "todo",
       title: "A Fazer",
-      color: "bg-blue-500"
+      color: "bg-blue-500",
+      subColumns: [
+        {
+          title: "Sprint 1",
+          tasks: [
+            {
+              title: "Implementar autenticação",
+              description: "Sistema completo de login e registro",
+              priority: "high",
+              dueDate: "2024-12-31",
+              assignee: "João Silva",
+              tags: ["backend", "security"],
+              checklist: [
+                "Setup JWT",
+                "Criar endpoints",
+                "Testar segurança"
+              ]
+            },
+            {
+              title: "Criar dashboard",
+              description: "Interface administrativa",
+              priority: "medium",
+              tags: ["frontend", "ui"]
+            }
+          ]
+        },
+        {
+          title: "Sprint 2",
+          tasks: [
+            {
+              title: "Deploy produção",
+              description: "Configurar CI/CD",
+              priority: "high",
+              assignee: "Maria Santos",
+              tags: ["devops"]
+            }
+          ]
+        }
+      ]
     },
     {
       id: "doing",
@@ -28,37 +66,6 @@ const EXAMPLE_JSON = {
       id: "done",
       title: "Concluído",
       color: "bg-green-500"
-    }
-  ],
-  tasks: [
-    {
-      title: "Implementar autenticação",
-      description: "Sistema completo de login e registro",
-      column: "doing",
-      priority: "high",
-      dueDate: "2024-12-31",
-      assignee: "João Silva",
-      tags: ["backend", "security"],
-      checklist: [
-        "Setup JWT",
-        "Criar endpoints",
-        "Testar segurança"
-      ]
-    },
-    {
-      title: "Criar dashboard",
-      description: "Interface administrativa",
-      column: "todo",
-      priority: "medium",
-      tags: ["frontend", "ui"]
-    },
-    {
-      title: "Deploy produção",
-      description: "Configurar CI/CD",
-      column: "done",
-      priority: "high",
-      assignee: "Maria Santos",
-      tags: ["devops"]
     }
   ]
 };
@@ -78,20 +85,48 @@ export const ImportModal = ({ isOpen, onClose, onImport, currentBoardId }: Impor
     try {
       const parsed = JSON.parse(jsonText);
 
-      // Validações básicas
-      if (!parsed.tasks || !Array.isArray(parsed.tasks)) {
-        throw new Error('JSON deve conter um array "tasks"');
+      // Suporta dois formatos: antigo (tasks direto) e novo (columns com subColumns)
+      let taskCount = 0;
+      let subColumnCount = 0;
+
+      // Formato novo: columns com subColumns
+      if (parsed.columns && Array.isArray(parsed.columns)) {
+        parsed.columns.forEach((column: any, colIdx: number) => {
+          if (column.subColumns && Array.isArray(column.subColumns)) {
+            column.subColumns.forEach((subCol: any, subIdx: number) => {
+              subColumnCount++;
+              if (!subCol.title) {
+                throw new Error(`Coluna ${colIdx + 1}, SubColuna ${subIdx + 1}: campo "title" é obrigatório`);
+              }
+              if (subCol.tasks && Array.isArray(subCol.tasks)) {
+                subCol.tasks.forEach((task: any, taskIdx: number) => {
+                  taskCount++;
+                  if (!task.title) {
+                    throw new Error(`SubColuna "${subCol.title}", Task ${taskIdx + 1}: campo "title" é obrigatório`);
+                  }
+                });
+              }
+            });
+          }
+        });
       }
 
-      // Validar cada task
-      parsed.tasks.forEach((task: any, index: number) => {
-        if (!task.title) {
-          throw new Error(`Task ${index + 1}: campo "title" é obrigatório`);
-        }
-        if (!task.column) {
-          throw new Error(`Task ${index + 1}: campo "column" é obrigatório`);
-        }
-      });
+      // Formato antigo: tasks direto (retrocompatibilidade)
+      if (parsed.tasks && Array.isArray(parsed.tasks)) {
+        parsed.tasks.forEach((task: any, index: number) => {
+          taskCount++;
+          if (!task.title) {
+            throw new Error(`Task ${index + 1}: campo "title" é obrigatório`);
+          }
+          if (!task.column) {
+            throw new Error(`Task ${index + 1}: campo "column" é obrigatório`);
+          }
+        });
+      }
+
+      if (taskCount === 0 && subColumnCount === 0) {
+        throw new Error('JSON deve conter tarefas em "tasks" ou em "columns[].subColumns[].tasks"');
+      }
 
       setPreview(parsed);
     } catch (err: any) {
@@ -231,79 +266,97 @@ export const ImportModal = ({ isOpen, onClose, onImport, currentBoardId }: Impor
                 </div>
               )}
 
-              {/* Columns */}
+              {/* Columns with SubColumns */}
               {preview.columns && preview.columns.length > 0 && (
                 <div className="mb-4">
                   <p className="text-sm text-gray-400 mb-2">
-                    {preview.columns.length} coluna(s) a criar:
+                    {preview.columns.length} coluna(s) a processar:
                   </p>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="space-y-3">
                     {preview.columns.map((col: any, idx: number) => (
-                      <span
-                        key={idx}
-                        className={`px-3 py-1 ${col.color || 'bg-gray-500'} bg-opacity-20 border border-gray-600 rounded-lg text-sm text-white`}
-                      >
-                        {col.title}
-                      </span>
+                      <div key={idx} className="border border-gray-700 rounded-lg p-3">
+                        <div className={`inline-flex items-center px-3 py-1 ${col.color || 'bg-gray-500'} bg-opacity-20 border border-gray-600 rounded-lg text-sm text-white mb-2`}>
+                          {col.title}
+                        </div>
+                        {col.subColumns && col.subColumns.length > 0 && (
+                          <div className="ml-4 mt-2 space-y-2">
+                            <p className="text-xs text-gray-500">
+                              {col.subColumns.length} subcoluna(s):
+                            </p>
+                            {col.subColumns.map((subCol: any, subIdx: number) => (
+                              <div key={subIdx} className="pl-3 border-l-2 border-purple-500/50">
+                                <p className="text-sm text-purple-400 font-medium">📂 {subCol.title}</p>
+                                {subCol.tasks && subCol.tasks.length > 0 && (
+                                  <p className="text-xs text-gray-500 mt-1">
+                                    {subCol.tasks.length} tarefa(s)
+                                  </p>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     ))}
                   </div>
                 </div>
               )}
 
-              {/* Tasks */}
-              <div className="mb-4">
-                <p className="text-sm text-gray-400 mb-2">
-                  {preview.tasks.length} tarefa(s) a importar:
-                </p>
-                <div className="space-y-2 max-h-64 overflow-y-auto">
-                  {preview.tasks.map((task: any, idx: number) => (
-                    <div
-                      key={idx}
-                      className="p-3 bg-gray-900/50 rounded-lg border border-gray-700"
-                    >
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <p className="text-white font-medium">{task.title}</p>
-                          {task.description && (
-                            <p className="text-sm text-gray-400 mt-1">{task.description}</p>
-                          )}
-                          <div className="flex items-center space-x-3 mt-2">
-                            <span className="text-xs text-gray-500">
-                              Coluna: <span className="text-blue-400">{task.column}</span>
-                            </span>
-                            {task.priority && (
-                              <span className={`text-xs px-2 py-0.5 rounded ${
-                                task.priority === 'high' ? 'bg-red-900/30 text-red-400' :
-                                task.priority === 'medium' ? 'bg-yellow-900/30 text-yellow-400' :
-                                'bg-green-900/30 text-green-400'
-                              }`}>
-                                {task.priority}
-                              </span>
+              {/* Tasks (formato antigo) */}
+              {preview.tasks && preview.tasks.length > 0 && (
+                <div className="mb-4">
+                  <p className="text-sm text-gray-400 mb-2">
+                    {preview.tasks.length} tarefa(s) a importar (formato antigo):
+                  </p>
+                  <div className="space-y-2 max-h-64 overflow-y-auto">
+                    {preview.tasks.map((task: any, idx: number) => (
+                      <div
+                        key={idx}
+                        className="p-3 bg-gray-900/50 rounded-lg border border-gray-700"
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <p className="text-white font-medium">{task.title}</p>
+                            {task.description && (
+                              <p className="text-sm text-gray-400 mt-1">{task.description}</p>
                             )}
-                            {task.assignee && (
+                            <div className="flex items-center space-x-3 mt-2">
                               <span className="text-xs text-gray-500">
-                                👤 {task.assignee}
+                                Coluna: <span className="text-blue-400">{task.column}</span>
                               </span>
+                              {task.priority && (
+                                <span className={`text-xs px-2 py-0.5 rounded ${
+                                  task.priority === 'high' ? 'bg-red-900/30 text-red-400' :
+                                  task.priority === 'medium' ? 'bg-yellow-900/30 text-yellow-400' :
+                                  'bg-green-900/30 text-green-400'
+                                }`}>
+                                  {task.priority}
+                                </span>
+                              )}
+                              {task.assignee && (
+                                <span className="text-xs text-gray-500">
+                                  👤 {task.assignee}
+                                </span>
+                              )}
+                            </div>
+                            {task.tags && task.tags.length > 0 && (
+                              <div className="flex flex-wrap gap-1 mt-2">
+                                {task.tags.map((tag: string, tagIdx: number) => (
+                                  <span
+                                    key={tagIdx}
+                                    className="text-xs px-2 py-0.5 bg-gray-700 text-gray-300 rounded"
+                                  >
+                                    {tag}
+                                  </span>
+                                ))}
+                              </div>
                             )}
                           </div>
-                          {task.tags && task.tags.length > 0 && (
-                            <div className="flex flex-wrap gap-1 mt-2">
-                              {task.tags.map((tag: string, tagIdx: number) => (
-                                <span
-                                  key={tagIdx}
-                                  className="text-xs px-2 py-0.5 bg-gray-700 text-gray-300 rounded"
-                                >
-                                  {tag}
-                                </span>
-                              ))}
-                            </div>
-                          )}
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Import Button */}
               <button
@@ -318,18 +371,37 @@ export const ImportModal = ({ isOpen, onClose, onImport, currentBoardId }: Impor
 
           {/* Help */}
           <div className="mt-6 p-4 bg-gray-800/30 border border-gray-700 rounded-lg">
-            <h4 className="text-sm font-semibold text-white mb-2">📖 Formato JSON</h4>
-            <ul className="text-xs text-gray-400 space-y-1">
-              <li>• <span className="text-blue-400">tasks</span> (obrigatório): Array de tarefas</li>
-              <li>• <span className="text-blue-400">title</span> (obrigatório): Título da tarefa</li>
-              <li>• <span className="text-blue-400">column</span> (obrigatório): ID da coluna destino</li>
-              <li>• <span className="text-gray-300">description</span> (opcional): Descrição</li>
-              <li>• <span className="text-gray-300">priority</span> (opcional): high, medium, low</li>
-              <li>• <span className="text-gray-300">dueDate</span> (opcional): Data no formato YYYY-MM-DD</li>
-              <li>• <span className="text-gray-300">assignee</span> (opcional): Nome do responsável</li>
-              <li>• <span className="text-gray-300">tags</span> (opcional): Array de strings</li>
-              <li>• <span className="text-gray-300">checklist</span> (opcional): Array de strings</li>
-            </ul>
+            <h4 className="text-sm font-semibold text-white mb-3">📖 Formatos JSON Suportados</h4>
+
+            <div className="mb-3">
+              <p className="text-xs font-semibold text-purple-400 mb-1">✨ Formato Novo (com SubColunas):</p>
+              <ul className="text-xs text-gray-400 space-y-1 ml-3">
+                <li>• <span className="text-blue-400">columns[].subColumns</span>: Array de subcolunas</li>
+                <li>• <span className="text-blue-400">subColumns[].title</span> (obrigatório): Título da subcoluna</li>
+                <li>• <span className="text-blue-400">subColumns[].tasks</span>: Array de tarefas da subcoluna</li>
+              </ul>
+            </div>
+
+            <div>
+              <p className="text-xs font-semibold text-gray-400 mb-1">📦 Formato Antigo (retrocompatível):</p>
+              <ul className="text-xs text-gray-400 space-y-1 ml-3">
+                <li>• <span className="text-blue-400">tasks</span>: Array de tarefas direto</li>
+                <li>• <span className="text-blue-400">column</span> (obrigatório): ID da coluna destino</li>
+              </ul>
+            </div>
+
+            <div className="mt-3 pt-3 border-t border-gray-700">
+              <p className="text-xs font-semibold text-gray-300 mb-1">Campos de Task:</p>
+              <ul className="text-xs text-gray-400 space-y-1 ml-3">
+                <li>• <span className="text-blue-400">title</span> (obrigatório): Título da tarefa</li>
+                <li>• <span className="text-gray-300">description</span> (opcional): Descrição</li>
+                <li>• <span className="text-gray-300">priority</span> (opcional): high, medium, low</li>
+                <li>• <span className="text-gray-300">dueDate</span> (opcional): Data no formato YYYY-MM-DD</li>
+                <li>• <span className="text-gray-300">assignee</span> (opcional): Nome do responsável</li>
+                <li>• <span className="text-gray-300">tags</span> (opcional): Array de strings</li>
+                <li>• <span className="text-gray-300">checklist</span> (opcional): Array de strings</li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
