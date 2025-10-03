@@ -18,7 +18,16 @@ export const getBoards = async (req: Request, res: Response) => {
           columns: {
             orderBy: { position: 'asc' },
             include: {
+              subColumns: {
+                orderBy: { position: 'asc' },
+                include: {
+                  tasks: {
+                    orderBy: { position: 'asc' }
+                  }
+                }
+              },
               tasks: {
+                where: { subColumnId: null },
                 orderBy: { position: 'asc' }
               }
             }
@@ -39,6 +48,28 @@ export const getBoards = async (req: Request, res: Response) => {
           color: column.color,
           boardId: column.boardId,
           position: column.position,
+          isExpanded: column.isExpanded,
+          subColumns: column.subColumns?.map(subColumn => ({
+            id: subColumn.id,
+            title: subColumn.title,
+            position: subColumn.position,
+            columnId: subColumn.columnId,
+            tasks: subColumn.tasks?.map(task => ({
+              id: task.id,
+              title: task.title,
+              description: task.description || '',
+              priority: task.priority.toLowerCase(),
+              assignee: task.assignee || '',
+              dueDate: task.dueDate ? task.dueDate.toISOString().split('T')[0] : '',
+              tags: Array.isArray(task.tags) ? task.tags : [],
+              completed: task.completed,
+              createdAt: task.createdAt.toISOString(),
+              columnId: task.columnId,
+              subColumnId: task.subColumnId,
+              position: task.position,
+              checklist: []
+            })) || []
+          })) || [],
           tasks: column.tasks.map(task => ({
             id: task.id,
             title: task.title,
@@ -50,6 +81,7 @@ export const getBoards = async (req: Request, res: Response) => {
             completed: task.completed,
             createdAt: task.createdAt.toISOString(),
             columnId: task.columnId,
+            subColumnId: task.subColumnId,
             position: task.position,
             checklist: []
           }))
