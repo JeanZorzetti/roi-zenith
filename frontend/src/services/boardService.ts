@@ -221,6 +221,60 @@ class BoardService {
       return false;
     }
   }
+
+  // SubColumn methods
+  async createSubColumn(columnId: string, title: string): Promise<boolean> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/columns/${columnId}/sub-columns`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ title }),
+      });
+
+      return response.ok;
+    } catch (error) {
+      console.error('Error creating subcolumn:', error);
+      return false;
+    }
+  }
+
+  async updateSubColumn(subColumnId: string, updates: { title?: string; position?: number }): Promise<boolean> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/sub-columns/${subColumnId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+        },
+        credentials: 'include',
+        body: JSON.stringify(updates),
+      });
+
+      return response.ok;
+    } catch (error) {
+      console.error('Error updating subcolumn:', error);
+      return false;
+    }
+  }
+
+  async deleteSubColumn(subColumnId: string): Promise<boolean> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/sub-columns/${subColumnId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+
+      return response.ok;
+    } catch (error) {
+      console.error('Error deleting subcolumn:', error);
+      return false;
+    }
+  }
 }
 
 export const boardService = new BoardService();

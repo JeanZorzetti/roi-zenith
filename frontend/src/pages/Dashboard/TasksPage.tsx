@@ -26,7 +26,8 @@ import {
   Share2,
   Mail,
   Users,
-  Upload
+  Upload,
+  FolderPlus
 } from 'lucide-react';
 import { useSocket } from '@/hooks/useSocket';
 import { ActivityFeed } from '@/components/ActivityFeed';
@@ -2055,6 +2056,65 @@ const TasksPage = () => {
     setEditingColumnTitle('');
   };
 
+  // SubColumn management functions
+  const createSubColumn = async (columnId: string) => {
+    const title = prompt('Digite o título da nova subcoluna:');
+    if (!title || !title.trim()) return;
+
+    try {
+      setLoading(true);
+      const success = await boardService.createSubColumn(columnId, title.trim());
+
+      if (success) {
+        await loadBoards();
+      }
+    } catch (error) {
+      console.error('❌ Erro ao criar subcoluna:', error);
+      alert('Erro ao criar subcoluna. Tente novamente.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateSubColumn = async (subColumnId: string, currentTitle: string) => {
+    const title = prompt('Digite o novo título da subcoluna:', currentTitle);
+    if (!title || !title.trim() || title.trim() === currentTitle) return;
+
+    try {
+      setLoading(true);
+      const success = await boardService.updateSubColumn(subColumnId, { title: title.trim() });
+
+      if (success) {
+        await loadBoards();
+      }
+    } catch (error) {
+      console.error('❌ Erro ao atualizar subcoluna:', error);
+      alert('Erro ao atualizar subcoluna. Tente novamente.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteSubColumn = async (subColumnId: string) => {
+    if (!confirm('Tem certeza que deseja excluir esta subcoluna? Todas as tarefas serão movidas para a coluna principal.')) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const success = await boardService.deleteSubColumn(subColumnId);
+
+      if (success) {
+        await loadBoards();
+      }
+    } catch (error) {
+      console.error('❌ Erro ao deletar subcoluna:', error);
+      alert('Erro ao deletar subcoluna. Tente novamente.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Drag and drop handlers
   const handleDragStart = (e: React.DragEvent, taskId: string, columnId: string) => {
     setDraggedTask(taskId);
@@ -2146,6 +2206,67 @@ const TasksPage = () => {
       }
     } catch (error) {
       console.error('❌ Erro ao mover task:', error);
+      alert('Erro ao mover tarefa. Tente novamente.');
+    } finally {
+      setLoading(false);
+    }
+
+    setDraggedTask(null);
+    setDraggedFrom(null);
+  };
+
+  // Handle drop in subcolumn
+  const handleDropInSubColumn = async (e: React.DragEvent, targetColumnId: string, targetSubColumnId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!draggedTask || !draggedFrom) {
+      return;
+    }
+
+    // Find the moved task
+    const currentBoard = boards.find(b => b.id === currentBoardId);
+    if (!currentBoard) return;
+
+    let movedTask: Task | undefined;
+
+    // Search in all columns and subcolumns for the dragged task
+    for (const col of currentBoard.columns) {
+      // Check in column's direct tasks
+      movedTask = col.tasks.find(t => t.id === draggedTask);
+      if (movedTask) break;
+
+      // Check in column's subcolumns
+      if (col.subColumns) {
+        for (const subCol of col.subColumns) {
+          movedTask = subCol.tasks?.find(t => t.id === draggedTask);
+          if (movedTask) break;
+        }
+      }
+      if (movedTask) break;
+    }
+
+    if (!movedTask) {
+      setDraggedTask(null);
+      setDraggedFrom(null);
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      // Update task's columnId and subColumnId via API
+      const success = await boardService.updateTask(currentBoardId, draggedTask, {
+        columnId: targetColumnId,
+        subColumnId: targetSubColumnId
+      });
+
+      if (success) {
+        // Reload boards to get fresh data
+        await loadBoards();
+      }
+    } catch (error) {
+      console.error('❌ Erro ao mover task para subcoluna:', error);
       alert('Erro ao mover tarefa. Tente novamente.');
     } finally {
       setLoading(false);
@@ -2552,17 +2673,26 @@ const TasksPage = () => {
                   <Edit3 className="h-4 w-4" />
                 </button>
                 {canEdit() && (
-                  <button
-                    onClick={() => {
-                      resetTaskForm();
-                      setTargetColumnId(column.id);
-                      setShowTaskModal(true);
-                    }}
-                    className="p-1 rounded-lg text-gray-400 hover:text-green-400 hover:bg-gray-800/50 transition-colors"
-                    title="Adicionar tarefa aqui"
-                  >
-                    <Plus className="h-4 w-4" />
-                  </button>
+                  <>
+                    <button
+                      onClick={() => {
+                        resetTaskForm();
+                        setTargetColumnId(column.id);
+                        setShowTaskModal(true);
+                      }}
+                      className="p-1 rounded-lg text-gray-400 hover:text-green-400 hover:bg-gray-800/50 transition-colors"
+                      title="Adicionar tarefa aqui"
+                    >
+                      <Plus className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => createSubColumn(column.id)}
+                      className="p-1 rounded-lg text-gray-400 hover:text-purple-400 hover:bg-gray-800/50 transition-colors"
+                      title="Adicionar subcoluna"
+                    >
+                      <FolderPlus className="h-4 w-4" />
+                    </button>
+                  </>
                 )}
                 {columns.length > 1 && (
                   <button
@@ -2588,11 +2718,11 @@ const TasksPage = () => {
                     return (
                     <div key={subColumn.id} className="border border-gray-700/50 rounded-xl overflow-hidden">
                       {/* SubColumn Header */}
-                      <div
-                        onClick={() => toggleSubColumnExpanded(subColumn.id)}
-                        className="bg-gray-800/50 p-3 flex items-center justify-between cursor-pointer hover:bg-gray-800/70 transition-colors"
-                      >
-                        <div className="flex items-center space-x-3">
+                      <div className="bg-gray-800/50 p-3 flex items-center justify-between hover:bg-gray-800/70 transition-colors">
+                        <div
+                          className="flex items-center space-x-3 flex-1 cursor-pointer"
+                          onClick={() => toggleSubColumnExpanded(subColumn.id)}
+                        >
                           <ChevronDown
                             className={`h-4 w-4 text-gray-400 transition-transform duration-200 ${
                               isExpanded ? 'rotate-0' : '-rotate-90'
@@ -2603,11 +2733,37 @@ const TasksPage = () => {
                             {subColumn.tasks?.length || 0}
                           </span>
                         </div>
+                        <div className="flex items-center space-x-1">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              updateSubColumn(subColumn.id, subColumn.title);
+                            }}
+                            className="p-1 rounded text-gray-400 hover:text-blue-400 transition-colors"
+                            title="Editar subcoluna"
+                          >
+                            <Edit3 className="h-3 w-3" />
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deleteSubColumn(subColumn.id);
+                            }}
+                            className="p-1 rounded text-gray-400 hover:text-red-400 transition-colors"
+                            title="Deletar subcoluna"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </button>
+                        </div>
                       </div>
 
                       {/* SubColumn Tasks */}
                       {isExpanded && (
-                      <div className="p-3 space-y-2 bg-gray-900/30">
+                      <div
+                        className="p-3 space-y-2 bg-gray-900/30 min-h-[100px]"
+                        onDragOver={(e) => e.preventDefault()}
+                        onDrop={(e) => handleDropInSubColumn(e, column.id, subColumn.id)}
+                      >
                         {subColumn.tasks?.map((task) => {
                           const checklist = task.checklist || [];
                           const checklistProgress = getChecklistProgress(checklist);

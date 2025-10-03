@@ -46,7 +46,8 @@
       "Bash(awk:*)",
       "Bash(git log:*)",
       "Bash(python:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(python3:*)"
     ],
     "deny": [],
     "ask": []
