@@ -50,6 +50,17 @@ interface Task {
   completed: boolean;
   createdAt: string;
   checklist: ChecklistItem[];
+  columnId?: string;
+  subColumnId?: string | null;
+  position?: number;
+}
+
+interface SubColumn {
+  id: string;
+  title: string;
+  position: number;
+  columnId: string;
+  tasks: Task[];
 }
 
 interface Column {
@@ -57,6 +68,10 @@ interface Column {
   title: string;
   color: string;
   tasks: Task[];
+  isExpanded?: boolean;
+  subColumns?: SubColumn[];
+  position?: number;
+  boardId?: string;
 }
 
 interface BoardMember {
