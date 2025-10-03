@@ -792,6 +792,7 @@ const TasksPage = () => {
   const [editingColumnId, setEditingColumnId] = useState<string | null>(null);
   const [editingColumnTitle, setEditingColumnTitle] = useState('');
   const [targetColumnId, setTargetColumnId] = useState<string | null>(null);
+  const [expandedSubColumns, setExpandedSubColumns] = useState<Record<string, boolean>>({});
 
   // Board sharing state
   const [showShareModal, setShowShareModal] = useState(false);
@@ -1975,6 +1976,14 @@ const TasksPage = () => {
     }
   };
 
+  // Toggle SubColumn expanded state
+  const toggleSubColumnExpanded = (subColumnId: string) => {
+    setExpandedSubColumns(prev => ({
+      ...prev,
+      [subColumnId]: !prev[subColumnId]
+    }));
+  };
+
   // Add new column
   const addColumn = () => {
     if (!newColumnTitle.trim()) return;
@@ -2567,9 +2576,389 @@ const TasksPage = () => {
               </div>
             </div>
 
-            {/* Tasks */}
+            {/* Tasks or SubColumns (Accordion) */}
             <div className="space-y-3 min-h-[200px]">
-              {column.tasks.map((task) => {
+              {/* Render SubColumns if they exist (Accordion mode) */}
+              {column.subColumns && column.subColumns.length > 0 ? (
+                <>
+                  {/* Render SubColumns as Accordion */}
+                  {column.subColumns.map((subColumn) => {
+                    const isExpanded = expandedSubColumns[subColumn.id] !== false; // Default to true (expanded)
+
+                    return (
+                    <div key={subColumn.id} className="border border-gray-700/50 rounded-xl overflow-hidden">
+                      {/* SubColumn Header */}
+                      <div
+                        onClick={() => toggleSubColumnExpanded(subColumn.id)}
+                        className="bg-gray-800/50 p-3 flex items-center justify-between cursor-pointer hover:bg-gray-800/70 transition-colors"
+                      >
+                        <div className="flex items-center space-x-3">
+                          <ChevronDown
+                            className={`h-4 w-4 text-gray-400 transition-transform duration-200 ${
+                              isExpanded ? 'rotate-0' : '-rotate-90'
+                            }`}
+                          />
+                          <h4 className="font-semibold text-white">{subColumn.title}</h4>
+                          <span className="bg-gray-700/50 text-gray-400 px-2 py-0.5 rounded text-xs">
+                            {subColumn.tasks?.length || 0}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* SubColumn Tasks */}
+                      {isExpanded && (
+                      <div className="p-3 space-y-2 bg-gray-900/30">
+                        {subColumn.tasks?.map((task) => {
+                          const checklist = task.checklist || [];
+                          const checklistProgress = getChecklistProgress(checklist);
+                          const hasChecklist = checklist.length > 0;
+
+                          return (
+                            <div
+                              key={task.id}
+                              draggable
+                              onDragStart={(e) => handleDragStart(e, task.id, column.id)}
+                              onClick={(e) => {
+                                if (e.target instanceof HTMLElement && !e.target.closest('button')) {
+                                  openEditTask(task);
+                                }
+                              }}
+                              className={`kanban-card bg-gray-900/50 backdrop-blur-sm border border-gray-700/50 rounded-xl p-4 hover:border-gray-600/50 transition-all duration-300 cursor-pointer hover:shadow-lg hover:shadow-primary-500/10 hover:scale-[1.02] ${
+                                task.completed ? 'opacity-75' : ''
+                              }`}
+                            >
+                              {/* Task Header */}
+                              <div className="flex items-start justify-between mb-3">
+                                <div className="flex items-center space-x-2">
+                                  <button
+                                    onClick={() => toggleTaskCompletion(task.id)}
+                                    className="hover:scale-110 transition-transform"
+                                  >
+                                    {task.completed ? (
+                                      <CheckCircle2 className="h-4 w-4 text-green-400 flex-shrink-0" />
+                                    ) : (
+                                      <Circle className="h-4 w-4 text-gray-400 flex-shrink-0 hover:text-green-400" />
+                                    )}
+                                  </button>
+                                  <div className="flex items-center space-x-2">
+                                    {getPriorityIcon(task.priority)}
+                                    {hasChecklist && (
+                                      <ListChecks className="h-3 w-3 text-blue-400" />
+                                    )}
+                                  </div>
+                                </div>
+                                <div className="flex items-center space-x-1">
+                                  <button
+                                    onClick={() => openEditTask(task)}
+                                    className="p-1 rounded text-gray-400 hover:text-blue-400 transition-colors"
+                                  >
+                                    <Edit3 className="h-3 w-3" />
+                                  </button>
+                                  <button
+                                    onClick={() => deleteTask(task.id)}
+                                    className="p-1 rounded text-gray-400 hover:text-red-400 transition-colors"
+                                  >
+                                    <Trash2 className="h-3 w-3" />
+                                  </button>
+                                </div>
+                              </div>
+
+                              {/* Task Content */}
+                              <div className="mb-3">
+                                <h4 className={`font-medium mb-1 ${task.completed ? 'line-through text-gray-500' : 'text-white'}`}>
+                                  {task.title}
+                                </h4>
+                                {task.description && (
+                                  <p className="text-sm text-gray-400 line-clamp-2">{task.description}</p>
+                                )}
+                              </div>
+
+                              {/* Checklist Progress */}
+                              {hasChecklist && (
+                                <div className="mb-3">
+                                  <div className="flex items-center justify-between mb-2">
+                                    <span className="text-xs text-gray-400">
+                                      Checklist ({checklist.filter(item => item.completed).length}/{checklist.length})
+                                    </span>
+                                    <span className="text-xs text-gray-400">{checklistProgress}%</span>
+                                  </div>
+                                  <div className="w-full bg-gray-700 rounded-full h-2">
+                                    <div
+                                      className="bg-gradient-to-r from-primary-500 to-secondary-500 h-2 rounded-full transition-all duration-300"
+                                      style={{ width: `${checklistProgress}%` }}
+                                    ></div>
+                                  </div>
+
+                                  {/* Mini Checklist Preview */}
+                                  <div className="mt-2 space-y-1 max-h-20 overflow-y-auto">
+                                    {checklist.slice(0, 3).map((item) => (
+                                      <div key={item.id} className="flex items-center space-x-2">
+                                        <button
+                                          onClick={() => toggleTaskChecklistItem(task.id, item.id)}
+                                          className="hover:scale-110 transition-transform"
+                                        >
+                                          {item.completed ? (
+                                            <CheckCircle2 className="h-3 w-3 text-green-400 flex-shrink-0" />
+                                          ) : (
+                                            <Circle className="h-3 w-3 text-gray-400 flex-shrink-0 hover:text-green-400" />
+                                          )}
+                                        </button>
+                                        <span className={`text-xs ${item.completed ? 'line-through text-gray-500' : 'text-gray-300'} truncate`}>
+                                          {item.text}
+                                        </span>
+                                      </div>
+                                    ))}
+                                    {checklist.length > 3 && (
+                                      <div className="text-xs text-gray-500 pl-5">
+                                        +{checklist.length - 3} mais itens...
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Real-time editing indicator */}
+                              {editingUsers[task.id] && (
+                                <div className="mb-3 flex items-center space-x-2 bg-yellow-900/20 border border-yellow-500/30 px-3 py-2 rounded-lg">
+                                  <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+                                  <span className="text-yellow-300 text-xs font-medium">
+                                    {editingUsers[task.id].userName} está editando esta tarefa...
+                                  </span>
+                                  <div className="flex space-x-0.5">
+                                    <div className="w-1 h-1 bg-yellow-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                                    <div className="w-1 h-1 bg-yellow-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                                    <div className="w-1 h-1 bg-yellow-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Tags */}
+                              {task.tags.length > 0 && (
+                                <div className="flex flex-wrap gap-1 mb-3">
+                                  {task.tags.map((tag, index) => {
+                                    const getTagColor = (tag: string) => {
+                                      const lowerTag = tag.toLowerCase();
+                                      if (lowerTag.includes('crítico') || lowerTag.includes('urgente')) return 'bg-red-500/20 text-red-300 border-red-500/30';
+                                      if (lowerTag.includes('alta')) return 'bg-orange-500/20 text-orange-300 border-orange-500/30';
+                                      if (lowerTag.includes('média') || lowerTag.includes('medium')) return 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30';
+                                      if (lowerTag.includes('baixa') || lowerTag.includes('low')) return 'bg-green-500/20 text-green-300 border-green-500/30';
+                                      if (lowerTag.includes('frontend') || lowerTag.includes('ui') || lowerTag.includes('ux')) return 'bg-purple-500/20 text-purple-300 border-purple-500/30';
+                                      if (lowerTag.includes('backend') || lowerTag.includes('api')) return 'bg-blue-500/20 text-blue-300 border-blue-500/30';
+                                      if (lowerTag.includes('devops') || lowerTag.includes('infra')) return 'bg-gray-500/20 text-gray-300 border-gray-500/30';
+                                      if (lowerTag.includes('test') || lowerTag.includes('qualidade')) return 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30';
+                                      if (lowerTag.includes('doc') || lowerTag.includes('documentação')) return 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30';
+                                      if (lowerTag.includes('ml') || lowerTag.includes('ia')) return 'bg-pink-500/20 text-pink-300 border-pink-500/30';
+                                      return 'bg-primary-500/20 text-primary-300 border-primary-500/30';
+                                    };
+
+                                    return (
+                                      <span
+                                        key={index}
+                                        className={`px-2 py-1 text-xs rounded-lg border transition-all duration-200 hover:scale-105 hover:shadow-sm ${getTagColor(tag)}`}
+                                        title={`Tag: ${tag}`}
+                                      >
+                                        {tag}
+                                      </span>
+                                    );
+                                  })}
+                                </div>
+                              )}
+
+                              {/* Task Footer */}
+                              <div className="flex items-center justify-between text-xs text-gray-400">
+                                <div className="flex items-center space-x-3">
+                                  {task.assignee && (
+                                    <div className="flex items-center space-x-1">
+                                      <User className="h-3 w-3" />
+                                      <span>{task.assignee}</span>
+                                    </div>
+                                  )}
+                                  {task.dueDate && (
+                                    <div className="flex items-center space-x-1">
+                                      <Calendar className="h-3 w-3" />
+                                      <span>{new Date(task.dueDate).toLocaleDateString('pt-BR')}</span>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                      )}
+                    </div>
+                    );
+                  })}
+
+                  {/* Direct Tasks (not in any subcolumn) */}
+                  {column.tasks.filter(task => !task.subColumnId).map((task) => {
+                    const checklist = task.checklist || [];
+                    const checklistProgress = getChecklistProgress(checklist);
+                    const hasChecklist = checklist.length > 0;
+
+                    return (
+                      <div
+                        key={task.id}
+                        draggable
+                        onDragStart={(e) => handleDragStart(e, task.id, column.id)}
+                        onClick={(e) => {
+                          if (e.target instanceof HTMLElement && !e.target.closest('button')) {
+                            openEditTask(task);
+                          }
+                        }}
+                        className={`kanban-card bg-gray-900/50 backdrop-blur-sm border border-gray-700/50 rounded-xl p-4 hover:border-gray-600/50 transition-all duration-300 cursor-pointer hover:shadow-lg hover:shadow-primary-500/10 hover:scale-[1.02] ${
+                          task.completed ? 'opacity-75' : ''
+                        }`}
+                      >
+                        {/* Same task rendering as above - keeping original code */}
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex items-center space-x-2">
+                            <button
+                              onClick={() => toggleTaskCompletion(task.id)}
+                              className="hover:scale-110 transition-transform"
+                            >
+                              {task.completed ? (
+                                <CheckCircle2 className="h-4 w-4 text-green-400 flex-shrink-0" />
+                              ) : (
+                                <Circle className="h-4 w-4 text-gray-400 flex-shrink-0 hover:text-green-400" />
+                              )}
+                            </button>
+                            <div className="flex items-center space-x-2">
+                              {getPriorityIcon(task.priority)}
+                              {hasChecklist && (
+                                <ListChecks className="h-3 w-3 text-blue-400" />
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex items-center space-x-1">
+                            <button
+                              onClick={() => openEditTask(task)}
+                              className="p-1 rounded text-gray-400 hover:text-blue-400 transition-colors"
+                            >
+                              <Edit3 className="h-3 w-3" />
+                            </button>
+                            <button
+                              onClick={() => deleteTask(task.id)}
+                              className="p-1 rounded text-gray-400 hover:text-red-400 transition-colors"
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </button>
+                          </div>
+                        </div>
+                        <div className="mb-3">
+                          <h4 className={`font-medium mb-1 ${task.completed ? 'line-through text-gray-500' : 'text-white'}`}>
+                            {task.title}
+                          </h4>
+                          {task.description && (
+                            <p className="text-sm text-gray-400 line-clamp-2">{task.description}</p>
+                          )}
+                        </div>
+                        {hasChecklist && (
+                          <div className="mb-3">
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-xs text-gray-400">
+                                Checklist ({checklist.filter(item => item.completed).length}/{checklist.length})
+                              </span>
+                              <span className="text-xs text-gray-400">{checklistProgress}%</span>
+                            </div>
+                            <div className="w-full bg-gray-700 rounded-full h-2">
+                              <div
+                                className="bg-gradient-to-r from-primary-500 to-secondary-500 h-2 rounded-full transition-all duration-300"
+                                style={{ width: `${checklistProgress}%` }}
+                              ></div>
+                            </div>
+                            <div className="mt-2 space-y-1 max-h-20 overflow-y-auto">
+                              {checklist.slice(0, 3).map((item) => (
+                                <div key={item.id} className="flex items-center space-x-2">
+                                  <button
+                                    onClick={() => toggleTaskChecklistItem(task.id, item.id)}
+                                    className="hover:scale-110 transition-transform"
+                                  >
+                                    {item.completed ? (
+                                      <CheckCircle2 className="h-3 w-3 text-green-400 flex-shrink-0" />
+                                    ) : (
+                                      <Circle className="h-3 w-3 text-gray-400 flex-shrink-0 hover:text-green-400" />
+                                    )}
+                                  </button>
+                                  <span className={`text-xs ${item.completed ? 'line-through text-gray-500' : 'text-gray-300'} truncate`}>
+                                    {item.text}
+                                  </span>
+                                </div>
+                              ))}
+                              {checklist.length > 3 && (
+                                <div className="text-xs text-gray-500 pl-5">
+                                  +{checklist.length - 3} mais itens...
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                        {editingUsers[task.id] && (
+                          <div className="mb-3 flex items-center space-x-2 bg-yellow-900/20 border border-yellow-500/30 px-3 py-2 rounded-lg">
+                            <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+                            <span className="text-yellow-300 text-xs font-medium">
+                              {editingUsers[task.id].userName} está editando esta tarefa...
+                            </span>
+                            <div className="flex space-x-0.5">
+                              <div className="w-1 h-1 bg-yellow-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                              <div className="w-1 h-1 bg-yellow-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                              <div className="w-1 h-1 bg-yellow-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                            </div>
+                          </div>
+                        )}
+                        {task.tags.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mb-3">
+                            {task.tags.map((tag, index) => {
+                              const getTagColor = (tag: string) => {
+                                const lowerTag = tag.toLowerCase();
+                                if (lowerTag.includes('crítico') || lowerTag.includes('urgente')) return 'bg-red-500/20 text-red-300 border-red-500/30';
+                                if (lowerTag.includes('alta')) return 'bg-orange-500/20 text-orange-300 border-orange-500/30';
+                                if (lowerTag.includes('média') || lowerTag.includes('medium')) return 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30';
+                                if (lowerTag.includes('baixa') || lowerTag.includes('low')) return 'bg-green-500/20 text-green-300 border-green-500/30';
+                                if (lowerTag.includes('frontend') || lowerTag.includes('ui') || lowerTag.includes('ux')) return 'bg-purple-500/20 text-purple-300 border-purple-500/30';
+                                if (lowerTag.includes('backend') || lowerTag.includes('api')) return 'bg-blue-500/20 text-blue-300 border-blue-500/30';
+                                if (lowerTag.includes('devops') || lowerTag.includes('infra')) return 'bg-gray-500/20 text-gray-300 border-gray-500/30';
+                                if (lowerTag.includes('test') || lowerTag.includes('qualidade')) return 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30';
+                                if (lowerTag.includes('doc') || lowerTag.includes('documentação')) return 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30';
+                                if (lowerTag.includes('ml') || lowerTag.includes('ia')) return 'bg-pink-500/20 text-pink-300 border-pink-500/30';
+                                return 'bg-primary-500/20 text-primary-300 border-primary-500/30';
+                              };
+
+                              return (
+                                <span
+                                  key={index}
+                                  className={`px-2 py-1 text-xs rounded-lg border transition-all duration-200 hover:scale-105 hover:shadow-sm ${getTagColor(tag)}`}
+                                  title={`Tag: ${tag}`}
+                                >
+                                  {tag}
+                                </span>
+                              );
+                            })}
+                          </div>
+                        )}
+                        <div className="flex items-center justify-between text-xs text-gray-400">
+                          <div className="flex items-center space-x-3">
+                            {task.assignee && (
+                              <div className="flex items-center space-x-1">
+                                <User className="h-3 w-3" />
+                                <span>{task.assignee}</span>
+                              </div>
+                            )}
+                            {task.dueDate && (
+                              <div className="flex items-center space-x-1">
+                                <Calendar className="h-3 w-3" />
+                                <span>{new Date(task.dueDate).toLocaleDateString('pt-BR')}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </>
+              ) : (
+                /* No SubColumns - Render tasks normally (original behavior) */
+                column.tasks.map((task) => {
                 // Ensure checklist exists for backward compatibility
                 const checklist = task.checklist || [];
                 const checklistProgress = getChecklistProgress(checklist);
@@ -2747,7 +3136,8 @@ const TasksPage = () => {
                     </div>
                   </div>
                 );
-              })}
+              })
+              )}
 
               {/* Add Task Button */}
               {canEdit() && (
