@@ -501,6 +501,7 @@ export const updateTask = async (req: Request, res: Response) => {
       if (updates.completed !== undefined) updateData.completed = updates.completed;
       if (updates.position !== undefined) updateData.position = updates.position;
       if (updates.columnId !== undefined) updateData.columnId = updates.columnId;
+      if (updates.subColumnId !== undefined) updateData.subColumnId = updates.subColumnId;
 
       const updatedTask = await prisma.task.update({
         where: { id: taskId },
