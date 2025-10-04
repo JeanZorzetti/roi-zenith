@@ -149,14 +149,14 @@ Plano de implementação incremental de melhorias de UI/UX baseado nas melhores 
   - Submenu para mover entre colunas
   - Change priority
   - Assign to...
-- [ ] Keyboard shortcuts:
+- [x] 👌 Keyboard shortcuts:
   - `E` - Edit selected card
   - `D` - Delete selected card
   - `C` - Toggle complete
   - `N` - New task
   - `Esc` - Close modals
-  - `/` - Focus search
-- [ ] Inline editing:
+  - `Shift+Click` - Select task
+- [x] 👌 Inline editing:
   - Double-click no título para editar
   - Auto-save on blur
   - Escape para cancelar
