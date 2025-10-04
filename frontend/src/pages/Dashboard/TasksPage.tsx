@@ -2518,6 +2518,32 @@ const TasksPage = () => {
     }
   };
 
+  const getPriorityBorderClass = (priority: string) => {
+    switch (priority) {
+      case 'urgent': return 'border-l-4 border-l-red-500';
+      case 'high': return 'border-l-4 border-l-amber-500';
+      case 'medium': return 'border-l-2 border-l-yellow-500';
+      case 'low': return 'border-l-2 border-l-green-500';
+      default: return 'border-l border-l-gray-600';
+    }
+  };
+
+  const getInitials = (name: string) => {
+    if (!name) return '?';
+    const parts = name.trim().split(' ');
+    if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+    return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+  };
+
+  const getAvatarColor = (name: string) => {
+    const colors = [
+      'bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-pink-500',
+      'bg-indigo-500', 'bg-yellow-500', 'bg-red-500', 'bg-teal-500'
+    ];
+    const index = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
+    return colors[index];
+  };
+
   const colorOptions = [
     'bg-gray-500', 'bg-red-500', 'bg-orange-500', 'bg-yellow-500', 
     'bg-green-500', 'bg-blue-500', 'bg-purple-500', 'bg-pink-500'
@@ -2807,8 +2833,8 @@ const TasksPage = () => {
       </div>
 
       {/* Kanban Board */}
-      <div 
-        className={`flex gap-6 overflow-x-auto pb-6 select-none ${isScrolling ? 'cursor-grabbing' : 'cursor-grab'}`}
+      <div
+        className={`flex gap-8 overflow-x-auto pb-6 select-none ${isScrolling ? 'cursor-grabbing' : 'cursor-grab'}`}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
@@ -2976,7 +3002,7 @@ const TasksPage = () => {
                       {/* SubColumn Tasks */}
                       {isExpanded && (
                       <div
-                        className="p-3 space-y-2 bg-gray-900/30 min-h-[100px]"
+                        className="p-3 space-y-3 bg-gray-900/30 min-h-[100px]"
                         onDragOver={(e) => e.preventDefault()}
                         onDrop={(e) => handleDropInSubColumn(e, column.id, subColumn.id)}
                       >
@@ -2995,7 +3021,7 @@ const TasksPage = () => {
                                   openEditTask(task);
                                 }
                               }}
-                              className={`kanban-card bg-gray-900/50 backdrop-blur-sm border border-gray-700/50 rounded-xl p-4 hover:border-gray-600/50 transition-all duration-300 cursor-pointer hover:shadow-lg hover:shadow-primary-500/10 hover:scale-[1.02] ${
+                              className={`kanban-card bg-gray-900/50 backdrop-blur-sm border border-gray-700/50 rounded-xl p-5 hover:border-gray-600/50 transition-all duration-300 cursor-pointer hover:shadow-lg hover:shadow-primary-500/10 hover:scale-[1.02] ${getPriorityBorderClass(task.priority)} ${
                                 task.completed ? 'opacity-75' : ''
                               }`}
                             >
@@ -3037,7 +3063,7 @@ const TasksPage = () => {
 
                               {/* Task Content */}
                               <div className="mb-3">
-                                <h4 className={`font-medium mb-1 ${task.completed ? 'line-through text-gray-500' : 'text-white'}`}>
+                                <h4 className={`font-bold text-lg mb-1 ${task.completed ? 'line-through text-gray-500' : 'text-white'}`}>
                                   {task.title}
                                 </h4>
                                 {task.description && (
@@ -3140,9 +3166,11 @@ const TasksPage = () => {
                               <div className="flex items-center justify-between text-xs text-gray-400">
                                 <div className="flex items-center space-x-3">
                                   {task.assignee && (
-                                    <div className="flex items-center space-x-1">
-                                      <User className="h-3 w-3" />
-                                      <span>{task.assignee}</span>
+                                    <div className="flex items-center space-x-2" title={task.assignee}>
+                                      <div className={`w-8 h-8 rounded-full ${getAvatarColor(task.assignee)} flex items-center justify-center text-white text-xs font-semibold`}>
+                                        {getInitials(task.assignee)}
+                                      </div>
+                                      <span className="text-gray-300">{task.assignee}</span>
                                     </div>
                                   )}
                                   {task.dueDate && (
@@ -3178,7 +3206,7 @@ const TasksPage = () => {
                             openEditTask(task);
                           }
                         }}
-                        className={`kanban-card bg-gray-900/50 backdrop-blur-sm border border-gray-700/50 rounded-xl p-4 hover:border-gray-600/50 transition-all duration-300 cursor-pointer hover:shadow-lg hover:shadow-primary-500/10 hover:scale-[1.02] ${
+                        className={`kanban-card bg-gray-900/50 backdrop-blur-sm border border-gray-700/50 rounded-xl p-5 hover:border-gray-600/50 transition-all duration-300 cursor-pointer hover:shadow-lg hover:shadow-primary-500/10 hover:scale-[1.02] ${getPriorityBorderClass(task.priority)} ${
                           task.completed ? 'opacity-75' : ''
                         }`}
                       >
@@ -3218,7 +3246,7 @@ const TasksPage = () => {
                           </div>
                         </div>
                         <div className="mb-3">
-                          <h4 className={`font-medium mb-1 ${task.completed ? 'line-through text-gray-500' : 'text-white'}`}>
+                          <h4 className={`font-bold text-lg mb-1 ${task.completed ? 'line-through text-gray-500' : 'text-white'}`}>
                             {task.title}
                           </h4>
                           {task.description && (
@@ -3311,9 +3339,11 @@ const TasksPage = () => {
                         <div className="flex items-center justify-between text-xs text-gray-400">
                           <div className="flex items-center space-x-3">
                             {task.assignee && (
-                              <div className="flex items-center space-x-1">
-                                <User className="h-3 w-3" />
-                                <span>{task.assignee}</span>
+                              <div className="flex items-center space-x-2" title={task.assignee}>
+                                <div className={`w-8 h-8 rounded-full ${getAvatarColor(task.assignee)} flex items-center justify-center text-white text-xs font-semibold`}>
+                                  {getInitials(task.assignee)}
+                                </div>
+                                <span className="text-gray-300">{task.assignee}</span>
                               </div>
                             )}
                             {task.dueDate && (
@@ -3347,7 +3377,7 @@ const TasksPage = () => {
                         openEditTask(task);
                       }
                     }}
-                    className={`kanban-card bg-gray-900/50 backdrop-blur-sm border border-gray-700/50 rounded-xl p-4 hover:border-gray-600/50 transition-all duration-300 cursor-pointer hover:shadow-lg hover:shadow-primary-500/10 hover:scale-[1.02] ${
+                    className={`kanban-card bg-gray-900/50 backdrop-blur-sm border border-gray-700/50 rounded-xl p-5 hover:border-gray-600/50 transition-all duration-300 cursor-pointer hover:shadow-lg hover:shadow-primary-500/10 hover:scale-[1.02] ${getPriorityBorderClass(task.priority)} ${
                       task.completed ? 'opacity-75' : ''
                     }`}
                   >
@@ -3389,7 +3419,7 @@ const TasksPage = () => {
 
                     {/* Task Content */}
                     <div className="mb-3">
-                      <h4 className={`font-medium mb-1 ${task.completed ? 'line-through text-gray-500' : 'text-white'}`}>
+                      <h4 className={`font-bold text-lg mb-1 ${task.completed ? 'line-through text-gray-500' : 'text-white'}`}>
                         {task.title}
                       </h4>
                       {task.description && (
@@ -3493,9 +3523,11 @@ const TasksPage = () => {
                     <div className="flex items-center justify-between text-xs text-gray-400">
                       <div className="flex items-center space-x-3">
                         {task.assignee && (
-                          <div className="flex items-center space-x-1">
-                            <User className="h-3 w-3" />
-                            <span>{task.assignee}</span>
+                          <div className="flex items-center space-x-2" title={task.assignee}>
+                            <div className={`w-8 h-8 rounded-full ${getAvatarColor(task.assignee)} flex items-center justify-center text-white text-xs font-semibold`}>
+                              {getInitials(task.assignee)}
+                            </div>
+                            <span className="text-gray-300">{task.assignee}</span>
                           </div>
                         )}
                         {task.dueDate && (
