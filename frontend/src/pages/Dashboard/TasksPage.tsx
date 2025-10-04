@@ -3253,9 +3253,41 @@ const TasksPage = () => {
         </div>
 
         {/* Filters Row */}
-        <div className="flex items-center space-x-6">
-          {/* Priority Filters */}
-          <div className="flex items-center space-x-2">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-6">
+            {/* Quick Views */}
+            <div className="flex items-center space-x-2">
+              <span className="text-xs text-gray-400 font-semibold uppercase">Views:</span>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => {
+                    clearFilters();
+                    setFilterPriority(['urgent', 'high']);
+                  }}
+                  className="px-3 py-1.5 rounded-lg border border-purple-500/50 bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 text-xs font-medium transition-all duration-200"
+                >
+                  Alta Prioridade
+                </button>
+                <button
+                  onClick={() => {
+                    clearFilters();
+                    setFilterPriority(['urgent']);
+                  }}
+                  className="px-3 py-1.5 rounded-lg border border-red-500/50 bg-red-500/20 text-red-300 hover:bg-red-500/30 text-xs font-medium transition-all duration-200"
+                >
+                  Urgente
+                </button>
+                <button
+                  onClick={clearFilters}
+                  className="px-3 py-1.5 rounded-lg border border-gray-500/50 bg-gray-500/20 text-gray-300 hover:bg-gray-500/30 text-xs font-medium transition-all duration-200"
+                >
+                  Todas
+                </button>
+              </div>
+            </div>
+
+            {/* Priority Filters */}
+            <div className="flex items-center space-x-2">
             <span className="text-xs text-gray-400 font-semibold uppercase">Prioridade:</span>
             <div className="flex items-center space-x-2">
               {(['urgent', 'high', 'medium', 'low'] as const).map((priority) => {
@@ -3293,6 +3325,19 @@ const TasksPage = () => {
                 );
               })}
             </div>
+          </div>
+          </div>
+
+          {/* Task Count Badge */}
+          <div className="flex items-center space-x-2 px-4 py-2 bg-gray-700/30 border border-gray-600/50 rounded-lg">
+            <span className="text-xs text-gray-400">Total de tasks:</span>
+            <span className="text-sm font-bold text-white">
+              {boards.find(b => b.id === currentBoardId)?.columns.reduce((total, col) => {
+                let count = col.tasks.length;
+                col.subColumns?.forEach(sub => count += (sub.tasks?.length || 0));
+                return total + count;
+              }, 0) || 0}
+            </span>
           </div>
         </div>
       </div>
