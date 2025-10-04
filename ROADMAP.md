@@ -183,7 +183,7 @@ Plano de implementação incremental de melhorias de UI/UX baseado nas melhores 
   - Autocomplete com preview
   - Highlight de resultados
   - Search history
-- [ ] Filtros visuais:
+- [x] 👌 Filtros visuais:
   - Multi-select por tags
   - Filter por prioridade (checkboxes)
   - Filter por assignee (dropdown)
