@@ -193,7 +193,7 @@ Plano de implementação incremental de melhorias de UI/UX baseado nas melhores 
   - Cards filtrados com destaque
   - Outros cards com opacity reduzida
   - Clear filters button
-- [ ] Saved views:
+- [x] 👌 Saved views:
   - "My Tasks"
   - "High Priority"
   - "Due This Week"
