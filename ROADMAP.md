@@ -43,15 +43,15 @@ Plano de implementação incremental de melhorias de UI/UX baseado nas melhores 
 - Melhorar visualização de due dates
 
 ### Tarefas
-- [ ] Criar componente `TaskBadge` com cores customizáveis
-- [ ] Implementar barra de progresso visual para checklist
+- [x] 👌 Criar componente `TaskBadge` com cores customizáveis
+- [x] 👌 Implementar barra de progresso visual para checklist
   - Exibir porcentagem completada
   - Cores: verde (100%), azul (progresso), cinza (vazio)
-- [ ] Adicionar ícones de contexto:
+- [x] 👌 Adicionar ícones de contexto:
   - 📎 Anexos (se houver)
   - 💬 Comentários (se houver)
   - ✓ Subtasks completadas
-- [ ] Highlighting de due date:
+- [x] 👌 Highlighting de due date:
   - Vermelho: vencido
   - Laranja: vence em 24h
   - Amarelo: vence em 3 dias
