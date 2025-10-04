@@ -3197,7 +3197,8 @@ const TasksPage = () => {
       </div>
 
       {/* Search and Filters Bar */}
-      <div className="mb-6 bg-gradient-to-br from-gray-800/40 to-gray-900/40 backdrop-blur-md border border-gray-700/50 rounded-xl p-4">
+      <div className="mb-6 bg-gradient-to-br from-gray-800/40 to-gray-900/40 backdrop-blur-md border border-gray-700/50 rounded-xl p-4 space-y-4">
+        {/* Search Row */}
         <div className="flex items-center space-x-4">
           {/* Search Input */}
           <div className="flex-1 relative">
@@ -3223,6 +3224,50 @@ const TasksPage = () => {
               <span className="text-sm font-medium">Limpar Filtros</span>
             </button>
           )}
+        </div>
+
+        {/* Filters Row */}
+        <div className="flex items-center space-x-6">
+          {/* Priority Filters */}
+          <div className="flex items-center space-x-2">
+            <span className="text-xs text-gray-400 font-semibold uppercase">Prioridade:</span>
+            <div className="flex items-center space-x-2">
+              {(['urgent', 'high', 'medium', 'low'] as const).map((priority) => {
+                const isActive = filterPriority.includes(priority);
+                const colors = {
+                  urgent: 'bg-red-500/20 border-red-500/50 text-red-300 hover:bg-red-500/30',
+                  high: 'bg-amber-500/20 border-amber-500/50 text-amber-300 hover:bg-amber-500/30',
+                  medium: 'bg-yellow-500/20 border-yellow-500/50 text-yellow-300 hover:bg-yellow-500/30',
+                  low: 'bg-green-500/20 border-green-500/50 text-green-300 hover:bg-green-500/30'
+                };
+                const activeColors = {
+                  urgent: 'bg-red-500/40 border-red-400 text-red-200 ring-2 ring-red-500/30',
+                  high: 'bg-amber-500/40 border-amber-400 text-amber-200 ring-2 ring-amber-500/30',
+                  medium: 'bg-yellow-500/40 border-yellow-400 text-yellow-200 ring-2 ring-yellow-500/30',
+                  low: 'bg-green-500/40 border-green-400 text-green-200 ring-2 ring-green-500/30'
+                };
+                const labels = { urgent: 'Urgente', high: 'Alta', medium: 'Média', low: 'Baixa' };
+
+                return (
+                  <button
+                    key={priority}
+                    onClick={() => {
+                      setFilterPriority(prev =>
+                        prev.includes(priority)
+                          ? prev.filter(p => p !== priority)
+                          : [...prev, priority]
+                      );
+                    }}
+                    className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-all duration-200 ${
+                      isActive ? activeColors[priority] : colors[priority]
+                    }`}
+                  >
+                    {labels[priority]}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </div>
       </div>
 

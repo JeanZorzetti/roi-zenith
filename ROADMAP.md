@@ -178,7 +178,7 @@ Plano de implementação incremental de melhorias de UI/UX baseado nas melhores 
 - Adicionar saved views
 
 ### Tarefas
-- [ ] Barra de busca global:
+- [x] 👌 Barra de busca global:
   - Search by título, descrição, tags
   - Autocomplete com preview
   - Highlight de resultados
