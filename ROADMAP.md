@@ -189,7 +189,7 @@ Plano de implementação incremental de melhorias de UI/UX baseado nas melhores 
   - Filter por assignee (dropdown)
   - Filter por due date (range picker)
   - Filter por status
-- [ ] Highlight mode:
+- [x] 👌 Highlight mode:
   - Cards filtrados com destaque
   - Outros cards com opacity reduzida
   - Clear filters button
