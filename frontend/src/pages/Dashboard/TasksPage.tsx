@@ -2934,12 +2934,12 @@ const TasksPage = () => {
           >
             {/* Column Header */}
             <div
-              className="flex items-center justify-between mb-4 cursor-move"
+              className="flex items-center justify-between mb-4 cursor-move p-3 rounded-xl bg-gradient-to-r from-gray-800/60 via-gray-800/40 to-gray-800/60 backdrop-blur-md border border-white/10 hover:border-white/20 transition-all duration-300 shadow-lg"
               draggable
               onDragStart={(e) => handleColumnDragStart(e, column.id)}
             >
               <div className="flex items-center space-x-3">
-                <div className={`w-3 h-3 rounded-full ${column.color}`}></div>
+                <div className={`w-3 h-3 rounded-full ${column.color} shadow-lg`}></div>
                 {editingColumnId === column.id ? (
                   <div className="flex items-center space-x-2">
                     <input
@@ -2967,7 +2967,7 @@ const TasksPage = () => {
                     {column.title}
                   </h3>
                 )}
-                <span className="bg-gray-800/50 text-gray-400 px-2 py-1 rounded-lg text-xs font-medium">
+                <span className="bg-gradient-to-br from-gray-700/60 to-gray-800/60 backdrop-blur-sm text-gray-300 px-2.5 py-1 rounded-lg text-xs font-bold border border-white/10 shadow-sm">
                   {column.tasks.length}
                 </span>
               </div>
@@ -3023,10 +3023,10 @@ const TasksPage = () => {
                     const isExpanded = expandedSubColumns[subColumn.id] !== false; // Default to true (expanded)
 
                     return (
-                    <div key={subColumn.id} className="border border-gray-700/50 rounded-xl overflow-hidden">
+                    <div key={subColumn.id} className="border border-white/10 rounded-xl overflow-hidden backdrop-blur-md bg-gradient-to-br from-gray-800/40 to-gray-900/40 shadow-lg shadow-black/20">
                       {/* SubColumn Header */}
                       <div
-                        className="bg-gray-800/50 p-3 flex items-center justify-between hover:bg-gray-800/70 transition-colors cursor-move"
+                        className="bg-gradient-to-r from-gray-800/60 to-gray-800/40 backdrop-blur-sm p-3 flex items-center justify-between hover:from-gray-700/60 hover:to-gray-700/40 transition-all duration-300 cursor-move border-b border-white/5"
                         draggable
                         onDragStart={(e) => handleSubColumnDragStart(e, subColumn.id, column.id)}
                       >
@@ -3071,7 +3071,7 @@ const TasksPage = () => {
                       {/* SubColumn Tasks */}
                       {isExpanded && (
                       <div
-                        className="p-3 space-y-3 bg-gray-900/30 min-h-[100px]"
+                        className="p-3 space-y-3 bg-gradient-to-b from-gray-900/20 to-gray-900/40 backdrop-blur-sm min-h-[100px]"
                         onDragOver={(e) => e.preventDefault()}
                         onDrop={(e) => handleDropInSubColumn(e, column.id, subColumn.id)}
                       >
@@ -3090,7 +3090,7 @@ const TasksPage = () => {
                                   openEditTask(task);
                                 }
                               }}
-                              className={`kanban-card bg-gray-900/50 backdrop-blur-sm border border-gray-700/50 rounded-xl p-5 hover:border-gray-600/50 transition-all duration-300 cursor-pointer hover:shadow-lg hover:shadow-primary-500/10 hover:scale-[1.02] ${getPriorityBorderClass(task.priority)} ${
+                              className={`kanban-card bg-gradient-to-br from-gray-900/60 to-gray-900/40 backdrop-blur-md border border-gray-700/50 rounded-xl p-5 hover:border-gray-600/70 hover:from-gray-900/70 hover:to-gray-900/50 transition-all duration-300 cursor-pointer hover:shadow-xl hover:shadow-primary-500/20 hover:scale-[1.02] ${getPriorityBorderClass(task.priority)} ${
                                 task.completed ? 'opacity-75' : ''
                               }`}
                             >
@@ -3271,7 +3271,7 @@ const TasksPage = () => {
                             openEditTask(task);
                           }
                         }}
-                        className={`kanban-card bg-gray-900/50 backdrop-blur-sm border border-gray-700/50 rounded-xl p-5 hover:border-gray-600/50 transition-all duration-300 cursor-pointer hover:shadow-lg hover:shadow-primary-500/10 hover:scale-[1.02] ${getPriorityBorderClass(task.priority)} ${
+                        className={`kanban-card bg-gradient-to-br from-gray-900/60 to-gray-900/40 backdrop-blur-md border border-gray-700/50 rounded-xl p-5 hover:border-gray-600/70 hover:from-gray-900/70 hover:to-gray-900/50 transition-all duration-300 cursor-pointer hover:shadow-xl hover:shadow-primary-500/20 hover:scale-[1.02] ${getPriorityBorderClass(task.priority)} ${
                           task.completed ? 'opacity-75' : ''
                         }`}
                       >
@@ -3455,7 +3455,7 @@ const TasksPage = () => {
                         openEditTask(task);
                       }
                     }}
-                    className={`kanban-card bg-gray-900/50 backdrop-blur-sm border border-gray-700/50 rounded-xl p-5 hover:border-gray-600/50 transition-all duration-300 cursor-pointer hover:shadow-lg hover:shadow-primary-500/10 hover:scale-[1.02] ${getPriorityBorderClass(task.priority)} ${
+                    className={`kanban-card bg-gradient-to-br from-gray-900/60 to-gray-900/40 backdrop-blur-md border border-gray-700/50 rounded-xl p-5 hover:border-gray-600/70 hover:from-gray-900/70 hover:to-gray-900/50 transition-all duration-300 cursor-pointer hover:shadow-xl hover:shadow-primary-500/20 hover:scale-[1.02] ${getPriorityBorderClass(task.priority)} ${
                       task.completed ? 'opacity-75' : ''
                     }`}
                   >
