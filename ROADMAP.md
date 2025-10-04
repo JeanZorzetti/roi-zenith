@@ -74,16 +74,16 @@ Plano de implementação incremental de melhorias de UI/UX baseado nas melhores 
 - Implementar efeitos de profundidade (depth)
 
 ### Tarefas
-- [ ] Aplicar glassmorphism em subcolunas:
+- [x] 👌 Aplicar glassmorphism em subcolunas:
   ```css
   backdrop-filter: blur(12px)
   background: rgba(17, 24, 39, 0.7)
   border: 1px solid rgba(255, 255, 255, 0.1)
   ```
-- [ ] Column headers com efeito vidro fosco
-- [ ] Gradientes sutis nos backgrounds
-- [ ] Sombras difusas e coloridas (glow effect)
-- [ ] Bordas com shimmer effect nos headers
+- [x] 👌 Column headers com efeito vidro fosco
+- [x] 👌 Gradientes sutis nos backgrounds
+- [x] 👌 Sombras difusas e coloridas (glow effect)
+- [x] 👌 Bordas com shimmer effect nos headers
 
 ### Entregáveis
 - Interface moderna com profundidade visual
