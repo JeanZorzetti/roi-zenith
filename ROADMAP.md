@@ -144,7 +144,7 @@ Plano de implementação incremental de melhorias de UI/UX baseado nas melhores 
   - Duplicate (Copy icon)
   - Move (ArrowRight icon)
   - Quick complete (CheckCircle icon)
-- [ ] Context menu (right-click):
+- [x] 👌 Context menu (right-click):
   - Ações principais
   - Submenu para mover entre colunas
   - Change priority

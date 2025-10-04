@@ -2096,6 +2096,103 @@ const TasksPage = () => {
     }
   }, [contextMenu]);
 
+  // Selected task for keyboard shortcuts
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+
+  // Inline editing state
+  const [inlineEditingTaskId, setInlineEditingTaskId] = useState<string | null>(null);
+  const [inlineEditTitle, setInlineEditTitle] = useState<string>('');
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore if typing in input/textarea
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        // Only handle Esc in modals
+        if (e.key === 'Escape') {
+          if (showTaskModal) {
+            setShowTaskModal(false);
+            setEditingTask(null);
+          }
+          if (showColumnModal) {
+            setShowColumnModal(false);
+          }
+          if (showBoardModal) {
+            setShowBoardModal(false);
+          }
+          if (showShareModal) {
+            setShowShareModal(false);
+          }
+        }
+        return;
+      }
+
+      // N - New task
+      if (e.key === 'n' || e.key === 'N') {
+        if (!showTaskModal && !showColumnModal && !showBoardModal && canEdit()) {
+          const currentBoard = boards.find(b => b.id === currentBoardId);
+          if (currentBoard && currentBoard.columns.length > 0) {
+            resetTaskForm();
+            setTargetColumnId(currentBoard.columns[0].id);
+            setShowTaskModal(true);
+          }
+        }
+      }
+
+      // Esc - Close modals and cancel inline editing
+      if (e.key === 'Escape') {
+        if (inlineEditingTaskId) {
+          cancelInlineEdit();
+          return;
+        }
+        if (showTaskModal) {
+          setShowTaskModal(false);
+          setEditingTask(null);
+        }
+        if (showColumnModal) {
+          setShowColumnModal(false);
+        }
+        if (showBoardModal) {
+          setShowBoardModal(false);
+        }
+        if (showShareModal) {
+          setShowShareModal(false);
+        }
+        if (contextMenu) {
+          closeContextMenu();
+        }
+        setSelectedTaskId(null);
+      }
+
+      // E - Edit selected task
+      if ((e.key === 'e' || e.key === 'E') && selectedTaskId) {
+        const currentBoard = boards.find(b => b.id === currentBoardId);
+        const task = currentBoard?.columns
+          .flatMap(c => [...c.tasks, ...(c.subColumns?.flatMap(s => s.tasks || []) || [])])
+          .find(t => t.id === selectedTaskId);
+        if (task) {
+          openEditTask(task);
+        }
+      }
+
+      // D - Delete selected task
+      if ((e.key === 'd' || e.key === 'D') && selectedTaskId && canEdit()) {
+        if (confirm('Tem certeza que deseja excluir esta tarefa?')) {
+          deleteTask(selectedTaskId);
+          setSelectedTaskId(null);
+        }
+      }
+
+      // C - Toggle complete selected task
+      if ((e.key === 'c' || e.key === 'C') && selectedTaskId) {
+        toggleTaskCompletion(selectedTaskId);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [selectedTaskId, showTaskModal, showColumnModal, showBoardModal, showShareModal, contextMenu, boards, currentBoardId]);
+
   // Move task to different column from context menu
   const moveTaskToColumn = async (taskId: string, targetColumnId: string) => {
     try {
@@ -2152,6 +2249,44 @@ const TasksPage = () => {
       setLoading(false);
       closeContextMenu();
     }
+  };
+
+  // Start inline editing
+  const startInlineEditing = (taskId: string, currentTitle: string) => {
+    setInlineEditingTaskId(taskId);
+    setInlineEditTitle(currentTitle);
+  };
+
+  // Save inline editing
+  const saveInlineEdit = async () => {
+    if (!inlineEditingTaskId || !inlineEditTitle.trim()) {
+      setInlineEditingTaskId(null);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const success = await boardService.updateTask(currentBoardId, inlineEditingTaskId, {
+        title: inlineEditTitle.trim()
+      });
+
+      if (success) {
+        const reloadedBoards = await boardService.getBoards();
+        setBoards(reloadedBoards);
+      }
+    } catch (error) {
+      console.error('❌ Erro ao atualizar título:', error);
+    } finally {
+      setLoading(false);
+      setInlineEditingTaskId(null);
+      setInlineEditTitle('');
+    }
+  };
+
+  // Cancel inline editing
+  const cancelInlineEdit = () => {
+    setInlineEditingTaskId(null);
+    setInlineEditTitle('');
   };
 
   // Toggle task completion
@@ -3230,12 +3365,20 @@ const TasksPage = () => {
                               onDragStart={(e) => handleDragStart(e, task.id, column.id)}
                               onClick={(e) => {
                                 if (e.target instanceof HTMLElement && !e.target.closest('button')) {
-                                  openEditTask(task);
+                                  if (e.shiftKey) {
+                                    setSelectedTaskId(task.id);
+                                  } else {
+                                    openEditTask(task);
+                                  }
                                 }
                               }}
                               onContextMenu={(e) => handleContextMenu(e, task.id)}
-                              className={`group kanban-card bg-gradient-to-br from-gray-900/60 to-gray-900/40 backdrop-blur-md border border-gray-700/50 rounded-xl p-5 hover:border-gray-600/70 hover:from-gray-900/70 hover:to-gray-900/50 transition-all duration-300 cursor-pointer hover:shadow-xl hover:shadow-primary-500/20 hover:scale-[1.02] ${getPriorityBorderClass(task.priority)} ${
+                              className={`group kanban-card bg-gradient-to-br from-gray-900/60 to-gray-900/40 backdrop-blur-md border rounded-xl p-5 hover:from-gray-900/70 hover:to-gray-900/50 transition-all duration-300 cursor-pointer hover:shadow-xl hover:shadow-primary-500/20 hover:scale-[1.02] ${getPriorityBorderClass(task.priority)} ${
                                 task.completed ? 'opacity-75' : ''
+                              } ${
+                                selectedTaskId === task.id
+                                  ? 'border-primary-500/80 shadow-lg shadow-primary-500/30 ring-2 ring-primary-500/50'
+                                  : 'border-gray-700/50 hover:border-gray-600/70'
                               }`}
                             >
                               {/* Task Header */}
@@ -3285,9 +3428,32 @@ const TasksPage = () => {
 
                               {/* Task Content */}
                               <div className="mb-3">
-                                <h4 className={`font-bold text-lg mb-1 ${task.completed ? 'line-through text-gray-500' : 'text-white'}`}>
-                                  {task.title}
-                                </h4>
+                                {inlineEditingTaskId === task.id ? (
+                                  <input
+                                    type="text"
+                                    value={inlineEditTitle}
+                                    onChange={(e) => setInlineEditTitle(e.target.value)}
+                                    onBlur={saveInlineEdit}
+                                    onKeyDown={(e) => {
+                                      if (e.key === 'Enter') saveInlineEdit();
+                                      if (e.key === 'Escape') cancelInlineEdit();
+                                    }}
+                                    className="w-full font-bold text-lg mb-1 bg-gray-800 border border-primary-500 rounded px-2 py-1 text-white focus:outline-none focus:ring-2 focus:ring-primary-500/50"
+                                    autoFocus
+                                    onClick={(e) => e.stopPropagation()}
+                                  />
+                                ) : (
+                                  <h4
+                                    className={`font-bold text-lg mb-1 cursor-text ${task.completed ? 'line-through text-gray-500' : 'text-white'}`}
+                                    onDoubleClick={(e) => {
+                                      e.stopPropagation();
+                                      startInlineEditing(task.id, task.title);
+                                    }}
+                                    title="Double-click para editar"
+                                  >
+                                    {task.title}
+                                  </h4>
+                                )}
                                 {task.description && (
                                   <p className="text-sm text-gray-400 line-clamp-2">{task.description}</p>
                                 )}
@@ -3421,12 +3587,20 @@ const TasksPage = () => {
                         onDragStart={(e) => handleDragStart(e, task.id, column.id)}
                         onClick={(e) => {
                           if (e.target instanceof HTMLElement && !e.target.closest('button')) {
-                            openEditTask(task);
+                            if (e.shiftKey) {
+                              setSelectedTaskId(task.id);
+                            } else {
+                              openEditTask(task);
+                            }
                           }
                         }}
                         onContextMenu={(e) => handleContextMenu(e, task.id)}
-                        className={`group kanban-card bg-gradient-to-br from-gray-900/60 to-gray-900/40 backdrop-blur-md border border-gray-700/50 rounded-xl p-5 hover:border-gray-600/70 hover:from-gray-900/70 hover:to-gray-900/50 transition-all duration-300 cursor-pointer hover:shadow-xl hover:shadow-primary-500/20 hover:scale-[1.02] ${getPriorityBorderClass(task.priority)} ${
+                        className={`group kanban-card bg-gradient-to-br from-gray-900/60 to-gray-900/40 backdrop-blur-md border rounded-xl p-5 hover:from-gray-900/70 hover:to-gray-900/50 transition-all duration-300 cursor-pointer hover:shadow-xl hover:shadow-primary-500/20 hover:scale-[1.02] ${getPriorityBorderClass(task.priority)} ${
                           task.completed ? 'opacity-75' : ''
+                        } ${
+                          selectedTaskId === task.id
+                            ? 'border-primary-500/80 shadow-lg shadow-primary-500/30 ring-2 ring-primary-500/50'
+                            : 'border-gray-700/50 hover:border-gray-600/70'
                         }`}
                       >
                         {/* Same task rendering as above - keeping original code */}
@@ -3474,9 +3648,32 @@ const TasksPage = () => {
                           </div>
                         </div>
                         <div className="mb-3">
-                          <h4 className={`font-bold text-lg mb-1 ${task.completed ? 'line-through text-gray-500' : 'text-white'}`}>
-                            {task.title}
-                          </h4>
+                          {inlineEditingTaskId === task.id ? (
+                            <input
+                              type="text"
+                              value={inlineEditTitle}
+                              onChange={(e) => setInlineEditTitle(e.target.value)}
+                              onBlur={saveInlineEdit}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') saveInlineEdit();
+                                if (e.key === 'Escape') cancelInlineEdit();
+                              }}
+                              className="w-full font-bold text-lg mb-1 bg-gray-800 border border-primary-500 rounded px-2 py-1 text-white focus:outline-none focus:ring-2 focus:ring-primary-500/50"
+                              autoFocus
+                              onClick={(e) => e.stopPropagation()}
+                            />
+                          ) : (
+                            <h4
+                              className={`font-bold text-lg mb-1 cursor-text ${task.completed ? 'line-through text-gray-500' : 'text-white'}`}
+                              onDoubleClick={(e) => {
+                                e.stopPropagation();
+                                startInlineEditing(task.id, task.title);
+                              }}
+                              title="Double-click para editar"
+                            >
+                              {task.title}
+                            </h4>
+                          )}
                           {task.description && (
                             <p className="text-sm text-gray-400 line-clamp-2">{task.description}</p>
                           )}
@@ -3615,12 +3812,20 @@ const TasksPage = () => {
                     onClick={(e) => {
                       // Avoid opening when clicking on buttons or when dragging
                       if (e.target instanceof HTMLElement && !e.target.closest('button')) {
-                        openEditTask(task);
+                        if (e.shiftKey) {
+                          setSelectedTaskId(task.id);
+                        } else {
+                          openEditTask(task);
+                        }
                       }
                     }}
                     onContextMenu={(e) => handleContextMenu(e, task.id)}
-                    className={`group kanban-card bg-gradient-to-br from-gray-900/60 to-gray-900/40 backdrop-blur-md border border-gray-700/50 rounded-xl p-5 hover:border-gray-600/70 hover:from-gray-900/70 hover:to-gray-900/50 transition-all duration-300 cursor-pointer hover:shadow-xl hover:shadow-primary-500/20 hover:scale-[1.02] ${getPriorityBorderClass(task.priority)} ${
+                    className={`group kanban-card bg-gradient-to-br from-gray-900/60 to-gray-900/40 backdrop-blur-md border rounded-xl p-5 hover:from-gray-900/70 hover:to-gray-900/50 transition-all duration-300 cursor-pointer hover:shadow-xl hover:shadow-primary-500/20 hover:scale-[1.02] ${getPriorityBorderClass(task.priority)} ${
                       task.completed ? 'opacity-75' : ''
+                    } ${
+                      selectedTaskId === task.id
+                        ? 'border-primary-500/80 shadow-lg shadow-primary-500/30 ring-2 ring-primary-500/50'
+                        : 'border-gray-700/50 hover:border-gray-600/70'
                     }`}
                   >
                     {/* Task Header */}
@@ -3670,9 +3875,32 @@ const TasksPage = () => {
 
                     {/* Task Content */}
                     <div className="mb-3">
-                      <h4 className={`font-bold text-lg mb-1 ${task.completed ? 'line-through text-gray-500' : 'text-white'}`}>
-                        {task.title}
-                      </h4>
+                      {inlineEditingTaskId === task.id ? (
+                        <input
+                          type="text"
+                          value={inlineEditTitle}
+                          onChange={(e) => setInlineEditTitle(e.target.value)}
+                          onBlur={saveInlineEdit}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') saveInlineEdit();
+                            if (e.key === 'Escape') cancelInlineEdit();
+                          }}
+                          className="w-full font-bold text-lg mb-1 bg-gray-800 border border-primary-500 rounded px-2 py-1 text-white focus:outline-none focus:ring-2 focus:ring-primary-500/50"
+                          autoFocus
+                          onClick={(e) => e.stopPropagation()}
+                        />
+                      ) : (
+                        <h4
+                          className={`font-bold text-lg mb-1 cursor-text ${task.completed ? 'line-through text-gray-500' : 'text-white'}`}
+                          onDoubleClick={(e) => {
+                            e.stopPropagation();
+                            startInlineEditing(task.id, task.title);
+                          }}
+                          title="Double-click para editar"
+                        >
+                          {task.title}
+                        </h4>
+                      )}
                       {task.description && (
                         <p className="text-sm text-gray-400 line-clamp-2">{task.description}</p>
                       )}
