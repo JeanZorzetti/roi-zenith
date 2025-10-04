@@ -211,7 +211,7 @@ Plano de implementação incremental de melhorias de UI/UX baseado nas melhores 
 
 ---
 
-## 📅 Sprint 7: WIP Limits & Workflow Metrics
+## 📅 Sprint 7: WIP Limits & Workflow Metrics ✅
 **Duração estimada:** 4-5 dias
 **Impacto:** Médio | **Complexidade:** Média
 
@@ -221,22 +221,22 @@ Plano de implementação incremental de melhorias de UI/UX baseado nas melhores 
 - Tracking de tempo em coluna
 
 ### Tarefas
-- [ ] WIP limits configuráveis:
+- [x] 👌 WIP limits configuráveis:
   - Setting por coluna (número máximo)
   - Progress ring visual no header
   - Alerta quando atingir limite (borda vermelha pulsante)
   - Bloqueio opcional de novos cards
-- [ ] Task age indicator:
+- [x] 👌 Task age indicator:
   - Calcular tempo desde criação/movimento
   - Cores progressivas (verde → amarelo → vermelho)
   - Badge com dias no card
   - Pulsating border para tasks antigas
-- [ ] Column metrics:
+- [x] 👌 Column metrics:
   - Total tasks
   - Tasks this week
   - Avg time in column
   - Completion rate
-- [ ] Mini dashboard no header do board:
+- [x] 👌 Mini dashboard no header do board:
   - Cards totais
   - Cards concluídos hoje/semana
   - Velocity (tasks/dia)

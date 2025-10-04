@@ -29,7 +29,13 @@ import {
   Upload,
   FolderPlus,
   LayoutGrid,
-  List
+  List,
+  Gauge,
+  BarChart3,
+  TrendingUp,
+  Target,
+  Zap,
+  AlertTriangle
 } from 'lucide-react';
 import { useSocket } from '@/hooks/useSocket';
 import { ActivityFeed } from '@/components/ActivityFeed';
@@ -56,6 +62,7 @@ interface Task {
   columnId?: string;
   subColumnId?: string | null;
   position?: number;
+  movedToColumnAt?: string;
 }
 
 interface SubColumn {
@@ -75,6 +82,8 @@ interface Column {
   subColumns?: SubColumn[];
   position?: number;
   boardId?: string;
+  wipLimit?: number;
+  enforceWipLimit?: boolean;
 }
 
 interface BoardMember {
@@ -2112,6 +2121,15 @@ const TasksPage = () => {
   const [filterTags, setFilterTags] = useState<string[]>([]);
   const [viewMode, setViewMode] = useState<'kanban' | 'list'>('kanban');
 
+  // WIP Limit modal state
+  const [showWipLimitModal, setShowWipLimitModal] = useState(false);
+  const [wipLimitColumnId, setWipLimitColumnId] = useState<string | null>(null);
+  const [wipLimitValue, setWipLimitValue] = useState<number>(0);
+  const [enforceWipLimit, setEnforceWipLimit] = useState(false);
+
+  // Column metrics expanded state
+  const [expandedMetricsColumnId, setExpandedMetricsColumnId] = useState<string | null>(null);
+
   // Filter tasks based on search and filters
   const filterTask = (task: Task): boolean => {
     // Search filter
@@ -2714,7 +2732,7 @@ const TasksPage = () => {
                 // Add to target
                 return {
                   ...col,
-                  tasks: [...col.tasks, { ...movedTask, columnId: targetColumnId }]
+                  tasks: [...col.tasks, { ...movedTask, columnId: targetColumnId, movedToColumnAt: new Date().toISOString() }]
                 };
               }
               return col;
@@ -2938,6 +2956,134 @@ const TasksPage = () => {
     if (progress >= 50) return 'bg-gradient-to-r from-yellow-500 to-orange-500';
     if (progress >= 25) return 'bg-gradient-to-r from-orange-500 to-red-500';
     return 'bg-gradient-to-r from-gray-500 to-gray-600';
+  };
+
+  // WIP Limit functions
+  const openWipLimitModal = (columnId: string) => {
+    const column = columns.find(c => c.id === columnId);
+    if (column) {
+      setWipLimitColumnId(columnId);
+      setWipLimitValue(column.wipLimit || 0);
+      setEnforceWipLimit(column.enforceWipLimit || false);
+      setShowWipLimitModal(true);
+    }
+  };
+
+  const saveWipLimit = () => {
+    if (!wipLimitColumnId) return;
+
+    setBoards(prevBoards =>
+      prevBoards.map(board =>
+        board.id === currentBoardId
+          ? {
+              ...board,
+              columns: board.columns.map(col =>
+                col.id === wipLimitColumnId
+                  ? { ...col, wipLimit: wipLimitValue > 0 ? wipLimitValue : undefined, enforceWipLimit }
+                  : col
+              ),
+            }
+          : board
+      )
+    );
+
+    setShowWipLimitModal(false);
+    setWipLimitColumnId(null);
+  };
+
+  const getWipLimitPercentage = (column: Column): number => {
+    if (!column.wipLimit) return 0;
+    return Math.min((column.tasks.length / column.wipLimit) * 100, 100);
+  };
+
+  const isWipLimitExceeded = (column: Column): boolean => {
+    if (!column.wipLimit) return false;
+    return column.tasks.length >= column.wipLimit;
+  };
+
+  // Task Age functions
+  const getTaskAgeDays = (task: Task): number => {
+    const ageStart = task.movedToColumnAt || task.createdAt;
+    const diffMs = new Date().getTime() - new Date(ageStart).getTime();
+    return Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  };
+
+  const getTaskAgeColor = (days: number) => {
+    if (days <= 2) return { bg: 'bg-green-500/20', text: 'text-green-400', border: 'border-green-500/50' };
+    if (days <= 5) return { bg: 'bg-yellow-500/20', text: 'text-yellow-400', border: 'border-yellow-500/50' };
+    if (days <= 10) return { bg: 'bg-orange-500/20', text: 'text-orange-400', border: 'border-orange-500/50' };
+    return { bg: 'bg-red-500/20', text: 'text-red-400', border: 'border-red-500/50' };
+  };
+
+  const isTaskOld = (task: Task): boolean => {
+    return getTaskAgeDays(task) > 7;
+  };
+
+  // Column Metrics functions
+  const getColumnMetrics = (column: Column) => {
+    const now = new Date();
+    const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+    const tasksThisWeek = column.tasks.filter(task => {
+      const taskDate = new Date(task.movedToColumnAt || task.createdAt);
+      return taskDate >= oneWeekAgo;
+    }).length;
+
+    const completedTasks = column.tasks.filter(task => task.completed).length;
+    const completionRate = column.tasks.length > 0
+      ? Math.round((completedTasks / column.tasks.length) * 100)
+      : 0;
+
+    const avgTimeInColumn = column.tasks.length > 0
+      ? Math.round(column.tasks.reduce((acc, task) => acc + getTaskAgeDays(task), 0) / column.tasks.length)
+      : 0;
+
+    return {
+      total: column.tasks.length,
+      thisWeek: tasksThisWeek,
+      avgTime: avgTimeInColumn,
+      completionRate
+    };
+  };
+
+  // Board Dashboard Metrics
+  const getBoardDashboardMetrics = () => {
+    const currentBoard = boards.find(b => b.id === currentBoardId);
+    if (!currentBoard) return null;
+
+    const allTasks = currentBoard.columns.flatMap(col => col.tasks);
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+    const completedToday = allTasks.filter(task => {
+      if (!task.completed) return false;
+      const taskDate = new Date(task.movedToColumnAt || task.createdAt);
+      return taskDate >= today;
+    }).length;
+
+    const completedThisWeek = allTasks.filter(task => {
+      if (!task.completed) return false;
+      const taskDate = new Date(task.movedToColumnAt || task.createdAt);
+      return taskDate >= oneWeekAgo;
+    }).length;
+
+    const velocity = completedThisWeek / 7;
+
+    // Detect bottlenecks (columns with high avg time and many tasks)
+    const bottlenecks = currentBoard.columns.filter(col => {
+      const metrics = getColumnMetrics(col);
+      return col.tasks.length > 3 && metrics.avgTime > 5;
+    });
+
+    return {
+      total: allTasks.length,
+      completedToday,
+      completedThisWeek,
+      velocity: Math.round(velocity * 10) / 10,
+      bottleneckCount: bottlenecks.length,
+      bottleneckNames: bottlenecks.map(col => col.title)
+    };
   };
 
   const getDueDateStatus = (dueDate: string | null) => {
@@ -3360,17 +3506,60 @@ const TasksPage = () => {
               </button>
             </div>
 
-            {/* Task Count Badge */}
-            <div className="flex items-center space-x-2 px-4 py-2 bg-gray-700/30 border border-gray-600/50 rounded-lg">
-              <span className="text-xs text-gray-400">Total de tasks:</span>
-              <span className="text-sm font-bold text-white">
-                {boards.find(b => b.id === currentBoardId)?.columns.reduce((total, col) => {
-                  let count = col.tasks.length;
-                  col.subColumns?.forEach(sub => count += (sub.tasks?.length || 0));
-                  return total + count;
-                }, 0) || 0}
-              </span>
-            </div>
+            {/* Mini Dashboard */}
+            {(() => {
+              const metrics = getBoardDashboardMetrics();
+              if (!metrics) return null;
+
+              return (
+                <div className="flex items-center space-x-3 px-4 py-2 bg-gradient-to-r from-purple-900/20 to-blue-900/20 border border-purple-500/30 rounded-lg backdrop-blur-md">
+                  <div className="flex items-center space-x-2">
+                    <Target className="h-4 w-4 text-purple-400" />
+                    <div>
+                      <div className="text-xs text-gray-400">Total</div>
+                      <div className="text-sm font-bold text-white">{metrics.total}</div>
+                    </div>
+                  </div>
+                  <div className="w-px h-8 bg-gray-600"></div>
+                  <div className="flex items-center space-x-2">
+                    <CheckCircle2 className="h-4 w-4 text-green-400" />
+                    <div>
+                      <div className="text-xs text-gray-400">Hoje</div>
+                      <div className="text-sm font-bold text-white">{metrics.completedToday}</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <TrendingUp className="h-4 w-4 text-blue-400" />
+                    <div>
+                      <div className="text-xs text-gray-400">Semana</div>
+                      <div className="text-sm font-bold text-white">{metrics.completedThisWeek}</div>
+                    </div>
+                  </div>
+                  <div className="w-px h-8 bg-gray-600"></div>
+                  <div className="flex items-center space-x-2">
+                    <Zap className="h-4 w-4 text-yellow-400" />
+                    <div>
+                      <div className="text-xs text-gray-400">Velocity</div>
+                      <div className="text-sm font-bold text-white">{metrics.velocity}/dia</div>
+                    </div>
+                  </div>
+                  {metrics.bottleneckCount > 0 && (
+                    <>
+                      <div className="w-px h-8 bg-gray-600"></div>
+                      <div className="flex items-center space-x-2">
+                        <AlertTriangle className="h-4 w-4 text-red-400 animate-pulse" />
+                        <div>
+                          <div className="text-xs text-gray-400">Bottlenecks</div>
+                          <div className="text-sm font-bold text-red-400" title={metrics.bottleneckNames.join(', ')}>
+                            {metrics.bottleneckCount}
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+              );
+            })()}
           </div>
         </div>
       </div>
@@ -3511,7 +3700,11 @@ const TasksPage = () => {
           >
             {/* Column Header */}
             <div
-              className="flex items-center justify-between mb-4 cursor-move p-3 rounded-xl bg-gradient-to-r from-gray-800/60 via-gray-800/40 to-gray-800/60 backdrop-blur-md border border-white/10 hover:border-white/20 transition-all duration-300 shadow-lg"
+              className={`flex items-center justify-between mb-4 cursor-move p-3 rounded-xl bg-gradient-to-r from-gray-800/60 via-gray-800/40 to-gray-800/60 backdrop-blur-md border transition-all duration-300 shadow-lg ${
+                isWipLimitExceeded(column)
+                  ? 'border-red-500/50 hover:border-red-500/70 animate-pulse'
+                  : 'border-white/10 hover:border-white/20'
+              }`}
               draggable
               onDragStart={(e) => handleColumnDragStart(e, column.id)}
             >
@@ -3546,7 +3739,40 @@ const TasksPage = () => {
                 )}
                 <span className="bg-gradient-to-br from-gray-700/60 to-gray-800/60 backdrop-blur-sm text-gray-300 px-2.5 py-1 rounded-lg text-xs font-bold border border-white/10 shadow-sm">
                   {column.tasks.length}
+                  {column.wipLimit && <span className="text-gray-500">/{column.wipLimit}</span>}
                 </span>
+                {column.wipLimit && (
+                  <div className="relative w-8 h-8">
+                    <svg className="w-8 h-8 transform -rotate-90">
+                      <circle
+                        cx="16"
+                        cy="16"
+                        r="12"
+                        stroke="currentColor"
+                        strokeWidth="3"
+                        fill="none"
+                        className="text-gray-700"
+                      />
+                      <circle
+                        cx="16"
+                        cy="16"
+                        r="12"
+                        stroke="currentColor"
+                        strokeWidth="3"
+                        fill="none"
+                        strokeDasharray={`${2 * Math.PI * 12}`}
+                        strokeDashoffset={`${2 * Math.PI * 12 * (1 - getWipLimitPercentage(column) / 100)}`}
+                        className={`transition-all duration-300 ${
+                          isWipLimitExceeded(column)
+                            ? 'text-red-500 animate-pulse'
+                            : getWipLimitPercentage(column) > 75
+                            ? 'text-yellow-500'
+                            : 'text-green-500'
+                        }`}
+                      />
+                    </svg>
+                  </div>
+                )}
               </div>
               <div className="flex items-center space-x-1">
                 <button
@@ -3576,6 +3802,20 @@ const TasksPage = () => {
                     >
                       <FolderPlus className="h-4 w-4 transition-transform duration-200 hover:scale-110" />
                     </button>
+                    <button
+                      onClick={() => openWipLimitModal(column.id)}
+                      className="p-1 rounded-lg text-gray-400 hover:text-orange-400 hover:bg-gray-800/50 transition-all duration-200 hover:scale-110 active:scale-95"
+                      title="Configurar WIP Limit"
+                    >
+                      <Gauge className="h-4 w-4 transition-transform duration-200 hover:scale-110" />
+                    </button>
+                    <button
+                      onClick={() => setExpandedMetricsColumnId(expandedMetricsColumnId === column.id ? null : column.id)}
+                      className="p-1 rounded-lg text-gray-400 hover:text-cyan-400 hover:bg-gray-800/50 transition-all duration-200 hover:scale-110 active:scale-95"
+                      title="Ver métricas"
+                    >
+                      <BarChart3 className="h-4 w-4 transition-transform duration-200 hover:scale-110" />
+                    </button>
                   </>
                 )}
                 {columns.length > 1 && (
@@ -3589,6 +3829,45 @@ const TasksPage = () => {
                 )}
               </div>
             </div>
+
+            {/* Column Metrics Panel */}
+            {expandedMetricsColumnId === column.id && (() => {
+              const metrics = getColumnMetrics(column);
+              return (
+                <div className="mb-3 p-3 bg-gradient-to-br from-cyan-900/20 to-blue-900/20 border border-cyan-500/30 rounded-xl backdrop-blur-md">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="flex items-center space-x-2">
+                      <Target className="h-4 w-4 text-cyan-400" />
+                      <div>
+                        <div className="text-xs text-gray-400">Total</div>
+                        <div className="text-sm font-bold text-white">{metrics.total}</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <TrendingUp className="h-4 w-4 text-green-400" />
+                      <div>
+                        <div className="text-xs text-gray-400">Esta semana</div>
+                        <div className="text-sm font-bold text-white">{metrics.thisWeek}</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Clock className="h-4 w-4 text-yellow-400" />
+                      <div>
+                        <div className="text-xs text-gray-400">Tempo médio</div>
+                        <div className="text-sm font-bold text-white">{metrics.avgTime}d</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <CheckCircle2 className="h-4 w-4 text-purple-400" />
+                      <div>
+                        <div className="text-xs text-gray-400">Taxa conclusão</div>
+                        <div className="text-sm font-bold text-white">{metrics.completionRate}%</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* Tasks or SubColumns (Accordion) */}
             <div className="space-y-3 min-h-[200px]">
@@ -3681,6 +3960,8 @@ const TasksPage = () => {
                                 selectedTaskId === task.id
                                   ? 'border-primary-500/80 shadow-lg shadow-primary-500/30 ring-2 ring-primary-500/50'
                                   : 'border-gray-700/50 hover:border-gray-600/70'
+                              } ${
+                                isTaskOld(task) ? 'animate-pulse' : ''
                               }`}
                             >
                               {/* Task Header */}
@@ -3840,6 +4121,20 @@ const TasksPage = () => {
                                 </div>
                               )}
 
+                              {/* Task Age Indicator */}
+                              {(() => {
+                                const ageDays = getTaskAgeDays(task);
+                                const ageColor = getTaskAgeColor(ageDays);
+                                return (
+                                  <div className={`flex items-center space-x-1.5 px-2 py-1 rounded-md border mb-3 ${ageColor.bg} ${ageColor.border}`}>
+                                    <Clock className={`h-3 w-3 ${ageColor.text}`} />
+                                    <span className={`text-xs font-medium ${ageColor.text}`}>
+                                      {ageDays === 0 ? 'Hoje' : ageDays === 1 ? '1 dia' : `${ageDays} dias`}
+                                    </span>
+                                  </div>
+                                );
+                              })()}
+
                               {/* Task Footer */}
                               <div className="flex items-center justify-between text-xs text-gray-400">
                                 <div className="flex items-center space-x-3">
@@ -3906,6 +4201,8 @@ const TasksPage = () => {
                           selectedTaskId === task.id
                             ? 'border-primary-500/80 shadow-lg shadow-primary-500/30 ring-2 ring-primary-500/50'
                             : 'border-gray-700/50 hover:border-gray-600/70'
+                        } ${
+                          isTaskOld(task) ? 'animate-pulse' : ''
                         }`}
                       >
                         {/* Same task rendering as above - keeping original code */}
@@ -4071,6 +4368,21 @@ const TasksPage = () => {
                             })}
                           </div>
                         )}
+
+                        {/* Task Age Indicator */}
+                        {(() => {
+                          const ageDays = getTaskAgeDays(task);
+                          const ageColor = getTaskAgeColor(ageDays);
+                          return (
+                            <div className={`flex items-center space-x-1.5 px-2 py-1 rounded-md border mb-3 ${ageColor.bg} ${ageColor.border}`}>
+                              <Clock className={`h-3 w-3 ${ageColor.text}`} />
+                              <span className={`text-xs font-medium ${ageColor.text}`}>
+                                {ageDays === 0 ? 'Hoje' : ageDays === 1 ? '1 dia' : `${ageDays} dias`}
+                              </span>
+                            </div>
+                          );
+                        })()}
+
                         <div className="flex items-center justify-between text-xs text-gray-400">
                           <div className="flex items-center space-x-3">
                             {task.assignee && (
@@ -4442,6 +4754,78 @@ const TasksPage = () => {
               >
                 <Save className="h-4 w-4" />
                 <span>{editingBoard ? 'Salvar' : 'Criar'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* WIP Limit Modal */}
+      {showWipLimitModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-gray-900 rounded-2xl border border-gray-700 p-6 w-full max-w-md">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold text-white">
+                Configurar WIP Limit
+              </h3>
+              <button
+                onClick={() => setShowWipLimitModal(false)}
+                className="p-1 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Limite de WIP (Work In Progress)
+                </label>
+                <p className="text-xs text-gray-500 mb-3">
+                  Define o número máximo de tarefas permitidas nesta coluna. Defina como 0 para desabilitar.
+                </p>
+                <input
+                  type="number"
+                  min="0"
+                  value={wipLimitValue}
+                  onChange={(e) => setWipLimitValue(parseInt(e.target.value) || 0)}
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-primary-500"
+                  placeholder="Ex: 5"
+                />
+              </div>
+
+              <div className="flex items-start space-x-3">
+                <input
+                  type="checkbox"
+                  id="enforceWipLimit"
+                  checked={enforceWipLimit}
+                  onChange={(e) => setEnforceWipLimit(e.target.checked)}
+                  className="mt-1 w-4 h-4 bg-gray-800 border-gray-700 rounded focus:ring-primary-500"
+                />
+                <div className="flex-1">
+                  <label htmlFor="enforceWipLimit" className="text-sm font-medium text-gray-300 cursor-pointer">
+                    Bloquear novos cards ao atingir limite
+                  </label>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Impede a adição de novas tarefas quando o limite for atingido.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end space-x-3 mt-6">
+              <button
+                onClick={() => setShowWipLimitModal(false)}
+                className="px-4 py-2 text-gray-400 hover:text-white transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={saveWipLimit}
+                className="flex items-center space-x-2 bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-500 hover:to-secondary-500 px-4 py-2 rounded-lg text-white transition-all duration-300"
+              >
+                <Save className="h-4 w-4" />
+                <span>Salvar</span>
               </button>
             </div>
           </div>
