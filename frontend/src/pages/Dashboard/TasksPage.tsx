@@ -2974,10 +2974,10 @@ const TasksPage = () => {
               <div className="flex items-center space-x-1">
                 <button
                   onClick={() => startEditingColumn(column.id, column.title)}
-                  className="p-1 rounded-lg text-gray-400 hover:text-blue-400 hover:bg-gray-800/50 transition-colors"
+                  className="p-1 rounded-lg text-gray-400 hover:text-blue-400 hover:bg-gray-800/50 transition-all duration-200 hover:scale-110 active:scale-95"
                   title="Editar título da coluna"
                 >
-                  <Edit3 className="h-4 w-4" />
+                  <Edit3 className="h-4 w-4 transition-transform duration-200 hover:rotate-12" />
                 </button>
                 {canEdit() && (
                   <>
@@ -2987,27 +2987,27 @@ const TasksPage = () => {
                         setTargetColumnId(column.id);
                         setShowTaskModal(true);
                       }}
-                      className="p-1 rounded-lg text-gray-400 hover:text-green-400 hover:bg-gray-800/50 transition-colors"
+                      className="p-1 rounded-lg text-gray-400 hover:text-green-400 hover:bg-gray-800/50 transition-all duration-200 hover:scale-110 active:scale-95"
                       title="Adicionar tarefa aqui"
                     >
-                      <Plus className="h-4 w-4" />
+                      <Plus className="h-4 w-4 transition-transform duration-200 hover:rotate-90" />
                     </button>
                     <button
                       onClick={() => createSubColumn(column.id)}
-                      className="p-1 rounded-lg text-gray-400 hover:text-purple-400 hover:bg-gray-800/50 transition-colors"
+                      className="p-1 rounded-lg text-gray-400 hover:text-purple-400 hover:bg-gray-800/50 transition-all duration-200 hover:scale-110 active:scale-95"
                       title="Adicionar subcoluna"
                     >
-                      <FolderPlus className="h-4 w-4" />
+                      <FolderPlus className="h-4 w-4 transition-transform duration-200 hover:scale-110" />
                     </button>
                   </>
                 )}
                 {columns.length > 1 && (
                   <button
                     onClick={() => deleteColumn(column.id)}
-                    className="p-1 rounded-lg text-gray-400 hover:text-red-400 hover:bg-gray-800/50 transition-colors"
+                    className="p-1 rounded-lg text-gray-400 hover:text-red-400 hover:bg-gray-800/50 transition-all duration-200 hover:scale-110 active:scale-95"
                     title="Excluir coluna"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash2 className="h-4 w-4 transition-transform duration-200 hover:scale-110" />
                   </button>
                 )}
               </div>
@@ -3090,7 +3090,7 @@ const TasksPage = () => {
                                   openEditTask(task);
                                 }
                               }}
-                              className={`kanban-card bg-gradient-to-br from-gray-900/60 to-gray-900/40 backdrop-blur-md border border-gray-700/50 rounded-xl p-5 hover:border-gray-600/70 hover:from-gray-900/70 hover:to-gray-900/50 transition-all duration-300 cursor-pointer hover:shadow-xl hover:shadow-primary-500/20 hover:scale-[1.02] ${getPriorityBorderClass(task.priority)} ${
+                              className={`group kanban-card bg-gradient-to-br from-gray-900/60 to-gray-900/40 backdrop-blur-md border border-gray-700/50 rounded-xl p-5 hover:border-gray-600/70 hover:from-gray-900/70 hover:to-gray-900/50 transition-all duration-300 cursor-pointer hover:shadow-xl hover:shadow-primary-500/20 hover:scale-[1.02] ${getPriorityBorderClass(task.priority)} ${
                                 task.completed ? 'opacity-75' : ''
                               }`}
                             >
@@ -3099,12 +3099,12 @@ const TasksPage = () => {
                                 <div className="flex items-center space-x-2">
                                   <button
                                     onClick={() => toggleTaskCompletion(task.id)}
-                                    className="hover:scale-110 transition-transform"
+                                    className="hover:scale-125 active:scale-95 transition-all duration-200 group"
                                   >
                                     {task.completed ? (
-                                      <CheckCircle2 className="h-4 w-4 text-green-400 flex-shrink-0" />
+                                      <CheckCircle2 className="h-4 w-4 text-green-400 flex-shrink-0 animate-pulse" />
                                     ) : (
-                                      <Circle className="h-4 w-4 text-gray-400 flex-shrink-0 hover:text-green-400" />
+                                      <Circle className="h-4 w-4 text-gray-400 flex-shrink-0 hover:text-green-400 group-hover:rotate-90 transition-all duration-300" />
                                     )}
                                   </button>
                                   <div className="flex items-center space-x-2">
@@ -3114,18 +3114,18 @@ const TasksPage = () => {
                                     )}
                                   </div>
                                 </div>
-                                <div className="flex items-center space-x-1">
+                                <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                                   <button
                                     onClick={() => openEditTask(task)}
-                                    className="p-1 rounded text-gray-400 hover:text-blue-400 transition-colors"
+                                    className="p-1 rounded text-gray-400 hover:text-blue-400 hover:bg-blue-500/10 transition-all duration-200 hover:scale-110 active:scale-95"
                                   >
-                                    <Edit3 className="h-3 w-3" />
+                                    <Edit3 className="h-3 w-3 transition-transform duration-200 hover:rotate-12" />
                                   </button>
                                   <button
                                     onClick={() => deleteTask(task.id)}
-                                    className="p-1 rounded text-gray-400 hover:text-red-400 transition-colors"
+                                    className="p-1 rounded text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200 hover:scale-110 active:scale-95"
                                   >
-                                    <Trash2 className="h-3 w-3" />
+                                    <Trash2 className="h-3 w-3 transition-transform duration-200 hover:scale-110" />
                                   </button>
                                 </div>
                               </div>
@@ -3271,7 +3271,7 @@ const TasksPage = () => {
                             openEditTask(task);
                           }
                         }}
-                        className={`kanban-card bg-gradient-to-br from-gray-900/60 to-gray-900/40 backdrop-blur-md border border-gray-700/50 rounded-xl p-5 hover:border-gray-600/70 hover:from-gray-900/70 hover:to-gray-900/50 transition-all duration-300 cursor-pointer hover:shadow-xl hover:shadow-primary-500/20 hover:scale-[1.02] ${getPriorityBorderClass(task.priority)} ${
+                        className={`group kanban-card bg-gradient-to-br from-gray-900/60 to-gray-900/40 backdrop-blur-md border border-gray-700/50 rounded-xl p-5 hover:border-gray-600/70 hover:from-gray-900/70 hover:to-gray-900/50 transition-all duration-300 cursor-pointer hover:shadow-xl hover:shadow-primary-500/20 hover:scale-[1.02] ${getPriorityBorderClass(task.priority)} ${
                           task.completed ? 'opacity-75' : ''
                         }`}
                       >
@@ -3280,12 +3280,12 @@ const TasksPage = () => {
                           <div className="flex items-center space-x-2">
                             <button
                               onClick={() => toggleTaskCompletion(task.id)}
-                              className="hover:scale-110 transition-transform"
+                              className="hover:scale-125 active:scale-95 transition-all duration-200 group"
                             >
                               {task.completed ? (
-                                <CheckCircle2 className="h-4 w-4 text-green-400 flex-shrink-0" />
+                                <CheckCircle2 className="h-4 w-4 text-green-400 flex-shrink-0 animate-pulse" />
                               ) : (
-                                <Circle className="h-4 w-4 text-gray-400 flex-shrink-0 hover:text-green-400" />
+                                <Circle className="h-4 w-4 text-gray-400 flex-shrink-0 hover:text-green-400 group-hover:rotate-90 transition-all duration-300" />
                               )}
                             </button>
                             <div className="flex items-center space-x-2">
@@ -3295,18 +3295,18 @@ const TasksPage = () => {
                               )}
                             </div>
                           </div>
-                          <div className="flex items-center space-x-1">
+                          <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                             <button
                               onClick={() => openEditTask(task)}
-                              className="p-1 rounded text-gray-400 hover:text-blue-400 transition-colors"
+                              className="p-1 rounded text-gray-400 hover:text-blue-400 hover:bg-blue-500/10 transition-all duration-200 hover:scale-110 active:scale-95"
                             >
-                              <Edit3 className="h-3 w-3" />
+                              <Edit3 className="h-3 w-3 transition-transform duration-200 hover:rotate-12" />
                             </button>
                             <button
                               onClick={() => deleteTask(task.id)}
-                              className="p-1 rounded text-gray-400 hover:text-red-400 transition-colors"
+                              className="p-1 rounded text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200 hover:scale-110 active:scale-95"
                             >
-                              <Trash2 className="h-3 w-3" />
+                              <Trash2 className="h-3 w-3 transition-transform duration-200 hover:scale-110" />
                             </button>
                           </div>
                         </div>
@@ -3455,21 +3455,21 @@ const TasksPage = () => {
                         openEditTask(task);
                       }
                     }}
-                    className={`kanban-card bg-gradient-to-br from-gray-900/60 to-gray-900/40 backdrop-blur-md border border-gray-700/50 rounded-xl p-5 hover:border-gray-600/70 hover:from-gray-900/70 hover:to-gray-900/50 transition-all duration-300 cursor-pointer hover:shadow-xl hover:shadow-primary-500/20 hover:scale-[1.02] ${getPriorityBorderClass(task.priority)} ${
+                    className={`group kanban-card bg-gradient-to-br from-gray-900/60 to-gray-900/40 backdrop-blur-md border border-gray-700/50 rounded-xl p-5 hover:border-gray-600/70 hover:from-gray-900/70 hover:to-gray-900/50 transition-all duration-300 cursor-pointer hover:shadow-xl hover:shadow-primary-500/20 hover:scale-[1.02] ${getPriorityBorderClass(task.priority)} ${
                       task.completed ? 'opacity-75' : ''
                     }`}
                   >
                     {/* Task Header */}
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center space-x-2">
-                        <button 
+                        <button
                           onClick={() => toggleTaskCompletion(task.id)}
-                          className="hover:scale-110 transition-transform"
+                          className="hover:scale-125 active:scale-95 transition-all duration-200 group"
                         >
                           {task.completed ? (
-                            <CheckCircle2 className="h-4 w-4 text-green-400 flex-shrink-0" />
+                            <CheckCircle2 className="h-4 w-4 text-green-400 flex-shrink-0 animate-pulse" />
                           ) : (
-                            <Circle className="h-4 w-4 text-gray-400 flex-shrink-0 hover:text-green-400" />
+                            <Circle className="h-4 w-4 text-gray-400 flex-shrink-0 hover:text-green-400 group-hover:rotate-90 transition-all duration-300" />
                           )}
                         </button>
                         <div className="flex items-center space-x-2">
@@ -3479,18 +3479,18 @@ const TasksPage = () => {
                           )}
                         </div>
                       </div>
-                      <div className="flex items-center space-x-1">
-                        <button 
+                      <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                        <button
                           onClick={() => openEditTask(task)}
-                          className="p-1 rounded text-gray-400 hover:text-blue-400 transition-colors"
+                          className="p-1 rounded text-gray-400 hover:text-blue-400 hover:bg-blue-500/10 transition-all duration-200 hover:scale-110 active:scale-95"
                         >
-                          <Edit3 className="h-3 w-3" />
+                          <Edit3 className="h-3 w-3 transition-transform duration-200 hover:rotate-12" />
                         </button>
-                        <button 
+                        <button
                           onClick={() => deleteTask(task.id)}
-                          className="p-1 rounded text-gray-400 hover:text-red-400 transition-colors"
+                          className="p-1 rounded text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200 hover:scale-110 active:scale-95"
                         >
-                          <Trash2 className="h-3 w-3" />
+                          <Trash2 className="h-3 w-3 transition-transform duration-200 hover:scale-110" />
                         </button>
                       </div>
                     </div>
