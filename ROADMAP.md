@@ -138,7 +138,7 @@ Plano de implementação incremental de melhorias de UI/UX baseado nas melhores 
 - Adicionar atalhos de teclado
 
 ### Tarefas
-- [ ] Quick actions no hover do card:
+- [x] 👌 Quick actions no hover do card:
   - Edit (Pencil icon)
   - Delete (Trash icon)
   - Duplicate (Copy icon)

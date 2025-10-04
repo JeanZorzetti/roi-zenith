@@ -932,6 +932,13 @@ const TasksPage = () => {
     timestamp: Date;
   }[]>([]);
 
+  // Context menu state
+  const [contextMenu, setContextMenu] = useState<{
+    taskId: string;
+    x: number;
+    y: number;
+  } | null>(null);
+
   const showNotification = (type: 'success' | 'info' | 'warning', message: string, userName?: string) => {
     const notification = {
       id: Date.now(),
@@ -2066,6 +2073,87 @@ const TasksPage = () => {
     }
   };
 
+  // Handle context menu
+  const handleContextMenu = (e: React.MouseEvent, taskId: string) => {
+    e.preventDefault();
+    setContextMenu({
+      taskId,
+      x: e.clientX,
+      y: e.clientY
+    });
+  };
+
+  const closeContextMenu = () => {
+    setContextMenu(null);
+  };
+
+  // Close context menu when clicking outside
+  useEffect(() => {
+    const handleClick = () => closeContextMenu();
+    if (contextMenu) {
+      document.addEventListener('click', handleClick);
+      return () => document.removeEventListener('click', handleClick);
+    }
+  }, [contextMenu]);
+
+  // Move task to different column from context menu
+  const moveTaskToColumn = async (taskId: string, targetColumnId: string) => {
+    try {
+      setLoading(true);
+      const currentBoard = boards.find(b => b.id === currentBoardId);
+      if (!currentBoard) return;
+
+      // Find task in all columns and subcolumns
+      let taskToMove: Task | undefined;
+      for (const col of currentBoard.columns) {
+        taskToMove = col.tasks.find(t => t.id === taskId);
+        if (taskToMove) break;
+        if (col.subColumns) {
+          for (const subCol of col.subColumns) {
+            taskToMove = subCol.tasks?.find(t => t.id === taskId);
+            if (taskToMove) break;
+          }
+        }
+        if (taskToMove) break;
+      }
+
+      if (!taskToMove) return;
+
+      const success = await boardService.updateTask(currentBoardId, taskId, {
+        columnId: targetColumnId,
+        subColumnId: null
+      });
+
+      if (success) {
+        const reloadedBoards = await boardService.getBoards();
+        setBoards(reloadedBoards);
+      }
+    } catch (error) {
+      console.error('❌ Erro ao mover task:', error);
+    } finally {
+      setLoading(false);
+      closeContextMenu();
+    }
+  };
+
+  // Change task priority from context menu
+  const changeTaskPriority = async (taskId: string, priority: 'low' | 'medium' | 'high' | 'urgent') => {
+    try {
+      setLoading(true);
+      const success = await boardService.updateTask(currentBoardId, taskId, { priority });
+
+      if (success) {
+        const reloadedBoards = await boardService.getBoards();
+        setBoards(reloadedBoards);
+      }
+    } catch (error) {
+      console.error('❌ Erro ao mudar prioridade:', error);
+    } finally {
+      setLoading(false);
+      closeContextMenu();
+    }
+  };
+
   // Toggle task completion
   const toggleTaskCompletion = async (taskId: string) => {
     let updatedTask: Task | null = null;
@@ -3145,6 +3233,7 @@ const TasksPage = () => {
                                   openEditTask(task);
                                 }
                               }}
+                              onContextMenu={(e) => handleContextMenu(e, task.id)}
                               className={`group kanban-card bg-gradient-to-br from-gray-900/60 to-gray-900/40 backdrop-blur-md border border-gray-700/50 rounded-xl p-5 hover:border-gray-600/70 hover:from-gray-900/70 hover:to-gray-900/50 transition-all duration-300 cursor-pointer hover:shadow-xl hover:shadow-primary-500/20 hover:scale-[1.02] ${getPriorityBorderClass(task.priority)} ${
                                 task.completed ? 'opacity-75' : ''
                               }`}
@@ -3335,6 +3424,7 @@ const TasksPage = () => {
                             openEditTask(task);
                           }
                         }}
+                        onContextMenu={(e) => handleContextMenu(e, task.id)}
                         className={`group kanban-card bg-gradient-to-br from-gray-900/60 to-gray-900/40 backdrop-blur-md border border-gray-700/50 rounded-xl p-5 hover:border-gray-600/70 hover:from-gray-900/70 hover:to-gray-900/50 transition-all duration-300 cursor-pointer hover:shadow-xl hover:shadow-primary-500/20 hover:scale-[1.02] ${getPriorityBorderClass(task.priority)} ${
                           task.completed ? 'opacity-75' : ''
                         }`}
@@ -3528,6 +3618,7 @@ const TasksPage = () => {
                         openEditTask(task);
                       }
                     }}
+                    onContextMenu={(e) => handleContextMenu(e, task.id)}
                     className={`group kanban-card bg-gradient-to-br from-gray-900/60 to-gray-900/40 backdrop-blur-md border border-gray-700/50 rounded-xl p-5 hover:border-gray-600/70 hover:from-gray-900/70 hover:to-gray-900/50 transition-all duration-300 cursor-pointer hover:shadow-xl hover:shadow-primary-500/20 hover:scale-[1.02] ${getPriorityBorderClass(task.priority)} ${
                       task.completed ? 'opacity-75' : ''
                     }`}
@@ -4340,6 +4431,101 @@ const TasksPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Context Menu */}
+      {contextMenu && (
+        <div
+          className="fixed z-50 bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700 rounded-xl shadow-2xl shadow-black/50 backdrop-blur-md py-2 min-w-[220px]"
+          style={{
+            top: `${contextMenu.y}px`,
+            left: `${contextMenu.x}px`,
+          }}
+        >
+          <button
+            onClick={() => {
+              const task = boards.find(b => b.id === currentBoardId)?.columns
+                .flatMap(c => [...c.tasks, ...(c.subColumns?.flatMap(s => s.tasks || []) || [])])
+                .find(t => t.id === contextMenu.taskId);
+              if (task) openEditTask(task);
+              closeContextMenu();
+            }}
+            className="w-full px-4 py-2 text-left text-gray-200 hover:bg-blue-500/20 hover:text-blue-400 transition-all duration-200 flex items-center space-x-2"
+          >
+            <Edit3 className="h-4 w-4" />
+            <span>Editar</span>
+          </button>
+
+          <button
+            onClick={() => {
+              duplicateTask(contextMenu.taskId);
+              closeContextMenu();
+            }}
+            className="w-full px-4 py-2 text-left text-gray-200 hover:bg-purple-500/20 hover:text-purple-400 transition-all duration-200 flex items-center space-x-2"
+          >
+            <Copy className="h-4 w-4" />
+            <span>Duplicar</span>
+          </button>
+
+          <div className="h-px bg-gray-700 my-1"></div>
+
+          <div className="px-4 py-1.5 text-xs text-gray-500 font-semibold uppercase">Mover para</div>
+          {boards.find(b => b.id === currentBoardId)?.columns.map(col => (
+            <button
+              key={col.id}
+              onClick={() => moveTaskToColumn(contextMenu.taskId, col.id)}
+              className="w-full px-4 py-2 text-left text-gray-200 hover:bg-green-500/20 hover:text-green-400 transition-all duration-200 flex items-center space-x-2"
+            >
+              <ArrowRight className="h-4 w-4" />
+              <span>{col.title}</span>
+            </button>
+          ))}
+
+          <div className="h-px bg-gray-700 my-1"></div>
+
+          <div className="px-4 py-1.5 text-xs text-gray-500 font-semibold uppercase">Prioridade</div>
+          <button
+            onClick={() => changeTaskPriority(contextMenu.taskId, 'urgent')}
+            className="w-full px-4 py-2 text-left text-gray-200 hover:bg-red-500/20 hover:text-red-400 transition-all duration-200 flex items-center space-x-2"
+          >
+            <Flag className="h-4 w-4 text-red-500" />
+            <span>Urgente</span>
+          </button>
+          <button
+            onClick={() => changeTaskPriority(contextMenu.taskId, 'high')}
+            className="w-full px-4 py-2 text-left text-gray-200 hover:bg-amber-500/20 hover:text-amber-400 transition-all duration-200 flex items-center space-x-2"
+          >
+            <Flag className="h-4 w-4 text-amber-500" />
+            <span>Alta</span>
+          </button>
+          <button
+            onClick={() => changeTaskPriority(contextMenu.taskId, 'medium')}
+            className="w-full px-4 py-2 text-left text-gray-200 hover:bg-yellow-500/20 hover:text-yellow-400 transition-all duration-200 flex items-center space-x-2"
+          >
+            <Flag className="h-4 w-4 text-yellow-500" />
+            <span>Média</span>
+          </button>
+          <button
+            onClick={() => changeTaskPriority(contextMenu.taskId, 'low')}
+            className="w-full px-4 py-2 text-left text-gray-200 hover:bg-green-500/20 hover:text-green-400 transition-all duration-200 flex items-center space-x-2"
+          >
+            <Flag className="h-4 w-4 text-green-500" />
+            <span>Baixa</span>
+          </button>
+
+          <div className="h-px bg-gray-700 my-1"></div>
+
+          <button
+            onClick={() => {
+              deleteTask(contextMenu.taskId);
+              closeContextMenu();
+            }}
+            className="w-full px-4 py-2 text-left text-gray-200 hover:bg-red-500/20 hover:text-red-400 transition-all duration-200 flex items-center space-x-2"
+          >
+            <Trash2 className="h-4 w-4" />
+            <span>Excluir</span>
+          </button>
+        </div>
+      )}
 
       {/* Container de Notificações Globais */}
       <ToastContainer />
