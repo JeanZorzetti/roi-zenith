@@ -2149,6 +2149,23 @@ const TasksPage = () => {
   // Check if any filters are active
   const hasActiveFilters = searchQuery.trim() || filterPriority.length > 0 || filterAssignee.length > 0 || filterTags.length > 0;
 
+  // Count filtered tasks
+  const getFilteredTasksCount = (): number => {
+    if (!hasActiveFilters) return 0;
+
+    const currentBoard = boards.find(b => b.id === currentBoardId);
+    if (!currentBoard) return 0;
+
+    let count = 0;
+    currentBoard.columns.forEach(col => {
+      count += col.tasks.filter(filterTask).length;
+      col.subColumns?.forEach(subCol => {
+        count += (subCol.tasks || []).filter(filterTask).length;
+      });
+    });
+    return count;
+  };
+
   // Clear all filters
   const clearFilters = () => {
     setSearchQuery('');
@@ -3214,6 +3231,15 @@ const TasksPage = () => {
             </svg>
           </div>
 
+          {/* Results Counter */}
+          {hasActiveFilters && (
+            <div className="flex items-center space-x-2 px-4 py-2.5 bg-primary-500/20 border border-primary-500/50 rounded-lg">
+              <span className="text-sm font-medium text-primary-300">
+                {getFilteredTasksCount()} resultado{getFilteredTasksCount() !== 1 ? 's' : ''}
+              </span>
+            </div>
+          )}
+
           {/* Clear Filters Button */}
           {hasActiveFilters && (
             <button
@@ -3482,10 +3508,11 @@ const TasksPage = () => {
                         onDragOver={(e) => e.preventDefault()}
                         onDrop={(e) => handleDropInSubColumn(e, column.id, subColumn.id)}
                       >
-                        {subColumn.tasks?.filter(filterTask).map((task) => {
+                        {subColumn.tasks?.map((task) => {
                           const checklist = task.checklist || [];
                           const checklistProgress = getChecklistProgress(checklist);
                           const hasChecklist = checklist.length > 0;
+                          const isHighlighted = !hasActiveFilters || filterTask(task);
 
                           return (
                             <div
@@ -3504,6 +3531,8 @@ const TasksPage = () => {
                               onContextMenu={(e) => handleContextMenu(e, task.id)}
                               className={`group kanban-card bg-gradient-to-br from-gray-900/60 to-gray-900/40 backdrop-blur-md border rounded-xl p-5 hover:from-gray-900/70 hover:to-gray-900/50 transition-all duration-300 cursor-pointer hover:shadow-xl hover:shadow-primary-500/20 hover:scale-[1.02] ${getPriorityBorderClass(task.priority)} ${
                                 task.completed ? 'opacity-75' : ''
+                              } ${
+                                !isHighlighted ? 'opacity-30 hover:opacity-50' : ''
                               } ${
                                 selectedTaskId === task.id
                                   ? 'border-primary-500/80 shadow-lg shadow-primary-500/30 ring-2 ring-primary-500/50'
@@ -3704,10 +3733,11 @@ const TasksPage = () => {
                   })}
 
                   {/* Direct Tasks (not in any subcolumn) */}
-                  {column.tasks.filter(task => !task.subColumnId).filter(filterTask).map((task) => {
+                  {column.tasks.filter(task => !task.subColumnId).map((task) => {
                     const checklist = task.checklist || [];
                     const checklistProgress = getChecklistProgress(checklist);
                     const hasChecklist = checklist.length > 0;
+                    const isHighlighted = !hasActiveFilters || filterTask(task);
 
                     return (
                       <div
@@ -3726,6 +3756,8 @@ const TasksPage = () => {
                         onContextMenu={(e) => handleContextMenu(e, task.id)}
                         className={`group kanban-card bg-gradient-to-br from-gray-900/60 to-gray-900/40 backdrop-blur-md border rounded-xl p-5 hover:from-gray-900/70 hover:to-gray-900/50 transition-all duration-300 cursor-pointer hover:shadow-xl hover:shadow-primary-500/20 hover:scale-[1.02] ${getPriorityBorderClass(task.priority)} ${
                           task.completed ? 'opacity-75' : ''
+                        } ${
+                          !isHighlighted ? 'opacity-30 hover:opacity-50' : ''
                         } ${
                           selectedTaskId === task.id
                             ? 'border-primary-500/80 shadow-lg shadow-primary-500/30 ring-2 ring-primary-500/50'
@@ -3927,12 +3959,13 @@ const TasksPage = () => {
                 </>
               ) : (
                 /* No SubColumns - Render tasks normally (original behavior) */
-                column.tasks.filter(filterTask).map((task) => {
+                column.tasks.map((task) => {
                 // Ensure checklist exists for backward compatibility
                 const checklist = task.checklist || [];
                 const checklistProgress = getChecklistProgress(checklist);
                 const hasChecklist = checklist.length > 0;
-                
+                const isHighlighted = !hasActiveFilters || filterTask(task);
+
                 return (
                   <div
                     key={task.id}
@@ -3951,6 +3984,8 @@ const TasksPage = () => {
                     onContextMenu={(e) => handleContextMenu(e, task.id)}
                     className={`group kanban-card bg-gradient-to-br from-gray-900/60 to-gray-900/40 backdrop-blur-md border rounded-xl p-5 hover:from-gray-900/70 hover:to-gray-900/50 transition-all duration-300 cursor-pointer hover:shadow-xl hover:shadow-primary-500/20 hover:scale-[1.02] ${getPriorityBorderClass(task.priority)} ${
                       task.completed ? 'opacity-75' : ''
+                    } ${
+                      !isHighlighted ? 'opacity-30 hover:opacity-50' : ''
                     } ${
                       selectedTaskId === task.id
                         ? 'border-primary-500/80 shadow-lg shadow-primary-500/30 ring-2 ring-primary-500/50'
