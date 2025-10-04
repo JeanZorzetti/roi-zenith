@@ -2544,6 +2544,75 @@ const TasksPage = () => {
     return colors[index];
   };
 
+  const getTagColor = (tag: string) => {
+    const lowerTag = tag.toLowerCase();
+    // Priority tags
+    if (lowerTag.includes('crítico') || lowerTag.includes('urgente') || lowerTag.includes('urgent'))
+      return 'bg-red-500/30 text-red-200 border-red-400/50 shadow-sm shadow-red-500/20';
+    if (lowerTag.includes('alta') || lowerTag.includes('high'))
+      return 'bg-orange-500/30 text-orange-200 border-orange-400/50 shadow-sm shadow-orange-500/20';
+    if (lowerTag.includes('média') || lowerTag.includes('medium'))
+      return 'bg-yellow-500/30 text-yellow-200 border-yellow-400/50 shadow-sm shadow-yellow-500/20';
+    if (lowerTag.includes('baixa') || lowerTag.includes('low'))
+      return 'bg-green-500/30 text-green-200 border-green-400/50 shadow-sm shadow-green-500/20';
+
+    // Tech tags
+    if (lowerTag.includes('frontend') || lowerTag.includes('ui') || lowerTag.includes('ux'))
+      return 'bg-purple-500/30 text-purple-200 border-purple-400/50 shadow-sm shadow-purple-500/20';
+    if (lowerTag.includes('backend') || lowerTag.includes('api'))
+      return 'bg-blue-500/30 text-blue-200 border-blue-400/50 shadow-sm shadow-blue-500/20';
+    if (lowerTag.includes('devops') || lowerTag.includes('infra'))
+      return 'bg-gray-500/30 text-gray-200 border-gray-400/50 shadow-sm shadow-gray-500/20';
+    if (lowerTag.includes('test') || lowerTag.includes('qualidade') || lowerTag.includes('qa'))
+      return 'bg-cyan-500/30 text-cyan-200 border-cyan-400/50 shadow-sm shadow-cyan-500/20';
+    if (lowerTag.includes('doc') || lowerTag.includes('documentação'))
+      return 'bg-indigo-500/30 text-indigo-200 border-indigo-400/50 shadow-sm shadow-indigo-500/20';
+    if (lowerTag.includes('ml') || lowerTag.includes('ia') || lowerTag.includes('ai'))
+      return 'bg-pink-500/30 text-pink-200 border-pink-400/50 shadow-sm shadow-pink-500/20';
+    if (lowerTag.includes('bug') || lowerTag.includes('fix'))
+      return 'bg-red-600/30 text-red-200 border-red-500/50 shadow-sm shadow-red-600/20';
+    if (lowerTag.includes('feature') || lowerTag.includes('novo'))
+      return 'bg-emerald-500/30 text-emerald-200 border-emerald-400/50 shadow-sm shadow-emerald-500/20';
+    if (lowerTag.includes('refactor') || lowerTag.includes('melhoria'))
+      return 'bg-violet-500/30 text-violet-200 border-violet-400/50 shadow-sm shadow-violet-500/20';
+
+    // Default
+    return 'bg-primary-500/30 text-primary-200 border-primary-400/50 shadow-sm shadow-primary-500/20';
+  };
+
+  const getProgressBarColor = (progress: number) => {
+    if (progress === 100) return 'bg-gradient-to-r from-green-500 to-emerald-500';
+    if (progress >= 75) return 'bg-gradient-to-r from-blue-500 to-cyan-500';
+    if (progress >= 50) return 'bg-gradient-to-r from-yellow-500 to-orange-500';
+    if (progress >= 25) return 'bg-gradient-to-r from-orange-500 to-red-500';
+    return 'bg-gradient-to-r from-gray-500 to-gray-600';
+  };
+
+  const getDueDateStatus = (dueDate: string | null) => {
+    if (!dueDate) return null;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const due = new Date(dueDate);
+    due.setHours(0, 0, 0, 0);
+    const diffTime = due.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays < 0) {
+      return { color: 'text-red-400 bg-red-500/20 border-red-500/50', label: 'Vencido', urgent: true };
+    } else if (diffDays === 0) {
+      return { color: 'text-orange-400 bg-orange-500/20 border-orange-500/50', label: 'Hoje', urgent: true };
+    } else if (diffDays === 1) {
+      return { color: 'text-yellow-400 bg-yellow-500/20 border-yellow-500/50', label: 'Amanhã', urgent: false };
+    } else if (diffDays <= 3) {
+      return { color: 'text-yellow-300 bg-yellow-500/10 border-yellow-500/30', label: `${diffDays} dias`, urgent: false };
+    } else if (diffDays <= 7) {
+      return { color: 'text-green-400 bg-green-500/10 border-green-500/30', label: `${diffDays} dias`, urgent: false };
+    } else {
+      return { color: 'text-gray-400 bg-gray-500/10 border-gray-500/30', label: new Date(dueDate).toLocaleDateString('pt-BR'), urgent: false };
+    }
+  };
+
   const colorOptions = [
     'bg-gray-500', 'bg-red-500', 'bg-orange-500', 'bg-yellow-500', 
     'bg-green-500', 'bg-blue-500', 'bg-purple-500', 'bg-pink-500'
@@ -3075,14 +3144,19 @@ const TasksPage = () => {
                               {hasChecklist && (
                                 <div className="mb-3">
                                   <div className="flex items-center justify-between mb-2">
-                                    <span className="text-xs text-gray-400">
-                                      Checklist ({checklist.filter(item => item.completed).length}/{checklist.length})
+                                    <div className="flex items-center space-x-2">
+                                      <ListChecks className="h-3.5 w-3.5 text-blue-400" />
+                                      <span className="text-xs font-medium text-gray-300">
+                                        {checklist.filter(item => item.completed).length}/{checklist.length} concluídos
+                                      </span>
+                                    </div>
+                                    <span className={`text-xs font-bold ${checklistProgress === 100 ? 'text-green-400' : 'text-gray-400'}`}>
+                                      {checklistProgress}%
                                     </span>
-                                    <span className="text-xs text-gray-400">{checklistProgress}%</span>
                                   </div>
-                                  <div className="w-full bg-gray-700 rounded-full h-2">
+                                  <div className="w-full bg-gray-700/50 rounded-full h-2.5 overflow-hidden border border-gray-600/50">
                                     <div
-                                      className="bg-gradient-to-r from-primary-500 to-secondary-500 h-2 rounded-full transition-all duration-300"
+                                      className={`h-2.5 rounded-full transition-all duration-500 ${getProgressBarColor(checklistProgress)}`}
                                       style={{ width: `${checklistProgress}%` }}
                                     ></div>
                                   </div>
@@ -3132,33 +3206,16 @@ const TasksPage = () => {
 
                               {/* Tags */}
                               {task.tags.length > 0 && (
-                                <div className="flex flex-wrap gap-1 mb-3">
-                                  {task.tags.map((tag, index) => {
-                                    const getTagColor = (tag: string) => {
-                                      const lowerTag = tag.toLowerCase();
-                                      if (lowerTag.includes('crítico') || lowerTag.includes('urgente')) return 'bg-red-500/20 text-red-300 border-red-500/30';
-                                      if (lowerTag.includes('alta')) return 'bg-orange-500/20 text-orange-300 border-orange-500/30';
-                                      if (lowerTag.includes('média') || lowerTag.includes('medium')) return 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30';
-                                      if (lowerTag.includes('baixa') || lowerTag.includes('low')) return 'bg-green-500/20 text-green-300 border-green-500/30';
-                                      if (lowerTag.includes('frontend') || lowerTag.includes('ui') || lowerTag.includes('ux')) return 'bg-purple-500/20 text-purple-300 border-purple-500/30';
-                                      if (lowerTag.includes('backend') || lowerTag.includes('api')) return 'bg-blue-500/20 text-blue-300 border-blue-500/30';
-                                      if (lowerTag.includes('devops') || lowerTag.includes('infra')) return 'bg-gray-500/20 text-gray-300 border-gray-500/30';
-                                      if (lowerTag.includes('test') || lowerTag.includes('qualidade')) return 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30';
-                                      if (lowerTag.includes('doc') || lowerTag.includes('documentação')) return 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30';
-                                      if (lowerTag.includes('ml') || lowerTag.includes('ia')) return 'bg-pink-500/20 text-pink-300 border-pink-500/30';
-                                      return 'bg-primary-500/20 text-primary-300 border-primary-500/30';
-                                    };
-
-                                    return (
-                                      <span
-                                        key={index}
-                                        className={`px-2 py-1 text-xs rounded-lg border transition-all duration-200 hover:scale-105 hover:shadow-sm ${getTagColor(tag)}`}
-                                        title={`Tag: ${tag}`}
-                                      >
-                                        {tag}
-                                      </span>
-                                    );
-                                  })}
+                                <div className="flex flex-wrap gap-1.5 mb-3">
+                                  {task.tags.map((tag, index) => (
+                                    <span
+                                      key={index}
+                                      className={`px-2.5 py-1 text-xs font-medium rounded-md border transition-all duration-200 hover:scale-105 hover:shadow-md backdrop-blur-sm ${getTagColor(tag)}`}
+                                      title={`Tag: ${tag}`}
+                                    >
+                                      {tag}
+                                    </span>
+                                  ))}
                                 </div>
                               )}
 
@@ -3173,12 +3230,20 @@ const TasksPage = () => {
                                       <span className="text-gray-300">{task.assignee}</span>
                                     </div>
                                   )}
-                                  {task.dueDate && (
-                                    <div className="flex items-center space-x-1">
-                                      <Calendar className="h-3 w-3" />
-                                      <span>{new Date(task.dueDate).toLocaleDateString('pt-BR')}</span>
-                                    </div>
-                                  )}
+                                  {task.dueDate && (() => {
+                                    const dueDateStatus = getDueDateStatus(task.dueDate);
+                                    return dueDateStatus ? (
+                                      <div className={`flex items-center space-x-1.5 px-2 py-1 rounded-md border ${dueDateStatus.color} ${dueDateStatus.urgent ? 'animate-pulse' : ''}`}>
+                                        <Clock className="h-3 w-3" />
+                                        <span className="font-medium">{dueDateStatus.label}</span>
+                                      </div>
+                                    ) : (
+                                      <div className="flex items-center space-x-1">
+                                        <Calendar className="h-3 w-3" />
+                                        <span>{new Date(task.dueDate).toLocaleDateString('pt-BR')}</span>
+                                      </div>
+                                    );
+                                  })()}
                                 </div>
                               </div>
                             </div>
@@ -3256,14 +3321,19 @@ const TasksPage = () => {
                         {hasChecklist && (
                           <div className="mb-3">
                             <div className="flex items-center justify-between mb-2">
-                              <span className="text-xs text-gray-400">
-                                Checklist ({checklist.filter(item => item.completed).length}/{checklist.length})
+                              <div className="flex items-center space-x-2">
+                                <ListChecks className="h-3.5 w-3.5 text-blue-400" />
+                                <span className="text-xs font-medium text-gray-300">
+                                  {checklist.filter(item => item.completed).length}/{checklist.length} concluídos
+                                </span>
+                              </div>
+                              <span className={`text-xs font-bold ${checklistProgress === 100 ? 'text-green-400' : 'text-gray-400'}`}>
+                                {checklistProgress}%
                               </span>
-                              <span className="text-xs text-gray-400">{checklistProgress}%</span>
                             </div>
-                            <div className="w-full bg-gray-700 rounded-full h-2">
+                            <div className="w-full bg-gray-700/50 rounded-full h-2.5 overflow-hidden border border-gray-600/50">
                               <div
-                                className="bg-gradient-to-r from-primary-500 to-secondary-500 h-2 rounded-full transition-all duration-300"
+                                className={`h-2.5 rounded-full transition-all duration-500 ${getProgressBarColor(checklistProgress)}`}
                                 style={{ width: `${checklistProgress}%` }}
                               ></div>
                             </div>
@@ -3346,12 +3416,20 @@ const TasksPage = () => {
                                 <span className="text-gray-300">{task.assignee}</span>
                               </div>
                             )}
-                            {task.dueDate && (
-                              <div className="flex items-center space-x-1">
-                                <Calendar className="h-3 w-3" />
-                                <span>{new Date(task.dueDate).toLocaleDateString('pt-BR')}</span>
-                              </div>
-                            )}
+                            {task.dueDate && (() => {
+                              const dueDateStatus = getDueDateStatus(task.dueDate);
+                              return dueDateStatus ? (
+                                <div className={`flex items-center space-x-1.5 px-2 py-1 rounded-md border ${dueDateStatus.color} ${dueDateStatus.urgent ? 'animate-pulse' : ''}`}>
+                                  <Clock className="h-3 w-3" />
+                                  <span className="font-medium">{dueDateStatus.label}</span>
+                                </div>
+                              ) : (
+                                <div className="flex items-center space-x-1">
+                                  <Calendar className="h-3 w-3" />
+                                  <span>{new Date(task.dueDate).toLocaleDateString('pt-BR')}</span>
+                                </div>
+                              );
+                            })()}
                           </div>
                         </div>
                       </div>
@@ -3431,14 +3509,19 @@ const TasksPage = () => {
                     {hasChecklist && (
                       <div className="mb-3">
                         <div className="flex items-center justify-between mb-2">
-                          <span className="text-xs text-gray-400">
-                            Checklist ({checklist.filter(item => item.completed).length}/{checklist.length})
+                          <div className="flex items-center space-x-2">
+                            <ListChecks className="h-3.5 w-3.5 text-blue-400" />
+                            <span className="text-xs font-medium text-gray-300">
+                              {checklist.filter(item => item.completed).length}/{checklist.length} concluídos
+                            </span>
+                          </div>
+                          <span className={`text-xs font-bold ${checklistProgress === 100 ? 'text-green-400' : 'text-gray-400'}`}>
+                            {checklistProgress}%
                           </span>
-                          <span className="text-xs text-gray-400">{checklistProgress}%</span>
                         </div>
-                        <div className="w-full bg-gray-700 rounded-full h-2">
-                          <div 
-                            className="bg-gradient-to-r from-primary-500 to-secondary-500 h-2 rounded-full transition-all duration-300" 
+                        <div className="w-full bg-gray-700/50 rounded-full h-2.5 overflow-hidden border border-gray-600/50">
+                          <div
+                            className={`h-2.5 rounded-full transition-all duration-500 ${getProgressBarColor(checklistProgress)}`}
                             style={{ width: `${checklistProgress}%` }}
                           ></div>
                         </div>
@@ -3530,12 +3613,20 @@ const TasksPage = () => {
                             <span className="text-gray-300">{task.assignee}</span>
                           </div>
                         )}
-                        {task.dueDate && (
-                          <div className="flex items-center space-x-1">
-                            <Calendar className="h-3 w-3" />
-                            <span>{new Date(task.dueDate).toLocaleDateString('pt-BR')}</span>
-                          </div>
-                        )}
+                        {task.dueDate && (() => {
+                          const dueDateStatus = getDueDateStatus(task.dueDate);
+                          return dueDateStatus ? (
+                            <div className={`flex items-center space-x-1.5 px-2 py-1 rounded-md border ${dueDateStatus.color} ${dueDateStatus.urgent ? 'animate-pulse' : ''}`}>
+                              <Clock className="h-3 w-3" />
+                              <span className="font-medium">{dueDateStatus.label}</span>
+                            </div>
+                          ) : (
+                            <div className="flex items-center space-x-1">
+                              <Calendar className="h-3 w-3" />
+                              <span>{new Date(task.dueDate).toLocaleDateString('pt-BR')}</span>
+                            </div>
+                          );
+                        })()}
                       </div>
                     </div>
                   </div>

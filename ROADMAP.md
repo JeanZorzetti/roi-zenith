@@ -16,14 +16,14 @@ Plano de implementação incremental de melhorias de UI/UX baseado nas melhores 
 - Aprimorar hierarquia tipográfica
 
 ### Tarefas
-- [ ] Adicionar bordas coloridas de prioridade (esquerda, 3px)
+- [x] 👌 Adicionar bordas coloridas de prioridade (esquerda, 3px)
   - 🔴 High: `border-l-red-500`
   - 🟡 Medium: `border-l-amber-500`
   - 🟢 Low: `border-l-green-500`
-- [ ] Implementar componente Avatar circular (32px)
-- [ ] Ajustar spacing: cards `space-y-3`, padding `p-5`, gap colunas `gap-8`
-- [ ] Melhorar tipografia: títulos `font-bold text-lg`
-- [ ] Adicionar tooltips informativos nos ícones
+- [x] 👌 Implementar componente Avatar circular (32px)
+- [x] 👌 Ajustar spacing: cards `space-y-3`, padding `p-5`, gap colunas `gap-8`
+- [x] 👌 Melhorar tipografia: títulos `font-bold text-lg`
+- [x] 👌 Adicionar tooltips informativos nos ícones
 
 ### Entregáveis
 - Cards com prioridade visualmente clara
