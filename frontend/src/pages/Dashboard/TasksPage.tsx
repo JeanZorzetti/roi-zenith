@@ -27,7 +27,9 @@ import {
   Mail,
   Users,
   Upload,
-  FolderPlus
+  FolderPlus,
+  LayoutGrid,
+  List
 } from 'lucide-react';
 import { useSocket } from '@/hooks/useSocket';
 import { ActivityFeed } from '@/components/ActivityFeed';
@@ -2108,6 +2110,7 @@ const TasksPage = () => {
   const [filterPriority, setFilterPriority] = useState<string[]>([]);
   const [filterAssignee, setFilterAssignee] = useState<string[]>([]);
   const [filterTags, setFilterTags] = useState<string[]>([]);
+  const [viewMode, setViewMode] = useState<'kanban' | 'list'>('kanban');
 
   // Filter tasks based on search and filters
   const filterTask = (task: Task): boolean => {
@@ -3328,16 +3331,46 @@ const TasksPage = () => {
           </div>
           </div>
 
-          {/* Task Count Badge */}
-          <div className="flex items-center space-x-2 px-4 py-2 bg-gray-700/30 border border-gray-600/50 rounded-lg">
-            <span className="text-xs text-gray-400">Total de tasks:</span>
-            <span className="text-sm font-bold text-white">
-              {boards.find(b => b.id === currentBoardId)?.columns.reduce((total, col) => {
-                let count = col.tasks.length;
-                col.subColumns?.forEach(sub => count += (sub.tasks?.length || 0));
-                return total + count;
-              }, 0) || 0}
-            </span>
+          <div className="flex items-center space-x-3">
+            {/* View Switcher */}
+            <div className="flex items-center bg-gray-700/30 border border-gray-600/50 rounded-lg p-1">
+              <button
+                onClick={() => setViewMode('kanban')}
+                className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-md transition-all duration-200 ${
+                  viewMode === 'kanban'
+                    ? 'bg-primary-500/30 text-primary-300 shadow-sm'
+                    : 'text-gray-400 hover:text-gray-300 hover:bg-gray-600/30'
+                }`}
+                title="Kanban View"
+              >
+                <LayoutGrid className="h-4 w-4" />
+                <span className="text-xs font-medium">Kanban</span>
+              </button>
+              <button
+                onClick={() => setViewMode('list')}
+                className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-md transition-all duration-200 ${
+                  viewMode === 'list'
+                    ? 'bg-primary-500/30 text-primary-300 shadow-sm'
+                    : 'text-gray-400 hover:text-gray-300 hover:bg-gray-600/30'
+                }`}
+                title="List View"
+              >
+                <List className="h-4 w-4" />
+                <span className="text-xs font-medium">Lista</span>
+              </button>
+            </div>
+
+            {/* Task Count Badge */}
+            <div className="flex items-center space-x-2 px-4 py-2 bg-gray-700/30 border border-gray-600/50 rounded-lg">
+              <span className="text-xs text-gray-400">Total de tasks:</span>
+              <span className="text-sm font-bold text-white">
+                {boards.find(b => b.id === currentBoardId)?.columns.reduce((total, col) => {
+                  let count = col.tasks.length;
+                  col.subColumns?.forEach(sub => count += (sub.tasks?.length || 0));
+                  return total + count;
+                }, 0) || 0}
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -3379,16 +3412,82 @@ const TasksPage = () => {
         ))}
       </div>
 
-      {/* Kanban Board */}
-      <div
-        className={`flex gap-8 overflow-x-auto pb-6 select-none ${isScrolling ? 'cursor-grabbing' : 'cursor-grab'}`}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseLeave}
-        style={{ scrollbarWidth: 'thin' }}
-      >
-        {columns.map((column) => (
+      {/* Board Content - Kanban or List */}
+      {viewMode === 'list' ? (
+        /* List View */
+        <div className="space-y-4">
+          {columns.map((column) => (
+            <div key={column.id} className="bg-gradient-to-br from-gray-800/40 to-gray-900/40 backdrop-blur-md border border-gray-700/50 rounded-xl p-4">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center space-x-3">
+                  <div className={`w-3 h-3 rounded-full ${column.color}`}></div>
+                  <h3 className="font-bold text-white text-lg">{column.title}</h3>
+                  <span className="bg-gray-700/50 text-gray-400 px-2 py-1 rounded text-xs">
+                    {column.tasks.length}
+                  </span>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                {column.tasks.map((task) => {
+                  const isHighlighted = !hasActiveFilters || filterTask(task);
+                  return (
+                    <div
+                      key={task.id}
+                      onClick={() => openEditTask(task)}
+                      className={`flex items-center justify-between p-3 bg-gray-900/40 border border-gray-700/50 rounded-lg hover:border-gray-600/70 cursor-pointer transition-all ${
+                        !isHighlighted ? 'opacity-30 hover:opacity-50' : ''
+                      } ${getPriorityBorderClass(task.priority)}`}
+                    >
+                      <div className="flex items-center space-x-3 flex-1">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleTaskCompletion(task.id);
+                          }}
+                          className="hover:scale-110 transition-transform"
+                        >
+                          {task.completed ? (
+                            <CheckCircle2 className="h-4 w-4 text-green-400" />
+                          ) : (
+                            <Circle className="h-4 w-4 text-gray-400" />
+                          )}
+                        </button>
+                        <span className={`font-medium flex-1 ${task.completed ? 'line-through text-gray-500' : 'text-white'}`}>
+                          {task.title}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center space-x-2">
+                        {task.assignee && (
+                          <div className={`w-6 h-6 rounded-full ${getAvatarColor(task.assignee)} flex items-center justify-center text-xs font-bold text-white`}>
+                            {getInitials(task.assignee)}
+                          </div>
+                        )}
+                        {task.dueDate && getDueDateStatus(task.dueDate) && (
+                          <span className={`text-xs px-2 py-1 rounded border ${getDueDateStatus(task.dueDate)?.color}`}>
+                            {getDueDateStatus(task.dueDate)?.label}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        /* Kanban View */
+        <div
+          className={`flex gap-8 overflow-x-auto pb-6 select-none ${isScrolling ? 'cursor-grabbing' : 'cursor-grab'}`}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseLeave}
+          style={{ scrollbarWidth: 'thin' }}
+        >
+          {columns.map((column) => (
           <div
             key={column.id}
             className="flex-shrink-0 w-80"
@@ -4262,6 +4361,7 @@ const TasksPage = () => {
           </div>
         ))}
       </div>
+      )}
 
       {/* Board Modal */}
       {showBoardModal && (

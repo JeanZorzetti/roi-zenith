@@ -198,7 +198,7 @@ Plano de implementação incremental de melhorias de UI/UX baseado nas melhores 
   - "High Priority"
   - "Due This Week"
   - Custom views (user-created)
-- [ ] View switcher:
+- [x] 👌 View switcher:
   - Kanban (atual)
   - List view
   - Calendar view (futuro)
