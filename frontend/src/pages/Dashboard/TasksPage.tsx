@@ -2011,6 +2011,61 @@ const TasksPage = () => {
     }
   };
 
+  // Duplicate task
+  const duplicateTask = async (taskId: string) => {
+    try {
+      setLoading(true);
+
+      // Find the task to duplicate
+      const currentBoard = boards.find(b => b.id === currentBoardId);
+      if (!currentBoard) return;
+
+      let taskToDuplicate: Task | undefined;
+      let targetColumnId: string | undefined;
+
+      for (const col of currentBoard.columns) {
+        taskToDuplicate = col.tasks.find(t => t.id === taskId);
+        if (taskToDuplicate) {
+          targetColumnId = col.id;
+          break;
+        }
+        // Check in subcolumns
+        if (col.subColumns) {
+          for (const subCol of col.subColumns) {
+            taskToDuplicate = subCol.tasks?.find(t => t.id === taskId);
+            if (taskToDuplicate) {
+              targetColumnId = col.id;
+              break;
+            }
+          }
+        }
+        if (taskToDuplicate) break;
+      }
+
+      if (!taskToDuplicate || !targetColumnId) return;
+
+      // Create duplicate with new ID and title
+      const duplicatedTask = {
+        ...taskToDuplicate,
+        title: `${taskToDuplicate.title} (cópia)`,
+        completed: false,
+        id: undefined, // Let backend generate new ID
+      };
+
+      const success = await boardService.createTask(currentBoardId, duplicatedTask);
+
+      if (success) {
+        const reloadedBoards = await boardService.getBoards();
+        setBoards(reloadedBoards);
+      }
+    } catch (error) {
+      console.error('❌ Erro ao duplicar task:', error);
+      alert('Erro ao duplicar tarefa. Tente novamente.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Toggle task completion
   const toggleTaskCompletion = async (taskId: string) => {
     let updatedTask: Task | null = null;
@@ -3116,14 +3171,23 @@ const TasksPage = () => {
                                 </div>
                                 <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                                   <button
+                                    onClick={() => duplicateTask(task.id)}
+                                    className="p-1 rounded text-gray-400 hover:text-purple-400 hover:bg-purple-500/10 transition-all duration-200 hover:scale-110 active:scale-95"
+                                    title="Duplicar tarefa"
+                                  >
+                                    <Copy className="h-3 w-3 transition-transform duration-200 hover:scale-110" />
+                                  </button>
+                                  <button
                                     onClick={() => openEditTask(task)}
                                     className="p-1 rounded text-gray-400 hover:text-blue-400 hover:bg-blue-500/10 transition-all duration-200 hover:scale-110 active:scale-95"
+                                    title="Editar tarefa"
                                   >
                                     <Edit3 className="h-3 w-3 transition-transform duration-200 hover:rotate-12" />
                                   </button>
                                   <button
                                     onClick={() => deleteTask(task.id)}
                                     className="p-1 rounded text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200 hover:scale-110 active:scale-95"
+                                    title="Excluir tarefa"
                                   >
                                     <Trash2 className="h-3 w-3 transition-transform duration-200 hover:scale-110" />
                                   </button>
@@ -3297,14 +3361,23 @@ const TasksPage = () => {
                           </div>
                           <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                             <button
+                              onClick={() => duplicateTask(task.id)}
+                              className="p-1 rounded text-gray-400 hover:text-purple-400 hover:bg-purple-500/10 transition-all duration-200 hover:scale-110 active:scale-95"
+                              title="Duplicar tarefa"
+                            >
+                              <Copy className="h-3 w-3 transition-transform duration-200 hover:scale-110" />
+                            </button>
+                            <button
                               onClick={() => openEditTask(task)}
                               className="p-1 rounded text-gray-400 hover:text-blue-400 hover:bg-blue-500/10 transition-all duration-200 hover:scale-110 active:scale-95"
+                              title="Editar tarefa"
                             >
                               <Edit3 className="h-3 w-3 transition-transform duration-200 hover:rotate-12" />
                             </button>
                             <button
                               onClick={() => deleteTask(task.id)}
                               className="p-1 rounded text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200 hover:scale-110 active:scale-95"
+                              title="Excluir tarefa"
                             >
                               <Trash2 className="h-3 w-3 transition-transform duration-200 hover:scale-110" />
                             </button>
@@ -3481,14 +3554,23 @@ const TasksPage = () => {
                       </div>
                       <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                         <button
+                          onClick={() => duplicateTask(task.id)}
+                          className="p-1 rounded text-gray-400 hover:text-purple-400 hover:bg-purple-500/10 transition-all duration-200 hover:scale-110 active:scale-95"
+                          title="Duplicar tarefa"
+                        >
+                          <Copy className="h-3 w-3 transition-transform duration-200 hover:scale-110" />
+                        </button>
+                        <button
                           onClick={() => openEditTask(task)}
                           className="p-1 rounded text-gray-400 hover:text-blue-400 hover:bg-blue-500/10 transition-all duration-200 hover:scale-110 active:scale-95"
+                          title="Editar tarefa"
                         >
                           <Edit3 className="h-3 w-3 transition-transform duration-200 hover:rotate-12" />
                         </button>
                         <button
                           onClick={() => deleteTask(task.id)}
                           className="p-1 rounded text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200 hover:scale-110 active:scale-95"
+                          title="Excluir tarefa"
                         >
                           <Trash2 className="h-3 w-3 transition-transform duration-200 hover:scale-110" />
                         </button>
