@@ -2103,6 +2103,60 @@ const TasksPage = () => {
   const [inlineEditingTaskId, setInlineEditingTaskId] = useState<string | null>(null);
   const [inlineEditTitle, setInlineEditTitle] = useState<string>('');
 
+  // Search and filters state
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [filterPriority, setFilterPriority] = useState<string[]>([]);
+  const [filterAssignee, setFilterAssignee] = useState<string[]>([]);
+  const [filterTags, setFilterTags] = useState<string[]>([]);
+
+  // Filter tasks based on search and filters
+  const filterTask = (task: Task): boolean => {
+    // Search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      const matchTitle = task.title.toLowerCase().includes(query);
+      const matchDescription = task.description?.toLowerCase().includes(query);
+      const matchTags = task.tags.some(tag => tag.toLowerCase().includes(query));
+
+      if (!matchTitle && !matchDescription && !matchTags) {
+        return false;
+      }
+    }
+
+    // Priority filter
+    if (filterPriority.length > 0 && !filterPriority.includes(task.priority)) {
+      return false;
+    }
+
+    // Assignee filter
+    if (filterAssignee.length > 0 && task.assignee && !filterAssignee.includes(task.assignee)) {
+      return false;
+    }
+
+    // Tags filter
+    if (filterTags.length > 0) {
+      const hasMatchingTag = filterTags.some(filterTag =>
+        task.tags.some(taskTag => taskTag.toLowerCase().includes(filterTag.toLowerCase()))
+      );
+      if (!hasMatchingTag) {
+        return false;
+      }
+    }
+
+    return true;
+  };
+
+  // Check if any filters are active
+  const hasActiveFilters = searchQuery.trim() || filterPriority.length > 0 || filterAssignee.length > 0 || filterTags.length > 0;
+
+  // Clear all filters
+  const clearFilters = () => {
+    setSearchQuery('');
+    setFilterPriority([]);
+    setFilterAssignee([]);
+    setFilterTags([]);
+  };
+
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -3142,6 +3196,36 @@ const TasksPage = () => {
         </div>
       </div>
 
+      {/* Search and Filters Bar */}
+      <div className="mb-6 bg-gradient-to-br from-gray-800/40 to-gray-900/40 backdrop-blur-md border border-gray-700/50 rounded-xl p-4">
+        <div className="flex items-center space-x-4">
+          {/* Search Input */}
+          <div className="flex-1 relative">
+            <input
+              type="text"
+              placeholder="Buscar tasks... (título, descrição, tags)"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-gray-900/60 border border-gray-700/50 rounded-lg px-4 py-2.5 pl-10 text-white placeholder-gray-500 focus:outline-none focus:border-primary-500/50 focus:ring-2 focus:ring-primary-500/20 transition-all"
+            />
+            <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+
+          {/* Clear Filters Button */}
+          {hasActiveFilters && (
+            <button
+              onClick={clearFilters}
+              className="flex items-center space-x-2 px-4 py-2.5 bg-red-500/20 hover:bg-red-500/30 border border-red-500/50 rounded-lg text-red-300 hover:text-red-200 transition-all duration-200"
+            >
+              <X className="h-4 w-4" />
+              <span className="text-sm font-medium">Limpar Filtros</span>
+            </button>
+          )}
+        </div>
+      </div>
+
       {/* Toast Notifications */}
       <div className="fixed top-4 right-4 z-50 space-y-2">
         {notifications.map((notification) => (
@@ -3353,7 +3437,7 @@ const TasksPage = () => {
                         onDragOver={(e) => e.preventDefault()}
                         onDrop={(e) => handleDropInSubColumn(e, column.id, subColumn.id)}
                       >
-                        {subColumn.tasks?.map((task) => {
+                        {subColumn.tasks?.filter(filterTask).map((task) => {
                           const checklist = task.checklist || [];
                           const checklistProgress = getChecklistProgress(checklist);
                           const hasChecklist = checklist.length > 0;
@@ -3575,7 +3659,7 @@ const TasksPage = () => {
                   })}
 
                   {/* Direct Tasks (not in any subcolumn) */}
-                  {column.tasks.filter(task => !task.subColumnId).map((task) => {
+                  {column.tasks.filter(task => !task.subColumnId).filter(filterTask).map((task) => {
                     const checklist = task.checklist || [];
                     const checklistProgress = getChecklistProgress(checklist);
                     const hasChecklist = checklist.length > 0;
@@ -3798,7 +3882,7 @@ const TasksPage = () => {
                 </>
               ) : (
                 /* No SubColumns - Render tasks normally (original behavior) */
-                column.tasks.map((task) => {
+                column.tasks.filter(filterTask).map((task) => {
                 // Ensure checklist exists for backward compatibility
                 const checklist = task.checklist || [];
                 const checklistProgress = getChecklistProgress(checklist);
