@@ -102,21 +102,21 @@ Plano de implementação incremental de melhorias de UI/UX baseado nas melhores 
 - Adicionar micro-interações delightful
 
 ### Tarefas
-- [ ] Hover states aprimorados:
+- [x] 👌 Hover states aprimorados:
   - Scale suave (1.02 → 1.03)
   - Elevation aumentada (shadow-lg → shadow-2xl)
   - Glow na cor de prioridade
   - Ícones aparecem com fade-in
-- [ ] Drag & drop feedback:
+- [x] 👌 Drag & drop feedback:
   - Ghost preview (opacity 50%)
   - Drop zone highlight com animação
   - Cursor feedback (grab/grabbing)
   - Shake animation em drop inválido
-- [ ] Animação de conclusão de task:
+- [x] 👌 Animação de conclusão de task:
   - Fade out suave
   - Check icon animado
   - Confetti celebration (opcional/toggleable)
-- [ ] Transições de estado:
+- [x] 👌 Transições de estado:
   - Smooth color transitions (300ms ease-in-out)
   - Loading states com skeleton
   - Error states com shake
