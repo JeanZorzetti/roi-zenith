@@ -4044,8 +4044,9 @@ const TasksPage = () => {
                               onDragStart={(e) => handleDragStart(e, task.id, column.id)}
                               onClick={(e) => {
                                 if (e.target instanceof HTMLElement && !e.target.closest('button')) {
-                                  if (e.shiftKey) {
-                                    setSelectedTaskId(task.id);
+                                  if (isMultiSelectMode || e.shiftKey) {
+                                    e.stopPropagation();
+                                    toggleTaskSelection(task.id, true);
                                   } else {
                                     openEditTask(task);
                                   }
@@ -4057,7 +4058,9 @@ const TasksPage = () => {
                               } ${
                                 !isHighlighted ? 'opacity-30 hover:opacity-50' : ''
                               } ${
-                                selectedTaskId === task.id
+                                selectedTasks.includes(task.id)
+                                  ? 'border-blue-500/80 shadow-lg shadow-blue-500/30 ring-2 ring-blue-500/50 bg-blue-900/20'
+                                  : selectedTaskId === task.id
                                   ? 'border-primary-500/80 shadow-lg shadow-primary-500/30 ring-2 ring-primary-500/50'
                                   : 'border-gray-700/50 hover:border-gray-600/70'
                               } ${
@@ -4285,8 +4288,9 @@ const TasksPage = () => {
                         onDragStart={(e) => handleDragStart(e, task.id, column.id)}
                         onClick={(e) => {
                           if (e.target instanceof HTMLElement && !e.target.closest('button')) {
-                            if (e.shiftKey) {
-                              setSelectedTaskId(task.id);
+                            if (isMultiSelectMode || e.shiftKey) {
+                              e.stopPropagation();
+                              toggleTaskSelection(task.id, true);
                             } else {
                               openEditTask(task);
                             }
@@ -4298,7 +4302,9 @@ const TasksPage = () => {
                         } ${
                           !isHighlighted ? 'opacity-30 hover:opacity-50' : ''
                         } ${
-                          selectedTaskId === task.id
+                          selectedTasks.includes(task.id)
+                            ? 'border-blue-500/80 shadow-lg shadow-blue-500/30 ring-2 ring-blue-500/50 bg-blue-900/20'
+                            : selectedTaskId === task.id
                             ? 'border-primary-500/80 shadow-lg shadow-primary-500/30 ring-2 ring-primary-500/50'
                             : 'border-gray-700/50 hover:border-gray-600/70'
                         } ${
