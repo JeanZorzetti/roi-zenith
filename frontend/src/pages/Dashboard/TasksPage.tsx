@@ -35,7 +35,10 @@ import {
   TrendingUp,
   Target,
   Zap,
-  AlertTriangle
+  AlertTriangle,
+  GripVertical,
+  CheckSquare,
+  Square
 } from 'lucide-react';
 import { useSocket } from '@/hooks/useSocket';
 import { ActivityFeed } from '@/components/ActivityFeed';
@@ -799,6 +802,14 @@ const TasksPage = () => {
   const [draggedSubColumn, setDraggedSubColumn] = useState<string | null>(null);
   const [draggedSubColumnFrom, setDraggedSubColumnFrom] = useState<string | null>(null);
   const [draggedColumn, setDraggedColumn] = useState<string | null>(null);
+
+  // Enhanced drag preview state
+  const [dragPreview, setDragPreview] = useState<{x: number, y: number, task: Task | null}>({x: 0, y: 0, task: null});
+  const [isDragging, setIsDragging] = useState(false);
+
+  // Multi-select state
+  const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
+  const [isMultiSelectMode, setIsMultiSelectMode] = useState(false);
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [showColumnModal, setShowColumnModal] = useState(false);
@@ -3086,6 +3097,60 @@ const TasksPage = () => {
     };
   };
 
+  // Multi-select functions
+  const toggleTaskSelection = (taskId: string, shiftKey: boolean) => {
+    if (shiftKey) {
+      // Multi-select with shift
+      setSelectedTasks(prev =>
+        prev.includes(taskId)
+          ? prev.filter(id => id !== taskId)
+          : [...prev, taskId]
+      );
+    } else {
+      // Single select
+      setSelectedTasks([taskId]);
+    }
+  };
+
+  const clearSelection = () => {
+    setSelectedTasks([]);
+  };
+
+  const bulkDeleteTasks = async () => {
+    if (selectedTasks.length === 0) return;
+
+    const confirmed = confirm(`Deseja excluir ${selectedTasks.length} task(s) selecionada(s)?`);
+    if (!confirmed) return;
+
+    for (const taskId of selectedTasks) {
+      await deleteTask(taskId);
+    }
+    clearSelection();
+  };
+
+  const bulkMoveTasks = async (targetColumnId: string) => {
+    if (selectedTasks.length === 0) return;
+
+    for (const taskId of selectedTasks) {
+      const currentBoard = boards.find(b => b.id === currentBoardId);
+      const sourceColumn = currentBoard?.columns.find(col =>
+        col.tasks.some(t => t.id === taskId)
+      );
+
+      if (sourceColumn && sourceColumn.id !== targetColumnId) {
+        const task = sourceColumn.tasks.find(t => t.id === taskId);
+        if (task) {
+          await boardService.updateTask(currentBoardId, taskId, { columnId: targetColumnId });
+        }
+      }
+    }
+
+    // Reload boards
+    const reloadedBoards = await boardService.getBoards();
+    setBoards(reloadedBoards);
+    clearSelection();
+  };
+
   const getDueDateStatus = (dueDate: string | null) => {
     if (!dueDate) return null;
 
@@ -3505,6 +3570,41 @@ const TasksPage = () => {
                 <span className="text-xs font-medium">Lista</span>
               </button>
             </div>
+
+            {/* Multi-Select Toggle */}
+            <button
+              onClick={() => {
+                setIsMultiSelectMode(!isMultiSelectMode);
+                if (isMultiSelectMode) clearSelection();
+              }}
+              className={`flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all duration-200 ${
+                isMultiSelectMode
+                  ? 'bg-blue-500/30 border-blue-500/50 text-blue-300'
+                  : 'bg-gray-700/30 border-gray-600/50 text-gray-400 hover:text-gray-300'
+              }`}
+              title="Multi-select mode"
+            >
+              {isMultiSelectMode ? (
+                <CheckSquare className="h-4 w-4" />
+              ) : (
+                <Square className="h-4 w-4" />
+              )}
+              <span className="text-xs font-medium">
+                {isMultiSelectMode ? `${selectedTasks.length} selecionadas` : 'Selecionar múltiplas'}
+              </span>
+            </button>
+
+            {/* Bulk Actions */}
+            {isMultiSelectMode && selectedTasks.length > 0 && (
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={bulkDeleteTasks}
+                  className="px-3 py-2 bg-red-500/20 border border-red-500/50 text-red-300 rounded-lg text-xs font-medium hover:bg-red-500/30 transition-all"
+                >
+                  Excluir {selectedTasks.length}
+                </button>
+              </div>
+            )}
 
             {/* Mini Dashboard */}
             {(() => {

@@ -249,7 +249,7 @@ Plano de implementação incremental de melhorias de UI/UX baseado nas melhores 
 
 ---
 
-## 📅 Sprint 8: Advanced Drag & Drop Enhancements
+## 📅 Sprint 8: Advanced Drag & Drop Enhancements (Em Progresso)
 **Duração estimada:** 4-6 dias
 **Impacto:** Médio | **Complexidade:** Alta
 
@@ -259,12 +259,12 @@ Plano de implementação incremental de melhorias de UI/UX baseado nas melhores 
 - Adicionar drag handles customizados
 
 ### Tarefas
-- [ ] Enhanced drag preview:
+- [x] 👌 Enhanced drag preview:
   - Card preview com blur background
   - Contador se múltiplos cards
   - Indicador de destino válido/inválido
   - Smooth transition ao soltar
-- [ ] Multi-select & multi-drag:
+- [x] 👌 Multi-select & multi-drag:
   - Shift+click para selecionar múltiplos
   - Checkbox mode toggle
   - Drag múltiplos cards juntos
