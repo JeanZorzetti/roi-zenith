@@ -4070,8 +4070,26 @@ const TasksPage = () => {
                               {/* Task Header */}
                               <div className="flex items-start justify-between mb-3">
                                 <div className="flex items-center space-x-2">
+                                  {isMultiSelectMode && (
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        toggleTaskSelection(task.id, true);
+                                      }}
+                                      className="hover:scale-110 transition-all duration-200"
+                                    >
+                                      {selectedTasks.includes(task.id) ? (
+                                        <CheckSquare className="h-5 w-5 text-blue-400" />
+                                      ) : (
+                                        <Square className="h-5 w-5 text-gray-400" />
+                                      )}
+                                    </button>
+                                  )}
                                   <button
-                                    onClick={() => toggleTaskCompletion(task.id)}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      toggleTaskCompletion(task.id);
+                                    }}
                                     className="hover:scale-125 active:scale-95 transition-all duration-200 group"
                                   >
                                     {task.completed ? (
@@ -4314,8 +4332,26 @@ const TasksPage = () => {
                         {/* Same task rendering as above - keeping original code */}
                         <div className="flex items-start justify-between mb-3">
                           <div className="flex items-center space-x-2">
+                            {isMultiSelectMode && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  toggleTaskSelection(task.id, true);
+                                }}
+                                className="hover:scale-110 transition-all duration-200"
+                              >
+                                {selectedTasks.includes(task.id) ? (
+                                  <CheckSquare className="h-5 w-5 text-blue-400" />
+                                ) : (
+                                  <Square className="h-5 w-5 text-gray-400" />
+                                )}
+                              </button>
+                            )}
                             <button
-                              onClick={() => toggleTaskCompletion(task.id)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleTaskCompletion(task.id);
+                              }}
                               className="hover:scale-125 active:scale-95 transition-all duration-200 group"
                             >
                               {task.completed ? (
