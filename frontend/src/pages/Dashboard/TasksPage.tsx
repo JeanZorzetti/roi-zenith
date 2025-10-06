@@ -813,6 +813,11 @@ const TasksPage = () => {
 
   // Smart drop zones state
   const [dropIndicator, setDropIndicator] = useState<{columnId: string, subColumnId?: string, index: number} | null>(null);
+
+  // Responsive state
+  const [isMobile, setIsMobile] = useState(false);
+  const [isTablet, setIsTablet] = useState(false);
+
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [showColumnModal, setShowColumnModal] = useState(false);
@@ -920,6 +925,19 @@ const TasksPage = () => {
   useEffect(() => {
     localStorage.setItem('kanban-boards', JSON.stringify(boards));
   }, [boards]);
+
+  // Responsive breakpoints detection
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      setIsMobile(width < 768);
+      setIsTablet(width >= 768 && width < 1024);
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Socket.IO integration for real-time collaboration
   const [sessionId] = useState(() => {
@@ -3796,17 +3814,29 @@ const TasksPage = () => {
       ) : (
         /* Kanban View */
         <div
-          className={`flex gap-8 overflow-x-auto pb-6 select-none ${isScrolling ? 'cursor-grabbing' : 'cursor-grab'}`}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseLeave}
+          className={`${
+            isMobile
+              ? 'flex flex-col gap-4'
+              : isTablet
+              ? 'grid grid-cols-2 gap-6 overflow-x-auto pb-6'
+              : 'flex gap-8 overflow-x-auto pb-6'
+          } select-none ${!isMobile && !isTablet ? (isScrolling ? 'cursor-grabbing' : 'cursor-grab') : ''}`}
+          onMouseDown={!isMobile ? handleMouseDown : undefined}
+          onMouseMove={!isMobile ? handleMouseMove : undefined}
+          onMouseUp={!isMobile ? handleMouseUp : undefined}
+          onMouseLeave={!isMobile ? handleMouseLeave : undefined}
           style={{ scrollbarWidth: 'thin' }}
         >
           {columns.map((column) => (
           <div
             key={column.id}
-            className="flex-shrink-0 w-80"
+            className={`${
+              isMobile
+                ? 'w-full'
+                : isTablet
+                ? 'w-full'
+                : 'flex-shrink-0 w-80'
+            }`}
             onDragOver={(e) => {
               if (draggedColumn) {
                 handleColumnDragOver(e);

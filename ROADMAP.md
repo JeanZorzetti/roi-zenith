@@ -297,7 +297,7 @@ Plano de implementação incremental de melhorias de UI/UX baseado nas melhores 
 - Criar layouts adaptivos
 
 ### Tarefas
-- [ ] Breakpoints responsivos:
+- [x] 👌 Breakpoints responsivos:
   - Desktop: grid de colunas horizontal
   - Tablet: 2 colunas por linha + scroll
   - Mobile: lista vertical única
