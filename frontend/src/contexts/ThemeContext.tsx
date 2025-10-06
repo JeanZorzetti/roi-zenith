@@ -31,6 +31,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
 
   useEffect(() => {
     const theme = getTheme(themeId);
+    console.log('🎨 Applying theme:', themeId, theme);
     setCurrentTheme(theme);
     localStorage.setItem('dashboard-theme', themeId);
 
