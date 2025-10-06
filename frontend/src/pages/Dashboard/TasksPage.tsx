@@ -3699,12 +3699,7 @@ const TasksPage = () => {
             <div>
               <h1
                 className="text-3xl font-black"
-                style={{
-                  background: `linear-gradient(90deg, ${currentTheme.colors.text}, ${currentTheme.colors.textSecondary}, ${currentTheme.colors.primary})`,
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text'
-                }}
+                style={{ color: currentTheme.colors.text }}
               >
                 Organizador de Tarefas
                 {isGuest && (
@@ -3890,9 +3885,19 @@ const TasksPage = () => {
           </div>
           
           <div className="flex items-center space-x-3">
-            <button 
+            <button
               onClick={() => setShowColumnModal(true)}
-              className="flex items-center space-x-2 bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-xl transition-all duration-300"
+              className="flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300"
+              style={{
+                backgroundColor: currentTheme.colors.cardBg,
+                color: currentTheme.colors.text
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = currentTheme.colors.cardBgHover;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = currentTheme.colors.cardBg;
+              }}
             >
               <Plus className="h-4 w-4" />
               <span className="font-medium">Nova Coluna</span>
@@ -3903,7 +3908,11 @@ const TasksPage = () => {
                   setTargetColumnId(getDefaultTaskColumn());
                   setShowTaskModal(true);
                 }}
-                className="flex items-center space-x-2 bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-500 hover:to-secondary-500 px-4 py-2 rounded-xl transition-all duration-300 hover:scale-105"
+                className="flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 hover:scale-105"
+                style={{
+                  background: `linear-gradient(90deg, ${currentTheme.colors.primary}, ${currentTheme.colors.accent})`,
+                  color: '#ffffff'
+                }}
               >
                 <Plus className="h-4 w-4" />
                 <span className="font-medium">Nova Tarefa</span>
@@ -3914,7 +3923,17 @@ const TasksPage = () => {
       </div>
 
       {/* Search and Filters Bar */}
-      <div className="mb-6 bg-gradient-to-br from-gray-800/40 to-gray-900/40 backdrop-blur-md border border-gray-700/50 rounded-xl p-4 space-y-4" role="search" aria-label="Buscar e filtrar tarefas">
+      <div
+        className="mb-6 backdrop-blur-md rounded-xl p-4 space-y-4"
+        role="search"
+        aria-label="Buscar e filtrar tarefas"
+        style={{
+          background: `linear-gradient(135deg, ${currentTheme.colors.cardBg}, ${currentTheme.colors.backgroundSecondary})`,
+          borderWidth: '1px',
+          borderStyle: 'solid',
+          borderColor: currentTheme.colors.border
+        }}
+      >
         {/* Search Row */}
         <div className="flex items-center space-x-4">
           {/* Search Input */}
@@ -3926,11 +3945,31 @@ const TasksPage = () => {
               placeholder="Buscar tasks... (título, descrição, tags)"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
-              className="w-full bg-gray-900/60 border border-gray-700/50 rounded-lg px-4 py-2.5 pl-10 text-white placeholder-gray-500 focus:outline-none focus:border-primary-500/50 focus:ring-2 focus:ring-primary-500/20 transition-all"
+              className="w-full rounded-lg px-4 py-2.5 pl-10 focus:outline-none focus:ring-2 transition-all"
+              style={{
+                backgroundColor: currentTheme.colors.inputBg,
+                borderWidth: '1px',
+                borderStyle: 'solid',
+                borderColor: currentTheme.colors.inputBorder,
+                color: currentTheme.colors.text
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = currentTheme.colors.primary;
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = currentTheme.colors.inputBorder;
+              }}
               aria-label="Buscar tasks por título, descrição ou tags"
               role="searchbox"
             />
-            <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <svg
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5"
+              style={{ color: currentTheme.colors.textMuted }}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </div>
