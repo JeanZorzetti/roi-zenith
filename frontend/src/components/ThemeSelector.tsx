@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Palette, Check } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import { themeList } from '../themes/themes';
@@ -6,10 +7,23 @@ import { themeList } from '../themes/themes';
 export const ThemeSelector: React.FC = () => {
   const { currentTheme, setTheme, themeId } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, right: 0 });
+
+  useEffect(() => {
+    if (isOpen && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setDropdownPosition({
+        top: rect.bottom + 8,
+        right: window.innerWidth - rect.right
+      });
+    }
+  }, [isOpen]);
 
   return (
-    <div className="relative">
+    <>
       <button
+        ref={buttonRef}
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
         style={{
@@ -26,7 +40,7 @@ export const ThemeSelector: React.FC = () => {
         <span className="text-sm font-medium hidden sm:inline">Tema</span>
       </button>
 
-      {isOpen && (
+      {isOpen && createPortal(
         <>
           {/* Backdrop */}
           <div
@@ -36,8 +50,10 @@ export const ThemeSelector: React.FC = () => {
 
           {/* Dropdown */}
           <div
-            className="absolute right-0 mt-2 w-72 rounded-xl shadow-2xl z-[9999] max-h-96 overflow-y-auto"
+            className="fixed w-72 rounded-xl shadow-2xl z-[9999] max-h-96 overflow-y-auto"
             style={{
+              top: `${dropdownPosition.top}px`,
+              right: `${dropdownPosition.right}px`,
               backgroundColor: currentTheme.colors.backgroundSecondary,
               borderColor: currentTheme.colors.border,
               border: '1px solid'
@@ -171,8 +187,9 @@ export const ThemeSelector: React.FC = () => {
               </p>
             </div>
           </div>
-        </>
+        </>,
+        document.body
       )}
-    </div>
+    </>
   );
 };
