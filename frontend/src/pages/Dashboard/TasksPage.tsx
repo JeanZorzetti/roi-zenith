@@ -4446,11 +4446,26 @@ const TasksPage = () => {
           >
             {/* Column Header */}
             <div
-              className={`flex items-center justify-between mb-4 cursor-move p-3 rounded-xl bg-gradient-to-r from-gray-800/60 via-gray-800/40 to-gray-800/60 backdrop-blur-md border transition-all duration-300 shadow-lg ${
-                isWipLimitExceeded(column)
-                  ? 'border-red-500/50 hover:border-red-500/70 animate-pulse'
-                  : 'border-white/10 hover:border-white/20'
-              }`}
+              className="flex items-center justify-between mb-4 cursor-move p-3 rounded-xl backdrop-blur-md transition-all duration-300 shadow-lg"
+              style={{
+                background: `linear-gradient(90deg, ${currentTheme.colors.cardBg}99, ${currentTheme.colors.cardBg}66, ${currentTheme.colors.cardBg}99)`,
+                borderWidth: '1px',
+                borderStyle: 'solid',
+                borderColor: isWipLimitExceeded(column)
+                  ? `${currentTheme.colors.error}80`
+                  : currentTheme.colors.border,
+                animation: isWipLimitExceeded(column) ? 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite' : 'none'
+              }}
+              onMouseEnter={(e) => {
+                if (!isWipLimitExceeded(column)) {
+                  e.currentTarget.style.borderColor = currentTheme.colors.borderHover;
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isWipLimitExceeded(column)) {
+                  e.currentTarget.style.borderColor = currentTheme.colors.border;
+                }
+              }}
               draggable
               onDragStart={(e) => handleColumnDragStart(e, column.id)}
             >
@@ -4470,22 +4485,52 @@ const TasksPage = () => {
                         }
                       }}
                       onBlur={saveColumnTitle}
-                      className="font-bold text-white bg-gray-800 border border-gray-600 rounded px-2 py-1 text-sm focus:outline-none focus:border-primary-500"
+                      className="font-bold rounded px-2 py-1 text-sm focus:outline-none"
+                      style={{
+                        backgroundColor: currentTheme.colors.inputBg,
+                        borderWidth: '1px',
+                        borderStyle: 'solid',
+                        borderColor: currentTheme.colors.inputBorder,
+                        color: currentTheme.colors.text
+                      }}
+                      onFocus={(e) => {
+                        e.currentTarget.style.borderColor = currentTheme.colors.primary;
+                      }}
                       autoFocus
                     />
                   </div>
                 ) : (
                   <h3
-                    className="font-bold text-white cursor-pointer hover:text-primary-300 transition-colors"
+                    className="font-bold cursor-pointer transition-colors"
+                    style={{ color: currentTheme.colors.text }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.color = currentTheme.colors.primary;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = currentTheme.colors.text;
+                    }}
                     onClick={() => startEditingColumn(column.id, column.title)}
                     title="Clique para editar o título"
                   >
                     {column.title}
                   </h3>
                 )}
-                <span className="bg-gradient-to-br from-gray-700/60 to-gray-800/60 backdrop-blur-sm text-gray-300 px-2.5 py-1 rounded-lg text-xs font-bold border border-white/10 shadow-sm">
+                <span
+                  className="backdrop-blur-sm px-2.5 py-1 rounded-lg text-xs font-bold shadow-sm"
+                  style={{
+                    background: `linear-gradient(135deg, ${currentTheme.colors.cardBgHover}, ${currentTheme.colors.cardBg})`,
+                    color: currentTheme.colors.textSecondary,
+                    borderWidth: '1px',
+                    borderStyle: 'solid',
+                    borderColor: currentTheme.colors.border
+                  }}
+                >
                   {column.tasks.length}
-                  {column.wipLimit && <span className="text-gray-500">/{column.wipLimit}</span>}
+                  {column.wipLimit && (
+                    <span style={{ color: currentTheme.colors.textMuted }}>
+                      /{column.wipLimit}
+                    </span>
+                  )}
                 </span>
                 {column.wipLimit && (
                   <div className="relative w-8 h-8">
