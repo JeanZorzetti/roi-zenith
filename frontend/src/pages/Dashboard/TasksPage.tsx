@@ -49,6 +49,7 @@ import { ActivityFeed } from '@/components/ActivityFeed';
 import { ToastContainer } from '@/components/Notifications';
 import { ImportModal } from '@/components/ImportModal';
 import { ThemeSelector } from '@/components/ThemeSelector';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface ChecklistItem {
   id: string;
@@ -119,6 +120,7 @@ interface Board {
 }
 
 const TasksPage = () => {
+  const { currentTheme, themeId } = useTheme();
   const [searchParams] = useSearchParams();
 
   // Load boards from API
@@ -3402,7 +3404,16 @@ const TasksPage = () => {
   };
 
   return (
-    <div className="p-6 min-h-screen bg-pure-black text-pure-white" role="main" aria-label="Dashboard de tarefas">
+    <div
+      key={themeId}
+      className="p-6 min-h-screen"
+      role="main"
+      aria-label="Dashboard de tarefas"
+      style={{
+        backgroundColor: currentTheme.colors.background,
+        color: currentTheme.colors.text
+      }}
+    >
       {/* Skip Links for Keyboard Navigation */}
       <a
         href="#main-content"
