@@ -341,7 +341,7 @@ Plano de implementação incremental de melhorias de UI/UX baseado nas melhores 
   - Debounce em search/filters (300ms)
   - Memoization de componentes pesados
   - Code splitting por rota
-- [ ] Loading states:
+- [x] 👌 Loading states:
   - Skeleton loaders para cards
   - Shimmer effect durante load
   - Progressive image loading

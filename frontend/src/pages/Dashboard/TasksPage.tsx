@@ -3299,6 +3299,54 @@ const TasksPage = () => {
     'bg-green-500', 'bg-blue-500', 'bg-purple-500', 'bg-pink-500'
   ];
 
+  // Skeleton loader component
+  if (loading) {
+    return (
+      <div className="p-6 min-h-screen bg-pure-black text-pure-white">
+        <div className="animate-pulse">
+          {/* Header Skeleton */}
+          <div className="mb-8">
+            <div className="h-10 bg-gray-800/50 rounded-lg w-64 mb-4"></div>
+            <div className="h-6 bg-gray-800/30 rounded w-96"></div>
+          </div>
+
+          {/* Filters Skeleton */}
+          <div className="flex gap-4 mb-6">
+            <div className="h-12 bg-gray-800/50 rounded-lg flex-1"></div>
+            <div className="h-12 bg-gray-800/50 rounded-lg w-32"></div>
+            <div className="h-12 bg-gray-800/50 rounded-lg w-32"></div>
+          </div>
+
+          {/* Columns Skeleton */}
+          <div className="flex gap-6">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="flex-1">
+                <div className="h-8 bg-gray-800/50 rounded-lg mb-4"></div>
+                <div className="space-y-3">
+                  {[1, 2, 3].map((j) => (
+                    <div key={j} className="h-32 bg-gray-800/30 rounded-xl relative overflow-hidden">
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-700/20 to-transparent shimmer"></div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <style>{`
+          @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+          }
+          .shimmer {
+            animation: shimmer 2s infinite;
+          }
+        `}</style>
+      </div>
+    );
+  }
+
   return (
     <div className="p-6 min-h-screen bg-pure-black text-pure-white">
       <style>{`
