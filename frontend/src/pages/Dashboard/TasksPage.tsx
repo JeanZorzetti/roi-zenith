@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { boardService } from '../../services/boardService';
 import {
@@ -2164,11 +2164,21 @@ const TasksPage = () => {
   const [inlineEditTitle, setInlineEditTitle] = useState<string>('');
 
   // Search and filters state
+  const [searchInput, setSearchInput] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [filterPriority, setFilterPriority] = useState<string[]>([]);
   const [filterAssignee, setFilterAssignee] = useState<string[]>([]);
   const [filterTags, setFilterTags] = useState<string[]>([]);
   const [viewMode, setViewMode] = useState<'kanban' | 'list'>('kanban');
+
+  // Debounce search input (300ms)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearchQuery(searchInput);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchInput]);
 
   // WIP Limit modal state
   const [showWipLimitModal, setShowWipLimitModal] = useState(false);
@@ -2179,8 +2189,8 @@ const TasksPage = () => {
   // Column metrics expanded state
   const [expandedMetricsColumnId, setExpandedMetricsColumnId] = useState<string | null>(null);
 
-  // Filter tasks based on search and filters
-  const filterTask = (task: Task): boolean => {
+  // Filter tasks based on search and filters (memoized)
+  const filterTask = useCallback((task: Task): boolean => {
     // Search filter
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
@@ -2214,7 +2224,7 @@ const TasksPage = () => {
     }
 
     return true;
-  };
+  }, [searchQuery, filterPriority, filterAssignee, filterTags]);
 
   // Check if any filters are active
   const hasActiveFilters = searchQuery.trim() || filterPriority.length > 0 || filterAssignee.length > 0 || filterTags.length > 0;
@@ -2238,6 +2248,7 @@ const TasksPage = () => {
 
   // Clear all filters
   const clearFilters = () => {
+    setSearchInput('');
     setSearchQuery('');
     setFilterPriority([]);
     setFilterAssignee([]);
@@ -3543,8 +3554,8 @@ const TasksPage = () => {
             <input
               type="text"
               placeholder="Buscar tasks... (título, descrição, tags)"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
               className="w-full bg-gray-900/60 border border-gray-700/50 rounded-lg px-4 py-2.5 pl-10 text-white placeholder-gray-500 focus:outline-none focus:border-primary-500/50 focus:ring-2 focus:ring-primary-500/20 transition-all"
             />
             <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">

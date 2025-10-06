@@ -335,7 +335,7 @@ Plano de implementação incremental de melhorias de UI/UX baseado nas melhores 
 - Polimento final da UX
 
 ### Tarefas
-- [ ] Performance optimizations:
+- [x] 👌 Performance optimizations:
   - Virtualização de listas longas (react-window)
   - Lazy loading de subcolunas collapsed
   - Debounce em search/filters (300ms)
