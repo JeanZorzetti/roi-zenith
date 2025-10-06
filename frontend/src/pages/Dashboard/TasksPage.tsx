@@ -3406,7 +3406,15 @@ const TasksPage = () => {
   };
 
   return (
-    <div className="p-6 min-h-screen bg-pure-black text-pure-white">
+    <div className="p-6 min-h-screen bg-pure-black text-pure-white" role="main" aria-label="Dashboard de tarefas">
+      {/* Skip Links for Keyboard Navigation */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary-600 focus:text-white focus:rounded-lg focus:shadow-lg"
+      >
+        Pular para conteúdo principal
+      </a>
+
       {/* Offline Mode Indicator */}
       {!isOnline && (
         <div className="mb-6 bg-yellow-900/20 border border-yellow-500/30 rounded-xl p-4 backdrop-blur-sm animate-in">
@@ -3508,6 +3516,54 @@ const TasksPage = () => {
           box-shadow: 0 0 20px rgba(59, 130, 246, 0.3), 0 0 40px rgba(59, 130, 246, 0.1);
         }
 
+        /* Accessibility: Focus Indicators */
+        button:focus-visible,
+        a:focus-visible,
+        input:focus-visible,
+        select:focus-visible,
+        textarea:focus-visible,
+        [role="button"]:focus-visible {
+          outline: 2px solid rgb(99, 102, 241);
+          outline-offset: 2px;
+          box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
+        }
+
+        /* Screen Reader Only utility */
+        .sr-only {
+          position: absolute;
+          width: 1px;
+          height: 1px;
+          padding: 0;
+          margin: -1px;
+          overflow: hidden;
+          clip: rect(0, 0, 0, 0);
+          white-space: nowrap;
+          border-width: 0;
+        }
+
+        .sr-only:not(.focus\:not-sr-only:focus) {
+          position: absolute;
+          width: 1px;
+          height: 1px;
+          padding: 0;
+          margin: -1px;
+          overflow: hidden;
+          clip: rect(0, 0, 0, 0);
+          white-space: nowrap;
+          border-width: 0;
+        }
+
+        .focus\:not-sr-only:focus {
+          position: static;
+          width: auto;
+          height: auto;
+          padding: inherit;
+          margin: inherit;
+          overflow: visible;
+          clip: auto;
+          white-space: normal;
+        }
+
         .user-avatar-glow {
           box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
         }
@@ -3561,7 +3617,10 @@ const TasksPage = () => {
             <div className="relative">
               <button
                 onClick={() => setShowBoardSelector(!showBoardSelector)}
-                className="flex items-center space-x-3 bg-gray-800/50 hover:bg-gray-700/50 px-4 py-3 rounded-xl border border-gray-700/50 transition-all duration-300"
+                className="flex items-center space-x-3 bg-gray-800/50 hover:bg-gray-700/50 px-4 py-3 rounded-xl border border-gray-700/50 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-gray-900"
+                aria-label="Selecionar quadro"
+                aria-expanded={showBoardSelector}
+                aria-haspopup="true"
               >
                 <div className={`w-4 h-4 rounded-full ${currentBoard?.color || 'bg-blue-500'}`}></div>
                 <div className="text-left">
@@ -3580,15 +3639,17 @@ const TasksPage = () => {
                       <div className="flex items-center space-x-2">
                         <button
                           onClick={() => {setShowImportModal(true); setShowBoardSelector(false);}}
-                          className="flex items-center space-x-1 text-xs text-green-400 hover:text-green-300 transition-colors"
+                          className="flex items-center space-x-1 text-xs text-green-400 hover:text-green-300 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 rounded px-2 py-1"
                           title="Importar JSON"
+                          aria-label="Importar quadro de arquivo JSON"
                         >
                           <Upload className="h-3 w-3" />
                           <span>Importar</span>
                         </button>
                         <button
                           onClick={() => {setShowBoardModal(true); setShowBoardSelector(false);}}
-                          className="flex items-center space-x-1 text-xs text-primary-400 hover:text-primary-300 transition-colors"
+                          className="flex items-center space-x-1 text-xs text-primary-400 hover:text-primary-300 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 rounded px-2 py-1"
+                          aria-label="Criar novo quadro"
                         >
                           <Plus className="h-3 w-3" />
                           <span>Novo</span>
@@ -3633,20 +3694,24 @@ const TasksPage = () => {
                           <div className="flex items-center space-x-1">
                             <button
                               onClick={() => toggleBoardFavorite(board.id)}
-                              className="p-1 rounded text-gray-400 hover:text-yellow-400 transition-colors"
+                              className="p-1 rounded text-gray-400 hover:text-yellow-400 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                              aria-label={board.isFavorite ? `Remover ${board.title} dos favoritos` : `Adicionar ${board.title} aos favoritos`}
+                              aria-pressed={board.isFavorite}
                             >
                               <Star className={`h-3 w-3 ${board.isFavorite ? 'fill-current text-yellow-400' : ''}`} />
                             </button>
                             <button
                               onClick={() => duplicateBoard(board)}
-                              className="p-1 rounded text-gray-400 hover:text-blue-400 transition-colors"
+                              className="p-1 rounded text-gray-400 hover:text-blue-400 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              aria-label={`Duplicar quadro ${board.title}`}
                             >
                               <Copy className="h-3 w-3" />
                             </button>
                             <button
                               onClick={() => openShareModal(board.id)}
-                              className="p-1 rounded text-gray-400 hover:text-purple-400 transition-colors"
+                              className="p-1 rounded text-gray-400 hover:text-purple-400 transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500"
                               title="Compartilhar quadro"
+                              aria-label={`Compartilhar quadro ${board.title}`}
                             >
                               <Share2 className="h-3 w-3" />
                             </button>
@@ -3700,19 +3765,23 @@ const TasksPage = () => {
       </div>
 
       {/* Search and Filters Bar */}
-      <div className="mb-6 bg-gradient-to-br from-gray-800/40 to-gray-900/40 backdrop-blur-md border border-gray-700/50 rounded-xl p-4 space-y-4">
+      <div className="mb-6 bg-gradient-to-br from-gray-800/40 to-gray-900/40 backdrop-blur-md border border-gray-700/50 rounded-xl p-4 space-y-4" role="search" aria-label="Buscar e filtrar tarefas">
         {/* Search Row */}
         <div className="flex items-center space-x-4">
           {/* Search Input */}
           <div className="flex-1 relative">
+            <label htmlFor="search-tasks" className="sr-only">Buscar tasks</label>
             <input
+              id="search-tasks"
               type="text"
               placeholder="Buscar tasks... (título, descrição, tags)"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               className="w-full bg-gray-900/60 border border-gray-700/50 rounded-lg px-4 py-2.5 pl-10 text-white placeholder-gray-500 focus:outline-none focus:border-primary-500/50 focus:ring-2 focus:ring-primary-500/20 transition-all"
+              aria-label="Buscar tasks por título, descrição ou tags"
+              role="searchbox"
             />
-            <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </div>
@@ -3816,26 +3885,30 @@ const TasksPage = () => {
 
           <div className="flex items-center space-x-3">
             {/* View Switcher */}
-            <div className="flex items-center bg-gray-700/30 border border-gray-600/50 rounded-lg p-1">
+            <div className="flex items-center bg-gray-700/30 border border-gray-600/50 rounded-lg p-1" role="group" aria-label="Selecionar modo de visualização">
               <button
                 onClick={() => setViewMode('kanban')}
-                className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-md transition-all duration-200 ${
+                className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 ${
                   viewMode === 'kanban'
                     ? 'bg-primary-500/30 text-primary-300 shadow-sm'
                     : 'text-gray-400 hover:text-gray-300 hover:bg-gray-600/30'
                 }`}
                 title="Kanban View"
+                aria-label="Alternar para visualização Kanban"
+                aria-pressed={viewMode === 'kanban'}
               >
                 <LayoutGrid className="h-4 w-4" />
                 <span className="text-xs font-medium">Kanban</span>
               </button>
               <button
                 onClick={() => setViewMode('list')}
-                className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-md transition-all duration-200 ${
+                className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 ${
                   viewMode === 'list'
                     ? 'bg-primary-500/30 text-primary-300 shadow-sm'
                     : 'text-gray-400 hover:text-gray-300 hover:bg-gray-600/30'
                 }`}
+                aria-label="Alternar para visualização em lista"
+                aria-pressed={viewMode === 'list'}
                 title="List View"
               >
                 <List className="h-4 w-4" />
@@ -3846,12 +3919,14 @@ const TasksPage = () => {
             {/* Compact Mode Toggle */}
             <button
               onClick={() => setIsCompactMode(!isCompactMode)}
-              className={`flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all duration-200 ${
+              className={`flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 ${
                 isCompactMode
                   ? 'bg-purple-500/30 border-purple-500/50 text-purple-300'
                   : 'bg-gray-700/30 border-gray-600/50 text-gray-400 hover:text-gray-300'
               }`}
               title={isCompactMode ? 'Modo Normal' : 'Modo Compacto'}
+              aria-label={isCompactMode ? 'Desativar modo compacto' : 'Ativar modo compacto'}
+              aria-pressed={isCompactMode}
             >
               {isCompactMode ? (
                 <Maximize2 className="h-4 w-4" />
@@ -3994,6 +4069,7 @@ const TasksPage = () => {
       </div>
 
       {/* Board Content - Kanban or List */}
+      <div id="main-content">
       {viewMode === 'list' ? (
         /* List View */
         <div className="space-y-4">
@@ -5227,6 +5303,7 @@ const TasksPage = () => {
         )}
       </div>
       )}
+      </div>
 
       {/* Board Modal */}
       {showBoardModal && (
@@ -6020,10 +6097,11 @@ const TasksPage = () => {
             setTargetColumnId(columns[0]?.id || null);
             setShowTaskModal(true);
           }}
-          className="fixed bottom-6 right-6 w-14 h-14 bg-primary-500 hover:bg-primary-600 text-white rounded-full shadow-2xl shadow-primary-500/50 flex items-center justify-center z-50 transition-all duration-200 hover:scale-110 active:scale-95"
+          className="fixed bottom-6 right-6 w-14 h-14 bg-primary-500 hover:bg-primary-600 text-white rounded-full shadow-2xl shadow-primary-500/50 flex items-center justify-center z-50 transition-all duration-200 hover:scale-110 active:scale-95 focus:outline-none focus:ring-4 focus:ring-primary-500/50"
           title="Nova Task"
+          aria-label="Criar nova task"
         >
-          <Plus className="h-6 w-6" />
+          <Plus className="h-6 w-6" aria-hidden="true" />
         </button>
       )}
     </div>
