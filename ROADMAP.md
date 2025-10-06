@@ -308,7 +308,7 @@ Plano de implementação incremental de melhorias de UI/UX baseado nas melhores 
     - Swipe right: mark complete
     - Swipe left: delete/archive
     - Long press: select mode
-- [ ] Compact mode toggle:
+- [x] 👌 Compact mode toggle:
   - Densidade visual ajustável
   - Cards menores (compact)
   - Mais informação visível

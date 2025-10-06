@@ -38,7 +38,9 @@ import {
   AlertTriangle,
   GripVertical,
   CheckSquare,
-  Square
+  Square,
+  Minimize2,
+  Maximize2
 } from 'lucide-react';
 import { useSocket } from '@/hooks/useSocket';
 import { ActivityFeed } from '@/components/ActivityFeed';
@@ -822,6 +824,12 @@ const TasksPage = () => {
   const [touchStart, setTouchStart] = useState<{x: number, y: number, taskId: string} | null>(null);
   const [swipedTask, setSwipedTask] = useState<{taskId: string, direction: 'left' | 'right'} | null>(null);
 
+  // Compact mode state
+  const [isCompactMode, setIsCompactMode] = useState(() => {
+    const saved = localStorage.getItem('compact-mode');
+    return saved ? JSON.parse(saved) : false;
+  });
+
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [showColumnModal, setShowColumnModal] = useState(false);
@@ -942,6 +950,11 @@ const TasksPage = () => {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // Save compact mode preference
+  useEffect(() => {
+    localStorage.setItem('compact-mode', JSON.stringify(isCompactMode));
+  }, [isCompactMode]);
 
   // Socket.IO integration for real-time collaboration
   const [sessionId] = useState(() => {
@@ -3665,6 +3678,26 @@ const TasksPage = () => {
               </button>
             </div>
 
+            {/* Compact Mode Toggle */}
+            <button
+              onClick={() => setIsCompactMode(!isCompactMode)}
+              className={`flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all duration-200 ${
+                isCompactMode
+                  ? 'bg-purple-500/30 border-purple-500/50 text-purple-300'
+                  : 'bg-gray-700/30 border-gray-600/50 text-gray-400 hover:text-gray-300'
+              }`}
+              title={isCompactMode ? 'Modo Normal' : 'Modo Compacto'}
+            >
+              {isCompactMode ? (
+                <Maximize2 className="h-4 w-4" />
+              ) : (
+                <Minimize2 className="h-4 w-4" />
+              )}
+              <span className="text-xs font-medium">
+                {isCompactMode ? 'Normal' : 'Compacto'}
+              </span>
+            </button>
+
             {/* Multi-Select Toggle */}
             <button
               onClick={() => {
@@ -4176,7 +4209,7 @@ const TasksPage = () => {
                                 }
                               }}
                               onContextMenu={(e) => handleContextMenu(e, task.id)}
-                              className={`group kanban-card bg-gradient-to-br from-gray-900/60 to-gray-900/40 backdrop-blur-md border rounded-xl p-5 hover:from-gray-900/70 hover:to-gray-900/50 transition-all duration-300 cursor-pointer hover:shadow-xl hover:shadow-primary-500/20 hover:scale-[1.02] ${getPriorityBorderClass(task.priority)} ${
+                              className={`group kanban-card bg-gradient-to-br from-gray-900/60 to-gray-900/40 backdrop-blur-md border rounded-xl ${isCompactMode ? 'p-3' : 'p-5'} hover:from-gray-900/70 hover:to-gray-900/50 transition-all duration-300 cursor-pointer hover:shadow-xl hover:shadow-primary-500/20 hover:scale-[1.02] ${getPriorityBorderClass(task.priority)} ${
                                 task.completed ? 'opacity-75' : ''
                               } ${
                                 !isHighlighted ? 'opacity-30 hover:opacity-50' : ''
@@ -4191,7 +4224,7 @@ const TasksPage = () => {
                               }`}
                             >
                               {/* Task Header */}
-                              <div className="flex items-start justify-between mb-3">
+                              <div className={`flex items-start justify-between ${isCompactMode ? 'mb-2' : 'mb-3'}`}>
                                 <div className="flex items-center space-x-2">
                                   {/* Drag Handle */}
                                   <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 cursor-grab active:cursor-grabbing">
@@ -4450,7 +4483,7 @@ const TasksPage = () => {
                           }
                         }}
                         onContextMenu={(e) => handleContextMenu(e, task.id)}
-                        className={`group kanban-card bg-gradient-to-br from-gray-900/60 to-gray-900/40 backdrop-blur-md border rounded-xl p-5 hover:from-gray-900/70 hover:to-gray-900/50 transition-all duration-300 cursor-pointer hover:shadow-xl hover:shadow-primary-500/20 hover:scale-[1.02] ${getPriorityBorderClass(task.priority)} ${
+                        className={`group kanban-card bg-gradient-to-br from-gray-900/60 to-gray-900/40 backdrop-blur-md border rounded-xl ${isCompactMode ? 'p-3' : 'p-5'} hover:from-gray-900/70 hover:to-gray-900/50 transition-all duration-300 cursor-pointer hover:shadow-xl hover:shadow-primary-500/20 hover:scale-[1.02] ${getPriorityBorderClass(task.priority)} ${
                           task.completed ? 'opacity-75' : ''
                         } ${
                           !isHighlighted ? 'opacity-30 hover:opacity-50' : ''
@@ -4727,7 +4760,7 @@ const TasksPage = () => {
                       }
                     }}
                     onContextMenu={(e) => handleContextMenu(e, task.id)}
-                    className={`group kanban-card bg-gradient-to-br from-gray-900/60 to-gray-900/40 backdrop-blur-md border rounded-xl p-5 hover:from-gray-900/70 hover:to-gray-900/50 transition-all duration-300 cursor-pointer hover:shadow-xl hover:shadow-primary-500/20 hover:scale-[1.02] ${getPriorityBorderClass(task.priority)} ${
+                    className={`group kanban-card bg-gradient-to-br from-gray-900/60 to-gray-900/40 backdrop-blur-md border rounded-xl ${isCompactMode ? 'p-3' : 'p-5'} hover:from-gray-900/70 hover:to-gray-900/50 transition-all duration-300 cursor-pointer hover:shadow-xl hover:shadow-primary-500/20 hover:scale-[1.02] ${getPriorityBorderClass(task.priority)} ${
                       task.completed ? 'opacity-75' : ''
                     } ${
                       !isHighlighted ? 'opacity-30 hover:opacity-50' : ''
