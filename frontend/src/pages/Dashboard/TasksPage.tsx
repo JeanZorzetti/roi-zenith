@@ -3336,30 +3336,63 @@ const TasksPage = () => {
   // Skeleton loader component
   if (loading) {
     return (
-      <div className="p-6 min-h-screen bg-pure-black text-pure-white">
+      <div
+        className="p-6 min-h-screen"
+        style={{
+          backgroundColor: currentTheme.colors.background,
+          color: currentTheme.colors.text
+        }}
+      >
         <div className="animate-pulse">
           {/* Header Skeleton */}
           <div className="mb-8">
-            <div className="h-10 bg-gray-800/50 rounded-lg w-64 mb-4"></div>
-            <div className="h-6 bg-gray-800/30 rounded w-96"></div>
+            <div
+              className="h-10 rounded-lg w-64 mb-4"
+              style={{ backgroundColor: currentTheme.colors.cardBg }}
+            ></div>
+            <div
+              className="h-6 rounded w-96"
+              style={{ backgroundColor: `${currentTheme.colors.cardBg}80` }}
+            ></div>
           </div>
 
           {/* Filters Skeleton */}
           <div className="flex gap-4 mb-6">
-            <div className="h-12 bg-gray-800/50 rounded-lg flex-1"></div>
-            <div className="h-12 bg-gray-800/50 rounded-lg w-32"></div>
-            <div className="h-12 bg-gray-800/50 rounded-lg w-32"></div>
+            <div
+              className="h-12 rounded-lg flex-1"
+              style={{ backgroundColor: currentTheme.colors.cardBg }}
+            ></div>
+            <div
+              className="h-12 rounded-lg w-32"
+              style={{ backgroundColor: currentTheme.colors.cardBg }}
+            ></div>
+            <div
+              className="h-12 rounded-lg w-32"
+              style={{ backgroundColor: currentTheme.colors.cardBg }}
+            ></div>
           </div>
 
           {/* Columns Skeleton */}
           <div className="flex gap-6">
             {[1, 2, 3, 4].map((i) => (
               <div key={i} className="flex-1">
-                <div className="h-8 bg-gray-800/50 rounded-lg mb-4"></div>
+                <div
+                  className="h-8 rounded-lg mb-4"
+                  style={{ backgroundColor: currentTheme.colors.cardBg }}
+                ></div>
                 <div className="space-y-3">
                   {[1, 2, 3].map((j) => (
-                    <div key={j} className="h-32 bg-gray-800/30 rounded-xl relative overflow-hidden">
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-700/20 to-transparent shimmer"></div>
+                    <div
+                      key={j}
+                      className="h-32 rounded-xl relative overflow-hidden"
+                      style={{ backgroundColor: `${currentTheme.colors.cardBg}60` }}
+                    >
+                      <div
+                        className="absolute inset-0 shimmer"
+                        style={{
+                          background: `linear-gradient(90deg, transparent, ${currentTheme.colors.cardBgHover}40, transparent)`
+                        }}
+                      ></div>
                     </div>
                   ))}
                 </div>
@@ -3424,14 +3457,30 @@ const TasksPage = () => {
 
       {/* Offline Mode Indicator */}
       {!isOnline && (
-        <div className="mb-6 bg-yellow-900/20 border border-yellow-500/30 rounded-xl p-4 backdrop-blur-sm animate-in">
+        <div
+          className="mb-6 rounded-xl p-4 backdrop-blur-sm animate-in"
+          style={{
+            backgroundColor: currentTheme.colors.warningBg,
+            borderWidth: '1px',
+            borderStyle: 'solid',
+            borderColor: currentTheme.colors.warningBorder
+          }}
+        >
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 rounded-full bg-yellow-500/20 flex items-center justify-center flex-shrink-0">
-              <Zap className="h-4 w-4 text-yellow-400" />
+            <div
+              className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+              style={{ backgroundColor: `${currentTheme.colors.warning}33` }}
+            >
+              <Zap className="h-4 w-4" style={{ color: currentTheme.colors.warning }} />
             </div>
             <div>
-              <h3 className="text-sm font-semibold text-yellow-300 mb-1">Modo Offline</h3>
-              <p className="text-sm text-yellow-200/80">
+              <h3
+                className="text-sm font-semibold mb-1"
+                style={{ color: currentTheme.colors.warning }}
+              >
+                Modo Offline
+              </h3>
+              <p className="text-sm" style={{ color: currentTheme.colors.textSecondary }}>
                 Você está sem conexão. As alterações serão salvas localmente e sincronizadas quando voltar online.
               </p>
             </div>
@@ -3441,19 +3490,44 @@ const TasksPage = () => {
 
       {/* Error Banner */}
       {error && (
-        <div className="mb-6 bg-red-900/20 border border-red-500/30 rounded-xl p-4 backdrop-blur-sm animate-in">
+        <div
+          className="mb-6 rounded-xl p-4 backdrop-blur-sm animate-in"
+          style={{
+            backgroundColor: currentTheme.colors.errorBg,
+            borderWidth: '1px',
+            borderStyle: 'solid',
+            borderColor: currentTheme.colors.errorBorder
+          }}
+        >
           <div className="flex items-start justify-between">
             <div className="flex items-start space-x-3">
-              <div className="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <AlertTriangle className="h-4 w-4 text-red-400" />
+              <div
+                className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+                style={{ backgroundColor: `${currentTheme.colors.error}33` }}
+              >
+                <AlertTriangle className="h-4 w-4" style={{ color: currentTheme.colors.error }} />
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-red-300 mb-1">Erro de Conexão</h3>
-                <p className="text-sm text-red-200/80">{error}</p>
+                <h3
+                  className="text-sm font-semibold mb-1"
+                  style={{ color: currentTheme.colors.error }}
+                >
+                  Erro de Conexão
+                </h3>
+                <p className="text-sm" style={{ color: currentTheme.colors.textSecondary }}>
+                  {error}
+                </p>
                 <button
                   onClick={retryLoadBoards}
                   disabled={isRetrying}
-                  className="mt-3 inline-flex items-center space-x-2 bg-red-600/20 hover:bg-red-600/30 border border-red-500/30 text-red-300 px-3 py-1.5 rounded-lg text-sm transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="mt-3 inline-flex items-center space-x-2 px-3 py-1.5 rounded-lg text-sm transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{
+                    backgroundColor: `${currentTheme.colors.error}33`,
+                    borderWidth: '1px',
+                    borderStyle: 'solid',
+                    borderColor: currentTheme.colors.errorBorder,
+                    color: currentTheme.colors.error
+                  }}
                 >
                   <RefreshCw className={`h-3.5 w-3.5 ${isRetrying ? 'animate-spin' : ''}`} />
                   <span>{isRetrying ? 'Reconectando...' : 'Tentar Novamente'}</span>
@@ -3462,7 +3536,17 @@ const TasksPage = () => {
             </div>
             <button
               onClick={() => setError(null)}
-              className="p-1 rounded-lg text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors"
+              className="p-1 rounded-lg transition-colors"
+              style={{
+                color: currentTheme.colors.error,
+                backgroundColor: 'transparent'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = `${currentTheme.colors.error}1A`;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
             >
               <X className="h-4 w-4" />
             </button>
