@@ -809,6 +809,9 @@ const TasksPage = () => {
   const [dragPreview, setDragPreview] = useState<{x: number, y: number, task: Task | null}>({x: 0, y: 0, task: null});
   const [isDragging, setIsDragging] = useState(false);
 
+  // Separate loading state for operations (not full page load)
+  const [isOperationLoading, setIsOperationLoading] = useState(false);
+
   // Multi-select state
   const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
   const [isMultiSelectMode, setIsMultiSelectMode] = useState(false);
@@ -2787,7 +2790,7 @@ const TasksPage = () => {
     }
 
     try {
-      setLoading(true);
+      setIsOperationLoading(true);
 
       // Update task's columnId via API
       const success = await boardService.updateTask(currentBoardId, draggedTask, {
@@ -2848,7 +2851,7 @@ const TasksPage = () => {
       console.error('❌ Erro ao mover task:', error);
       alert('Erro ao mover tarefa. Tente novamente.');
     } finally {
-      setLoading(false);
+      setIsOperationLoading(false);
     }
 
     setDraggedTask(null);
@@ -2897,7 +2900,7 @@ const TasksPage = () => {
     }
 
     try {
-      setLoading(true);
+      setIsOperationLoading(true);
 
       // Update task's columnId and subColumnId via API
       const success = await boardService.updateTask(currentBoardId, draggedTask, {
@@ -2914,7 +2917,7 @@ const TasksPage = () => {
       console.error('❌ Erro ao mover task para subcoluna:', error);
       alert('Erro ao mover tarefa. Tente novamente.');
     } finally {
-      setLoading(false);
+      setIsOperationLoading(false);
     }
 
     setDraggedTask(null);
