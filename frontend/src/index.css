@@ -1,3 +1,6 @@
+/* Theme System - CSS Custom Properties */
+@import './styles/theme-variables.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

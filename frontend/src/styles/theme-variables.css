@@ -1,0 +1,342 @@
+/**
+ * Theme CSS Custom Properties
+ *
+ * Essas variáveis são automaticamente atualizadas pelo ThemeContext
+ * quando o usuário seleciona um tema diferente.
+ *
+ * Uso:
+ *   background-color: var(--color-background);
+ *   color: var(--color-text);
+ *   border-color: var(--color-border);
+ */
+
+:root {
+  /* ========================================
+     BACKGROUNDS
+     ======================================== */
+
+  /* Background principal (body, containers principais) */
+  --color-background: #000000;
+
+  /* Background secundário (sidebars, headers) */
+  --color-background-secondary: #0a0a0a;
+
+  /* Background terciário (seções, painéis) */
+  --color-background-tertiary: #141414;
+
+  /* ========================================
+     CARDS & SURFACES
+     ======================================== */
+
+  /* Background de cards padrão */
+  --color-card-bg: rgba(20, 20, 20, 0.8);
+
+  /* Background de cards em hover */
+  --color-card-bg-hover: rgba(30, 30, 30, 0.9);
+
+  /* Border de cards */
+  --color-card-border: rgba(255, 255, 255, 0.1);
+
+  /* ========================================
+     TEXT
+     ======================================== */
+
+  /* Texto principal */
+  --color-text: #ffffff;
+
+  /* Texto secundário (labels, metadata) */
+  --color-text-secondary: #a0a0a0;
+
+  /* Texto muted (placeholders, disabled) */
+  --color-text-muted: #666666;
+
+  /* ========================================
+     BRAND COLORS
+     ======================================== */
+
+  /* Cor primária (botões principais, links) */
+  --color-primary: #8b5cf6;
+
+  /* Cor primária em hover */
+  --color-primary-hover: #7c3aed;
+
+  /* Cor de acento (highlights, badges especiais) */
+  --color-accent: #d946ef;
+
+  /* Cor de acento em hover */
+  --color-accent-hover: #c026d3;
+
+  /* ========================================
+     STATUS COLORS
+     ======================================== */
+
+  /* Sucesso (ações positivas, confirmações) */
+  --color-success: #10b981;
+  --color-success-bg: rgba(16, 185, 129, 0.1);
+  --color-success-border: rgba(16, 185, 129, 0.3);
+
+  /* Warning (avisos, atenção) */
+  --color-warning: #f59e0b;
+  --color-warning-bg: rgba(245, 158, 11, 0.1);
+  --color-warning-border: rgba(245, 158, 11, 0.3);
+
+  /* Erro (ações destrutivas, erros) */
+  --color-error: #ef4444;
+  --color-error-bg: rgba(239, 68, 68, 0.1);
+  --color-error-border: rgba(239, 68, 68, 0.3);
+
+  /* Info (informações, dicas) */
+  --color-info: #3b82f6;
+  --color-info-bg: rgba(59, 130, 246, 0.1);
+  --color-info-border: rgba(59, 130, 246, 0.3);
+
+  /* ========================================
+     PRIORITY COLORS (Kanban)
+     ======================================== */
+
+  /* Prioridade Baixa */
+  --color-priority-low: #6b7280;
+  --color-priority-low-bg: rgba(107, 114, 128, 0.1);
+
+  /* Prioridade Média */
+  --color-priority-medium: #3b82f6;
+  --color-priority-medium-bg: rgba(59, 130, 246, 0.1);
+
+  /* Prioridade Alta */
+  --color-priority-high: #f59e0b;
+  --color-priority-high-bg: rgba(245, 158, 11, 0.1);
+
+  /* Prioridade Urgente */
+  --color-priority-urgent: #ef4444;
+  --color-priority-urgent-bg: rgba(239, 68, 68, 0.1);
+
+  /* ========================================
+     BORDERS & DIVIDERS
+     ======================================== */
+
+  /* Border padrão */
+  --color-border: rgba(255, 255, 255, 0.1);
+
+  /* Border em hover */
+  --color-border-hover: rgba(255, 255, 255, 0.2);
+
+  /* Border forte (separadores importantes) */
+  --color-border-strong: rgba(255, 255, 255, 0.2);
+
+  /* Divider (linhas separadoras) */
+  --color-divider: rgba(255, 255, 255, 0.08);
+
+  /* ========================================
+     INTERACTIVE ELEMENTS
+     ======================================== */
+
+  /* Botões primários */
+  --color-button-primary-bg: #8b5cf6;
+  --color-button-primary-hover: #7c3aed;
+  --color-button-primary-text: #ffffff;
+
+  /* Botões secundários */
+  --color-button-secondary-bg: rgba(139, 92, 246, 0.1);
+  --color-button-secondary-hover: rgba(139, 92, 246, 0.2);
+  --color-button-secondary-text: #8b5cf6;
+
+  /* Botões ghost (apenas texto) */
+  --color-button-ghost-hover: rgba(255, 255, 255, 0.05);
+  --color-button-ghost-text: #a0a0a0;
+
+  /* Inputs e textareas */
+  --color-input-bg: rgba(20, 20, 20, 0.6);
+  --color-input-border: rgba(255, 255, 255, 0.1);
+  --color-input-border-focus: rgba(139, 92, 246, 0.5);
+  --color-input-text: #ffffff;
+  --color-input-placeholder: #666666;
+
+  /* Checkboxes e radios */
+  --color-checkbox-bg: rgba(20, 20, 20, 0.6);
+  --color-checkbox-border: rgba(255, 255, 255, 0.2);
+  --color-checkbox-checked: #8b5cf6;
+
+  /* ========================================
+     DROPDOWNS & MENUS
+     ======================================== */
+
+  /* Background de dropdowns */
+  --color-dropdown-bg: #1a1a1a;
+
+  /* Item de dropdown em hover */
+  --color-dropdown-hover: rgba(139, 92, 246, 0.1);
+
+  /* Border de dropdowns */
+  --color-dropdown-border: rgba(255, 255, 255, 0.1);
+
+  /* Shadow de dropdowns */
+  --color-dropdown-shadow: rgba(0, 0, 0, 0.5);
+
+  /* ========================================
+     MODALS & OVERLAYS
+     ======================================== */
+
+  /* Backdrop (overlay escuro atrás de modais) */
+  --color-backdrop: rgba(0, 0, 0, 0.7);
+
+  /* Background de modais */
+  --color-modal-bg: #1a1a1a;
+
+  /* Border de modais */
+  --color-modal-border: rgba(255, 255, 255, 0.1);
+
+  /* Shadow de modais */
+  --color-modal-shadow: rgba(0, 0, 0, 0.8);
+
+  /* ========================================
+     KANBAN SPECIFIC
+     ======================================== */
+
+  /* Background de colunas */
+  --color-column-bg: rgba(20, 20, 20, 0.5);
+
+  /* Background de colunas em hover */
+  --color-column-hover: rgba(30, 30, 30, 0.6);
+
+  /* Border de colunas */
+  --color-column-border: rgba(255, 255, 255, 0.05);
+
+  /* Background de subcolunas */
+  --color-subcolumn-bg: rgba(15, 15, 15, 0.6);
+
+  /* Background de área de drag-and-drop */
+  --color-drag-over: rgba(139, 92, 246, 0.1);
+
+  /* Border de área de drag-and-drop */
+  --color-drag-border: rgba(139, 92, 246, 0.5);
+
+  /* ========================================
+     BADGES & TAGS
+     ======================================== */
+
+  /* Badge padrão */
+  --color-badge-bg: rgba(139, 92, 246, 0.1);
+  --color-badge-text: #8b5cf6;
+  --color-badge-border: rgba(139, 92, 246, 0.3);
+
+  /* Tag padrão */
+  --color-tag-bg: rgba(100, 100, 100, 0.2);
+  --color-tag-text: #a0a0a0;
+  --color-tag-border: rgba(255, 255, 255, 0.1);
+
+  /* ========================================
+     SCROLLBARS
+     ======================================== */
+
+  --color-scrollbar-track: rgba(20, 20, 20, 0.3);
+  --color-scrollbar-thumb: rgba(139, 92, 246, 0.3);
+  --color-scrollbar-thumb-hover: rgba(139, 92, 246, 0.5);
+
+  /* ========================================
+     FOCUS & SELECTION
+     ======================================== */
+
+  /* Outline de foco (acessibilidade) */
+  --color-focus-ring: rgba(139, 92, 246, 0.5);
+
+  /* Background de seleção de texto */
+  --color-selection-bg: rgba(139, 92, 246, 0.3);
+  --color-selection-text: #ffffff;
+
+  /* ========================================
+     SHADOWS
+     ======================================== */
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+}
+
+/* ========================================
+   CUSTOM SCROLLBAR STYLING
+   ======================================== */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-scrollbar-track);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-scrollbar-thumb);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-scrollbar-thumb-hover);
+}
+
+/* ========================================
+   TEXT SELECTION
+   ======================================== */
+
+::selection {
+  background: var(--color-selection-bg);
+  color: var(--color-selection-text);
+}
+
+::-moz-selection {
+  background: var(--color-selection-bg);
+  color: var(--color-selection-text);
+}
+
+/* ========================================
+   FOCUS VISIBLE (Acessibilidade)
+   ======================================== */
+
+*:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* ========================================
+   UTILITY CLASSES
+   ======================================== */
+
+.themed-bg {
+  background-color: var(--color-background);
+}
+
+.themed-bg-secondary {
+  background-color: var(--color-background-secondary);
+}
+
+.themed-card {
+  background-color: var(--color-card-bg);
+  border: 1px solid var(--color-card-border);
+}
+
+.themed-card:hover {
+  background-color: var(--color-card-bg-hover);
+}
+
+.themed-text {
+  color: var(--color-text);
+}
+
+.themed-text-secondary {
+  color: var(--color-text-secondary);
+}
+
+.themed-text-muted {
+  color: var(--color-text-muted);
+}
+
+.themed-border {
+  border-color: var(--color-border);
+}
+
+.themed-divider {
+  border-color: var(--color-divider);
+}
