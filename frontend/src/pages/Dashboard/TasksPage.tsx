@@ -4672,7 +4672,14 @@ const TasksPage = () => {
                     return (
                     <div
                       key={subColumn.id}
-                      className="border border-white/10 rounded-xl overflow-hidden backdrop-blur-md bg-gradient-to-br from-gray-800/40 to-gray-900/40 shadow-lg shadow-black/20"
+                      className="rounded-xl overflow-hidden backdrop-blur-md shadow-lg"
+                      style={{
+                        background: `linear-gradient(135deg, ${currentTheme.colors.cardBg}66, ${currentTheme.colors.cardBg}40)`,
+                        borderWidth: '1px',
+                        borderStyle: 'solid',
+                        borderColor: currentTheme.colors.border,
+                        boxShadow: `0 4px 12px ${currentTheme.colors.background}33`
+                      }}
                       onDragOver={(e) => {
                         e.preventDefault();
                         // Auto-expand on hover during drag
@@ -4683,21 +4690,45 @@ const TasksPage = () => {
                     >
                       {/* SubColumn Header */}
                       <div
-                        className="bg-gradient-to-r from-gray-800/60 to-gray-800/40 backdrop-blur-sm p-3 flex items-center justify-between hover:from-gray-700/60 hover:to-gray-700/40 transition-all duration-300 cursor-move border-b border-white/5"
+                        className="backdrop-blur-sm p-3 flex items-center justify-between transition-all duration-300 cursor-move"
+                        style={{
+                          background: `linear-gradient(90deg, ${currentTheme.colors.cardBg}99, ${currentTheme.colors.cardBg}66)`,
+                          borderBottomWidth: '1px',
+                          borderBottomStyle: 'solid',
+                          borderBottomColor: currentTheme.colors.border
+                        }}
                         draggable
                         onDragStart={(e) => handleSubColumnDragStart(e, subColumn.id, column.id)}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = `linear-gradient(90deg, ${currentTheme.colors.cardBgHover}99, ${currentTheme.colors.cardBgHover}66)`;
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = `linear-gradient(90deg, ${currentTheme.colors.cardBg}99, ${currentTheme.colors.cardBg}66)`;
+                        }}
                       >
                         <div
                           className="flex items-center space-x-3 flex-1 cursor-pointer"
                           onClick={() => toggleSubColumnExpanded(subColumn.id)}
                         >
                           <ChevronDown
-                            className={`h-4 w-4 text-gray-400 transition-transform duration-200 ${
+                            className={`h-4 w-4 transition-transform duration-200 ${
                               isExpanded ? 'rotate-0' : '-rotate-90'
                             }`}
+                            style={{ color: currentTheme.colors.textSecondary }}
                           />
-                          <h4 className="font-semibold text-white">{subColumn.title}</h4>
-                          <span className="bg-gray-700/50 text-gray-400 px-2 py-0.5 rounded text-xs">
+                          <h4
+                            className="font-semibold"
+                            style={{ color: currentTheme.colors.text }}
+                          >
+                            {subColumn.title}
+                          </h4>
+                          <span
+                            className="px-2 py-0.5 rounded text-xs"
+                            style={{
+                              backgroundColor: `${currentTheme.colors.accent}33`,
+                              color: currentTheme.colors.accent
+                            }}
+                          >
                             {subColumn.tasks?.length || 0}
                           </span>
                         </div>
@@ -4707,8 +4738,17 @@ const TasksPage = () => {
                               e.stopPropagation();
                               updateSubColumn(subColumn.id, subColumn.title);
                             }}
-                            className="p-1 rounded text-gray-400 hover:text-blue-400 transition-colors"
+                            className="p-1 rounded transition-colors"
+                            style={{ color: currentTheme.colors.textSecondary }}
                             title="Editar subcoluna"
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.color = currentTheme.colors.primary;
+                              e.currentTarget.style.backgroundColor = `${currentTheme.colors.primary}20`;
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.color = currentTheme.colors.textSecondary;
+                              e.currentTarget.style.backgroundColor = 'transparent';
+                            }}
                           >
                             <Edit3 className="h-3 w-3" />
                           </button>
@@ -4717,8 +4757,17 @@ const TasksPage = () => {
                               e.stopPropagation();
                               deleteSubColumn(subColumn.id);
                             }}
-                            className="p-1 rounded text-gray-400 hover:text-red-400 transition-colors"
+                            className="p-1 rounded transition-colors"
+                            style={{ color: currentTheme.colors.textSecondary }}
                             title="Deletar subcoluna"
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.color = currentTheme.colors.error;
+                              e.currentTarget.style.backgroundColor = `${currentTheme.colors.error}20`;
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.color = currentTheme.colors.textSecondary;
+                              e.currentTarget.style.backgroundColor = 'transparent';
+                            }}
                           >
                             <Trash2 className="h-3 w-3" />
                           </button>
@@ -4728,7 +4777,10 @@ const TasksPage = () => {
                       {/* SubColumn Tasks */}
                       {isExpanded && (
                       <div
-                        className="p-3 space-y-3 bg-gradient-to-b from-gray-900/20 to-gray-900/40 backdrop-blur-sm min-h-[100px]"
+                        className="p-3 space-y-3 backdrop-blur-sm min-h-[100px]"
+                        style={{
+                          background: `linear-gradient(180deg, ${currentTheme.colors.backgroundSecondary}33, ${currentTheme.colors.backgroundSecondary}66)`
+                        }}
                         onDragOver={(e) => e.preventDefault()}
                         onDrop={(e) => handleDropInSubColumn(e, column.id, subColumn.id)}
                       >
@@ -5241,11 +5293,24 @@ const TasksPage = () => {
 
                         {/* Empty state for subcolumn */}
                         {(!subColumn.tasks || subColumn.tasks.length === 0) && (
-                          <div className="text-center py-8 text-gray-500">
+                          <div className="text-center py-8">
                             <div className="flex flex-col items-center space-y-2">
-                              <Circle className="h-12 w-12 text-gray-700/50" />
-                              <p className="text-sm">Nenhuma task aqui</p>
-                              <p className="text-xs text-gray-600">Arraste tasks para cá</p>
+                              <Circle
+                                className="h-12 w-12"
+                                style={{ color: `${currentTheme.colors.border}80` }}
+                              />
+                              <p
+                                className="text-sm"
+                                style={{ color: currentTheme.colors.textMuted }}
+                              >
+                                Nenhuma task aqui
+                              </p>
+                              <p
+                                className="text-xs"
+                                style={{ color: currentTheme.colors.textTertiary }}
+                              >
+                                Arraste tasks para cá
+                              </p>
                             </div>
                           </div>
                         )}
