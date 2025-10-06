@@ -2591,7 +2591,7 @@ const TasksPage = () => {
   // Auto-scroll when dragging near edges
   const handleAutoScroll = (e: React.DragEvent) => {
     const threshold = 150;
-    const scrollSpeed = 25;
+    const scrollSpeed = 50;
     const { clientY } = e;
     const windowHeight = window.innerHeight;
 
