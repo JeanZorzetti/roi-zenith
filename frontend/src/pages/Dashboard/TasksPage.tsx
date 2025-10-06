@@ -4070,6 +4070,10 @@ const TasksPage = () => {
                               {/* Task Header */}
                               <div className="flex items-start justify-between mb-3">
                                 <div className="flex items-center space-x-2">
+                                  {/* Drag Handle */}
+                                  <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 cursor-grab active:cursor-grabbing">
+                                    <GripVertical className="h-4 w-4 text-gray-500" />
+                                  </div>
                                   {isMultiSelectMode && (
                                     <button
                                       onClick={(e) => {
@@ -4332,6 +4336,10 @@ const TasksPage = () => {
                         {/* Same task rendering as above - keeping original code */}
                         <div className="flex items-start justify-between mb-3">
                           <div className="flex items-center space-x-2">
+                            {/* Drag Handle */}
+                            <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 cursor-grab active:cursor-grabbing">
+                              <GripVertical className="h-4 w-4 text-gray-500" />
+                            </div>
                             {isMultiSelectMode && (
                               <button
                                 onClick={(e) => {

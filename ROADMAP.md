@@ -269,7 +269,7 @@ Plano de implementação incremental de melhorias de UI/UX baseado nas melhores 
   - Checkbox mode toggle
   - Drag múltiplos cards juntos
   - Bulk actions (delete, move, assign)
-- [ ] Visual drag handles:
+- [x] 👌 Visual drag handles:
   - 6-dot handle icon (⋮⋮)
   - Apenas visível no hover
   - Cursor change on handle hover
