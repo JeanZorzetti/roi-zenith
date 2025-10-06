@@ -3976,8 +3976,16 @@ const TasksPage = () => {
 
           {/* Results Counter */}
           {hasActiveFilters && (
-            <div className="flex items-center space-x-2 px-4 py-2.5 bg-primary-500/20 border border-primary-500/50 rounded-lg">
-              <span className="text-sm font-medium text-primary-300">
+            <div
+              className="flex items-center space-x-2 px-4 py-2.5 rounded-lg"
+              style={{
+                backgroundColor: `${currentTheme.colors.primary}33`,
+                borderWidth: '1px',
+                borderStyle: 'solid',
+                borderColor: `${currentTheme.colors.primary}80`
+              }}
+            >
+              <span className="text-sm font-medium" style={{ color: currentTheme.colors.primary }}>
                 {getFilteredTasksCount()} resultado{getFilteredTasksCount() !== 1 ? 's' : ''}
               </span>
             </div>
@@ -3987,7 +3995,20 @@ const TasksPage = () => {
           {hasActiveFilters && (
             <button
               onClick={clearFilters}
-              className="flex items-center space-x-2 px-4 py-2.5 bg-red-500/20 hover:bg-red-500/30 border border-red-500/50 rounded-lg text-red-300 hover:text-red-200 transition-all duration-200"
+              className="flex items-center space-x-2 px-4 py-2.5 rounded-lg transition-all duration-200"
+              style={{
+                backgroundColor: `${currentTheme.colors.error}33`,
+                borderWidth: '1px',
+                borderStyle: 'solid',
+                borderColor: `${currentTheme.colors.error}80`,
+                color: currentTheme.colors.error
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = `${currentTheme.colors.error}4D`;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = `${currentTheme.colors.error}33`;
+              }}
             >
               <X className="h-4 w-4" />
               <span className="text-sm font-medium">Limpar Filtros</span>
@@ -4000,14 +4021,29 @@ const TasksPage = () => {
           <div className="flex items-center space-x-6">
             {/* Quick Views */}
             <div className="flex items-center space-x-2">
-              <span className="text-xs text-gray-400 font-semibold uppercase">Views:</span>
+              <span className="text-xs font-semibold uppercase" style={{ color: currentTheme.colors.textMuted }}>
+                Views:
+              </span>
               <div className="flex items-center space-x-2">
                 <button
                   onClick={() => {
                     clearFilters();
                     setFilterPriority(['urgent', 'high']);
                   }}
-                  className="px-3 py-1.5 rounded-lg border border-purple-500/50 bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 text-xs font-medium transition-all duration-200"
+                  className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200"
+                  style={{
+                    backgroundColor: `${currentTheme.colors.primary}33`,
+                    borderWidth: '1px',
+                    borderStyle: 'solid',
+                    borderColor: `${currentTheme.colors.primary}80`,
+                    color: currentTheme.colors.primary
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = `${currentTheme.colors.primary}4D`;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = `${currentTheme.colors.primary}33`;
+                  }}
                 >
                   Alta Prioridade
                 </button>
@@ -4016,13 +4052,39 @@ const TasksPage = () => {
                     clearFilters();
                     setFilterPriority(['urgent']);
                   }}
-                  className="px-3 py-1.5 rounded-lg border border-red-500/50 bg-red-500/20 text-red-300 hover:bg-red-500/30 text-xs font-medium transition-all duration-200"
+                  className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200"
+                  style={{
+                    backgroundColor: `${currentTheme.colors.priorityUrgent}33`,
+                    borderWidth: '1px',
+                    borderStyle: 'solid',
+                    borderColor: `${currentTheme.colors.priorityUrgent}80`,
+                    color: currentTheme.colors.priorityUrgent
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = `${currentTheme.colors.priorityUrgent}4D`;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = `${currentTheme.colors.priorityUrgent}33`;
+                  }}
                 >
                   Urgente
                 </button>
                 <button
                   onClick={clearFilters}
-                  className="px-3 py-1.5 rounded-lg border border-gray-500/50 bg-gray-500/20 text-gray-300 hover:bg-gray-500/30 text-xs font-medium transition-all duration-200"
+                  className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200"
+                  style={{
+                    backgroundColor: `${currentTheme.colors.textSecondary}33`,
+                    borderWidth: '1px',
+                    borderStyle: 'solid',
+                    borderColor: `${currentTheme.colors.textSecondary}80`,
+                    color: currentTheme.colors.textSecondary
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = `${currentTheme.colors.textSecondary}4D`;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = `${currentTheme.colors.textSecondary}33`;
+                  }}
                 >
                   Todas
                 </button>
@@ -4031,23 +4093,20 @@ const TasksPage = () => {
 
             {/* Priority Filters */}
             <div className="flex items-center space-x-2">
-            <span className="text-xs text-gray-400 font-semibold uppercase">Prioridade:</span>
+            <span className="text-xs font-semibold uppercase" style={{ color: currentTheme.colors.textMuted }}>
+              Prioridade:
+            </span>
             <div className="flex items-center space-x-2">
               {(['urgent', 'high', 'medium', 'low'] as const).map((priority) => {
                 const isActive = filterPriority.includes(priority);
-                const colors = {
-                  urgent: 'bg-red-500/20 border-red-500/50 text-red-300 hover:bg-red-500/30',
-                  high: 'bg-amber-500/20 border-amber-500/50 text-amber-300 hover:bg-amber-500/30',
-                  medium: 'bg-yellow-500/20 border-yellow-500/50 text-yellow-300 hover:bg-yellow-500/30',
-                  low: 'bg-green-500/20 border-green-500/50 text-green-300 hover:bg-green-500/30'
-                };
-                const activeColors = {
-                  urgent: 'bg-red-500/40 border-red-400 text-red-200 ring-2 ring-red-500/30',
-                  high: 'bg-amber-500/40 border-amber-400 text-amber-200 ring-2 ring-amber-500/30',
-                  medium: 'bg-yellow-500/40 border-yellow-400 text-yellow-200 ring-2 ring-yellow-500/30',
-                  low: 'bg-green-500/40 border-green-400 text-green-200 ring-2 ring-green-500/30'
+                const priorityColors = {
+                  urgent: currentTheme.colors.priorityUrgent,
+                  high: currentTheme.colors.priorityHigh,
+                  medium: currentTheme.colors.priorityMedium,
+                  low: currentTheme.colors.priorityLow
                 };
                 const labels = { urgent: 'Urgente', high: 'Alta', medium: 'Média', low: 'Baixa' };
+                const baseColor = priorityColors[priority];
 
                 return (
                   <button
@@ -4059,9 +4118,25 @@ const TasksPage = () => {
                           : [...prev, priority]
                       );
                     }}
-                    className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-all duration-200 ${
-                      isActive ? activeColors[priority] : colors[priority]
-                    }`}
+                    className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200"
+                    style={{
+                      backgroundColor: isActive ? `${baseColor}66` : `${baseColor}33`,
+                      borderWidth: '1px',
+                      borderStyle: 'solid',
+                      borderColor: isActive ? baseColor : `${baseColor}80`,
+                      color: baseColor,
+                      boxShadow: isActive ? `0 0 0 2px ${baseColor}33` : 'none'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isActive) {
+                        e.currentTarget.style.backgroundColor = `${baseColor}4D`;
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isActive) {
+                        e.currentTarget.style.backgroundColor = `${baseColor}33`;
+                      }
+                    }}
                   >
                     {labels[priority]}
                   </button>
