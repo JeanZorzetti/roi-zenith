@@ -818,6 +818,10 @@ const TasksPage = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
 
+  // Swipe gesture state
+  const [touchStart, setTouchStart] = useState<{x: number, y: number, taskId: string} | null>(null);
+  const [swipedTask, setSwipedTask] = useState<{taskId: string, direction: 'left' | 'right'} | null>(null);
+
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [showColumnModal, setShowColumnModal] = useState(false);
@@ -2895,6 +2899,51 @@ const TasksPage = () => {
     setDropIndicator(null);
   };
 
+  // Swipe gesture handlers for mobile
+  const handleTouchStart = (e: React.TouchEvent, taskId: string) => {
+    if (!isMobile) return;
+    const touch = e.touches[0];
+    setTouchStart({ x: touch.clientX, y: touch.clientY, taskId });
+  };
+
+  const handleTouchMove = (e: React.TouchEvent, taskId: string) => {
+    if (!isMobile || !touchStart || touchStart.taskId !== taskId) return;
+
+    const touch = e.touches[0];
+    const deltaX = touch.clientX - touchStart.x;
+    const deltaY = Math.abs(touch.clientY - touchStart.y);
+
+    // Only trigger swipe if horizontal movement is dominant
+    if (Math.abs(deltaX) > 50 && deltaY < 30) {
+      if (deltaX > 0) {
+        setSwipedTask({ taskId, direction: 'right' });
+      } else {
+        setSwipedTask({ taskId, direction: 'left' });
+      }
+    }
+  };
+
+  const handleTouchEnd = async (taskId: string) => {
+    if (!isMobile || !swipedTask || swipedTask.taskId !== taskId) {
+      setTouchStart(null);
+      return;
+    }
+
+    // Swipe right: mark complete
+    if (swipedTask.direction === 'right') {
+      await toggleTaskCompletion(taskId);
+    }
+    // Swipe left: delete
+    else if (swipedTask.direction === 'left') {
+      if (confirm('Deseja excluir esta task?')) {
+        await deleteTask(taskId);
+      }
+    }
+
+    setTouchStart(null);
+    setSwipedTask(null);
+  };
+
   // Horizontal scroll functions
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     const target = e.target as HTMLElement;
@@ -4111,8 +4160,11 @@ const TasksPage = () => {
                                 <div className="h-1 bg-blue-500 rounded-full shadow-lg shadow-blue-500/50 my-2 animate-pulse" />
                               )}
                               <div
-                                draggable
-                                onDragStart={(e) => handleDragStart(e, task.id, column.id)}
+                                draggable={!isMobile}
+                                onDragStart={(e) => !isMobile && handleDragStart(e, task.id, column.id)}
+                                onTouchStart={(e) => handleTouchStart(e, task.id)}
+                                onTouchMove={(e) => handleTouchMove(e, task.id)}
+                                onTouchEnd={() => handleTouchEnd(task.id)}
                               onClick={(e) => {
                                 if (e.target instanceof HTMLElement && !e.target.closest('button')) {
                                   if (isMultiSelectMode || e.shiftKey) {
@@ -4382,8 +4434,11 @@ const TasksPage = () => {
                           <div className="h-1 bg-blue-500 rounded-full shadow-lg shadow-blue-500/50 my-2 animate-pulse" />
                         )}
                         <div
-                          draggable
-                          onDragStart={(e) => handleDragStart(e, task.id, column.id)}
+                          draggable={!isMobile}
+                          onDragStart={(e) => !isMobile && handleDragStart(e, task.id, column.id)}
+                          onTouchStart={(e) => handleTouchStart(e, task.id)}
+                          onTouchMove={(e) => handleTouchMove(e, task.id)}
+                          onTouchEnd={() => handleTouchEnd(task.id)}
                         onClick={(e) => {
                           if (e.target instanceof HTMLElement && !e.target.closest('button')) {
                             if (isMultiSelectMode || e.shiftKey) {
@@ -4656,8 +4711,11 @@ const TasksPage = () => {
                       <div className="h-1 bg-blue-500 rounded-full shadow-lg shadow-blue-500/50 my-2 animate-pulse" />
                     )}
                     <div
-                      draggable
-                      onDragStart={(e) => handleDragStart(e, task.id, column.id)}
+                      draggable={!isMobile}
+                      onDragStart={(e) => !isMobile && handleDragStart(e, task.id, column.id)}
+                      onTouchStart={(e) => handleTouchStart(e, task.id)}
+                      onTouchMove={(e) => handleTouchMove(e, task.id)}
+                      onTouchEnd={() => handleTouchEnd(task.id)}
                     onClick={(e) => {
                       // Avoid opening when clicking on buttons or when dragging
                       if (e.target instanceof HTMLElement && !e.target.closest('button')) {
@@ -5690,6 +5748,21 @@ const TasksPage = () => {
         onImport={handleImport}
         currentBoardId={currentBoardId}
       />
+
+      {/* Mobile FAB (Floating Action Button) */}
+      {isMobile && canEdit() && (
+        <button
+          onClick={() => {
+            resetTaskForm();
+            setTargetColumnId(columns[0]?.id || null);
+            setShowTaskModal(true);
+          }}
+          className="fixed bottom-6 right-6 w-14 h-14 bg-primary-500 hover:bg-primary-600 text-white rounded-full shadow-2xl shadow-primary-500/50 flex items-center justify-center z-50 transition-all duration-200 hover:scale-110 active:scale-95"
+          title="Nova Task"
+        >
+          <Plus className="h-6 w-6" />
+        </button>
+      )}
     </div>
   );
 };

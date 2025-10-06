@@ -301,7 +301,7 @@ Plano de implementação incremental de melhorias de UI/UX baseado nas melhores 
   - Desktop: grid de colunas horizontal
   - Tablet: 2 colunas por linha + scroll
   - Mobile: lista vertical única
-- [ ] Mobile-specific UI:
+- [x] 👌 Mobile-specific UI:
   - Bottom sheet para edição
   - Floating action button (FAB) para new task
   - Swipe gestures:
