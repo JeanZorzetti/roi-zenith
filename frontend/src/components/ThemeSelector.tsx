@@ -30,13 +30,13 @@ export const ThemeSelector: React.FC = () => {
         <>
           {/* Backdrop */}
           <div
-            className="fixed inset-0 z-[90]"
+            className="fixed inset-0 z-[9998]"
             onClick={() => setIsOpen(false)}
           />
 
           {/* Dropdown */}
           <div
-            className="absolute right-0 mt-2 w-72 rounded-xl shadow-2xl z-[100] max-h-96 overflow-y-auto"
+            className="absolute right-0 mt-2 w-72 rounded-xl shadow-2xl z-[9999] max-h-96 overflow-y-auto"
             style={{
               backgroundColor: currentTheme.colors.backgroundSecondary,
               borderColor: currentTheme.colors.border,
