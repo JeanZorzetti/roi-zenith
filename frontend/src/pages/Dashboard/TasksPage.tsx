@@ -48,6 +48,7 @@ import { useSocket } from '@/hooks/useSocket';
 import { ActivityFeed } from '@/components/ActivityFeed';
 import { ToastContainer } from '@/components/Notifications';
 import { ImportModal } from '@/components/ImportModal';
+import { ThemeSelector } from '@/components/ThemeSelector';
 
 interface ChecklistItem {
   id: string;
@@ -3940,6 +3941,9 @@ const TasksPage = () => {
                 {isCompactMode ? 'Normal' : 'Compacto'}
               </span>
             </button>
+
+            {/* Theme Selector */}
+            <ThemeSelector />
 
             {/* Multi-Select Toggle */}
             <button
