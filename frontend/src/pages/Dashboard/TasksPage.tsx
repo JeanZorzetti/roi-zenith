@@ -4761,26 +4761,55 @@ const TasksPage = () => {
                                 }
                               }}
                               onContextMenu={(e) => handleContextMenu(e, task.id)}
-                              className={`group kanban-card bg-gradient-to-br from-gray-900/60 to-gray-900/40 backdrop-blur-md border rounded-xl ${isCompactMode ? 'p-3' : 'p-5'} hover:from-gray-900/70 hover:to-gray-900/50 transition-all duration-300 cursor-pointer hover:shadow-xl hover:shadow-primary-500/20 hover:scale-[1.02] ${getPriorityBorderClass(task.priority)} ${
-                                task.completed ? 'opacity-75' : ''
-                              } ${
-                                !isHighlighted ? 'opacity-30 hover:opacity-50' : ''
-                              } ${
-                                selectedTasks.includes(task.id)
-                                  ? 'border-blue-500/80 shadow-lg shadow-blue-500/30 ring-2 ring-blue-500/50 bg-blue-900/20'
-                                  : selectedTaskId === task.id
-                                  ? 'border-primary-500/80 shadow-lg shadow-primary-500/30 ring-2 ring-primary-500/50'
-                                  : 'border-gray-700/50 hover:border-gray-600/70'
-                              } ${
+                              className={`group kanban-card backdrop-blur-md rounded-xl ${isCompactMode ? 'p-3' : 'p-5'} transition-all duration-300 cursor-pointer hover:scale-[1.02] ${
                                 isTaskOld(task) ? 'animate-pulse' : ''
                               }`}
+                              style={{
+                                background: `linear-gradient(135deg, ${currentTheme.colors.cardBg}99, ${currentTheme.colors.cardBg}66)`,
+                                borderWidth: selectedTasks.includes(task.id) || selectedTaskId === task.id ? '2px' : '1px',
+                                borderStyle: 'solid',
+                                borderColor: selectedTasks.includes(task.id)
+                                  ? currentTheme.colors.accent
+                                  : selectedTaskId === task.id
+                                  ? currentTheme.colors.primary
+                                  : task.priority === 'urgent'
+                                  ? currentTheme.colors.priorityUrgent
+                                  : task.priority === 'high'
+                                  ? currentTheme.colors.priorityHigh
+                                  : task.priority === 'medium'
+                                  ? currentTheme.colors.priorityMedium
+                                  : currentTheme.colors.priorityLow,
+                                opacity: task.completed ? 0.75 : (!isHighlighted ? 0.3 : 1),
+                                boxShadow: selectedTasks.includes(task.id)
+                                  ? `0 4px 16px ${currentTheme.colors.accent}33, 0 0 0 2px ${currentTheme.colors.accent}80`
+                                  : selectedTaskId === task.id
+                                  ? `0 4px 16px ${currentTheme.colors.primary}33, 0 0 0 2px ${currentTheme.colors.primary}80`
+                                  : 'none'
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.background = `linear-gradient(135deg, ${currentTheme.colors.cardBgHover}99, ${currentTheme.colors.cardBgHover}66)`;
+                                e.currentTarget.style.opacity = !isHighlighted ? '0.5' : '1';
+                                if (!selectedTasks.includes(task.id) && selectedTaskId !== task.id) {
+                                  e.currentTarget.style.boxShadow = `0 8px 24px ${currentTheme.colors.primary}20`;
+                                }
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.background = `linear-gradient(135deg, ${currentTheme.colors.cardBg}99, ${currentTheme.colors.cardBg}66)`;
+                                e.currentTarget.style.opacity = task.completed ? '0.75' : (!isHighlighted ? '0.3' : '1');
+                                if (!selectedTasks.includes(task.id) && selectedTaskId !== task.id) {
+                                  e.currentTarget.style.boxShadow = 'none';
+                                }
+                              }}
                             >
                               {/* Task Header */}
                               <div className={`flex items-start justify-between ${isCompactMode ? 'mb-2' : 'mb-3'}`}>
                                 <div className="flex items-center space-x-2">
                                   {/* Drag Handle */}
                                   <div className={`${isMobile ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity duration-200 cursor-grab active:cursor-grabbing`}>
-                                    <GripVertical className={`${isMobile ? 'h-6 w-6' : 'h-4 w-4'} text-gray-500`} />
+                                    <GripVertical
+                                      className={`${isMobile ? 'h-6 w-6' : 'h-4 w-4'}`}
+                                      style={{ color: currentTheme.colors.textMuted }}
+                                    />
                                   </div>
                                   {isMultiSelectMode && (
                                     <button
@@ -4791,9 +4820,15 @@ const TasksPage = () => {
                                       className={`hover:scale-110 transition-all duration-200 ${isMobile ? 'p-2' : ''}`}
                                     >
                                       {selectedTasks.includes(task.id) ? (
-                                        <CheckSquare className={`${isMobile ? 'h-6 w-6' : 'h-5 w-5'} text-blue-400`} />
+                                        <CheckSquare
+                                          className={`${isMobile ? 'h-6 w-6' : 'h-5 w-5'}`}
+                                          style={{ color: currentTheme.colors.accent }}
+                                        />
                                       ) : (
-                                        <Square className={`${isMobile ? 'h-6 w-6' : 'h-5 w-5'} text-gray-400`} />
+                                        <Square
+                                          className={`${isMobile ? 'h-6 w-6' : 'h-5 w-5'}`}
+                                          style={{ color: currentTheme.colors.textSecondary }}
+                                        />
                                       )}
                                     </button>
                                   )}
@@ -4805,37 +4840,75 @@ const TasksPage = () => {
                                     className={`hover:scale-125 active:scale-95 transition-all duration-200 group ${isMobile ? 'p-2' : ''}`}
                                   >
                                     {task.completed ? (
-                                      <CheckCircle2 className={`${isMobile ? 'h-6 w-6' : 'h-4 w-4'} text-green-400 flex-shrink-0 animate-pulse`} />
+                                      <CheckCircle2
+                                        className={`${isMobile ? 'h-6 w-6' : 'h-4 w-4'} flex-shrink-0 animate-pulse`}
+                                        style={{ color: currentTheme.colors.success }}
+                                      />
                                     ) : (
-                                      <Circle className={`${isMobile ? 'h-6 w-6' : 'h-4 w-4'} text-gray-400 flex-shrink-0 hover:text-green-400 group-hover:rotate-90 transition-all duration-300`} />
+                                      <Circle
+                                        className={`${isMobile ? 'h-6 w-6' : 'h-4 w-4'} flex-shrink-0 group-hover:rotate-90 transition-all duration-300`}
+                                        style={{ color: currentTheme.colors.textSecondary }}
+                                        onMouseEnter={(e) => e.currentTarget.style.color = currentTheme.colors.success}
+                                        onMouseLeave={(e) => e.currentTarget.style.color = currentTheme.colors.textSecondary}
+                                      />
                                     )}
                                   </button>
                                   <div className="flex items-center space-x-2">
                                     {getPriorityIcon(task.priority)}
                                     {hasChecklist && (
-                                      <ListChecks className="h-3 w-3 text-blue-400" />
+                                      <ListChecks
+                                        className="h-3 w-3"
+                                        style={{ color: currentTheme.colors.accent }}
+                                      />
                                     )}
                                   </div>
                                 </div>
                                 <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                                   <button
                                     onClick={() => duplicateTask(task.id)}
-                                    className="p-1 rounded text-gray-400 hover:text-purple-400 hover:bg-purple-500/10 transition-all duration-200 hover:scale-110 active:scale-95"
+                                    className="p-1 rounded transition-all duration-200 hover:scale-110 active:scale-95"
+                                    style={{ color: currentTheme.colors.textSecondary }}
                                     title="Duplicar tarefa"
+                                    onMouseEnter={(e) => {
+                                      e.currentTarget.style.color = currentTheme.colors.accent;
+                                      e.currentTarget.style.backgroundColor = `${currentTheme.colors.accent}20`;
+                                    }}
+                                    onMouseLeave={(e) => {
+                                      e.currentTarget.style.color = currentTheme.colors.textSecondary;
+                                      e.currentTarget.style.backgroundColor = 'transparent';
+                                    }}
                                   >
                                     <Copy className="h-3 w-3 transition-transform duration-200 hover:scale-110" />
                                   </button>
                                   <button
                                     onClick={() => openEditTask(task)}
-                                    className={`${isMobile ? 'p-2' : 'p-1'} rounded text-gray-400 hover:text-blue-400 hover:bg-blue-500/10 transition-all duration-200 hover:scale-110 active:scale-95`}
+                                    className={`${isMobile ? 'p-2' : 'p-1'} rounded transition-all duration-200 hover:scale-110 active:scale-95`}
+                                    style={{ color: currentTheme.colors.textSecondary }}
                                     title="Editar tarefa"
+                                    onMouseEnter={(e) => {
+                                      e.currentTarget.style.color = currentTheme.colors.primary;
+                                      e.currentTarget.style.backgroundColor = `${currentTheme.colors.primary}20`;
+                                    }}
+                                    onMouseLeave={(e) => {
+                                      e.currentTarget.style.color = currentTheme.colors.textSecondary;
+                                      e.currentTarget.style.backgroundColor = 'transparent';
+                                    }}
                                   >
                                     <Edit3 className={`${isMobile ? 'h-5 w-5' : 'h-3 w-3'} transition-transform duration-200 hover:rotate-12`} />
                                   </button>
                                   <button
                                     onClick={() => deleteTask(task.id)}
-                                    className={`${isMobile ? 'p-2' : 'p-1'} rounded text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200 hover:scale-110 active:scale-95`}
+                                    className={`${isMobile ? 'p-2' : 'p-1'} rounded transition-all duration-200 hover:scale-110 active:scale-95`}
+                                    style={{ color: currentTheme.colors.textSecondary }}
                                     title="Excluir tarefa"
+                                    onMouseEnter={(e) => {
+                                      e.currentTarget.style.color = currentTheme.colors.error;
+                                      e.currentTarget.style.backgroundColor = `${currentTheme.colors.error}20`;
+                                    }}
+                                    onMouseLeave={(e) => {
+                                      e.currentTarget.style.color = currentTheme.colors.textSecondary;
+                                      e.currentTarget.style.backgroundColor = 'transparent';
+                                    }}
                                   >
                                     <Trash2 className={`${isMobile ? 'h-5 w-5' : 'h-3 w-3'} transition-transform duration-200 hover:scale-110`} />
                                   </button>
@@ -4854,13 +4927,24 @@ const TasksPage = () => {
                                       if (e.key === 'Enter') saveInlineEdit();
                                       if (e.key === 'Escape') cancelInlineEdit();
                                     }}
-                                    className="w-full font-bold text-lg mb-1 bg-gray-800 border border-primary-500 rounded px-2 py-1 text-white focus:outline-none focus:ring-2 focus:ring-primary-500/50"
+                                    className="w-full font-bold text-lg mb-1 rounded px-2 py-1 focus:outline-none focus:ring-2"
+                                    style={{
+                                      backgroundColor: currentTheme.colors.inputBg,
+                                      borderWidth: '1px',
+                                      borderStyle: 'solid',
+                                      borderColor: currentTheme.colors.primary,
+                                      color: currentTheme.colors.text,
+                                      boxShadow: `0 0 0 2px ${currentTheme.colors.primary}33`
+                                    }}
                                     autoFocus
                                     onClick={(e) => e.stopPropagation()}
                                   />
                                 ) : (
                                   <h4
-                                    className={`font-bold text-lg mb-1 cursor-text ${task.completed ? 'line-through text-gray-500' : 'text-white'}`}
+                                    className={`font-bold text-lg mb-1 cursor-text ${task.completed ? 'line-through' : ''}`}
+                                    style={{
+                                      color: task.completed ? currentTheme.colors.textMuted : currentTheme.colors.text
+                                    }}
                                     onDoubleClick={(e) => {
                                       e.stopPropagation();
                                       startInlineEditing(task.id, task.title);
@@ -4871,7 +4955,12 @@ const TasksPage = () => {
                                   </h4>
                                 )}
                                 {task.description && (
-                                  <p className="text-sm text-gray-400 line-clamp-2">{task.description}</p>
+                                  <p
+                                    className="text-sm line-clamp-2"
+                                    style={{ color: currentTheme.colors.textSecondary }}
+                                  >
+                                    {task.description}
+                                  </p>
                                 )}
                               </div>
 
@@ -4880,19 +4969,47 @@ const TasksPage = () => {
                                 <div className="mb-3">
                                   <div className="flex items-center justify-between mb-2">
                                     <div className="flex items-center space-x-2">
-                                      <ListChecks className="h-3.5 w-3.5 text-blue-400" />
-                                      <span className="text-xs font-medium text-gray-300">
+                                      <ListChecks
+                                        className="h-3.5 w-3.5"
+                                        style={{ color: currentTheme.colors.accent }}
+                                      />
+                                      <span
+                                        className="text-xs font-medium"
+                                        style={{ color: currentTheme.colors.textSecondary }}
+                                      >
                                         {checklist.filter(item => item.completed).length}/{checklist.length} concluídos
                                       </span>
                                     </div>
-                                    <span className={`text-xs font-bold ${checklistProgress === 100 ? 'text-green-400' : 'text-gray-400'}`}>
+                                    <span
+                                      className="text-xs font-bold"
+                                      style={{
+                                        color: checklistProgress === 100
+                                          ? currentTheme.colors.success
+                                          : currentTheme.colors.textSecondary
+                                      }}
+                                    >
                                       {checklistProgress}%
                                     </span>
                                   </div>
-                                  <div className="w-full bg-gray-700/50 rounded-full h-2.5 overflow-hidden border border-gray-600/50">
+                                  <div
+                                    className="w-full rounded-full h-2.5 overflow-hidden"
+                                    style={{
+                                      backgroundColor: `${currentTheme.colors.border}80`,
+                                      borderWidth: '1px',
+                                      borderStyle: 'solid',
+                                      borderColor: currentTheme.colors.border
+                                    }}
+                                  >
                                     <div
-                                      className={`h-2.5 rounded-full transition-all duration-500 ${getProgressBarColor(checklistProgress)}`}
-                                      style={{ width: `${checklistProgress}%` }}
+                                      className="h-2.5 rounded-full transition-all duration-500"
+                                      style={{
+                                        width: `${checklistProgress}%`,
+                                        backgroundColor: checklistProgress === 100
+                                          ? currentTheme.colors.success
+                                          : checklistProgress >= 50
+                                          ? currentTheme.colors.accent
+                                          : currentTheme.colors.textMuted
+                                      }}
                                     ></div>
                                   </div>
 
@@ -4905,18 +5022,36 @@ const TasksPage = () => {
                                           className="hover:scale-110 transition-transform"
                                         >
                                           {item.completed ? (
-                                            <CheckCircle2 className="h-3 w-3 text-green-400 flex-shrink-0" />
+                                            <CheckCircle2
+                                              className="h-3 w-3 flex-shrink-0"
+                                              style={{ color: currentTheme.colors.success }}
+                                            />
                                           ) : (
-                                            <Circle className="h-3 w-3 text-gray-400 flex-shrink-0 hover:text-green-400" />
+                                            <Circle
+                                              className="h-3 w-3 flex-shrink-0"
+                                              style={{ color: currentTheme.colors.textSecondary }}
+                                              onMouseEnter={(e) => e.currentTarget.style.color = currentTheme.colors.success}
+                                              onMouseLeave={(e) => e.currentTarget.style.color = currentTheme.colors.textSecondary}
+                                            />
                                           )}
                                         </button>
-                                        <span className={`text-xs ${item.completed ? 'line-through text-gray-500' : 'text-gray-300'} truncate`}>
+                                        <span
+                                          className={`text-xs truncate ${item.completed ? 'line-through' : ''}`}
+                                          style={{
+                                            color: item.completed
+                                              ? currentTheme.colors.textMuted
+                                              : currentTheme.colors.textSecondary
+                                          }}
+                                        >
                                           {item.text}
                                         </span>
                                       </div>
                                     ))}
                                     {checklist.length > 3 && (
-                                      <div className="text-xs text-gray-500 pl-5">
+                                      <div
+                                        className="text-xs pl-5"
+                                        style={{ color: currentTheme.colors.textMuted }}
+                                      >
                                         +{checklist.length - 3} mais itens...
                                       </div>
                                     )}
@@ -4926,15 +5061,47 @@ const TasksPage = () => {
 
                               {/* Real-time editing indicator */}
                               {editingUsers[task.id] && (
-                                <div className="mb-3 flex items-center space-x-2 bg-yellow-900/20 border border-yellow-500/30 px-3 py-2 rounded-lg">
-                                  <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
-                                  <span className="text-yellow-300 text-xs font-medium">
+                                <div
+                                  className="mb-3 flex items-center space-x-2 px-3 py-2 rounded-lg"
+                                  style={{
+                                    backgroundColor: `${currentTheme.colors.warning}20`,
+                                    borderWidth: '1px',
+                                    borderStyle: 'solid',
+                                    borderColor: `${currentTheme.colors.warning}33`
+                                  }}
+                                >
+                                  <div
+                                    className="w-2 h-2 rounded-full animate-pulse"
+                                    style={{ backgroundColor: currentTheme.colors.warning }}
+                                  ></div>
+                                  <span
+                                    className="text-xs font-medium"
+                                    style={{ color: currentTheme.colors.warning }}
+                                  >
                                     {editingUsers[task.id].userName} está editando esta tarefa...
                                   </span>
                                   <div className="flex space-x-0.5">
-                                    <div className="w-1 h-1 bg-yellow-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                                    <div className="w-1 h-1 bg-yellow-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                                    <div className="w-1 h-1 bg-yellow-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                                    <div
+                                      className="w-1 h-1 rounded-full animate-bounce"
+                                      style={{
+                                        backgroundColor: currentTheme.colors.warning,
+                                        animationDelay: '0ms'
+                                      }}
+                                    ></div>
+                                    <div
+                                      className="w-1 h-1 rounded-full animate-bounce"
+                                      style={{
+                                        backgroundColor: currentTheme.colors.warning,
+                                        animationDelay: '150ms'
+                                      }}
+                                    ></div>
+                                    <div
+                                      className="w-1 h-1 rounded-full animate-bounce"
+                                      style={{
+                                        backgroundColor: currentTheme.colors.warning,
+                                        animationDelay: '300ms'
+                                      }}
+                                    ></div>
                                   </div>
                                 </div>
                               )}
@@ -4945,8 +5112,23 @@ const TasksPage = () => {
                                   {task.tags.map((tag, index) => (
                                     <span
                                       key={index}
-                                      className={`px-2.5 py-1 text-xs font-medium rounded-md border transition-all duration-200 hover:scale-105 hover:shadow-md backdrop-blur-sm ${getTagColor(tag)}`}
+                                      className="px-2.5 py-1 text-xs font-medium rounded-md transition-all duration-200 hover:scale-105 hover:shadow-md backdrop-blur-sm"
+                                      style={{
+                                        backgroundColor: `${currentTheme.colors.accent}33`,
+                                        borderWidth: '1px',
+                                        borderStyle: 'solid',
+                                        borderColor: `${currentTheme.colors.accent}80`,
+                                        color: currentTheme.colors.accent
+                                      }}
                                       title={`Tag: ${tag}`}
+                                      onMouseEnter={(e) => {
+                                        e.currentTarget.style.backgroundColor = `${currentTheme.colors.accent}4D`;
+                                        e.currentTarget.style.borderColor = currentTheme.colors.accent;
+                                      }}
+                                      onMouseLeave={(e) => {
+                                        e.currentTarget.style.backgroundColor = `${currentTheme.colors.accent}33`;
+                                        e.currentTarget.style.borderColor = `${currentTheme.colors.accent}80`;
+                                      }}
                                     >
                                       {tag}
                                     </span>
@@ -4957,11 +5139,30 @@ const TasksPage = () => {
                               {/* Task Age Indicator */}
                               {(() => {
                                 const ageDays = getTaskAgeDays(task);
-                                const ageColor = getTaskAgeColor(ageDays);
+                                const ageColorValue = ageDays >= 7
+                                  ? currentTheme.colors.error
+                                  : ageDays >= 3
+                                  ? currentTheme.colors.warning
+                                  : currentTheme.colors.textMuted;
+
                                 return (
-                                  <div className={`flex items-center space-x-1.5 px-2 py-1 rounded-md border mb-3 ${ageColor.bg} ${ageColor.border}`}>
-                                    <Clock className={`h-3 w-3 ${ageColor.text}`} />
-                                    <span className={`text-xs font-medium ${ageColor.text}`}>
+                                  <div
+                                    className="flex items-center space-x-1.5 px-2 py-1 rounded-md mb-3"
+                                    style={{
+                                      backgroundColor: `${ageColorValue}20`,
+                                      borderWidth: '1px',
+                                      borderStyle: 'solid',
+                                      borderColor: `${ageColorValue}66`
+                                    }}
+                                  >
+                                    <Clock
+                                      className="h-3 w-3"
+                                      style={{ color: ageColorValue }}
+                                    />
+                                    <span
+                                      className="text-xs font-medium"
+                                      style={{ color: ageColorValue }}
+                                    >
                                       {ageDays === 0 ? 'Hoje' : ageDays === 1 ? '1 dia' : `${ageDays} dias`}
                                     </span>
                                   </div>
@@ -4969,27 +5170,65 @@ const TasksPage = () => {
                               })()}
 
                               {/* Task Footer */}
-                              <div className="flex items-center justify-between text-xs text-gray-400">
+                              <div
+                                className="flex items-center justify-between text-xs"
+                                style={{ color: currentTheme.colors.textSecondary }}
+                              >
                                 <div className="flex items-center space-x-3">
                                   {task.assignee && (
                                     <div className="flex items-center space-x-2" title={task.assignee}>
-                                      <div className={`w-8 h-8 rounded-full ${getAvatarColor(task.assignee)} flex items-center justify-center text-white text-xs font-semibold`}>
+                                      <div
+                                        className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold"
+                                        style={{
+                                          backgroundColor: currentTheme.colors.accent,
+                                          color: currentTheme.colors.text
+                                        }}
+                                      >
                                         {getInitials(task.assignee)}
                                       </div>
-                                      <span className="text-gray-300">{task.assignee}</span>
+                                      <span style={{ color: currentTheme.colors.textSecondary }}>
+                                        {task.assignee}
+                                      </span>
                                     </div>
                                   )}
                                   {task.dueDate && (() => {
                                     const dueDateStatus = getDueDateStatus(task.dueDate);
+                                    const dueDateColor = dueDateStatus?.urgent
+                                      ? currentTheme.colors.error
+                                      : dueDateStatus
+                                      ? currentTheme.colors.warning
+                                      : currentTheme.colors.textSecondary;
+
                                     return dueDateStatus ? (
-                                      <div className={`flex items-center space-x-1.5 px-2 py-1 rounded-md border ${dueDateStatus.color} ${dueDateStatus.urgent ? 'animate-pulse' : ''}`}>
-                                        <Clock className="h-3 w-3" />
-                                        <span className="font-medium">{dueDateStatus.label}</span>
+                                      <div
+                                        className={`flex items-center space-x-1.5 px-2 py-1 rounded-md ${dueDateStatus.urgent ? 'animate-pulse' : ''}`}
+                                        style={{
+                                          backgroundColor: `${dueDateColor}20`,
+                                          borderWidth: '1px',
+                                          borderStyle: 'solid',
+                                          borderColor: `${dueDateColor}66`
+                                        }}
+                                      >
+                                        <Clock
+                                          className="h-3 w-3"
+                                          style={{ color: dueDateColor }}
+                                        />
+                                        <span
+                                          className="font-medium"
+                                          style={{ color: dueDateColor }}
+                                        >
+                                          {dueDateStatus.label}
+                                        </span>
                                       </div>
                                     ) : (
                                       <div className="flex items-center space-x-1">
-                                        <Calendar className="h-3 w-3" />
-                                        <span>{new Date(task.dueDate).toLocaleDateString('pt-BR')}</span>
+                                        <Calendar
+                                          className="h-3 w-3"
+                                          style={{ color: currentTheme.colors.textSecondary }}
+                                        />
+                                        <span style={{ color: currentTheme.colors.textSecondary }}>
+                                          {new Date(task.dueDate).toLocaleDateString('pt-BR')}
+                                        </span>
                                       </div>
                                     );
                                   })()}
