@@ -4227,8 +4227,8 @@ const TasksPage = () => {
                               <div className={`flex items-start justify-between ${isCompactMode ? 'mb-2' : 'mb-3'}`}>
                                 <div className="flex items-center space-x-2">
                                   {/* Drag Handle */}
-                                  <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 cursor-grab active:cursor-grabbing">
-                                    <GripVertical className="h-4 w-4 text-gray-500" />
+                                  <div className={`${isMobile ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity duration-200 cursor-grab active:cursor-grabbing`}>
+                                    <GripVertical className={`${isMobile ? 'h-6 w-6' : 'h-4 w-4'} text-gray-500`} />
                                   </div>
                                   {isMultiSelectMode && (
                                     <button
@@ -4236,12 +4236,12 @@ const TasksPage = () => {
                                         e.stopPropagation();
                                         toggleTaskSelection(task.id, true);
                                       }}
-                                      className="hover:scale-110 transition-all duration-200"
+                                      className={`hover:scale-110 transition-all duration-200 ${isMobile ? 'p-2' : ''}`}
                                     >
                                       {selectedTasks.includes(task.id) ? (
-                                        <CheckSquare className="h-5 w-5 text-blue-400" />
+                                        <CheckSquare className={`${isMobile ? 'h-6 w-6' : 'h-5 w-5'} text-blue-400`} />
                                       ) : (
-                                        <Square className="h-5 w-5 text-gray-400" />
+                                        <Square className={`${isMobile ? 'h-6 w-6' : 'h-5 w-5'} text-gray-400`} />
                                       )}
                                     </button>
                                   )}
@@ -4250,12 +4250,12 @@ const TasksPage = () => {
                                       e.stopPropagation();
                                       toggleTaskCompletion(task.id);
                                     }}
-                                    className="hover:scale-125 active:scale-95 transition-all duration-200 group"
+                                    className={`hover:scale-125 active:scale-95 transition-all duration-200 group ${isMobile ? 'p-2' : ''}`}
                                   >
                                     {task.completed ? (
-                                      <CheckCircle2 className="h-4 w-4 text-green-400 flex-shrink-0 animate-pulse" />
+                                      <CheckCircle2 className={`${isMobile ? 'h-6 w-6' : 'h-4 w-4'} text-green-400 flex-shrink-0 animate-pulse`} />
                                     ) : (
-                                      <Circle className="h-4 w-4 text-gray-400 flex-shrink-0 hover:text-green-400 group-hover:rotate-90 transition-all duration-300" />
+                                      <Circle className={`${isMobile ? 'h-6 w-6' : 'h-4 w-4'} text-gray-400 flex-shrink-0 hover:text-green-400 group-hover:rotate-90 transition-all duration-300`} />
                                     )}
                                   </button>
                                   <div className="flex items-center space-x-2">
@@ -4275,17 +4275,17 @@ const TasksPage = () => {
                                   </button>
                                   <button
                                     onClick={() => openEditTask(task)}
-                                    className="p-1 rounded text-gray-400 hover:text-blue-400 hover:bg-blue-500/10 transition-all duration-200 hover:scale-110 active:scale-95"
+                                    className={`${isMobile ? 'p-2' : 'p-1'} rounded text-gray-400 hover:text-blue-400 hover:bg-blue-500/10 transition-all duration-200 hover:scale-110 active:scale-95`}
                                     title="Editar tarefa"
                                   >
-                                    <Edit3 className="h-3 w-3 transition-transform duration-200 hover:rotate-12" />
+                                    <Edit3 className={`${isMobile ? 'h-5 w-5' : 'h-3 w-3'} transition-transform duration-200 hover:rotate-12`} />
                                   </button>
                                   <button
                                     onClick={() => deleteTask(task.id)}
-                                    className="p-1 rounded text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200 hover:scale-110 active:scale-95"
+                                    className={`${isMobile ? 'p-2' : 'p-1'} rounded text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200 hover:scale-110 active:scale-95`}
                                     title="Excluir tarefa"
                                   >
-                                    <Trash2 className="h-3 w-3 transition-transform duration-200 hover:scale-110" />
+                                    <Trash2 className={`${isMobile ? 'h-5 w-5' : 'h-3 w-3'} transition-transform duration-200 hover:scale-110`} />
                                   </button>
                                 </div>
                               </div>
