@@ -5350,19 +5350,45 @@ const TasksPage = () => {
                           }
                         }}
                         onContextMenu={(e) => handleContextMenu(e, task.id)}
-                        className={`group kanban-card bg-gradient-to-br from-gray-900/60 to-gray-900/40 backdrop-blur-md border rounded-xl ${isCompactMode ? 'p-3' : 'p-5'} hover:from-gray-900/70 hover:to-gray-900/50 transition-all duration-300 cursor-pointer hover:shadow-xl hover:shadow-primary-500/20 hover:scale-[1.02] ${getPriorityBorderClass(task.priority)} ${
-                          task.completed ? 'opacity-75' : ''
-                        } ${
-                          !isHighlighted ? 'opacity-30 hover:opacity-50' : ''
-                        } ${
-                          selectedTasks.includes(task.id)
-                            ? 'border-blue-500/80 shadow-lg shadow-blue-500/30 ring-2 ring-blue-500/50 bg-blue-900/20'
-                            : selectedTaskId === task.id
-                            ? 'border-primary-500/80 shadow-lg shadow-primary-500/30 ring-2 ring-primary-500/50'
-                            : 'border-gray-700/50 hover:border-gray-600/70'
-                        } ${
+                        className={`group kanban-card backdrop-blur-md rounded-xl ${isCompactMode ? 'p-3' : 'p-5'} transition-all duration-300 cursor-pointer hover:scale-[1.02] ${
                           isTaskOld(task) ? 'animate-pulse' : ''
                         }`}
+                        style={{
+                          background: `linear-gradient(135deg, ${currentTheme.colors.cardBg}99, ${currentTheme.colors.cardBg}66)`,
+                          borderWidth: selectedTasks.includes(task.id) || selectedTaskId === task.id ? '2px' : '1px',
+                          borderStyle: 'solid',
+                          borderColor: selectedTasks.includes(task.id)
+                            ? currentTheme.colors.accent
+                            : selectedTaskId === task.id
+                            ? currentTheme.colors.primary
+                            : task.priority === 'urgent'
+                            ? currentTheme.colors.priorityUrgent
+                            : task.priority === 'high'
+                            ? currentTheme.colors.priorityHigh
+                            : task.priority === 'medium'
+                            ? currentTheme.colors.priorityMedium
+                            : currentTheme.colors.priorityLow,
+                          opacity: task.completed ? 0.75 : (!isHighlighted ? 0.3 : 1),
+                          boxShadow: selectedTasks.includes(task.id)
+                            ? `0 4px 16px ${currentTheme.colors.accent}33, 0 0 0 2px ${currentTheme.colors.accent}80`
+                            : selectedTaskId === task.id
+                            ? `0 4px 16px ${currentTheme.colors.primary}33, 0 0 0 2px ${currentTheme.colors.primary}80`
+                            : 'none'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = `linear-gradient(135deg, ${currentTheme.colors.cardBgHover}99, ${currentTheme.colors.cardBgHover}66)`;
+                          e.currentTarget.style.opacity = !isHighlighted ? '0.5' : '1';
+                          if (!selectedTasks.includes(task.id) && selectedTaskId !== task.id) {
+                            e.currentTarget.style.boxShadow = `0 8px 24px ${currentTheme.colors.primary}20`;
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = `linear-gradient(135deg, ${currentTheme.colors.cardBg}99, ${currentTheme.colors.cardBg}66)`;
+                          e.currentTarget.style.opacity = task.completed ? '0.75' : (!isHighlighted ? '0.3' : '1');
+                          if (!selectedTasks.includes(task.id) && selectedTaskId !== task.id) {
+                            e.currentTarget.style.boxShadow = 'none';
+                          }
+                        }}
                       >
                         {/* Same task rendering as above - keeping original code */}
                         <div className="flex items-start justify-between mb-3">
@@ -5597,11 +5623,24 @@ const TasksPage = () => {
 
                   {/* Empty state for direct tasks */}
                   {column.tasks.filter(task => !task.subColumnId).length === 0 && (
-                    <div className="text-center py-6 text-gray-500 mt-4">
+                    <div className="text-center py-6 mt-4">
                       <div className="flex flex-col items-center space-y-2">
-                        <Plus className="h-10 w-10 text-gray-700/50" />
-                        <p className="text-sm">Nenhuma task direta</p>
-                        <p className="text-xs text-gray-600">Organize suas tasks nas subcolunas acima</p>
+                        <Plus
+                          className="h-10 w-10"
+                          style={{ color: `${currentTheme.colors.border}80` }}
+                        />
+                        <p
+                          className="text-sm"
+                          style={{ color: currentTheme.colors.textMuted }}
+                        >
+                          Nenhuma task direta
+                        </p>
+                        <p
+                          className="text-xs"
+                          style={{ color: currentTheme.colors.textTertiary }}
+                        >
+                          Organize suas tasks nas subcolunas acima
+                        </p>
                       </div>
                     </div>
                   )}
@@ -5858,14 +5897,30 @@ const TasksPage = () => {
 
               {/* Empty state for column with no tasks */}
               {column.tasks.length === 0 && (
-                <div className="text-center py-12 text-gray-500">
+                <div className="text-center py-12">
                   <div className="flex flex-col items-center space-y-3">
-                    <div className="w-16 h-16 rounded-full bg-gray-800/30 flex items-center justify-center">
-                      <Circle className="h-8 w-8 text-gray-700/50" />
+                    <div
+                      className="w-16 h-16 rounded-full flex items-center justify-center"
+                      style={{ backgroundColor: `${currentTheme.colors.cardBg}50` }}
+                    >
+                      <Circle
+                        className="h-8 w-8"
+                        style={{ color: `${currentTheme.colors.border}80` }}
+                      />
                     </div>
                     <div>
-                      <p className="text-sm font-medium">Coluna vazia</p>
-                      <p className="text-xs text-gray-600 mt-1">Adicione tasks para começar</p>
+                      <p
+                        className="text-sm font-medium"
+                        style={{ color: currentTheme.colors.textMuted }}
+                      >
+                        Coluna vazia
+                      </p>
+                      <p
+                        className="text-xs mt-1"
+                        style={{ color: currentTheme.colors.textTertiary }}
+                      >
+                        Adicione tasks para começar
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -5879,7 +5934,19 @@ const TasksPage = () => {
                     setTargetColumnId(column.id);
                     setShowTaskModal(true);
                   }}
-                  className="w-full p-3 border-2 border-dashed border-gray-700/50 rounded-xl text-gray-400 hover:text-white hover:border-gray-600/50 transition-all duration-300 flex items-center justify-center space-x-2"
+                  className="w-full p-3 border-2 border-dashed rounded-xl transition-all duration-300 flex items-center justify-center space-x-2"
+                  style={{
+                    borderColor: `${currentTheme.colors.border}80`,
+                    color: currentTheme.colors.textSecondary
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = currentTheme.colors.text;
+                    e.currentTarget.style.borderColor = currentTheme.colors.border;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = currentTheme.colors.textSecondary;
+                    e.currentTarget.style.borderColor = `${currentTheme.colors.border}80`;
+                  }}
                 >
                   <Plus className="h-4 w-4" />
                   <span className="text-sm font-medium">Adicionar tarefa</span>
@@ -5892,20 +5959,44 @@ const TasksPage = () => {
         {/* Empty state for board with no columns */}
         {columns.length === 0 && (
           <div className="flex items-center justify-center min-h-[60vh]">
-            <div className="text-center text-gray-500 max-w-md">
+            <div className="text-center max-w-md">
               <div className="flex flex-col items-center space-y-4">
-                <div className="w-24 h-24 rounded-full bg-gray-800/30 flex items-center justify-center">
-                  <Columns className="h-12 w-12 text-gray-700/50" />
+                <div
+                  className="w-24 h-24 rounded-full flex items-center justify-center"
+                  style={{ backgroundColor: `${currentTheme.colors.cardBg}50` }}
+                >
+                  <Columns
+                    className="h-12 w-12"
+                    style={{ color: `${currentTheme.colors.border}80` }}
+                  />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-400 mb-2">Board vazio</h3>
-                  <p className="text-sm text-gray-600 mb-4">
+                  <h3
+                    className="text-lg font-semibold mb-2"
+                    style={{ color: currentTheme.colors.textSecondary }}
+                  >
+                    Board vazio
+                  </h3>
+                  <p
+                    className="text-sm mb-4"
+                    style={{ color: currentTheme.colors.textTertiary }}
+                  >
                     Adicione sua primeira coluna para começar a organizar suas tasks
                   </p>
                   {canEdit() && (
                     <button
                       onClick={() => setShowColumnModal(true)}
-                      className="inline-flex items-center space-x-2 bg-primary-600 hover:bg-primary-500 text-white px-4 py-2 rounded-lg transition-all duration-200 hover:scale-105"
+                      className="inline-flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 hover:scale-105"
+                      style={{
+                        backgroundColor: currentTheme.colors.primary,
+                        color: currentTheme.colors.text
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = currentTheme.colors.accent;
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = currentTheme.colors.primary;
+                      }}
                     >
                       <Plus className="h-4 w-4" />
                       <span>Adicionar Coluna</span>
