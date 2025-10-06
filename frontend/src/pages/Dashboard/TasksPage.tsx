@@ -6257,15 +6257,38 @@ const TasksPage = () => {
 
       {/* Task Modal */}
       {showTaskModal && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-gray-900 rounded-2xl border border-gray-700 p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div
+          className="fixed inset-0 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          style={{ backgroundColor: `${currentTheme.colors.background}CC` }}
+        >
+          <div
+            className="rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+            style={{
+              backgroundColor: currentTheme.colors.backgroundSecondary,
+              borderWidth: '1px',
+              borderStyle: 'solid',
+              borderColor: currentTheme.colors.border
+            }}
+          >
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold text-white">
+              <h3
+                className="text-xl font-bold"
+                style={{ color: currentTheme.colors.text }}
+              >
                 {editingTask ? 'Editar Tarefa' : 'Nova Tarefa'}
               </h3>
-              <button 
+              <button
                 onClick={() => {setShowTaskModal(false); resetTaskForm();}}
-                className="p-1 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
+                className="p-1 rounded-lg transition-colors"
+                style={{ color: currentTheme.colors.textSecondary }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = currentTheme.colors.text;
+                  e.currentTarget.style.backgroundColor = `${currentTheme.colors.cardBg}80`;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = currentTheme.colors.textSecondary;
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }}
               >
                 <X className="h-5 w-5" />
               </button>
@@ -6274,41 +6297,95 @@ const TasksPage = () => {
             <div className="space-y-4">
               {/* Title */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: currentTheme.colors.textSecondary }}
+                >
                   Título *
                 </label>
                 <input
                   type="text"
                   value={taskForm.title}
                   onChange={(e) => setTaskForm(prev => ({...prev, title: e.target.value}))}
-                  className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-primary-500"
+                  className="w-full px-3 py-2 rounded-lg focus:outline-none"
+                  style={{
+                    backgroundColor: currentTheme.colors.inputBg,
+                    borderWidth: '1px',
+                    borderStyle: 'solid',
+                    borderColor: currentTheme.colors.border,
+                    color: currentTheme.colors.text
+                  }}
                   placeholder="Digite o título da tarefa"
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = currentTheme.colors.primary;
+                    e.currentTarget.style.boxShadow = `0 0 0 2px ${currentTheme.colors.primary}33`;
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = currentTheme.colors.border;
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
                 />
               </div>
 
               {/* Description */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: currentTheme.colors.textSecondary }}
+                >
                   Descrição
                 </label>
                 <textarea
                   value={taskForm.description}
                   onChange={(e) => setTaskForm(prev => ({...prev, description: e.target.value}))}
-                  className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-primary-500"
+                  className="w-full px-3 py-2 rounded-lg focus:outline-none"
+                  style={{
+                    backgroundColor: currentTheme.colors.inputBg,
+                    borderWidth: '1px',
+                    borderStyle: 'solid',
+                    borderColor: currentTheme.colors.border,
+                    color: currentTheme.colors.text
+                  }}
                   rows={3}
                   placeholder="Descreva a tarefa (opcional)"
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = currentTheme.colors.primary;
+                    e.currentTarget.style.boxShadow = `0 0 0 2px ${currentTheme.colors.primary}33`;
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = currentTheme.colors.border;
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
                 />
               </div>
 
               {/* Priority */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: currentTheme.colors.textSecondary }}
+                >
                   Prioridade
                 </label>
                 <select
                   value={taskForm.priority}
                   onChange={(e) => setTaskForm(prev => ({...prev, priority: e.target.value as Task['priority']}))}
-                  className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-primary-500"
+                  className="w-full px-3 py-2 rounded-lg focus:outline-none"
+                  style={{
+                    backgroundColor: currentTheme.colors.inputBg,
+                    borderWidth: '1px',
+                    borderStyle: 'solid',
+                    borderColor: currentTheme.colors.border,
+                    color: currentTheme.colors.text
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = currentTheme.colors.primary;
+                    e.currentTarget.style.boxShadow = `0 0 0 2px ${currentTheme.colors.primary}33`;
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = currentTheme.colors.border;
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
                 >
                   <option value="low">Baixa</option>
                   <option value="medium">Média</option>
@@ -6320,53 +6397,117 @@ const TasksPage = () => {
               {/* Assignee & Due Date */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label
+                    className="block text-sm font-medium mb-2"
+                    style={{ color: currentTheme.colors.textSecondary }}
+                  >
                     Responsável
                   </label>
                   <input
                     type="text"
                     value={taskForm.assignee}
                     onChange={(e) => setTaskForm(prev => ({...prev, assignee: e.target.value}))}
-                    className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-primary-500"
+                    className="w-full px-3 py-2 rounded-lg focus:outline-none"
+                    style={{
+                      backgroundColor: currentTheme.colors.inputBg,
+                      borderWidth: '1px',
+                      borderStyle: 'solid',
+                      borderColor: currentTheme.colors.border,
+                      color: currentTheme.colors.text
+                    }}
                     placeholder="Nome"
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = currentTheme.colors.primary;
+                      e.currentTarget.style.boxShadow = `0 0 0 2px ${currentTheme.colors.primary}33`;
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = currentTheme.colors.border;
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label
+                    className="block text-sm font-medium mb-2"
+                    style={{ color: currentTheme.colors.textSecondary }}
+                  >
                     Data limite
                   </label>
                   <input
                     type="date"
                     value={taskForm.dueDate}
                     onChange={(e) => setTaskForm(prev => ({...prev, dueDate: e.target.value}))}
-                    className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-primary-500"
+                    className="w-full px-3 py-2 rounded-lg focus:outline-none"
+                    style={{
+                      backgroundColor: currentTheme.colors.inputBg,
+                      borderWidth: '1px',
+                      borderStyle: 'solid',
+                      borderColor: currentTheme.colors.border,
+                      color: currentTheme.colors.text
+                    }}
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = currentTheme.colors.primary;
+                      e.currentTarget.style.boxShadow = `0 0 0 2px ${currentTheme.colors.primary}33`;
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = currentTheme.colors.border;
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
                   />
                 </div>
               </div>
 
               {/* Tags */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: currentTheme.colors.textSecondary }}
+                >
                   Tags
                 </label>
                 <input
                   type="text"
                   value={taskForm.tags}
                   onChange={(e) => setTaskForm(prev => ({...prev, tags: e.target.value}))}
-                  className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-primary-500"
+                  className="w-full px-3 py-2 rounded-lg focus:outline-none"
+                  style={{
+                    backgroundColor: currentTheme.colors.inputBg,
+                    borderWidth: '1px',
+                    borderStyle: 'solid',
+                    borderColor: currentTheme.colors.border,
+                    color: currentTheme.colors.text
+                  }}
                   placeholder="vendas, urgent, cliente (separadas por vírgula)"
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = currentTheme.colors.primary;
+                    e.currentTarget.style.boxShadow = `0 0 0 2px ${currentTheme.colors.primary}33`;
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = currentTheme.colors.border;
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
                 />
               </div>
 
               {/* Checklist */}
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="block text-sm font-medium text-gray-300">
+                  <label
+                    className="block text-sm font-medium"
+                    style={{ color: currentTheme.colors.textSecondary }}
+                  >
                     Checklist ({taskForm.checklist.filter(item => item.completed).length}/{taskForm.checklist.length})
                   </label>
                   <button
                     onClick={addChecklistItem}
-                    className="flex items-center space-x-1 text-xs text-primary-400 hover:text-primary-300 transition-colors"
+                    className="flex items-center space-x-1 text-xs transition-colors"
+                    style={{ color: currentTheme.colors.primary }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.color = currentTheme.colors.accent;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = currentTheme.colors.primary;
+                    }}
                   >
                     <Plus className="h-3 w-3" />
                     <span>Adicionar item</span>
@@ -6417,7 +6558,14 @@ const TasksPage = () => {
             <div className="flex justify-end space-x-3 mt-6">
               <button
                 onClick={() => {setShowTaskModal(false); resetTaskForm();}}
-                className="px-4 py-2 text-gray-400 hover:text-white transition-colors"
+                className="px-4 py-2 transition-colors"
+                style={{ color: currentTheme.colors.textSecondary }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = currentTheme.colors.text;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = currentTheme.colors.textSecondary;
+                }}
               >
                 Cancelar
               </button>
@@ -6427,7 +6575,22 @@ const TasksPage = () => {
                   saveTask(columnId);
                 }}
                 disabled={!taskForm.title.trim()}
-                className="flex items-center space-x-2 bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-500 hover:to-secondary-500 disabled:from-gray-600 disabled:to-gray-600 px-4 py-2 rounded-lg text-white transition-all duration-300"
+                className="flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-300"
+                style={{
+                  background: !taskForm.title.trim()
+                    ? currentTheme.colors.textMuted
+                    : `linear-gradient(90deg, ${currentTheme.colors.primary}, ${currentTheme.colors.accent})`,
+                  color: currentTheme.colors.text,
+                  opacity: !taskForm.title.trim() ? 0.5 : 1
+                }}
+                onMouseEnter={(e) => {
+                  if (taskForm.title.trim()) {
+                    e.currentTarget.style.transform = 'scale(1.02)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'scale(1)';
+                }}
               >
                 <Save className="h-4 w-4" />
                 <span>{editingTask ? 'Salvar' : 'Criar'}</span>
@@ -6439,13 +6602,38 @@ const TasksPage = () => {
 
       {/* Column Modal */}
       {showColumnModal && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-gray-900 rounded-2xl border border-gray-700 p-6 w-full max-w-sm">
+        <div
+          className="fixed inset-0 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          style={{ backgroundColor: `${currentTheme.colors.background}CC` }}
+        >
+          <div
+            className="rounded-2xl p-6 w-full max-w-sm"
+            style={{
+              backgroundColor: currentTheme.colors.backgroundSecondary,
+              borderWidth: '1px',
+              borderStyle: 'solid',
+              borderColor: currentTheme.colors.border
+            }}
+          >
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold text-white">Nova Coluna</h3>
-              <button 
+              <h3
+                className="text-xl font-bold"
+                style={{ color: currentTheme.colors.text }}
+              >
+                Nova Coluna
+              </h3>
+              <button
                 onClick={() => setShowColumnModal(false)}
-                className="p-1 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
+                className="p-1 rounded-lg transition-colors"
+                style={{ color: currentTheme.colors.textSecondary }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = currentTheme.colors.text;
+                  e.currentTarget.style.backgroundColor = `${currentTheme.colors.cardBg}80`;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = currentTheme.colors.textSecondary;
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }}
               >
                 <X className="h-5 w-5" />
               </button>
@@ -6453,20 +6641,41 @@ const TasksPage = () => {
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: currentTheme.colors.textSecondary }}
+                >
                   Título da Coluna
                 </label>
                 <input
                   type="text"
                   value={newColumnTitle}
                   onChange={(e) => setNewColumnTitle(e.target.value)}
-                  className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-primary-500"
+                  className="w-full px-3 py-2 rounded-lg focus:outline-none"
+                  style={{
+                    backgroundColor: currentTheme.colors.inputBg,
+                    borderWidth: '1px',
+                    borderStyle: 'solid',
+                    borderColor: currentTheme.colors.border,
+                    color: currentTheme.colors.text
+                  }}
                   placeholder="Ex: Em Teste"
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = currentTheme.colors.primary;
+                    e.currentTarget.style.boxShadow = `0 0 0 2px ${currentTheme.colors.primary}33`;
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = currentTheme.colors.border;
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: currentTheme.colors.textSecondary }}
+                >
                   Cor
                 </label>
                 <div className="flex flex-wrap gap-2">
@@ -6474,9 +6683,12 @@ const TasksPage = () => {
                     <button
                       key={color}
                       onClick={() => setNewColumnColor(color)}
-                      className={`w-8 h-8 rounded-lg ${color} ${
-                        newColumnColor === color ? 'ring-2 ring-white' : ''
-                      } transition-all hover:scale-110`}
+                      className={`w-8 h-8 rounded-lg ${color} transition-all hover:scale-110`}
+                      style={{
+                        boxShadow: newColumnColor === color
+                          ? `0 0 0 2px ${currentTheme.colors.text}`
+                          : 'none'
+                      }}
                     />
                   ))}
                 </div>
@@ -6486,14 +6698,36 @@ const TasksPage = () => {
             <div className="flex justify-end space-x-3 mt-6">
               <button
                 onClick={() => setShowColumnModal(false)}
-                className="px-4 py-2 text-gray-400 hover:text-white transition-colors"
+                className="px-4 py-2 transition-colors"
+                style={{ color: currentTheme.colors.textSecondary }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = currentTheme.colors.text;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = currentTheme.colors.textSecondary;
+                }}
               >
                 Cancelar
               </button>
               <button
                 onClick={addColumn}
                 disabled={!newColumnTitle.trim()}
-                className="flex items-center space-x-2 bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-500 hover:to-secondary-500 disabled:from-gray-600 disabled:to-gray-600 px-4 py-2 rounded-lg text-white transition-all duration-300"
+                className="flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-300"
+                style={{
+                  background: !newColumnTitle.trim()
+                    ? currentTheme.colors.textMuted
+                    : `linear-gradient(90deg, ${currentTheme.colors.primary}, ${currentTheme.colors.accent})`,
+                  color: currentTheme.colors.text,
+                  opacity: !newColumnTitle.trim() ? 0.5 : 1
+                }}
+                onMouseEnter={(e) => {
+                  if (newColumnTitle.trim()) {
+                    e.currentTarget.style.transform = 'scale(1.02)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'scale(1)';
+                }}
               >
                 <Plus className="h-4 w-4" />
                 <span>Criar</span>
@@ -6505,16 +6739,39 @@ const TasksPage = () => {
 
       {/* Share Board Modal */}
       {showShareModal && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-gray-900 rounded-2xl border border-gray-700 p-6 w-full max-w-md">
+        <div
+          className="fixed inset-0 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          style={{ backgroundColor: `${currentTheme.colors.background}CC` }}
+        >
+          <div
+            className="rounded-2xl p-6 w-full max-w-md"
+            style={{
+              backgroundColor: currentTheme.colors.backgroundSecondary,
+              borderWidth: '1px',
+              borderStyle: 'solid',
+              borderColor: currentTheme.colors.border
+            }}
+          >
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold text-white flex items-center space-x-2">
+              <h3
+                className="text-xl font-bold flex items-center space-x-2"
+                style={{ color: currentTheme.colors.text }}
+              >
                 <Share2 className="h-5 w-5" />
                 <span>Compartilhar Quadro</span>
               </h3>
               <button
                 onClick={closeShareModal}
-                className="p-1 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
+                className="p-1 rounded-lg transition-colors"
+                style={{ color: currentTheme.colors.textSecondary }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = currentTheme.colors.text;
+                  e.currentTarget.style.backgroundColor = `${currentTheme.colors.cardBg}80`;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = currentTheme.colors.textSecondary;
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }}
               >
                 <X className="h-5 w-5" />
               </button>
@@ -6522,29 +6779,68 @@ const TasksPage = () => {
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: currentTheme.colors.textSecondary }}
+                >
                   E-mail do convidado *
                 </label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Mail
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4"
+                    style={{ color: currentTheme.colors.textSecondary }}
+                  />
                   <input
                     type="email"
                     value={shareEmail}
                     onChange={(e) => setShareEmail(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 bg-gray-800/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
+                    className="w-full pl-10 pr-4 py-3 rounded-lg focus:outline-none"
+                    style={{
+                      backgroundColor: `${currentTheme.colors.inputBg}80`,
+                      borderWidth: '1px',
+                      borderStyle: 'solid',
+                      borderColor: currentTheme.colors.border,
+                      color: currentTheme.colors.text
+                    }}
                     placeholder="exemplo@email.com"
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = currentTheme.colors.primary;
+                      e.currentTarget.style.boxShadow = `0 0 0 1px ${currentTheme.colors.primary}`;
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = currentTheme.colors.border;
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: currentTheme.colors.textSecondary }}
+                >
                   Tipo de Permissão
                 </label>
                 <select
                   value={sharePermission}
                   onChange={(e) => setSharePermission(e.target.value as 'view' | 'edit')}
-                  className="w-full px-3 py-3 bg-gray-800/50 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
+                  className="w-full px-3 py-3 rounded-lg focus:outline-none"
+                  style={{
+                    backgroundColor: `${currentTheme.colors.inputBg}80`,
+                    borderWidth: '1px',
+                    borderStyle: 'solid',
+                    borderColor: currentTheme.colors.border,
+                    color: currentTheme.colors.text
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = currentTheme.colors.primary;
+                    e.currentTarget.style.boxShadow = `0 0 0 1px ${currentTheme.colors.primary}`;
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = currentTheme.colors.border;
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
                 >
                   <option value="view">👀 Visualização (apenas ver)</option>
                   <option value="edit">✏️ Edição (criar e editar tarefas)</option>
