@@ -3697,15 +3697,32 @@ const TasksPage = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <div>
-              <h1 className="text-3xl font-black bg-gradient-to-r from-white via-gray-100 to-primary-300 bg-clip-text text-transparent">
+              <h1
+                className="text-3xl font-black"
+                style={{
+                  background: `linear-gradient(90deg, ${currentTheme.colors.text}, ${currentTheme.colors.textSecondary}, ${currentTheme.colors.primary})`,
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text'
+                }}
+              >
                 Organizador de Tarefas
                 {isGuest && (
-                  <span className="ml-3 px-3 py-1 bg-purple-500/20 border border-purple-500/30 rounded-full text-xs text-purple-300 font-normal">
+                  <span
+                    className="ml-3 px-3 py-1 rounded-full text-xs font-normal"
+                    style={{
+                      backgroundColor: `${currentTheme.colors.primary}33`,
+                      borderWidth: '1px',
+                      borderStyle: 'solid',
+                      borderColor: `${currentTheme.colors.primary}50`,
+                      color: currentTheme.colors.primary
+                    }}
+                  >
                     👤 Acesso Compartilhado
                   </span>
                 )}
               </h1>
-              <p className="text-gray-400 mt-2">
+              <p className="mt-2" style={{ color: currentTheme.colors.textSecondary }}>
                 {isGuest && guestSession ?
                   `Bem-vindo, ${guestSession.name}! Você tem acesso ${canEdit() ? 'de edição' : 'somente leitura'} a este quadro.` :
                   'Gerencie seus projetos com quadros Kanban personalizados'
@@ -3717,25 +3734,58 @@ const TasksPage = () => {
             <div className="relative">
               <button
                 onClick={() => setShowBoardSelector(!showBoardSelector)}
-                className="flex items-center space-x-3 bg-gray-800/50 hover:bg-gray-700/50 px-4 py-3 rounded-xl border border-gray-700/50 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-gray-900"
+                className="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-300 focus:outline-none focus:ring-2"
+                style={{
+                  backgroundColor: currentTheme.colors.cardBg,
+                  borderWidth: '1px',
+                  borderStyle: 'solid',
+                  borderColor: currentTheme.colors.border
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = currentTheme.colors.cardBgHover;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = currentTheme.colors.cardBg;
+                }}
                 aria-label="Selecionar quadro"
                 aria-expanded={showBoardSelector}
                 aria-haspopup="true"
               >
                 <div className={`w-4 h-4 rounded-full ${currentBoard?.color || 'bg-blue-500'}`}></div>
                 <div className="text-left">
-                  <div className="font-medium text-white">{currentBoard?.title || 'Selecionar Quadro'}</div>
-                  <div className="text-xs text-gray-400">{columns.length} colunas</div>
+                  <div className="font-medium" style={{ color: currentTheme.colors.text }}>
+                    {currentBoard?.title || 'Selecionar Quadro'}
+                  </div>
+                  <div className="text-xs" style={{ color: currentTheme.colors.textMuted }}>
+                    {columns.length} colunas
+                  </div>
                 </div>
-                <ChevronDown className="h-4 w-4 text-gray-400" />
+                <ChevronDown className="h-4 w-4" style={{ color: currentTheme.colors.textMuted }} />
               </button>
 
               {/* Board Selector Dropdown */}
               {showBoardSelector && (
-                <div className="absolute top-full mt-2 left-0 w-80 bg-gray-900/95 backdrop-blur-xl border border-gray-700/50 rounded-xl shadow-2xl z-50 max-h-96 overflow-y-auto">
-                  <div className="p-4 border-b border-gray-700/30">
+                <div
+                  className="absolute top-full mt-2 left-0 w-80 backdrop-blur-xl rounded-xl shadow-2xl z-50 max-h-96 overflow-y-auto"
+                  style={{
+                    backgroundColor: currentTheme.colors.backgroundSecondary,
+                    borderWidth: '1px',
+                    borderStyle: 'solid',
+                    borderColor: currentTheme.colors.border
+                  }}
+                >
+                  <div
+                    className="p-4"
+                    style={{
+                      borderBottomWidth: '1px',
+                      borderBottomStyle: 'solid',
+                      borderBottomColor: currentTheme.colors.divider
+                    }}
+                  >
                     <div className="flex items-center justify-between">
-                      <h3 className="font-bold text-white">Seus Quadros</h3>
+                      <h3 className="font-bold" style={{ color: currentTheme.colors.text }}>
+                        Seus Quadros
+                      </h3>
                       <div className="flex items-center space-x-2">
                         <button
                           onClick={() => {setShowImportModal(true); setShowBoardSelector(false);}}
