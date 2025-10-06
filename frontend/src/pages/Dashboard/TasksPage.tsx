@@ -40,7 +40,9 @@ import {
   CheckSquare,
   Square,
   Minimize2,
-  Maximize2
+  Maximize2,
+  RefreshCw,
+  Columns
 } from 'lucide-react';
 import { useSocket } from '@/hooks/useSocket';
 import { ActivityFeed } from '@/components/ActivityFeed';
@@ -142,6 +144,8 @@ const TasksPage = () => {
         }
       } catch (error) {
         console.error('❌ Erro ao carregar boards da API:', error);
+        setError('Não foi possível carregar os boards. Usando dados locais como fallback.');
+
         // Fallback para localStorage em caso de erro
         const localBoards = loadInitialData();
         setBoards(localBoards);
@@ -812,6 +816,13 @@ const TasksPage = () => {
   // Separate loading state for operations (not full page load)
   const [isOperationLoading, setIsOperationLoading] = useState(false);
 
+  // Error state for API failures
+  const [error, setError] = useState<string | null>(null);
+  const [isRetrying, setIsRetrying] = useState(false);
+
+  // Offline mode detector
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+
   // Multi-select state
   const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
   const [isMultiSelectMode, setIsMultiSelectMode] = useState(false);
@@ -958,6 +969,28 @@ const TasksPage = () => {
   useEffect(() => {
     localStorage.setItem('compact-mode', JSON.stringify(isCompactMode));
   }, [isCompactMode]);
+
+  // Monitor online/offline status
+  useEffect(() => {
+    const handleOnline = () => {
+      setIsOnline(true);
+      setError(null);
+      console.log('🟢 Conexão restaurada');
+    };
+
+    const handleOffline = () => {
+      setIsOnline(false);
+      console.log('🔴 Conexão perdida - modo offline');
+    };
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
 
   // Socket.IO integration for real-time collaboration
   const [sessionId] = useState(() => {
@@ -3350,8 +3383,78 @@ const TasksPage = () => {
     );
   }
 
+  // Retry function for failed operations
+  const retryLoadBoards = async () => {
+    setIsRetrying(true);
+    setError(null);
+    try {
+      setLoading(true);
+      const apiBoards = await boardService.getBoards();
+      if (apiBoards.length > 0) {
+        setBoards(apiBoards);
+        if (!currentBoardId) {
+          setCurrentBoardId(apiBoards[0].id);
+        }
+      }
+    } catch (error) {
+      console.error('❌ Erro ao retentar carregar boards:', error);
+      setError('Ainda não foi possível conectar ao servidor. Tente novamente mais tarde.');
+    } finally {
+      setLoading(false);
+      setIsRetrying(false);
+    }
+  };
+
   return (
     <div className="p-6 min-h-screen bg-pure-black text-pure-white">
+      {/* Offline Mode Indicator */}
+      {!isOnline && (
+        <div className="mb-6 bg-yellow-900/20 border border-yellow-500/30 rounded-xl p-4 backdrop-blur-sm animate-in">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 rounded-full bg-yellow-500/20 flex items-center justify-center flex-shrink-0">
+              <Zap className="h-4 w-4 text-yellow-400" />
+            </div>
+            <div>
+              <h3 className="text-sm font-semibold text-yellow-300 mb-1">Modo Offline</h3>
+              <p className="text-sm text-yellow-200/80">
+                Você está sem conexão. As alterações serão salvas localmente e sincronizadas quando voltar online.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Error Banner */}
+      {error && (
+        <div className="mb-6 bg-red-900/20 border border-red-500/30 rounded-xl p-4 backdrop-blur-sm animate-in">
+          <div className="flex items-start justify-between">
+            <div className="flex items-start space-x-3">
+              <div className="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <AlertTriangle className="h-4 w-4 text-red-400" />
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-red-300 mb-1">Erro de Conexão</h3>
+                <p className="text-sm text-red-200/80">{error}</p>
+                <button
+                  onClick={retryLoadBoards}
+                  disabled={isRetrying}
+                  className="mt-3 inline-flex items-center space-x-2 bg-red-600/20 hover:bg-red-600/30 border border-red-500/30 text-red-300 px-3 py-1.5 rounded-lg text-sm transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <RefreshCw className={`h-3.5 w-3.5 ${isRetrying ? 'animate-spin' : ''}`} />
+                  <span>{isRetrying ? 'Reconectando...' : 'Tentar Novamente'}</span>
+                </button>
+              </div>
+            </div>
+            <button
+              onClick={() => setError(null)}
+              className="p-1 rounded-lg text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
       <style>{`
         .custom-scrollbar {
           scrollbar-width: thin;

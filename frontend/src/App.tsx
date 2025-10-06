@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useAuthStore } from '@/stores/authStore';
 import AppRouter from "./routes/AppRouter";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 const queryClient = new QueryClient();
 
@@ -17,13 +18,15 @@ const App = () => {
   }, [initializeAuth]);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <AppRouter />
-      </TooltipProvider>
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <AppRouter />
+        </TooltipProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 };
 
