@@ -126,7 +126,7 @@ const TasksPage = () => {
       try {
         setLoading(true);
         const apiBoards = await boardService.getBoards();
-        console.log('📋 Boards carregados da API:', apiBoards);
+        // console.log('📋 Boards carregados da API:', apiBoards);
 
         if (apiBoards.length > 0) {
           setBoards(apiBoards);
@@ -135,7 +135,7 @@ const TasksPage = () => {
           }
         } else {
           // Fallback para localStorage se API não retornar boards
-          console.log('📋 Nenhum board na API, usando localStorage como fallback');
+          // console.log('📋 Nenhum board na API, usando localStorage como fallback');
           const localBoards = loadInitialData();
           setBoards(localBoards);
           if (localBoards.length > 0 && !currentBoardId) {
@@ -1969,12 +1969,7 @@ const TasksPage = () => {
 
   // Save task (create or update)
   const saveTask = async (columnId: string) => {
-    console.log('DEBUG: saveTask called with columnId:', columnId);
-    console.log('DEBUG: taskForm.title:', taskForm.title);
-    console.log('DEBUG: currentBoardId:', currentBoardId);
-
     if (!taskForm.title.trim()) {
-      console.log('DEBUG: Título vazio, cancelando criação');
       return;
     }
 
@@ -3464,6 +3459,15 @@ const TasksPage = () => {
       )}
 
       <style>{`
+        /* Animation & Timing Variables */
+        :root {
+          --transition-fast: 150ms;
+          --transition-base: 200ms;
+          --transition-slow: 300ms;
+          --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+          --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
         .custom-scrollbar {
           scrollbar-width: thin;
           scrollbar-color: rgba(99, 102, 241, 0.5) transparent;
@@ -3750,7 +3754,6 @@ const TasksPage = () => {
             {canEdit() && (
               <button
                 onClick={() => {
-                  console.log('DEBUG: Nova Tarefa button clicked');
                   setTargetColumnId(getDefaultTaskColumn());
                   setShowTaskModal(true);
                 }}
@@ -5630,9 +5633,7 @@ const TasksPage = () => {
               </button>
               <button
                 onClick={() => {
-                  console.log('DEBUG: Criar/Salvar button clicked');
                   const columnId = targetColumnId || getDefaultTaskColumn();
-                  console.log('DEBUG: Using columnId:', columnId);
                   saveTask(columnId);
                 }}
                 disabled={!taskForm.title.trim()}
