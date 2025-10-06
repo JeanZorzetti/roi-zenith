@@ -249,7 +249,7 @@ Plano de implementação incremental de melhorias de UI/UX baseado nas melhores 
 
 ---
 
-## 📅 Sprint 8: Advanced Drag & Drop Enhancements (Em Progresso)
+## 📅 Sprint 8: Advanced Drag & Drop Enhancements ✅ COMPLETO
 **Duração estimada:** 4-6 dias
 **Impacto:** Médio | **Complexidade:** Alta
 
@@ -274,7 +274,7 @@ Plano de implementação incremental de melhorias de UI/UX baseado nas melhores 
   - Apenas visível no hover
   - Cursor change on handle hover
   - Distinct color (gray-500)
-- [ ] Smart drop zones:
+- [x] 👌 Smart drop zones:
   - Auto-scroll quando próximo da borda
   - Expandir subcoluna collapsed ao hover
   - Insert indicators (linha entre cards)

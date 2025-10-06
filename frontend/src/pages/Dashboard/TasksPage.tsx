@@ -810,6 +810,9 @@ const TasksPage = () => {
   // Multi-select state
   const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
   const [isMultiSelectMode, setIsMultiSelectMode] = useState(false);
+
+  // Smart drop zones state
+  const [dropIndicator, setDropIndicator] = useState<{columnId: string, subColumnId?: string, index: number} | null>(null);
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [showColumnModal, setShowColumnModal] = useState(false);
@@ -2585,16 +2588,32 @@ const TasksPage = () => {
     }
   };
 
+  // Auto-scroll when dragging near edges
+  const handleAutoScroll = (e: React.DragEvent) => {
+    const threshold = 100;
+    const scrollSpeed = 10;
+    const { clientY } = e;
+    const windowHeight = window.innerHeight;
+
+    if (clientY < threshold) {
+      window.scrollBy(0, -scrollSpeed);
+    } else if (clientY > windowHeight - threshold) {
+      window.scrollBy(0, scrollSpeed);
+    }
+  };
+
   // Drag and drop handlers for tasks
   const handleDragStart = (e: React.DragEvent, taskId: string, columnId: string) => {
     setDraggedTask(taskId);
     setDraggedFrom(columnId);
+    setIsDragging(true);
     e.dataTransfer.effectAllowed = 'move';
   };
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
+    handleAutoScroll(e);
   };
 
   // Drag and drop handlers for columns
@@ -2716,6 +2735,8 @@ const TasksPage = () => {
     if (!movedTask) {
       setDraggedTask(null);
       setDraggedFrom(null);
+      setIsDragging(false);
+      setDropIndicator(null);
       return;
     }
 
@@ -2786,6 +2807,8 @@ const TasksPage = () => {
 
     setDraggedTask(null);
     setDraggedFrom(null);
+    setIsDragging(false);
+    setDropIndicator(null);
   };
 
   // Handle drop in subcolumn
@@ -2822,6 +2845,8 @@ const TasksPage = () => {
     if (!movedTask) {
       setDraggedTask(null);
       setDraggedFrom(null);
+      setIsDragging(false);
+      setDropIndicator(null);
       return;
     }
 
@@ -2848,6 +2873,8 @@ const TasksPage = () => {
 
     setDraggedTask(null);
     setDraggedFrom(null);
+    setIsDragging(false);
+    setDropIndicator(null);
   };
 
   // Horizontal scroll functions
@@ -3979,7 +4006,17 @@ const TasksPage = () => {
                     const isExpanded = expandedSubColumns[subColumn.id] !== false; // Default to true (expanded)
 
                     return (
-                    <div key={subColumn.id} className="border border-white/10 rounded-xl overflow-hidden backdrop-blur-md bg-gradient-to-br from-gray-800/40 to-gray-900/40 shadow-lg shadow-black/20">
+                    <div
+                      key={subColumn.id}
+                      className="border border-white/10 rounded-xl overflow-hidden backdrop-blur-md bg-gradient-to-br from-gray-800/40 to-gray-900/40 shadow-lg shadow-black/20"
+                      onDragOver={(e) => {
+                        e.preventDefault();
+                        // Auto-expand on hover during drag
+                        if (isDragging && !isExpanded) {
+                          setExpandedSubColumns(prev => ({ ...prev, [subColumn.id]: true }));
+                        }
+                      }}
+                    >
                       {/* SubColumn Header */}
                       <div
                         className="bg-gradient-to-r from-gray-800/60 to-gray-800/40 backdrop-blur-sm p-3 flex items-center justify-between hover:from-gray-700/60 hover:to-gray-700/40 transition-all duration-300 cursor-move border-b border-white/5"
@@ -4031,17 +4068,21 @@ const TasksPage = () => {
                         onDragOver={(e) => e.preventDefault()}
                         onDrop={(e) => handleDropInSubColumn(e, column.id, subColumn.id)}
                       >
-                        {subColumn.tasks?.map((task) => {
+                        {subColumn.tasks?.map((task, taskIndex) => {
                           const checklist = task.checklist || [];
                           const checklistProgress = getChecklistProgress(checklist);
                           const hasChecklist = checklist.length > 0;
                           const isHighlighted = !hasActiveFilters || filterTask(task);
 
                           return (
-                            <div
-                              key={task.id}
-                              draggable
-                              onDragStart={(e) => handleDragStart(e, task.id, column.id)}
+                            <React.Fragment key={task.id}>
+                              {/* Drop indicator line */}
+                              {isDragging && dropIndicator?.columnId === column.id && dropIndicator?.subColumnId === subColumn.id && dropIndicator?.index === taskIndex && (
+                                <div className="h-1 bg-blue-500 rounded-full shadow-lg shadow-blue-500/50 my-2 animate-pulse" />
+                              )}
+                              <div
+                                draggable
+                                onDragStart={(e) => handleDragStart(e, task.id, column.id)}
                               onClick={(e) => {
                                 if (e.target instanceof HTMLElement && !e.target.closest('button')) {
                                   if (isMultiSelectMode || e.shiftKey) {
@@ -4288,6 +4329,7 @@ const TasksPage = () => {
                                 </div>
                               </div>
                             </div>
+                            </React.Fragment>
                           );
                         })}
                       </div>
@@ -4297,17 +4339,21 @@ const TasksPage = () => {
                   })}
 
                   {/* Direct Tasks (not in any subcolumn) */}
-                  {column.tasks.filter(task => !task.subColumnId).map((task) => {
+                  {column.tasks.filter(task => !task.subColumnId).map((task, taskIndex) => {
                     const checklist = task.checklist || [];
                     const checklistProgress = getChecklistProgress(checklist);
                     const hasChecklist = checklist.length > 0;
                     const isHighlighted = !hasActiveFilters || filterTask(task);
 
                     return (
-                      <div
-                        key={task.id}
-                        draggable
-                        onDragStart={(e) => handleDragStart(e, task.id, column.id)}
+                      <React.Fragment key={task.id}>
+                        {/* Drop indicator line */}
+                        {isDragging && dropIndicator?.columnId === column.id && !dropIndicator?.subColumnId && dropIndicator?.index === taskIndex && (
+                          <div className="h-1 bg-blue-500 rounded-full shadow-lg shadow-blue-500/50 my-2 animate-pulse" />
+                        )}
+                        <div
+                          draggable
+                          onDragStart={(e) => handleDragStart(e, task.id, column.id)}
                         onClick={(e) => {
                           if (e.target instanceof HTMLElement && !e.target.closest('button')) {
                             if (isMultiSelectMode || e.shiftKey) {
@@ -4560,12 +4606,13 @@ const TasksPage = () => {
                           </div>
                         </div>
                       </div>
+                      </React.Fragment>
                     );
                   })}
                 </>
               ) : (
                 /* No SubColumns - Render tasks normally (original behavior) */
-                column.tasks.map((task) => {
+                column.tasks.map((task, taskIndex) => {
                 // Ensure checklist exists for backward compatibility
                 const checklist = task.checklist || [];
                 const checklistProgress = getChecklistProgress(checklist);
@@ -4573,10 +4620,14 @@ const TasksPage = () => {
                 const isHighlighted = !hasActiveFilters || filterTask(task);
 
                 return (
-                  <div
-                    key={task.id}
-                    draggable
-                    onDragStart={(e) => handleDragStart(e, task.id, column.id)}
+                  <React.Fragment key={task.id}>
+                    {/* Drop indicator line */}
+                    {isDragging && dropIndicator?.columnId === column.id && dropIndicator?.index === taskIndex && (
+                      <div className="h-1 bg-blue-500 rounded-full shadow-lg shadow-blue-500/50 my-2 animate-pulse" />
+                    )}
+                    <div
+                      draggable
+                      onDragStart={(e) => handleDragStart(e, task.id, column.id)}
                     onClick={(e) => {
                       // Avoid opening when clicking on buttons or when dragging
                       if (e.target instanceof HTMLElement && !e.target.closest('button')) {
@@ -4801,6 +4852,7 @@ const TasksPage = () => {
                       </div>
                     </div>
                   </div>
+                  </React.Fragment>
                 );
               })
               )}
