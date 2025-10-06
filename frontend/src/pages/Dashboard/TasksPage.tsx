@@ -4509,6 +4509,17 @@ const TasksPage = () => {
                             </React.Fragment>
                           );
                         })}
+
+                        {/* Empty state for subcolumn */}
+                        {(!subColumn.tasks || subColumn.tasks.length === 0) && (
+                          <div className="text-center py-8 text-gray-500">
+                            <div className="flex flex-col items-center space-y-2">
+                              <Circle className="h-12 w-12 text-gray-700/50" />
+                              <p className="text-sm">Nenhuma task aqui</p>
+                              <p className="text-xs text-gray-600">Arraste tasks para cá</p>
+                            </div>
+                          </div>
+                        )}
                       </div>
                       )}
                     </div>
@@ -4789,6 +4800,17 @@ const TasksPage = () => {
                       </React.Fragment>
                     );
                   })}
+
+                  {/* Empty state for direct tasks */}
+                  {column.tasks.filter(task => !task.subColumnId).length === 0 && (
+                    <div className="text-center py-6 text-gray-500 mt-4">
+                      <div className="flex flex-col items-center space-y-2">
+                        <Plus className="h-10 w-10 text-gray-700/50" />
+                        <p className="text-sm">Nenhuma task direta</p>
+                        <p className="text-xs text-gray-600">Organize suas tasks nas subcolunas acima</p>
+                      </div>
+                    </div>
+                  )}
                 </>
               ) : (
                 /* No SubColumns - Render tasks normally (original behavior) */
@@ -5040,6 +5062,21 @@ const TasksPage = () => {
               })
               )}
 
+              {/* Empty state for column with no tasks */}
+              {column.tasks.length === 0 && (
+                <div className="text-center py-12 text-gray-500">
+                  <div className="flex flex-col items-center space-y-3">
+                    <div className="w-16 h-16 rounded-full bg-gray-800/30 flex items-center justify-center">
+                      <Circle className="h-8 w-8 text-gray-700/50" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">Coluna vazia</p>
+                      <p className="text-xs text-gray-600 mt-1">Adicione tasks para começar</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Add Task Button */}
               {canEdit() && (
                 <button
@@ -5057,6 +5094,34 @@ const TasksPage = () => {
             </div>
           </div>
         ))}
+
+        {/* Empty state for board with no columns */}
+        {columns.length === 0 && (
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <div className="text-center text-gray-500 max-w-md">
+              <div className="flex flex-col items-center space-y-4">
+                <div className="w-24 h-24 rounded-full bg-gray-800/30 flex items-center justify-center">
+                  <Columns className="h-12 w-12 text-gray-700/50" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-400 mb-2">Board vazio</h3>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Adicione sua primeira coluna para começar a organizar suas tasks
+                  </p>
+                  {canEdit() && (
+                    <button
+                      onClick={() => setShowColumnModal(true)}
+                      className="inline-flex items-center space-x-2 bg-primary-600 hover:bg-primary-500 text-white px-4 py-2 rounded-lg transition-all duration-200 hover:scale-105"
+                    >
+                      <Plus className="h-4 w-4" />
+                      <span>Adicionar Coluna</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
       )}
 
