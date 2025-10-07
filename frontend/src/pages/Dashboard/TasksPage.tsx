@@ -4078,6 +4078,7 @@ const TasksPage = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-6">
             {/* Quick Views */}
+            {!isCompactMode && (
             <div className="flex items-center space-x-2">
               <span className="text-xs font-semibold uppercase" style={{ color: currentTheme.colors.textMuted }}>
                 Views:
@@ -4148,8 +4149,10 @@ const TasksPage = () => {
                 </button>
               </div>
             </div>
+            )}
 
             {/* Priority Filters */}
+            {!isCompactMode && (
             <div className="flex items-center space-x-2">
             <span className="text-xs font-semibold uppercase" style={{ color: currentTheme.colors.textMuted }}>
               Prioridade:
@@ -4202,6 +4205,7 @@ const TasksPage = () => {
               })}
             </div>
           </div>
+          )}
           </div>
 
           <div className="flex items-center space-x-3">
@@ -5141,7 +5145,7 @@ const TasksPage = () => {
                                     {task.title}
                                   </h4>
                                 )}
-                                {task.description && (
+                                {task.description && !isCompactMode && (
                                   <p
                                     className="line-clamp-1"
                                     style={{
@@ -5377,9 +5381,11 @@ const TasksPage = () => {
                                       >
                                         {getInitials(task.assignee)}
                                       </div>
-                                      <span style={{ color: currentTheme.colors.textSecondary }}>
-                                        {task.assignee}
-                                      </span>
+                                      {!isCompactMode && (
+                                        <span style={{ color: currentTheme.colors.textSecondary }}>
+                                          {task.assignee}
+                                        </span>
+                                      )}
                                     </div>
                                   )}
                                   {task.dueDate && (() => {
@@ -5392,34 +5398,39 @@ const TasksPage = () => {
 
                                     return dueDateStatus ? (
                                       <div
-                                        className={`flex items-center space-x-1.5 px-2 py-1 rounded-md ${dueDateStatus.urgent ? 'animate-pulse' : ''}`}
+                                        className={`flex items-center space-x-1.5 ${isCompactMode ? 'px-1.5 py-1' : 'px-2 py-1'} rounded-md ${dueDateStatus.urgent ? 'animate-pulse' : ''}`}
                                         style={{
                                           backgroundColor: `${dueDateColor}20`,
                                           borderWidth: '1px',
                                           borderStyle: 'solid',
                                           borderColor: `${dueDateColor}66`
                                         }}
+                                        title={dueDateStatus.label}
                                       >
                                         <Clock
                                           className="h-3 w-3"
                                           style={{ color: dueDateColor }}
                                         />
-                                        <span
-                                          className="font-medium"
-                                          style={{ color: dueDateColor }}
-                                        >
-                                          {dueDateStatus.label}
-                                        </span>
+                                        {!isCompactMode && (
+                                          <span
+                                            className="font-medium"
+                                            style={{ color: dueDateColor }}
+                                          >
+                                            {dueDateStatus.label}
+                                          </span>
+                                        )}
                                       </div>
                                     ) : (
-                                      <div className="flex items-center space-x-1">
+                                      <div className="flex items-center space-x-1" title={new Date(task.dueDate).toLocaleDateString('pt-BR')}>
                                         <Calendar
                                           className="h-3 w-3"
                                           style={{ color: currentTheme.colors.textSecondary }}
                                         />
-                                        <span style={{ color: currentTheme.colors.textSecondary }}>
-                                          {new Date(task.dueDate).toLocaleDateString('pt-BR')}
-                                        </span>
+                                        {!isCompactMode && (
+                                          <span style={{ color: currentTheme.colors.textSecondary }}>
+                                            {new Date(task.dueDate).toLocaleDateString('pt-BR')}
+                                          </span>
+                                        )}
                                       </div>
                                     );
                                   })()}
@@ -5614,7 +5625,7 @@ const TasksPage = () => {
                               {task.title}
                             </h4>
                           )}
-                          {task.description && (
+                          {task.description && !isCompactMode && (
                             <p className="text-sm text-gray-400 line-clamp-2">{task.description}</p>
                           )}
                         </div>
@@ -5728,20 +5739,26 @@ const TasksPage = () => {
                                 <div className={`w-8 h-8 rounded-full ${getAvatarColor(task.assignee)} flex items-center justify-center text-white text-xs font-semibold`}>
                                   {getInitials(task.assignee)}
                                 </div>
-                                <span className="text-gray-300">{task.assignee}</span>
+                                {!isCompactMode && (
+                                  <span className="text-gray-300">{task.assignee}</span>
+                                )}
                               </div>
                             )}
                             {task.dueDate && (() => {
                               const dueDateStatus = getDueDateStatus(task.dueDate);
                               return dueDateStatus ? (
-                                <div className={`flex items-center space-x-1.5 px-2 py-1 rounded-md border ${dueDateStatus.color} ${dueDateStatus.urgent ? 'animate-pulse' : ''}`}>
+                                <div className={`flex items-center space-x-1.5 ${isCompactMode ? 'px-1.5 py-1' : 'px-2 py-1'} rounded-md border ${dueDateStatus.color} ${dueDateStatus.urgent ? 'animate-pulse' : ''}`} title={dueDateStatus.label}>
                                   <Clock className="h-3 w-3" />
-                                  <span className="font-medium">{dueDateStatus.label}</span>
+                                  {!isCompactMode && (
+                                    <span className="font-medium">{dueDateStatus.label}</span>
+                                  )}
                                 </div>
                               ) : (
-                                <div className="flex items-center space-x-1">
+                                <div className="flex items-center space-x-1" title={new Date(task.dueDate).toLocaleDateString('pt-BR')}>
                                   <Calendar className="h-3 w-3" />
-                                  <span>{new Date(task.dueDate).toLocaleDateString('pt-BR')}</span>
+                                  {!isCompactMode && (
+                                    <span>{new Date(task.dueDate).toLocaleDateString('pt-BR')}</span>
+                                  )}
                                 </div>
                               );
                             })()}
