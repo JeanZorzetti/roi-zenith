@@ -4240,14 +4240,27 @@ const TasksPage = () => {
 
           <div className="flex items-center space-x-3">
             {/* View Switcher */}
-            <div className="flex items-center bg-gray-700/30 border border-gray-600/50 rounded-lg p-1" role="group" aria-label="Selecionar modo de visualização">
+            <div
+              className="flex items-center rounded-lg p-1 border"
+              style={{
+                backgroundColor: currentTheme.colors.backgroundSecondary,
+                borderColor: currentTheme.colors.border
+              }}
+              role="group"
+              aria-label="Selecionar modo de visualização"
+            >
               <button
                 onClick={() => setViewMode('kanban')}
-                className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 ${
+                className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-md transition-all duration-200 focus:outline-none focus:ring-2 ${
                   viewMode === 'kanban'
-                    ? 'bg-primary-500/30 text-primary-300 shadow-sm'
-                    : 'text-gray-400 hover:text-gray-300 hover:bg-gray-600/30'
+                    ? 'shadow-sm'
+                    : 'hover:bg-opacity-50'
                 }`}
+                style={{
+                  backgroundColor: viewMode === 'kanban' ? currentTheme.colors.primary + '30' : 'transparent',
+                  color: viewMode === 'kanban' ? currentTheme.colors.text : currentTheme.colors.textMuted,
+                  borderColor: currentTheme.colors.border
+                }}
                 title="Kanban View"
                 aria-label="Alternar para visualização Kanban"
                 aria-pressed={viewMode === 'kanban'}
@@ -4257,11 +4270,16 @@ const TasksPage = () => {
               </button>
               <button
                 onClick={() => setViewMode('list')}
-                className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 ${
+                className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-md transition-all duration-200 focus:outline-none focus:ring-2 ${
                   viewMode === 'list'
-                    ? 'bg-primary-500/30 text-primary-300 shadow-sm'
-                    : 'text-gray-400 hover:text-gray-300 hover:bg-gray-600/30'
+                    ? 'shadow-sm'
+                    : 'hover:bg-opacity-50'
                 }`}
+                style={{
+                  backgroundColor: viewMode === 'list' ? currentTheme.colors.primary + '30' : 'transparent',
+                  color: viewMode === 'list' ? currentTheme.colors.text : currentTheme.colors.textMuted,
+                  borderColor: currentTheme.colors.border
+                }}
                 aria-label="Alternar para visualização em lista"
                 aria-pressed={viewMode === 'list'}
                 title="List View"
@@ -4274,11 +4292,12 @@ const TasksPage = () => {
             {/* Compact Mode Toggle */}
             <button
               onClick={() => setIsCompactMode(!isCompactMode)}
-              className={`flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 ${
-                isCompactMode
-                  ? 'bg-purple-500/30 border-purple-500/50 text-purple-300'
-                  : 'bg-gray-700/30 border-gray-600/50 text-gray-400 hover:text-gray-300'
-              }`}
+              className="flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all duration-200 focus:outline-none focus:ring-2"
+              style={{
+                backgroundColor: isCompactMode ? currentTheme.colors.primary + '30' : currentTheme.colors.backgroundSecondary,
+                borderColor: isCompactMode ? currentTheme.colors.primary : currentTheme.colors.border,
+                color: isCompactMode ? currentTheme.colors.text : currentTheme.colors.textMuted
+              }}
               title={isCompactMode ? 'Modo Normal' : 'Modo Compacto'}
               aria-label={isCompactMode ? 'Desativar modo compacto' : 'Ativar modo compacto'}
               aria-pressed={isCompactMode}
@@ -4302,11 +4321,12 @@ const TasksPage = () => {
                 setIsMultiSelectMode(!isMultiSelectMode);
                 if (isMultiSelectMode) clearSelection();
               }}
-              className={`flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all duration-200 ${
-                isMultiSelectMode
-                  ? 'bg-blue-500/30 border-blue-500/50 text-blue-300'
-                  : 'bg-gray-700/30 border-gray-600/50 text-gray-400 hover:text-gray-300'
-              }`}
+              className="flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all duration-200 focus:outline-none focus:ring-2"
+              style={{
+                backgroundColor: isMultiSelectMode ? currentTheme.colors.primary + '30' : currentTheme.colors.backgroundSecondary,
+                borderColor: isMultiSelectMode ? currentTheme.colors.primary : currentTheme.colors.border,
+                color: isMultiSelectMode ? currentTheme.colors.text : currentTheme.colors.textMuted
+              }}
               title="Multi-select mode"
             >
               {isMultiSelectMode ? (
@@ -4337,45 +4357,51 @@ const TasksPage = () => {
               if (!metrics) return null;
 
               return (
-                <div className="flex items-center space-x-3 px-4 py-2 bg-gradient-to-r from-purple-900/20 to-blue-900/20 border border-purple-500/30 rounded-lg backdrop-blur-md">
+                <div
+                  className="flex items-center space-x-3 px-4 py-2 rounded-lg backdrop-blur-md border"
+                  style={{
+                    backgroundColor: currentTheme.colors.backgroundSecondary,
+                    borderColor: currentTheme.colors.border
+                  }}
+                >
                   <div className="flex items-center space-x-2">
-                    <Target className="h-4 w-4 text-purple-400" />
+                    <Target className="h-4 w-4" style={{ color: currentTheme.colors.primary }} />
                     <div>
-                      <div className="text-xs text-gray-400">Total</div>
-                      <div className="text-sm font-bold text-white">{metrics.total}</div>
+                      <div className="text-xs" style={{ color: currentTheme.colors.textMuted }}>Total</div>
+                      <div className="text-sm font-bold" style={{ color: currentTheme.colors.text }}>{metrics.total}</div>
                     </div>
                   </div>
-                  <div className="w-px h-8 bg-gray-600"></div>
+                  <div className="w-px h-8" style={{ backgroundColor: currentTheme.colors.border }}></div>
                   <div className="flex items-center space-x-2">
-                    <CheckCircle2 className="h-4 w-4 text-green-400" />
+                    <CheckCircle2 className="h-4 w-4" style={{ color: currentTheme.colors.success }} />
                     <div>
-                      <div className="text-xs text-gray-400">Hoje</div>
-                      <div className="text-sm font-bold text-white">{metrics.completedToday}</div>
+                      <div className="text-xs" style={{ color: currentTheme.colors.textMuted }}>Hoje</div>
+                      <div className="text-sm font-bold" style={{ color: currentTheme.colors.text }}>{metrics.completedToday}</div>
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <TrendingUp className="h-4 w-4 text-blue-400" />
+                    <TrendingUp className="h-4 w-4" style={{ color: currentTheme.colors.info }} />
                     <div>
-                      <div className="text-xs text-gray-400">Semana</div>
-                      <div className="text-sm font-bold text-white">{metrics.completedThisWeek}</div>
+                      <div className="text-xs" style={{ color: currentTheme.colors.textMuted }}>Semana</div>
+                      <div className="text-sm font-bold" style={{ color: currentTheme.colors.text }}>{metrics.completedThisWeek}</div>
                     </div>
                   </div>
-                  <div className="w-px h-8 bg-gray-600"></div>
+                  <div className="w-px h-8" style={{ backgroundColor: currentTheme.colors.border }}></div>
                   <div className="flex items-center space-x-2">
-                    <Zap className="h-4 w-4 text-yellow-400" />
+                    <Zap className="h-4 w-4" style={{ color: currentTheme.colors.warning }} />
                     <div>
-                      <div className="text-xs text-gray-400">Velocity</div>
-                      <div className="text-sm font-bold text-white">{metrics.velocity}/dia</div>
+                      <div className="text-xs" style={{ color: currentTheme.colors.textMuted }}>Velocity</div>
+                      <div className="text-sm font-bold" style={{ color: currentTheme.colors.text }}>{metrics.velocity}/dia</div>
                     </div>
                   </div>
                   {metrics.bottleneckCount > 0 && (
                     <>
-                      <div className="w-px h-8 bg-gray-600"></div>
+                      <div className="w-px h-8" style={{ backgroundColor: currentTheme.colors.border }}></div>
                       <div className="flex items-center space-x-2">
-                        <AlertTriangle className="h-4 w-4 text-red-400 animate-pulse" />
+                        <AlertTriangle className="h-4 w-4 animate-pulse" style={{ color: currentTheme.colors.error }} />
                         <div>
-                          <div className="text-xs text-gray-400">Bottlenecks</div>
-                          <div className="text-sm font-bold text-red-400" title={metrics.bottleneckNames.join(', ')}>
+                          <div className="text-xs" style={{ color: currentTheme.colors.textMuted }}>Bottlenecks</div>
+                          <div className="text-sm font-bold" style={{ color: currentTheme.colors.error }} title={metrics.bottleneckNames.join(', ')}>
                             {metrics.bottleneckCount}
                           </div>
                         </div>
