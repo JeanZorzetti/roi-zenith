@@ -46,6 +46,7 @@ import {
 } from 'lucide-react';
 import { useSocket } from '@/hooks/useSocket';
 import { ActivityFeed } from '@/components/ActivityFeed';
+import { DesignTokens } from '@/styles/design-tokens';
 import { ToastContainer } from '@/components/Notifications';
 import { ImportModal } from '@/components/ImportModal';
 import { ThemeSelector } from '@/components/ThemeSelector';
@@ -4405,16 +4406,19 @@ const TasksPage = () => {
         <div
           className={`${
             isMobile
-              ? 'flex flex-col gap-4'
+              ? 'flex flex-col'
               : isTablet
-              ? 'grid grid-cols-2 gap-6 overflow-x-auto pb-6'
-              : 'flex gap-8 overflow-x-auto pb-6'
+              ? 'grid grid-cols-2 overflow-x-auto pb-6'
+              : 'flex overflow-x-auto pb-6'
           } select-none ${!isMobile && !isTablet ? (isScrolling ? 'cursor-grabbing' : 'cursor-grab') : ''}`}
           onMouseDown={!isMobile ? handleMouseDown : undefined}
           onMouseMove={!isMobile ? handleMouseMove : undefined}
           onMouseUp={!isMobile ? handleMouseUp : undefined}
           onMouseLeave={!isMobile ? handleMouseLeave : undefined}
-          style={{ scrollbarWidth: 'thin' }}
+          style={{
+            scrollbarWidth: 'thin',
+            gap: DesignTokens.sizes.column.gap
+          }}
         >
           {columns.map((column) => (
           <div
@@ -4424,8 +4428,12 @@ const TasksPage = () => {
                 ? 'w-full'
                 : isTablet
                 ? 'w-full'
-                : 'flex-shrink-0 w-80'
+                : 'flex-shrink-0'
             }`}
+            style={{
+              minWidth: isMobile || isTablet ? 'auto' : DesignTokens.sizes.column.minWidth,
+              maxWidth: isMobile || isTablet ? 'none' : DesignTokens.sizes.column.maxWidth
+            }}
             onDragOver={(e) => {
               if (draggedColumn) {
                 handleColumnDragOver(e);
@@ -4446,14 +4454,22 @@ const TasksPage = () => {
           >
             {/* Column Header */}
             <div
-              className="flex items-center justify-between mb-4 cursor-move p-3 rounded-xl backdrop-blur-md transition-all duration-300 shadow-lg"
+              className="flex items-center justify-between mb-4 cursor-move backdrop-blur-md transition-all"
               style={{
-                background: `linear-gradient(90deg, ${currentTheme.colors.cardBg}99, ${currentTheme.colors.cardBg}66, ${currentTheme.colors.cardBg}99)`,
-                borderWidth: '1px',
+                height: DesignTokens.sizes.column.headerHeight,
+                paddingLeft: DesignTokens.spacing.md,
+                paddingRight: DesignTokens.spacing.md,
+                paddingTop: DesignTokens.spacing.sm,
+                paddingBottom: DesignTokens.spacing.sm,
+                borderRadius: DesignTokens.borderRadius.md,
+                backgroundColor: currentTheme.colors.cardBg,
+                borderWidth: DesignTokens.borderWidth.thin,
                 borderStyle: 'solid',
                 borderColor: isWipLimitExceeded(column)
                   ? `${currentTheme.colors.error}80`
                   : currentTheme.colors.border,
+                boxShadow: DesignTokens.shadow.sm,
+                transition: DesignTokens.transition.normal,
                 animation: isWipLimitExceeded(column) ? 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite' : 'none'
               }}
               onMouseEnter={(e) => {
@@ -4501,8 +4517,13 @@ const TasksPage = () => {
                   </div>
                 ) : (
                   <h3
-                    className="font-bold cursor-pointer transition-colors"
-                    style={{ color: currentTheme.colors.text }}
+                    className="cursor-pointer"
+                    style={{
+                      color: currentTheme.colors.text,
+                      fontSize: DesignTokens.fontSize.lg,
+                      fontWeight: DesignTokens.fontWeight.semibold,
+                      transition: DesignTokens.transition.fast
+                    }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.color = currentTheme.colors.primary;
                     }}
@@ -4516,11 +4537,18 @@ const TasksPage = () => {
                   </h3>
                 )}
                 <span
-                  className="backdrop-blur-sm px-2.5 py-1 rounded-lg text-xs font-bold shadow-sm"
+                  className="backdrop-blur-sm flex items-center justify-center"
                   style={{
-                    background: `linear-gradient(135deg, ${currentTheme.colors.cardBgHover}, ${currentTheme.colors.cardBg})`,
+                    height: DesignTokens.sizes.badge.height,
+                    minWidth: DesignTokens.sizes.badge.height,
+                    paddingLeft: DesignTokens.sizes.badge.paddingX,
+                    paddingRight: DesignTokens.sizes.badge.paddingX,
+                    borderRadius: DesignTokens.borderRadius.sm,
+                    backgroundColor: currentTheme.colors.cardBgHover,
                     color: currentTheme.colors.textSecondary,
-                    borderWidth: '1px',
+                    fontSize: DesignTokens.fontSize.sm,
+                    fontWeight: DesignTokens.fontWeight.semibold,
+                    borderWidth: DesignTokens.borderWidth.thin,
                     borderStyle: 'solid',
                     borderColor: currentTheme.colors.border
                   }}
@@ -4661,7 +4689,10 @@ const TasksPage = () => {
             })()}
 
             {/* Tasks or SubColumns (Accordion) */}
-            <div className="space-y-3 min-h-[200px]">
+            <div
+              className="min-h-[200px]"
+              style={{ display: 'flex', flexDirection: 'column', gap: DesignTokens.sizes.subcolumn.gap }}
+            >
               {/* Render SubColumns if they exist (Accordion mode) */}
               {column.subColumns && column.subColumns.length > 0 ? (
                 <>
@@ -4690,35 +4721,48 @@ const TasksPage = () => {
                     >
                       {/* SubColumn Header */}
                       <div
-                        className="backdrop-blur-sm p-3 flex items-center justify-between transition-all duration-300 cursor-move"
+                        className="backdrop-blur-sm flex items-center justify-between transition-all cursor-move"
                         style={{
-                          background: `linear-gradient(90deg, ${currentTheme.colors.cardBg}99, ${currentTheme.colors.cardBg}66)`,
-                          borderBottomWidth: '1px',
+                          height: DesignTokens.sizes.subcolumn.headerHeight,
+                          paddingLeft: DesignTokens.spacing.sm,
+                          paddingRight: DesignTokens.spacing.sm,
+                          backgroundColor: currentTheme.colors.cardBg,
+                          borderBottomWidth: DesignTokens.borderWidth.thin,
                           borderBottomStyle: 'solid',
-                          borderBottomColor: currentTheme.colors.border
+                          borderBottomColor: currentTheme.colors.border,
+                          transition: DesignTokens.transition.normal
                         }}
                         draggable
                         onDragStart={(e) => handleSubColumnDragStart(e, subColumn.id, column.id)}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.background = `linear-gradient(90deg, ${currentTheme.colors.cardBgHover}99, ${currentTheme.colors.cardBgHover}66)`;
+                          e.currentTarget.style.backgroundColor = currentTheme.colors.cardBgHover;
                         }}
                         onMouseLeave={(e) => {
-                          e.currentTarget.style.background = `linear-gradient(90deg, ${currentTheme.colors.cardBg}99, ${currentTheme.colors.cardBg}66)`;
+                          e.currentTarget.style.backgroundColor = currentTheme.colors.cardBg;
                         }}
                       >
                         <div
-                          className="flex items-center space-x-3 flex-1 cursor-pointer"
+                          className="flex items-center flex-1 cursor-pointer"
+                          style={{ gap: DesignTokens.spacing.sm }}
                           onClick={() => toggleSubColumnExpanded(subColumn.id)}
                         >
                           <ChevronDown
-                            className={`h-4 w-4 transition-transform duration-200 ${
+                            className={`transition-transform ${
                               isExpanded ? 'rotate-0' : '-rotate-90'
                             }`}
-                            style={{ color: currentTheme.colors.textSecondary }}
+                            style={{
+                              color: currentTheme.colors.textSecondary,
+                              width: DesignTokens.sizes.icon.md,
+                              height: DesignTokens.sizes.icon.md,
+                              transition: DesignTokens.transition.fast
+                            }}
                           />
                           <h4
-                            className="font-semibold"
-                            style={{ color: currentTheme.colors.text }}
+                            style={{
+                              color: currentTheme.colors.text,
+                              fontSize: DesignTokens.fontSize.md,
+                              fontWeight: DesignTokens.fontWeight.medium
+                            }}
                           >
                             {subColumn.title}
                           </h4>
