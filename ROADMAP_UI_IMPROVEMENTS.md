@@ -9,47 +9,58 @@
 ## 📋 Sprint 1: Sidebar & TopBar Collapsible (4-6h) ✅ COMPLETO
 
 ### ✅ Objetivos:
-- Interface imersiva com mais espaço para conteúdo
-- Sidebar e TopBar ocultáveis com botão hamburger
-- Animações suaves de transição
-- Estado persistido no localStorage
+- ✅ Interface imersiva com mais espaço para conteúdo
+- ✅ Sidebar e TopBar ocultáveis com botão hamburger
+- ✅ Animações suaves de transição (500ms)
+- ✅ Estado persistido no localStorage
 
 ### 🎯 Tasks:
 
-#### 1.1 - Criar Sistema de Toggle para Sidebar
+#### 1.1 - Criar Sistema de Toggle para Sidebar ✅ COMPLETO
 - [x] ✅ Adicionar estado `sidebarCollapsed` no contexto global ou localStorage
-- [x] ✅ Criar botão hamburger (☰) fixo no canto superior esquerdo
+- [x] ✅ Criar botão hamburger (☰) fixo com posição dinâmica
 - [x] ✅ Implementar animação de slide-in/slide-out (500ms ease-in-out)
 - [x] ✅ Ajustar largura da sidebar: `280px` (aberta) → `0px` (fechada)
 - [x] ✅ Adicionar overlay escuro quando sidebar aberta em mobile
+- [x] ✅ Sidebar aberta por padrão em desktop (>1024px), fechada em mobile
 
 **Arquivos:**
 - `frontend/src/layouts/DashboardLayout.tsx` ✅ CONECTADO
 - `frontend/src/contexts/UIContext.tsx` ✅ CRIADO
 
-#### 1.2 - Criar Sistema de Toggle para TopBar
-- [x] ✅ Adicionar estado `topbarCollapsed`
+#### 1.2 - Criar Sistema de Toggle para TopBar ✅ COMPLETO
+- [x] ✅ Adicionar estado `topbarCollapsed` (implementado como `topbarHidden`)
 - [x] ✅ Implementar auto-hide ao fazer scroll down
-- [x] ✅ Mostrar ao fazer scroll up ou hover no topo
+- [x] ✅ Mostrar ao fazer scroll up ou ao chegar no topo (scrollY === 0)
 - [x] ✅ Altura da topbar: `64px` (visível) → `0px` (oculta)
-- [ ] Adicionar indicador visual sutil quando oculta (opcional)
+- [x] ✅ Transição suave com overflow hidden
 
 **Arquivos:**
 - `frontend/src/layouts/DashboardLayout.tsx` ✅ APLICADO
+- `frontend/src/contexts/UIContext.tsx` ✅ COM AUTO-HIDE SCROLL
 
-#### 1.3 - Botão Hamburger Global
-- [x] ✅ Posição fixa: `top-4 left-4`
-- [x] ✅ Z-index alto (z-50) para ficar acima de tudo
-- [x] ✅ Ícone animado: ☰ → ✕ quando aberto
+#### 1.3 - Botão Hamburger Global ✅ COMPLETO
+- [x] ✅ Posição dinâmica: `left: 1rem` (collapsed) | `left: calc(280px + 1rem)` (expanded)
+- [x] ✅ Z-index 70 (DesignTokens.zIndex.hamburger) - mais alto que tudo
+- [x] ✅ Ícone animado: ☰ → ✕ com rotação e fade
 - [x] ✅ Tamanho: 44x44px (área de toque confortável)
-- [x] ✅ Background semi-transparente com blur
+- [x] ✅ Background semi-transparente com blur + hover effects
+- [x] ✅ Transição de posição sincronizada com sidebar (500ms)
 
 **Componente:** `frontend/src/components/HamburgerButton.tsx` ✅ CRIADO
 
-**Design:**
+**Implementação Final:**
 ```tsx
-<button className="fixed top-4 left-4 z-50 w-11 h-11 rounded-lg backdrop-blur-md transition-all">
-  <Menu className="h-6 w-6" />
+// Posição dinâmica baseada no estado da sidebar
+const leftPosition = sidebarCollapsed || isMobile ? '1rem' : 'calc(280px + 1rem)';
+
+<button
+  style={{
+    left: leftPosition,
+    transition: `all ${DesignTokens.transition.slow}`, // 500ms
+  }}
+>
+  {/* Ícones animados com fade e rotate */}
 </button>
 ```
 
@@ -262,7 +273,7 @@ const spacing = {
 
 ---
 
-## 🎯 Sprint 5: Sistema de Design Tokens (2-3h) ✅ COMPLETO
+## 🎯 Sprint 5: Sistema de Design Tokens (2-3h)
 
 ### ✅ Objetivos:
 - Criar constantes reutilizáveis
@@ -271,7 +282,7 @@ const spacing = {
 
 ### 🎯 Tasks:
 
-#### 5.1 - Design Tokens File ✅ COMPLETO
+#### 5.1 - Design Tokens File
 Criar `frontend/src/styles/design-tokens.ts`:
 
 ```typescript
