@@ -7,12 +7,14 @@ import { useAuthStore } from '@/stores/authStore';
 import AppRouter from "./routes/AppRouter";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { UIProvider } from "@/contexts/UIContext";
+import HamburgerButton from "@/components/HamburgerButton";
 
 const queryClient = new QueryClient();
 
 const App = () => {
   const initializeAuth = useAuthStore(state => state.initializeAuth);
-  
+
   useEffect(() => {
     // Initialize authentication on app startup
     initializeAuth();
@@ -21,13 +23,16 @@ const App = () => {
   return (
     <ErrorBoundary>
       <ThemeProvider>
-        <QueryClientProvider client={queryClient}>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <AppRouter />
-          </TooltipProvider>
-        </QueryClientProvider>
+        <UIProvider>
+          <QueryClientProvider client={queryClient}>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <HamburgerButton />
+              <AppRouter />
+            </TooltipProvider>
+          </QueryClientProvider>
+        </UIProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );
