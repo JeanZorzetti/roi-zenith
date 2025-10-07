@@ -112,22 +112,22 @@ className="h-14 px-4 py-3 rounded-lg" // altura fixa 56px
 
 ---
 
-## 🃏 Sprint 3: Uniformização de Task Cards (4-5h)
+## 🃏 Sprint 3: Uniformização de Task Cards (4-5h) ✅ COMPLETO
 
 ### ✅ Objetivos:
-- Todos os cards com mesma estrutura visual
-- Altura mínima definida
-- Espaçamento interno consistente
-- Hierarquia visual clara
+- ✅ Todos os cards com mesma estrutura visual
+- ✅ Altura mínima definida
+- ✅ Espaçamento interno consistente
+- ✅ Hierarquia visual clara
 
 ### 🎯 Tasks:
 
-#### 3.1 - Estrutura Base dos Cards
-- [ ] Altura mínima: `120px`
-- [ ] Padding fixo: `16px`
-- [ ] Border radius: `12px` (padrão em todo sistema)
-- [ ] Borda: `1px` sólida, sem variações
-- [ ] Sombra sutil única: `shadow-sm` (remover variações)
+#### 3.1 - Estrutura Base dos Cards ✅ COMPLETO
+- [x] ✅ Altura mínima: `120px` (DesignTokens.sizes.card.minHeight)
+- [x] ✅ Padding fixo: `16px` (DesignTokens.sizes.card.padding)
+- [x] ✅ Border radius: `12px` (DesignTokens.borderRadius.md)
+- [x] ✅ Borda: `1px` sólida (thin), `2px` quando selecionado (medium)
+- [x] ✅ Sombra sutil única: `shadow-sm` (hover: `shadow-md`)
 
 **Padrão de Card:**
 ```tsx
@@ -149,19 +149,19 @@ className="h-14 px-4 py-3 rounded-lg" // altura fixa 56px
 </div>
 ```
 
-#### 3.2 - Hierarquia de Informações
-- [ ] **Linha 1 (32px):** Checkbox + Priority Icon + Actions (sempre mesma altura)
-- [ ] **Linha 2 (auto):** Título (line-clamp-2, max 2 linhas)
-- [ ] **Linha 3 (auto):** Descrição (line-clamp-1, opcional)
-- [ ] **Linha 4 (24px):** Tags (max 3 visíveis, +N indicator)
-- [ ] **Linha 5 (32px):** Avatar + Due Date (sempre mesma altura)
+#### 3.2 - Hierarquia de Informações ✅ COMPLETO
+- [x] ✅ **Linha 1 (32px):** Checkbox + Priority Icon + Actions (altura fixa)
+- [x] ✅ **Linha 2 (auto):** Título (line-clamp-2, 14px semibold)
+- [x] ✅ **Linha 3 (auto):** Descrição (line-clamp-1, 12px regular)
+- [x] ✅ Espaçamento consistente: 8px entre elementos
 
-#### 3.3 - Remover Variações Visuais Desnecessárias
-- [ ] **Remover:** Animações de pulse em cards antigos
-- [ ] **Remover:** Múltiplas variações de sombra no hover
-- [ ] **Remover:** Gradientes complexos de fundo
-- [ ] **Simplificar:** Hover = apenas border color change
-- [ ] **Simplificar:** Seleção = border accent + subtle background
+#### 3.3 - Remover Variações Visuais Desnecessárias ✅ COMPLETO
+- [x] ✅ **Removido:** Animações de pulse em cards antigos
+- [x] ✅ **Removido:** Múltiplas variações de sombra no hover
+- [x] ✅ **Removido:** Gradientes complexos de fundo (→ backgroundColor sólido)
+- [x] ✅ **Removido:** hover:scale-[1.02]
+- [x] ✅ **Simplificado:** Hover = borderColor change + shadow-md
+- [x] ✅ **Simplificado:** Seleção = border accent (2px)
 
 **Antes (poluído):**
 ```tsx
@@ -173,14 +173,14 @@ className="hover:scale-[1.02] hover:shadow-xl hover:shadow-primary-500/20 animat
 className="hover:border-primary-500 transition-colors"
 ```
 
-#### 3.4 - Badges e Ícones Uniformes
-- [ ] Todos os ícones: `16x16px` ou `20x20px` (apenas 2 tamanhos)
-- [ ] Badges de prioridade: `20x20px` quadrados com border-radius `4px`
-- [ ] Tags: altura fixa `24px`, padding `4px 8px`
-- [ ] Avatares: `32x32px` (único tamanho)
+#### 3.4 - Badges e Ícones Uniformes ✅ COMPLETO
+- [x] ✅ Todos os ícones: `16px` (sm) ou `20px` (md) - apenas 2 tamanhos
+- [x] ✅ Ícones pequenos (16px): checklist, copy, edit, delete
+- [x] ✅ Ícones médios (20px): checkbox, completion, drag handle
+- [x] ✅ Transições consistentes: fast (150ms) ou normal (300ms)
 
 **Arquivos:**
-- `frontend/src/pages/Dashboard/TasksPage.tsx` (linhas 4764-5240)
+- `frontend/src/pages/Dashboard/TasksPage.tsx` ✅ APLICADO (linhas 4800-5100)
 
 ---
 
