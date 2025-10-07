@@ -2483,10 +2483,31 @@ const TasksPage = () => {
 
     // Find the task to update
     const currentBoard = boards.find(b => b.id === currentBoardId);
-    const taskColumn = currentBoard?.columns.find(col =>
+
+    // Search in both col.tasks and col.subColumns[].tasks[]
+    let taskColumn = currentBoard?.columns.find(col =>
       col.tasks.some(task => task.id === taskId)
     );
-    const existingTask = taskColumn?.tasks.find(task => task.id === taskId);
+    let existingTask = taskColumn?.tasks.find(task => task.id === taskId);
+    let isInSubColumn = false;
+    let subColumnId: string | undefined;
+
+    // If not found in col.tasks, search in subColumns
+    if (!existingTask) {
+      for (const col of currentBoard?.columns || []) {
+        for (const subCol of col.subColumns || []) {
+          const task = subCol.tasks?.find(t => t.id === taskId);
+          if (task) {
+            existingTask = task;
+            taskColumn = col;
+            isInSubColumn = true;
+            subColumnId = subCol.id;
+            break;
+          }
+        }
+        if (existingTask) break;
+      }
+    }
 
     if (!existingTask || !taskColumn) return;
 
@@ -2511,7 +2532,18 @@ const TasksPage = () => {
                   return updatedTask;
                 }
                 return task;
-              })
+              }),
+              subColumns: col.subColumns?.map(subCol => ({
+                ...subCol,
+                tasks: subCol.tasks?.map(task => {
+                  if (task.id === taskId) {
+                    updatedTask = { ...task, completed: !task.completed };
+                    taskColumnId = col.id;
+                    return updatedTask;
+                  }
+                  return task;
+                }) || []
+              })) || []
             }))
           } : board
         ));
