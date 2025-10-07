@@ -173,12 +173,13 @@ const DashboardLayout = () => {
 
       {/* Premium Sidebar */}
       <div
-        className="fixed inset-y-0 left-0 bg-gradient-to-b from-gray-900/95 via-gray-900/98 to-black/95 backdrop-blur-2xl border-r border-gray-700/30 transform shadow-2xl shadow-black/50"
+        className="fixed inset-y-0 left-0 bg-gradient-to-b from-gray-900/95 via-gray-900/98 to-black/95 backdrop-blur-2xl border-r border-gray-700/30 shadow-2xl shadow-black/50 overflow-hidden"
         style={{
           zIndex: DesignTokens.zIndex.modal,
-          width: sidebarCollapsed ? DesignTokens.sizes.sidebar.widthCollapsed : DesignTokens.sizes.sidebar.width,
-          transition: DesignTokens.transition.slow,
-          transform: sidebarCollapsed ? 'translateX(-100%)' : 'translateX(0)',
+          width: sidebarCollapsed ? '0' : DesignTokens.sizes.sidebar.width,
+          opacity: sidebarCollapsed ? 0 : 1,
+          visibility: sidebarCollapsed ? 'hidden' : 'visible',
+          transition: `width ${DesignTokens.transition.slow}, opacity ${DesignTokens.transition.slow}, visibility ${DesignTokens.transition.slow}`,
         }}
       >
         {/* Sidebar Background Effects */}
@@ -397,9 +398,11 @@ const DashboardLayout = () => {
           className="sticky top-0 bg-gray-900/95 backdrop-blur-xl border-b border-gray-800/50"
           style={{
             zIndex: DesignTokens.zIndex.sticky,
-            height: topbarHidden ? DesignTokens.sizes.topbar.heightCollapsed : DesignTokens.sizes.topbar.height,
+            height: topbarHidden ? '0' : DesignTokens.sizes.topbar.height,
+            opacity: topbarHidden ? 0 : 1,
+            visibility: topbarHidden ? 'hidden' : 'visible',
             overflow: 'hidden',
-            transition: DesignTokens.transition.slow,
+            transition: `height ${DesignTokens.transition.slow}, opacity ${DesignTokens.transition.slow}, visibility ${DesignTokens.transition.slow}`,
           }}
         >
           <div className="flex items-center justify-between h-20 px-6 lg:px-8">
