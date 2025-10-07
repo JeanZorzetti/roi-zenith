@@ -6,7 +6,7 @@
 
 ---
 
-## 📋 Sprint 1: Sidebar & TopBar Collapsible (4-6h)
+## 📋 Sprint 1: Sidebar & TopBar Collapsible (4-6h) 🚧 EM ANDAMENTO
 
 ### ✅ Objetivos:
 - Interface imersiva com mais espaço para conteúdo
@@ -17,20 +17,20 @@
 ### 🎯 Tasks:
 
 #### 1.1 - Criar Sistema de Toggle para Sidebar
-- [ ] Adicionar estado `sidebarCollapsed` no contexto global ou localStorage
-- [ ] Criar botão hamburger (☰) fixo no canto superior esquerdo
+- [x] ✅ Adicionar estado `sidebarCollapsed` no contexto global ou localStorage
+- [x] ✅ Criar botão hamburger (☰) fixo no canto superior esquerdo
 - [ ] Implementar animação de slide-in/slide-out (300ms ease-in-out)
 - [ ] Ajustar largura da sidebar: `280px` (aberta) → `0px` (fechada)
 - [ ] Adicionar overlay escuro quando sidebar aberta em mobile
 
 **Arquivos:**
 - `frontend/src/components/Layout/Sidebar.tsx`
-- `frontend/src/contexts/UIContext.tsx` (criar)
+- `frontend/src/contexts/UIContext.tsx` ✅ CRIADO
 
 #### 1.2 - Criar Sistema de Toggle para TopBar
-- [ ] Adicionar estado `topbarCollapsed`
-- [ ] Implementar auto-hide ao fazer scroll down
-- [ ] Mostrar ao fazer scroll up ou hover no topo
+- [x] ✅ Adicionar estado `topbarCollapsed`
+- [x] ✅ Implementar auto-hide ao fazer scroll down
+- [x] ✅ Mostrar ao fazer scroll up ou hover no topo
 - [ ] Altura da topbar: `64px` (visível) → `0px` (oculta)
 - [ ] Adicionar indicador visual sutil quando oculta
 
@@ -38,11 +38,13 @@
 - `frontend/src/components/Layout/TopBar.tsx`
 
 #### 1.3 - Botão Hamburger Global
-- [ ] Posição fixa: `top-4 left-4`
-- [ ] Z-index alto (z-50) para ficar acima de tudo
-- [ ] Ícone animado: ☰ → ✕ quando aberto
-- [ ] Tamanho: 44x44px (área de toque confortável)
-- [ ] Background semi-transparente com blur
+- [x] ✅ Posição fixa: `top-4 left-4`
+- [x] ✅ Z-index alto (z-50) para ficar acima de tudo
+- [x] ✅ Ícone animado: ☰ → ✕ quando aberto
+- [x] ✅ Tamanho: 44x44px (área de toque confortável)
+- [x] ✅ Background semi-transparente com blur
+
+**Componente:** `frontend/src/components/HamburgerButton.tsx` ✅ CRIADO
 
 **Design:**
 ```tsx
@@ -260,7 +262,7 @@ const spacing = {
 
 ---
 
-## 🎯 Sprint 5: Sistema de Design Tokens (2-3h)
+## 🎯 Sprint 5: Sistema de Design Tokens (2-3h) ✅ COMPLETO
 
 ### ✅ Objetivos:
 - Criar constantes reutilizáveis
@@ -269,7 +271,7 @@ const spacing = {
 
 ### 🎯 Tasks:
 
-#### 5.1 - Design Tokens File
+#### 5.1 - Design Tokens File ✅ COMPLETO
 Criar `frontend/src/styles/design-tokens.ts`:
 
 ```typescript
@@ -349,10 +351,18 @@ export const DesignTokens = {
 };
 ```
 
-#### 5.2 - Aplicar Tokens em Todos os Componentes
-- [ ] Substituir valores hardcoded por tokens
-- [ ] Criar helper hooks para acessar tokens
-- [ ] Documentar uso dos tokens
+#### 5.2 - Aplicar Tokens em Todos os Componentes ✅ COMPLETO
+- [x] ✅ Substituir valores hardcoded por tokens
+- [x] ✅ Criar helper hooks para acessar tokens (`useDesignTokens.ts`)
+- [x] ✅ Documentar uso dos tokens
+- [x] ✅ Adicionar CSS Variables no `index.css`
+
+**Arquivos Criados:**
+- `frontend/src/styles/design-tokens.ts` ✅
+- `frontend/src/hooks/useDesignTokens.ts` ✅
+- `frontend/src/contexts/UIContext.tsx` ✅
+- `frontend/src/components/HamburgerButton.tsx` ✅
+- `frontend/src/index.css` (atualizado com variáveis CSS) ✅
 
 ---
 
