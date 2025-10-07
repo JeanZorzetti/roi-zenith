@@ -2001,6 +2001,7 @@ const TasksPage = () => {
             board.id === currentBoardId ? {
               ...board,
               columns: board.columns.map(col => {
+                // Check if task is in col.tasks
                 const taskIndex = col.tasks.findIndex(t => t.id === editingTask.id);
                 if (taskIndex >= 0) {
                   const updatedTask = {
@@ -2012,7 +2013,24 @@ const TasksPage = () => {
                   newTasks[taskIndex] = updatedTask;
                   return { ...col, tasks: newTasks };
                 }
-                return col;
+
+                // Check if task is in subColumns
+                const updatedSubColumns = col.subColumns?.map(subCol => {
+                  const subTaskIndex = subCol.tasks?.findIndex(t => t.id === editingTask.id);
+                  if (subTaskIndex !== undefined && subTaskIndex >= 0) {
+                    const updatedTask = {
+                      ...editingTask,
+                      ...taskData,
+                      checklist: taskForm.checklist.filter(item => item.text.trim())
+                    };
+                    const newSubTasks = [...(subCol.tasks || [])];
+                    newSubTasks[subTaskIndex] = updatedTask;
+                    return { ...subCol, tasks: newSubTasks };
+                  }
+                  return subCol;
+                });
+
+                return { ...col, subColumns: updatedSubColumns };
               })
             } : board
           ));
