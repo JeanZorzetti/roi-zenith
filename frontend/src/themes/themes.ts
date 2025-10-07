@@ -422,6 +422,52 @@ export const themes: Record<string, Theme> = {
       glassBorder: 'rgba(255, 255, 255, 0.1)',
     }
   },
+
+  // 9. Light Professional
+  lightPro: {
+    id: 'lightPro',
+    name: '☀️ Light Pro',
+    description: 'Tema claro profissional e sólido',
+    colors: {
+      background: '#f8fafc',
+      backgroundSecondary: '#f1f5f9',
+      backgroundTertiary: '#e2e8f0',
+
+      cardBg: '#ffffff',
+      cardBgHover: '#f8fafc',
+      cardBorder: '#e2e8f0',
+
+      text: '#0f172a',
+      textSecondary: '#475569',
+      textMuted: '#94a3b8',
+
+      primary: '#3b82f6',
+      primaryHover: '#2563eb',
+      primaryLight: '#60a5fa',
+
+      accent: '#8b5cf6',
+      accentHover: '#7c3aed',
+
+      success: '#10b981',
+      warning: '#f59e0b',
+      error: '#ef4444',
+      info: '#06b6d4',
+
+      priorityLow: '#10b981',
+      priorityMedium: '#f59e0b',
+      priorityHigh: '#f97316',
+      priorityUrgent: '#ef4444',
+
+      border: '#e2e8f0',
+      borderHover: '#cbd5e1',
+      input: '#ffffff',
+      inputBorder: '#cbd5e1',
+      shadow: 'rgba(15, 23, 42, 0.1)',
+
+      glass: 'rgba(255, 255, 255, 0.8)',
+      glassBorder: 'rgba(226, 232, 240, 0.5)',
+    }
+  },
 };
 
 export const getTheme = (themeId: string): Theme => {
