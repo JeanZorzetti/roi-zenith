@@ -3277,13 +3277,15 @@ const TasksPage = () => {
 
     const completedToday = allTasks.filter(task => {
       if (!task.completed) return false;
-      const taskDate = new Date(task.movedToColumnAt || task.createdAt);
+      // Use updatedAt (when task was last modified, including completion) or createdAt as fallback
+      const taskDate = new Date(task.updatedAt || task.createdAt);
       return taskDate >= today;
     }).length;
 
     const completedThisWeek = allTasks.filter(task => {
       if (!task.completed) return false;
-      const taskDate = new Date(task.movedToColumnAt || task.createdAt);
+      // Use updatedAt (when task was last modified, including completion) or createdAt as fallback
+      const taskDate = new Date(task.updatedAt || task.createdAt);
       return taskDate >= oneWeekAgo;
     }).length;
 

@@ -64,6 +64,7 @@ export const getBoards = async (req: Request, res: Response) => {
               tags: Array.isArray(task.tags) ? task.tags : [],
               completed: task.completed,
               createdAt: task.createdAt.toISOString(),
+              updatedAt: task.updatedAt.toISOString(),
               columnId: task.columnId,
               subColumnId: task.subColumnId,
               position: task.position,
@@ -80,6 +81,7 @@ export const getBoards = async (req: Request, res: Response) => {
             tags: Array.isArray(task.tags) ? task.tags : [],
             completed: task.completed,
             createdAt: task.createdAt.toISOString(),
+            updatedAt: task.updatedAt.toISOString(),
             columnId: task.columnId,
             subColumnId: task.subColumnId,
             position: task.position,
@@ -438,6 +440,7 @@ export const createTask = async (req: Request, res: Response) => {
         tags: Array.isArray(newTask.tags) ? newTask.tags : [],
         completed: newTask.completed,
         createdAt: newTask.createdAt.toISOString(),
+        updatedAt: newTask.updatedAt.toISOString(),
         columnId: newTask.columnId,
         position: newTask.position,
         checklist: []
@@ -518,6 +521,7 @@ export const updateTask = async (req: Request, res: Response) => {
         tags: Array.isArray(updatedTask.tags) ? updatedTask.tags : [],
         completed: updatedTask.completed,
         createdAt: updatedTask.createdAt.toISOString(),
+        updatedAt: updatedTask.updatedAt.toISOString(),
         columnId: updatedTask.columnId,
         position: updatedTask.position,
         checklist: []
