@@ -3233,22 +3233,28 @@ const TasksPage = () => {
     const now = new Date();
     const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
-    const tasksThisWeek = column.tasks.filter(task => {
+    // Collect all tasks (direct + from subColumns)
+    const allTasks = [
+      ...column.tasks,
+      ...(column.subColumns?.flatMap(subCol => subCol.tasks || []) || [])
+    ];
+
+    const tasksThisWeek = allTasks.filter(task => {
       const taskDate = new Date(task.movedToColumnAt || task.createdAt);
       return taskDate >= oneWeekAgo;
     }).length;
 
-    const completedTasks = column.tasks.filter(task => task.completed).length;
-    const completionRate = column.tasks.length > 0
-      ? Math.round((completedTasks / column.tasks.length) * 100)
+    const completedTasks = allTasks.filter(task => task.completed).length;
+    const completionRate = allTasks.length > 0
+      ? Math.round((completedTasks / allTasks.length) * 100)
       : 0;
 
-    const avgTimeInColumn = column.tasks.length > 0
-      ? Math.round(column.tasks.reduce((acc, task) => acc + getTaskAgeDays(task), 0) / column.tasks.length)
+    const avgTimeInColumn = allTasks.length > 0
+      ? Math.round(allTasks.reduce((acc, task) => acc + getTaskAgeDays(task), 0) / allTasks.length)
       : 0;
 
     return {
-      total: column.tasks.length,
+      total: allTasks.length,
       thisWeek: tasksThisWeek,
       avgTime: avgTimeInColumn,
       completionRate
@@ -3260,7 +3266,11 @@ const TasksPage = () => {
     const currentBoard = boards.find(b => b.id === currentBoardId);
     if (!currentBoard) return null;
 
-    const allTasks = currentBoard.columns.flatMap(col => col.tasks);
+    // Collect all tasks (direct + from subColumns)
+    const allTasks = currentBoard.columns.flatMap(col => [
+      ...col.tasks,
+      ...(col.subColumns?.flatMap(subCol => subCol.tasks || []) || [])
+    ]);
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -3282,7 +3292,7 @@ const TasksPage = () => {
     // Detect bottlenecks (columns with high avg time and many tasks)
     const bottlenecks = currentBoard.columns.filter(col => {
       const metrics = getColumnMetrics(col);
-      return col.tasks.length > 3 && metrics.avgTime > 5;
+      return metrics.total > 3 && metrics.avgTime > 5;
     });
 
     return {
