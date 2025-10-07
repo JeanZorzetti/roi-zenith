@@ -6,7 +6,7 @@
 
 ---
 
-## 📋 Sprint 1: Sidebar & TopBar Collapsible (4-6h) 🚧 EM ANDAMENTO
+## 📋 Sprint 1: Sidebar & TopBar Collapsible (4-6h) ✅ COMPLETO
 
 ### ✅ Objetivos:
 - Interface imersiva com mais espaço para conteúdo
@@ -19,23 +19,23 @@
 #### 1.1 - Criar Sistema de Toggle para Sidebar
 - [x] ✅ Adicionar estado `sidebarCollapsed` no contexto global ou localStorage
 - [x] ✅ Criar botão hamburger (☰) fixo no canto superior esquerdo
-- [ ] Implementar animação de slide-in/slide-out (300ms ease-in-out)
-- [ ] Ajustar largura da sidebar: `280px` (aberta) → `0px` (fechada)
-- [ ] Adicionar overlay escuro quando sidebar aberta em mobile
+- [x] ✅ Implementar animação de slide-in/slide-out (500ms ease-in-out)
+- [x] ✅ Ajustar largura da sidebar: `280px` (aberta) → `0px` (fechada)
+- [x] ✅ Adicionar overlay escuro quando sidebar aberta em mobile
 
 **Arquivos:**
-- `frontend/src/components/Layout/Sidebar.tsx`
+- `frontend/src/layouts/DashboardLayout.tsx` ✅ CONECTADO
 - `frontend/src/contexts/UIContext.tsx` ✅ CRIADO
 
 #### 1.2 - Criar Sistema de Toggle para TopBar
 - [x] ✅ Adicionar estado `topbarCollapsed`
 - [x] ✅ Implementar auto-hide ao fazer scroll down
 - [x] ✅ Mostrar ao fazer scroll up ou hover no topo
-- [ ] Altura da topbar: `64px` (visível) → `0px` (oculta)
-- [ ] Adicionar indicador visual sutil quando oculta
+- [x] ✅ Altura da topbar: `64px` (visível) → `0px` (oculta)
+- [ ] Adicionar indicador visual sutil quando oculta (opcional)
 
 **Arquivos:**
-- `frontend/src/components/Layout/TopBar.tsx`
+- `frontend/src/layouts/DashboardLayout.tsx` ✅ APLICADO
 
 #### 1.3 - Botão Hamburger Global
 - [x] ✅ Posição fixa: `top-4 left-4`

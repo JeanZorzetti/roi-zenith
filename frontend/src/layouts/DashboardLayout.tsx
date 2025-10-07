@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
-import { 
-  LayoutDashboard, 
-  BarChart3, 
-  Users, 
-  FileText, 
-  Settings, 
-  LogOut, 
+import { useUI } from '@/contexts/UIContext';
+import { DesignTokens } from '@/styles/design-tokens';
+import {
+  LayoutDashboard,
+  BarChart3,
+  Users,
+  FileText,
+  Settings,
+  LogOut,
   User,
   Menu,
   X,
@@ -25,7 +27,7 @@ const DashboardLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuthStore();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { sidebarCollapsed, setSidebarCollapsed, topbarHidden, isMobile } = useUI();
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -161,18 +163,24 @@ const DashboardLayout = () => {
   return (
     <div className="min-h-screen bg-pure-black text-pure-white">
       {/* Mobile sidebar overlay */}
-      {sidebarOpen && (
-        <div 
-          className="fixed inset-0 z-40 bg-black/80 backdrop-blur-sm lg:hidden"
-          onClick={() => setSidebarOpen(false)}
+      {!sidebarCollapsed && isMobile && (
+        <div
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm"
+          style={{ zIndex: DesignTokens.zIndex.overlay }}
+          onClick={() => setSidebarCollapsed(true)}
         />
       )}
 
       {/* Premium Sidebar */}
-      <div className={`
-        fixed inset-y-0 left-0 z-50 w-80 bg-gradient-to-b from-gray-900/95 via-gray-900/98 to-black/95 backdrop-blur-2xl border-r border-gray-700/30 transform transition-all duration-500 ease-out lg:translate-x-0 shadow-2xl shadow-black/50
-        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-      `}>
+      <div
+        className="fixed inset-y-0 left-0 bg-gradient-to-b from-gray-900/95 via-gray-900/98 to-black/95 backdrop-blur-2xl border-r border-gray-700/30 transform shadow-2xl shadow-black/50"
+        style={{
+          zIndex: DesignTokens.zIndex.modal,
+          width: sidebarCollapsed ? DesignTokens.sizes.sidebar.widthCollapsed : DesignTokens.sizes.sidebar.width,
+          transition: DesignTokens.transition.slow,
+          transform: sidebarCollapsed ? 'translateX(-100%)' : 'translateX(0)',
+        }}
+      >
         {/* Sidebar Background Effects */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute top-0 right-0 w-32 h-32 bg-primary-500/10 rounded-full blur-2xl"></div>
@@ -197,12 +205,14 @@ const DashboardLayout = () => {
                 <p className="text-xs text-gray-400 font-medium">Intelligence Platform</p>
               </div>
             </div>
-            <button
-              onClick={() => setSidebarOpen(false)}
-              className="lg:hidden p-2 rounded-xl text-gray-400 hover:text-white hover:bg-gray-800/50 transition-all duration-300"
-            >
-              <X className="h-5 w-5" />
-            </button>
+            {isMobile && (
+              <button
+                onClick={() => setSidebarCollapsed(true)}
+                className="p-2 rounded-xl text-gray-400 hover:text-white hover:bg-gray-800/50 transition-all duration-300"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            )}
           </div>
 
           {/* User Premium Card */}
@@ -283,12 +293,12 @@ const DashboardLayout = () => {
                     <button
                       onClick={() => {
                         navigate(item.path);
-                        setSidebarOpen(false);
+                        if (isMobile) setSidebarCollapsed(true);
                       }}
                       className={`
                         relative w-full flex items-center justify-between p-4 rounded-2xl transition-all duration-500 group-hover:scale-[1.02]
-                        ${item.active 
-                          ? 'bg-gradient-to-r from-primary-600/20 to-secondary-600/20 border border-primary-500/40 shadow-lg shadow-primary-500/10' 
+                        ${item.active
+                          ? 'bg-gradient-to-r from-primary-600/20 to-secondary-600/20 border border-primary-500/40 shadow-lg shadow-primary-500/10'
                           : 'hover:bg-gray-800/50 border border-transparent group-hover:border-gray-700/50'
                         }
                       `}
@@ -376,17 +386,23 @@ const DashboardLayout = () => {
       </div>
 
       {/* Main content */}
-      <div className="lg:ml-80">
+      <div
+        style={{
+          marginLeft: sidebarCollapsed || isMobile ? '0' : DesignTokens.sizes.sidebar.width,
+          transition: DesignTokens.transition.slow,
+        }}
+      >
         {/* Top bar */}
-        <div className="sticky top-0 z-30 bg-gray-900/95 backdrop-blur-xl border-b border-gray-800/50">
+        <div
+          className="sticky top-0 bg-gray-900/95 backdrop-blur-xl border-b border-gray-800/50"
+          style={{
+            zIndex: DesignTokens.zIndex.sticky,
+            height: topbarHidden ? DesignTokens.sizes.topbar.heightCollapsed : DesignTokens.sizes.topbar.height,
+            overflow: 'hidden',
+            transition: DesignTokens.transition.slow,
+          }}
+        >
           <div className="flex items-center justify-between h-20 px-6 lg:px-8">
-            {/* Mobile menu button */}
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="lg:hidden p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800/50 transition-colors"
-            >
-              <Menu className="h-6 w-6" />
-            </button>
 
             {/* Search */}
             <div className="flex-1 max-w-lg mx-6 search-container">
