@@ -93,40 +93,8 @@ export const UIProvider: React.FC<UIProviderProps> = ({ children }) => {
     return () => window.removeEventListener('resize', handleResize);
   }, [sidebarCollapsed]);
 
-  // Auto-hide topbar on scroll down, show on scroll up
-  useEffect(() => {
-    let lastScrollY = window.scrollY;
-    let ticking = false;
-
-    const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          const currentScrollY = window.scrollY;
-
-          // Esconder ao scrollar pra baixo (mais de 64px)
-          if (currentScrollY > lastScrollY && currentScrollY > 64) {
-            setTopbarHidden(true);
-          }
-          // Mostrar ao scrollar pra cima
-          else if (currentScrollY < lastScrollY) {
-            setTopbarHidden(false);
-          }
-          // Sempre mostrar no topo
-          else if (currentScrollY === 0) {
-            setTopbarHidden(false);
-          }
-
-          lastScrollY = currentScrollY;
-          ticking = false;
-        });
-
-        ticking = true;
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  // TopBar visibility is now controlled only by sidebar state (see useEffect above)
+  // No auto-hide on scroll behavior
 
   const toggleSidebar = () => {
     setSidebarCollapsed(prev => !prev);
