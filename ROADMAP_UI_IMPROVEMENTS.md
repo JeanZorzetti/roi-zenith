@@ -66,21 +66,21 @@ const leftPosition = sidebarCollapsed || isMobile ? '1rem' : 'calc(280px + 1rem)
 
 ---
 
-## 📐 Sprint 2: Uniformização de Colunas e Subcolunas (3-4h)
+## 📐 Sprint 2: Uniformização de Colunas e Subcolunas (3-4h) ✅ COMPLETO
 
 ### ✅ Objetivos:
-- Títulos de colunas e subcolunas com altura fixa
-- Espaçamento consistente
-- Visual limpo sem elementos desnecessários
+- ✅ Títulos de colunas e subcolunas com altura fixa
+- ✅ Espaçamento consistente
+- ✅ Visual limpo sem elementos desnecessários
 
 ### 🎯 Tasks:
 
-#### 2.1 - Padronizar Headers de Colunas
-- [ ] Altura fixa: `56px` para todos os headers
-- [ ] Padding interno: `12px 16px`
-- [ ] Font-size título: `16px` (semibold)
-- [ ] Remover gradientes complexos → cor sólida com opacidade
-- [ ] Badge de contagem: tamanho fixo `24x24px`, centralizado
+#### 2.1 - Padronizar Headers de Colunas ✅ COMPLETO
+- [x] ✅ Altura fixa: `56px` para todos os headers (DesignTokens.sizes.column.headerHeight)
+- [x] ✅ Padding interno: `16px` horizontal + `8px` vertical
+- [x] ✅ Font-size título: `16px` (lg, semibold)
+- [x] ✅ Remover gradientes complexos → backgroundColor sólido
+- [x] ✅ Badge de contagem: tamanho fixo `24x24px`, centralizado
 
 **Antes:**
 ```tsx
@@ -92,21 +92,23 @@ className="p-3 rounded-xl" // altura variável
 className="h-14 px-4 py-3 rounded-lg" // altura fixa 56px
 ```
 
-#### 2.2 - Padronizar Headers de Subcolunas
-- [ ] Altura fixa: `48px` (menor que colunas principais)
-- [ ] Padding interno: `10px 14px`
-- [ ] Font-size: `14px` (medium)
-- [ ] Ícone de expand/collapse: tamanho fixo `20x20px`
-- [ ] Alinhamento vertical perfeito de todos elementos
+#### 2.2 - Padronizar Headers de Subcolunas ✅ COMPLETO
+- [x] ✅ Altura fixa: `48px` (DesignTokens.sizes.subcolumn.headerHeight)
+- [x] ✅ Padding interno: `8px` horizontal
+- [x] ✅ Font-size: `14px` (md, medium)
+- [x] ✅ Ícone de expand/collapse: tamanho fixo `20px`
+- [x] ✅ Alinhamento vertical perfeito de todos elementos
+- [x] ✅ Removido gradientes → backgroundColor sólido
 
-#### 2.3 - Sistema de Grid Consistente
-- [ ] Gap entre colunas: `16px` (fixo)
-- [ ] Gap entre subcolunas: `12px` (fixo)
-- [ ] Largura mínima de coluna: `320px`
-- [ ] Largura máxima de coluna: `400px`
+#### 2.3 - Sistema de Grid Consistente ✅ COMPLETO
+- [x] ✅ Gap entre colunas: `16px` (DesignTokens.sizes.column.gap)
+- [x] ✅ Gap entre subcolunas: `12px` (DesignTokens.sizes.subcolumn.gap)
+- [x] ✅ Largura mínima de coluna: `320px` (DesignTokens.sizes.column.minWidth)
+- [x] ✅ Largura máxima de coluna: `400px` (DesignTokens.sizes.column.maxWidth)
+- [x] ✅ Transições uniformes: 300ms (DesignTokens.transition.normal)
 
 **Arquivos:**
-- `frontend/src/pages/Dashboard/TasksPage.tsx` (linhas 4400-4800)
+- `frontend/src/pages/Dashboard/TasksPage.tsx` ✅ APLICADO (linhas 4400-4800)
 
 ---
 
