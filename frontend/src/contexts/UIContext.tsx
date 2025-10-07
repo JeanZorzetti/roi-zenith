@@ -68,6 +68,15 @@ export const UIProvider: React.FC<UIProviderProps> = ({ children }) => {
     localStorage.setItem('ui-compact-mode', String(compactMode));
   }, [compactMode]);
 
+  // Hide topbar when sidebar collapses
+  useEffect(() => {
+    if (sidebarCollapsed) {
+      setTopbarHidden(true);
+    } else {
+      setTopbarHidden(false);
+    }
+  }, [sidebarCollapsed]);
+
   // Handle window resize for mobile detection
   useEffect(() => {
     const handleResize = () => {
