@@ -22,13 +22,23 @@ export const getBoards = async (req: Request, res: Response) => {
                 orderBy: { position: 'asc' },
                 include: {
                   tasks: {
-                    orderBy: { position: 'asc' }
+                    orderBy: { position: 'asc' },
+                    include: {
+                      checklist: {
+                        orderBy: { position: 'asc' }
+                      }
+                    }
                   }
                 }
               },
               tasks: {
                 where: { subColumnId: null },
-                orderBy: { position: 'asc' }
+                orderBy: { position: 'asc' },
+                include: {
+                  checklist: {
+                    orderBy: { position: 'asc' }
+                  }
+                }
               }
             }
           }
@@ -68,7 +78,12 @@ export const getBoards = async (req: Request, res: Response) => {
               columnId: task.columnId,
               subColumnId: task.subColumnId,
               position: task.position,
-              checklist: []
+              checklist: task.checklist?.map((item: any) => ({
+                id: item.id,
+                text: item.text,
+                completed: item.completed,
+                taskId: item.taskId
+              })) || []
             })) || []
           })) || [],
           tasks: column.tasks.map(task => ({
@@ -85,7 +100,12 @@ export const getBoards = async (req: Request, res: Response) => {
             columnId: task.columnId,
             subColumnId: task.subColumnId,
             position: task.position,
-            checklist: []
+            checklist: task.checklist?.map((item: any) => ({
+              id: item.id,
+              text: item.text,
+              completed: item.completed,
+              taskId: item.taskId
+            })) || []
           }))
         }))
       }));
@@ -506,9 +526,35 @@ export const updateTask = async (req: Request, res: Response) => {
       if (updates.columnId !== undefined) updateData.columnId = updates.columnId;
       if (updates.subColumnId !== undefined) updateData.subColumnId = updates.subColumnId;
 
+      // Handle checklist updates
+      if (updates.checklist !== undefined) {
+        // Delete existing checklist items
+        await prisma.checklistItem.deleteMany({
+          where: { taskId }
+        });
+
+        // Create new checklist items
+        if (Array.isArray(updates.checklist) && updates.checklist.length > 0) {
+          await prisma.checklistItem.createMany({
+            data: updates.checklist.map((item: any, index: number) => ({
+              id: item.id || `checklist-${Date.now()}-${index}`,
+              text: item.text,
+              completed: item.completed || false,
+              position: index,
+              taskId: taskId
+            }))
+          });
+        }
+      }
+
       const updatedTask = await prisma.task.update({
         where: { id: taskId },
-        data: updateData
+        data: updateData,
+        include: {
+          checklist: {
+            orderBy: { position: 'asc' }
+          }
+        }
       });
 
       const formattedTask = {
@@ -524,7 +570,12 @@ export const updateTask = async (req: Request, res: Response) => {
         updatedAt: updatedTask.updatedAt.toISOString(),
         columnId: updatedTask.columnId,
         position: updatedTask.position,
-        checklist: []
+        checklist: updatedTask.checklist?.map((item: any) => ({
+          id: item.id,
+          text: item.text,
+          completed: item.completed,
+          taskId: item.taskId
+        })) || []
       };
 
       res.json({ message: 'Task updated successfully', task: formattedTask });

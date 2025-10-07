@@ -1985,7 +1985,8 @@ const TasksPage = () => {
       dueDate: taskForm.dueDate || undefined,
       tags: taskForm.tags ? taskForm.tags.split(',').map(tag => tag.trim()).filter(Boolean) : [],
       columnId,
-      completed: false
+      completed: false,
+      checklist: taskForm.checklist.filter(item => item.text.trim())
     };
 
     try {
