@@ -4005,7 +4005,7 @@ const TasksPage = () => {
               onChange={(e) => setSearchInput(e.target.value)}
               className="w-full rounded-lg px-4 py-2.5 pl-10 focus:outline-none focus:ring-2 transition-all"
               style={{
-                backgroundColor: currentTheme.colors.inputBg,
+                backgroundColor: currentTheme.colors.input,
                 borderWidth: '1px',
                 borderStyle: 'solid',
                 borderColor: currentTheme.colors.inputBorder,
@@ -4564,7 +4564,7 @@ const TasksPage = () => {
                       onBlur={saveColumnTitle}
                       className="font-bold rounded px-2 py-1 text-sm focus:outline-none"
                       style={{
-                        backgroundColor: currentTheme.colors.inputBg,
+                        backgroundColor: currentTheme.colors.input,
                         borderWidth: '1px',
                         borderStyle: 'solid',
                         borderColor: currentTheme.colors.inputBorder,
@@ -5113,7 +5113,7 @@ const TasksPage = () => {
                                     }}
                                     className="w-full rounded px-2 py-1 focus:outline-none focus:ring-2"
                                     style={{
-                                      backgroundColor: currentTheme.colors.inputBg,
+                                      backgroundColor: currentTheme.colors.input,
                                       borderWidth: DesignTokens.borderWidth.thin,
                                       borderStyle: 'solid',
                                       borderColor: currentTheme.colors.primary,
@@ -6213,7 +6213,7 @@ const TasksPage = () => {
                   onChange={(e) => setBoardForm(prev => ({...prev, title: e.target.value}))}
                   className="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2"
                   style={{
-                    backgroundColor: currentTheme.colors.inputBg,
+                    backgroundColor: currentTheme.colors.input,
                     borderWidth: '1px',
                     borderStyle: 'solid',
                     borderColor: currentTheme.colors.border,
@@ -6244,7 +6244,7 @@ const TasksPage = () => {
                   onChange={(e) => setBoardForm(prev => ({...prev, description: e.target.value}))}
                   className="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2"
                   style={{
-                    backgroundColor: currentTheme.colors.inputBg,
+                    backgroundColor: currentTheme.colors.input,
                     borderWidth: '1px',
                     borderStyle: 'solid',
                     borderColor: currentTheme.colors.border,
@@ -6457,7 +6457,7 @@ const TasksPage = () => {
                   onChange={(e) => setTaskForm(prev => ({...prev, title: e.target.value}))}
                   className="w-full px-3 py-2 rounded-lg focus:outline-none"
                   style={{
-                    backgroundColor: currentTheme.colors.inputBg,
+                    backgroundColor: currentTheme.colors.input,
                     borderWidth: '1px',
                     borderStyle: 'solid',
                     borderColor: currentTheme.colors.border,
@@ -6488,7 +6488,7 @@ const TasksPage = () => {
                   onChange={(e) => setTaskForm(prev => ({...prev, description: e.target.value}))}
                   className="w-full px-3 py-2 rounded-lg focus:outline-none"
                   style={{
-                    backgroundColor: currentTheme.colors.inputBg,
+                    backgroundColor: currentTheme.colors.input,
                     borderWidth: '1px',
                     borderStyle: 'solid',
                     borderColor: currentTheme.colors.border,
@@ -6520,7 +6520,7 @@ const TasksPage = () => {
                   onChange={(e) => setTaskForm(prev => ({...prev, priority: e.target.value as Task['priority']}))}
                   className="w-full px-3 py-2 rounded-lg focus:outline-none"
                   style={{
-                    backgroundColor: currentTheme.colors.inputBg,
+                    backgroundColor: currentTheme.colors.input,
                     borderWidth: '1px',
                     borderStyle: 'solid',
                     borderColor: currentTheme.colors.border,
@@ -6557,7 +6557,7 @@ const TasksPage = () => {
                     onChange={(e) => setTaskForm(prev => ({...prev, assignee: e.target.value}))}
                     className="w-full px-3 py-2 rounded-lg focus:outline-none"
                     style={{
-                      backgroundColor: currentTheme.colors.inputBg,
+                      backgroundColor: currentTheme.colors.input,
                       borderWidth: '1px',
                       borderStyle: 'solid',
                       borderColor: currentTheme.colors.border,
@@ -6587,7 +6587,7 @@ const TasksPage = () => {
                     onChange={(e) => setTaskForm(prev => ({...prev, dueDate: e.target.value}))}
                     className="w-full px-3 py-2 rounded-lg focus:outline-none"
                     style={{
-                      backgroundColor: currentTheme.colors.inputBg,
+                      backgroundColor: currentTheme.colors.input,
                       borderWidth: '1px',
                       borderStyle: 'solid',
                       borderColor: currentTheme.colors.border,
@@ -6619,7 +6619,7 @@ const TasksPage = () => {
                   onChange={(e) => setTaskForm(prev => ({...prev, tags: e.target.value}))}
                   className="w-full px-3 py-2 rounded-lg focus:outline-none"
                   style={{
-                    backgroundColor: currentTheme.colors.inputBg,
+                    backgroundColor: currentTheme.colors.input,
                     borderWidth: '1px',
                     borderStyle: 'solid',
                     borderColor: currentTheme.colors.border,
@@ -6801,7 +6801,7 @@ const TasksPage = () => {
                   onChange={(e) => setNewColumnTitle(e.target.value)}
                   className="w-full px-3 py-2 rounded-lg focus:outline-none"
                   style={{
-                    backgroundColor: currentTheme.colors.inputBg,
+                    backgroundColor: currentTheme.colors.input,
                     borderWidth: '1px',
                     borderStyle: 'solid',
                     borderColor: currentTheme.colors.border,
@@ -6944,7 +6944,7 @@ const TasksPage = () => {
                     onChange={(e) => setShareEmail(e.target.value)}
                     className="w-full pl-10 pr-4 py-3 rounded-lg focus:outline-none"
                     style={{
-                      backgroundColor: `${currentTheme.colors.inputBg}80`,
+                      backgroundColor: `${currentTheme.colors.input}80`,
                       borderWidth: '1px',
                       borderStyle: 'solid',
                       borderColor: currentTheme.colors.border,
@@ -6975,7 +6975,7 @@ const TasksPage = () => {
                   onChange={(e) => setSharePermission(e.target.value as 'view' | 'edit')}
                   className="w-full px-3 py-3 rounded-lg focus:outline-none"
                   style={{
-                    backgroundColor: `${currentTheme.colors.inputBg}80`,
+                    backgroundColor: `${currentTheme.colors.input}80`,
                     borderWidth: '1px',
                     borderStyle: 'solid',
                     borderColor: currentTheme.colors.border,
