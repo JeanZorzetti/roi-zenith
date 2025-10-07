@@ -4857,54 +4857,57 @@ const TasksPage = () => {
                                 }
                               }}
                               onContextMenu={(e) => handleContextMenu(e, task.id)}
-                              className={`group kanban-card backdrop-blur-md rounded-xl ${isCompactMode ? 'p-3' : 'p-5'} transition-all duration-300 cursor-pointer hover:scale-[1.02] ${
-                                isTaskOld(task) ? 'animate-pulse' : ''
-                              }`}
+                              className="group kanban-card backdrop-blur-md cursor-pointer"
                               style={{
-                                background: `linear-gradient(135deg, ${currentTheme.colors.cardBg}99, ${currentTheme.colors.cardBg}66)`,
-                                borderWidth: selectedTasks.includes(task.id) || selectedTaskId === task.id ? '2px' : '1px',
+                                minHeight: DesignTokens.sizes.card.minHeight,
+                                padding: DesignTokens.sizes.card.padding,
+                                borderRadius: DesignTokens.borderRadius.md,
+                                backgroundColor: currentTheme.colors.cardBg,
+                                borderWidth: selectedTasks.includes(task.id) || selectedTaskId === task.id ? DesignTokens.borderWidth.medium : DesignTokens.borderWidth.thin,
                                 borderStyle: 'solid',
                                 borderColor: selectedTasks.includes(task.id)
                                   ? currentTheme.colors.accent
                                   : selectedTaskId === task.id
                                   ? currentTheme.colors.primary
-                                  : task.priority === 'urgent'
-                                  ? currentTheme.colors.priorityUrgent
-                                  : task.priority === 'high'
-                                  ? currentTheme.colors.priorityHigh
-                                  : task.priority === 'medium'
-                                  ? currentTheme.colors.priorityMedium
-                                  : currentTheme.colors.priorityLow,
-                                opacity: task.completed ? 0.75 : (!isHighlighted ? 0.3 : 1),
-                                boxShadow: selectedTasks.includes(task.id)
-                                  ? `0 4px 16px ${currentTheme.colors.accent}33, 0 0 0 2px ${currentTheme.colors.accent}80`
-                                  : selectedTaskId === task.id
-                                  ? `0 4px 16px ${currentTheme.colors.primary}33, 0 0 0 2px ${currentTheme.colors.primary}80`
-                                  : 'none'
+                                  : currentTheme.colors.border,
+                                opacity: task.completed ? DesignTokens.opacity.muted : (!isHighlighted ? 0.3 : DesignTokens.opacity.active),
+                                boxShadow: DesignTokens.shadow.sm,
+                                transition: DesignTokens.transition.normal
                               }}
                               onMouseEnter={(e) => {
-                                e.currentTarget.style.background = `linear-gradient(135deg, ${currentTheme.colors.cardBgHover}99, ${currentTheme.colors.cardBgHover}66)`;
-                                e.currentTarget.style.opacity = !isHighlighted ? '0.5' : '1';
-                                if (!selectedTasks.includes(task.id) && selectedTaskId !== task.id) {
-                                  e.currentTarget.style.boxShadow = `0 8px 24px ${currentTheme.colors.primary}20`;
-                                }
+                                e.currentTarget.style.borderColor = selectedTasks.includes(task.id) || selectedTaskId === task.id
+                                  ? e.currentTarget.style.borderColor
+                                  : currentTheme.colors.borderHover;
+                                e.currentTarget.style.boxShadow = DesignTokens.shadow.md;
                               }}
                               onMouseLeave={(e) => {
-                                e.currentTarget.style.background = `linear-gradient(135deg, ${currentTheme.colors.cardBg}99, ${currentTheme.colors.cardBg}66)`;
-                                e.currentTarget.style.opacity = task.completed ? '0.75' : (!isHighlighted ? '0.3' : '1');
-                                if (!selectedTasks.includes(task.id) && selectedTaskId !== task.id) {
-                                  e.currentTarget.style.boxShadow = 'none';
-                                }
+                                e.currentTarget.style.borderColor = selectedTasks.includes(task.id)
+                                  ? currentTheme.colors.accent
+                                  : selectedTaskId === task.id
+                                  ? currentTheme.colors.primary
+                                  : currentTheme.colors.border;
+                                e.currentTarget.style.boxShadow = DesignTokens.shadow.sm;
                               }}
                             >
-                              {/* Task Header */}
-                              <div className={`flex items-start justify-between ${isCompactMode ? 'mb-2' : 'mb-3'}`}>
+                              {/* Task Header - Linha 1: 32px altura */}
+                              <div
+                                className="flex items-center justify-between"
+                                style={{
+                                  height: '32px',
+                                  marginBottom: DesignTokens.spacing.sm
+                                }}
+                              >
                                 <div className="flex items-center space-x-2">
                                   {/* Drag Handle */}
-                                  <div className={`${isMobile ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity duration-200 cursor-grab active:cursor-grabbing`}>
+                                  <div className={`${isMobile ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} cursor-grab active:cursor-grabbing`}
+                                    style={{ transition: DesignTokens.transition.fast }}
+                                  >
                                     <GripVertical
-                                      className={`${isMobile ? 'h-6 w-6' : 'h-4 w-4'}`}
-                                      style={{ color: currentTheme.colors.textMuted }}
+                                      style={{
+                                        color: currentTheme.colors.textMuted,
+                                        width: DesignTokens.sizes.icon.md,
+                                        height: DesignTokens.sizes.icon.md
+                                      }}
                                     />
                                   </div>
                                   {isMultiSelectMode && (
@@ -4917,13 +4920,19 @@ const TasksPage = () => {
                                     >
                                       {selectedTasks.includes(task.id) ? (
                                         <CheckSquare
-                                          className={`${isMobile ? 'h-6 w-6' : 'h-5 w-5'}`}
-                                          style={{ color: currentTheme.colors.accent }}
+                                          style={{
+                                            color: currentTheme.colors.accent,
+                                            width: DesignTokens.sizes.icon.md,
+                                            height: DesignTokens.sizes.icon.md
+                                          }}
                                         />
                                       ) : (
                                         <Square
-                                          className={`${isMobile ? 'h-6 w-6' : 'h-5 w-5'}`}
-                                          style={{ color: currentTheme.colors.textSecondary }}
+                                          style={{
+                                            color: currentTheme.colors.textSecondary,
+                                            width: DesignTokens.sizes.icon.md,
+                                            height: DesignTokens.sizes.icon.md
+                                          }}
                                         />
                                       )}
                                     </button>
@@ -4937,13 +4946,22 @@ const TasksPage = () => {
                                   >
                                     {task.completed ? (
                                       <CheckCircle2
-                                        className={`${isMobile ? 'h-6 w-6' : 'h-4 w-4'} flex-shrink-0 animate-pulse`}
-                                        style={{ color: currentTheme.colors.success }}
+                                        className="flex-shrink-0"
+                                        style={{
+                                          color: currentTheme.colors.success,
+                                          width: DesignTokens.sizes.icon.md,
+                                          height: DesignTokens.sizes.icon.md
+                                        }}
                                       />
                                     ) : (
                                       <Circle
-                                        className={`${isMobile ? 'h-6 w-6' : 'h-4 w-4'} flex-shrink-0 group-hover:rotate-90 transition-all duration-300`}
-                                        style={{ color: currentTheme.colors.textSecondary }}
+                                        className="flex-shrink-0"
+                                        style={{
+                                          color: currentTheme.colors.textSecondary,
+                                          width: DesignTokens.sizes.icon.md,
+                                          height: DesignTokens.sizes.icon.md,
+                                          transition: DesignTokens.transition.normal
+                                        }}
                                         onMouseEnter={(e) => e.currentTarget.style.color = currentTheme.colors.success}
                                         onMouseLeave={(e) => e.currentTarget.style.color = currentTheme.colors.textSecondary}
                                       />
@@ -4953,8 +4971,11 @@ const TasksPage = () => {
                                     {getPriorityIcon(task.priority)}
                                     {hasChecklist && (
                                       <ListChecks
-                                        className="h-3 w-3"
-                                        style={{ color: currentTheme.colors.accent }}
+                                        style={{
+                                          color: currentTheme.colors.accent,
+                                          width: DesignTokens.sizes.icon.sm,
+                                          height: DesignTokens.sizes.icon.sm
+                                        }}
                                       />
                                     )}
                                   </div>
@@ -4974,7 +4995,13 @@ const TasksPage = () => {
                                       e.currentTarget.style.backgroundColor = 'transparent';
                                     }}
                                   >
-                                    <Copy className="h-3 w-3 transition-transform duration-200 hover:scale-110" />
+                                    <Copy
+                                      style={{
+                                        width: DesignTokens.sizes.icon.sm,
+                                        height: DesignTokens.sizes.icon.sm,
+                                        transition: DesignTokens.transition.fast
+                                      }}
+                                    />
                                   </button>
                                   <button
                                     onClick={() => openEditTask(task)}
@@ -5011,8 +5038,8 @@ const TasksPage = () => {
                                 </div>
                               </div>
 
-                              {/* Task Content */}
-                              <div className="mb-3">
+                              {/* Task Content - Linha 2: Título */}
+                              <div style={{ marginBottom: DesignTokens.spacing.sm }}>
                                 {inlineEditingTaskId === task.id ? (
                                   <input
                                     type="text"
@@ -5023,13 +5050,16 @@ const TasksPage = () => {
                                       if (e.key === 'Enter') saveInlineEdit();
                                       if (e.key === 'Escape') cancelInlineEdit();
                                     }}
-                                    className="w-full font-bold text-lg mb-1 rounded px-2 py-1 focus:outline-none focus:ring-2"
+                                    className="w-full rounded px-2 py-1 focus:outline-none focus:ring-2"
                                     style={{
                                       backgroundColor: currentTheme.colors.inputBg,
-                                      borderWidth: '1px',
+                                      borderWidth: DesignTokens.borderWidth.thin,
                                       borderStyle: 'solid',
                                       borderColor: currentTheme.colors.primary,
                                       color: currentTheme.colors.text,
+                                      fontSize: DesignTokens.fontSize.md,
+                                      fontWeight: DesignTokens.fontWeight.semibold,
+                                      lineHeight: DesignTokens.lineHeight.tight,
                                       boxShadow: `0 0 0 2px ${currentTheme.colors.primary}33`
                                     }}
                                     autoFocus
@@ -5037,9 +5067,13 @@ const TasksPage = () => {
                                   />
                                 ) : (
                                   <h4
-                                    className={`font-bold text-lg mb-1 cursor-text ${task.completed ? 'line-through' : ''}`}
+                                    className={`cursor-text line-clamp-2 ${task.completed ? 'line-through' : ''}`}
                                     style={{
-                                      color: task.completed ? currentTheme.colors.textMuted : currentTheme.colors.text
+                                      color: task.completed ? currentTheme.colors.textMuted : currentTheme.colors.text,
+                                      fontSize: DesignTokens.fontSize.md,
+                                      fontWeight: DesignTokens.fontWeight.semibold,
+                                      lineHeight: DesignTokens.lineHeight.tight,
+                                      marginBottom: DesignTokens.spacing.xs
                                     }}
                                     onDoubleClick={(e) => {
                                       e.stopPropagation();
@@ -5052,8 +5086,12 @@ const TasksPage = () => {
                                 )}
                                 {task.description && (
                                   <p
-                                    className="text-sm line-clamp-2"
-                                    style={{ color: currentTheme.colors.textSecondary }}
+                                    className="line-clamp-1"
+                                    style={{
+                                      color: currentTheme.colors.textSecondary,
+                                      fontSize: DesignTokens.fontSize.sm,
+                                      lineHeight: DesignTokens.lineHeight.normal
+                                    }}
                                   >
                                     {task.description}
                                   </p>
