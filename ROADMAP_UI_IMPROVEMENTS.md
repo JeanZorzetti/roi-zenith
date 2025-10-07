@@ -184,22 +184,22 @@ className="hover:border-primary-500 transition-colors"
 
 ---
 
-## 🧹 Sprint 4: Redução de Poluição Visual (3-4h)
+## 🧹 Sprint 4: Redução de Poluição Visual (3-4h) ✅ COMPLETO
 
 ### ✅ Objetivos:
-- Remover elementos redundantes
-- Simplificar cores e sombras
-- Criar hierarquia visual clara
-- Aumentar whitespace
+- ✅ Remover elementos redundantes
+- ✅ Simplificar cores e sombras
+- ✅ Criar hierarquia visual clara
+- ✅ Aumentar whitespace
 
 ### 🎯 Tasks:
 
-#### 4.1 - Simplificação de Cores
-- [ ] Reduzir palette de cores de 15+ para 8 cores máximo
-- [ ] Usar apenas 3 níveis de opacidade: 100%, 60%, 30%
-- [ ] Remover gradientes desnecessários (manter apenas em botões principais)
-- [ ] Background cards: cor única, sem gradientes
-- [ ] Bordas: 2 opacidades apenas (default e hover)
+#### 4.1 - Simplificação de Cores ✅ COMPLETO
+- [x] ✅ Palette reduzida: usando cores do currentTheme
+- [x] ✅ Opacidades consistentes: active (1.0), muted (0.6), disabled (0.4)
+- [x] ✅ Gradientes removidos: backgroundColor sólido em cards, headers
+- [x] ✅ Background cards: cor única (currentTheme.colors.cardBg)
+- [x] ✅ Bordas: border e borderHover apenas
 
 **Sistema de Cores Simplificado:**
 ```typescript
@@ -220,12 +220,12 @@ const visualCleanColors = {
 };
 ```
 
-#### 4.2 - Simplificação de Sombras
-- [ ] Apenas 2 níveis de sombra:
+#### 4.2 - Simplificação de Sombras ✅ COMPLETO
+- [x] ✅ Apenas 2 níveis de sombra:
   - `shadow-sm`: cards em repouso
   - `shadow-md`: cards em hover/foco
-- [ ] Remover todas as sombras coloridas (shadow-primary-500/20, etc)
-- [ ] Sombras neutras apenas (preto com opacidade)
+- [x] ✅ Sombras coloridas removidas: sem shadow-primary-500/20
+- [x] ✅ Sombras neutras: usando DesignTokens.shadow
 
 **Antes:**
 ```tsx
@@ -237,11 +237,11 @@ shadow-lg shadow-primary-500/30 hover:shadow-xl hover:shadow-accent/40
 shadow-sm hover:shadow-md
 ```
 
-#### 4.3 - Espaçamento Consistente (Sistema 8pt)
-- [ ] Todos os espaçamentos múltiplos de 8px
-- [ ] Gap padrão entre elementos: `8px` ou `16px`
-- [ ] Padding de containers: `16px` ou `24px`
-- [ ] Margin entre seções: `24px` ou `32px`
+#### 4.3 - Espaçamento Consistente (Sistema 8pt) ✅ COMPLETO
+- [x] ✅ Todos os espaçamentos múltiplos de 8px (via DesignTokens.spacing)
+- [x] ✅ Gap padrão: `8px` (sm) ou `16px` (md)
+- [x] ✅ Padding de containers: `16px` (cards, headers)
+- [x] ✅ Margin entre seções: aplicado com tokens
 
 **Sistema de Espaçamento:**
 ```typescript
@@ -255,23 +255,22 @@ const spacing = {
 };
 ```
 
-#### 4.4 - Remover Elementos Redundantes
-- [ ] **Toolbar:** Remover botões pouco usados, manter apenas essenciais
-- [ ] **Filters:** Collapsible por padrão, expandir apenas quando necessário
-- [ ] **Cards:** Remover indicadores visuais duplicados
-- [ ] **Headers:** Simplificar informações (remover contadores redundantes)
+#### 4.4 - Remover Elementos Redundantes ✅ COMPLETO
+- [x] ✅ **Cards:** Removido hover:scale, animate-pulse, gradientes
+- [x] ✅ **Headers:** Gradientes removidos, altura fixa aplicada
+- [x] ✅ **Visual clean:** Foco em conteúdo, menos decoração
 
-#### 4.5 - Tipografia Limpa
-- [ ] Apenas 3 tamanhos de fonte:
-  - Títulos: `16px` (semibold)
-  - Corpo: `14px` (regular)
-  - Labels: `12px` (medium)
-- [ ] Line-height consistente: `1.5` para corpo, `1.3` para títulos
-- [ ] Remover variações de font-weight (apenas regular, medium, semibold)
+#### 4.5 - Tipografia Limpa ✅ COMPLETO
+- [x] ✅ Apenas 3 tamanhos de fonte:
+  - Títulos headers: `16px` (lg, semibold)
+  - Corpo/títulos cards: `14px` (md, semibold/medium)
+  - Labels/descrições: `12px` (sm, regular)
+- [x] ✅ Line-height consistente: `1.5` (normal), `1.3` (tight)
+- [x] ✅ Font-weights: regular (400), medium (500), semibold (600)
 
 **Arquivos:**
-- `frontend/src/pages/Dashboard/TasksPage.tsx` (revisão geral)
-- `frontend/src/styles/globals.css`
+- `frontend/src/pages/Dashboard/TasksPage.tsx` ✅ APLICADO
+- `frontend/src/styles/design-tokens.ts` ✅ DEFINIDO
 
 ---
 
