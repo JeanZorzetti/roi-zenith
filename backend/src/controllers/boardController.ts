@@ -418,7 +418,7 @@ export const deleteColumn = async (req: Request, res: Response) => {
 export const createTask = async (req: Request, res: Response) => {
   try {
     const { boardId } = req.params;
-    const { title, description, priority, assignee, dueDate, tags, columnId } = req.body;
+    const { title, description, priority, assignee, dueDate, tags, columnId, subColumnId, checklist } = req.body;
 
     try {
       // Verificar se a coluna existe
@@ -446,7 +446,34 @@ export const createTask = async (req: Request, res: Response) => {
           dueDate: dueDate ? new Date(dueDate) : null,
           tags: tags || [],
           columnId,
+          subColumnId: subColumnId || null,
           position: (lastTask?.position || 0) + 1
+        },
+        include: {
+          checklist: true
+        }
+      });
+
+      // Create checklist items if provided
+      if (checklist && Array.isArray(checklist) && checklist.length > 0) {
+        await prisma.checklistItem.createMany({
+          data: checklist.map((item: any, index: number) => ({
+            id: item.id || `checklist-${Date.now()}-${index}`,
+            text: item.text,
+            completed: item.completed || false,
+            position: index,
+            taskId: newTask.id
+          }))
+        });
+      }
+
+      // Reload task to get checklist
+      const taskWithChecklist = await prisma.task.findUnique({
+        where: { id: newTask.id },
+        include: {
+          checklist: {
+            orderBy: { position: 'asc' }
+          }
         }
       });
 
@@ -462,8 +489,14 @@ export const createTask = async (req: Request, res: Response) => {
         createdAt: newTask.createdAt.toISOString(),
         updatedAt: newTask.updatedAt.toISOString(),
         columnId: newTask.columnId,
+        subColumnId: newTask.subColumnId,
         position: newTask.position,
-        checklist: []
+        checklist: taskWithChecklist?.checklist?.map((item: any) => ({
+          id: item.id,
+          text: item.text,
+          completed: item.completed,
+          taskId: item.taskId
+        })) || []
       };
 
       res.json({ task: formattedTask });
