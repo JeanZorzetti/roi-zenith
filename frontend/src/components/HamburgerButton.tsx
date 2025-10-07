@@ -14,20 +14,25 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { DesignTokens } from '@/styles/design-tokens';
 
 export const HamburgerButton: React.FC = () => {
-  const { sidebarCollapsed, toggleSidebar } = useUI();
+  const { sidebarCollapsed, toggleSidebar, isMobile } = useUI();
   const { currentTheme } = useTheme();
+
+  // Calcular posição baseada no estado da sidebar
+  const leftPosition = sidebarCollapsed || isMobile ? '1rem' : 'calc(280px + 1rem)';
 
   return (
     <button
       onClick={toggleSidebar}
-      className="fixed top-4 left-4 w-11 h-11 rounded-lg backdrop-blur-md flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95"
+      className="fixed top-4 w-11 h-11 rounded-lg backdrop-blur-md flex items-center justify-center hover:scale-110 active:scale-95"
       style={{
+        left: leftPosition,
         zIndex: DesignTokens.zIndex.hamburger,
         backgroundColor: `${currentTheme.colors.cardBg}CC`,
         borderWidth: DesignTokens.borderWidth.thin,
         borderStyle: 'solid',
         borderColor: `${currentTheme.colors.border}80`,
         boxShadow: DesignTokens.shadow.md,
+        transition: `all ${DesignTokens.transition.slow}`,
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.backgroundColor = `${currentTheme.colors.cardBgHover}E6`;

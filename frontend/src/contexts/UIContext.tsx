@@ -36,9 +36,12 @@ interface UIProviderProps {
 
 export const UIProvider: React.FC<UIProviderProps> = ({ children }) => {
   // Sidebar state (persistido no localStorage)
+  // Desktop: aberto por padrão, Mobile: fechado por padrão
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(() => {
     const saved = localStorage.getItem('ui-sidebar-collapsed');
-    return saved === 'true';
+    if (saved !== null) return saved === 'true';
+    // Se não há valor salvo, usar padrão baseado no tamanho da tela
+    return window.innerWidth < 1024; // Mobile/tablet fechado, desktop aberto
   });
 
   // TopBar state (não persistido - reset ao recarregar)
