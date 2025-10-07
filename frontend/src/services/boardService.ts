@@ -241,6 +241,23 @@ class BoardService {
     }
   }
 
+  async deleteColumn(boardId: string, columnId: string): Promise<boolean> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/boards/${boardId}/columns/${columnId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+
+      return response.ok;
+    } catch (error) {
+      console.error('Error deleting column:', error);
+      return false;
+    }
+  }
+
   // SubColumn methods
   async createSubColumn(columnId: string, title: string): Promise<boolean> {
     try {

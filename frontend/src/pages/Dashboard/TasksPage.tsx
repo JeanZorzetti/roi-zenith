@@ -2634,19 +2634,29 @@ const TasksPage = () => {
   };
 
   // Delete column
-  const deleteColumn = (columnId: string) => {
+  const deleteColumn = async (columnId: string) => {
     if (columns.length <= 1) {
       alert('Você deve ter pelo menos uma coluna!');
       return;
     }
 
     if (confirm('Tem certeza que deseja excluir esta coluna? Todas as tarefas serão perdidas.')) {
+      // Update UI optimistically
       setBoards(prev => prev.map(board =>
         board.id === currentBoardId ? {
           ...board,
           columns: board.columns.filter(col => col.id !== columnId)
         } : board
       ));
+
+      // Delete from backend
+      const success = await boardService.deleteColumn(currentBoardId, columnId);
+      if (!success) {
+        console.error('Failed to delete column from backend');
+        // Reload to sync state
+        const boards = await boardService.getBoards();
+        setBoards(boards);
+      }
     }
   };
 
