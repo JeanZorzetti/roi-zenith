@@ -2512,51 +2512,64 @@ const TasksPage = () => {
     if (!existingTask || !taskColumn) return;
 
     try {
-      setLoading(true);
-
-      const success = await boardService.updateTask(currentBoardId, taskId, {
-        completed: !existingTask.completed
-      });
-
-      if (success) {
-        // Update local state
-        setBoards(prev => prev.map(board =>
-          board.id === currentBoardId ? {
-            ...board,
-            columns: board.columns.map(col => ({
-              ...col,
-              tasks: col.tasks.map(task => {
+      // Update local state immediately (optimistic update)
+      setBoards(prev => prev.map(board =>
+        board.id === currentBoardId ? {
+          ...board,
+          columns: board.columns.map(col => ({
+            ...col,
+            tasks: col.tasks.map(task => {
+              if (task.id === taskId) {
+                updatedTask = { ...task, completed: !task.completed };
+                taskColumnId = col.id;
+                return updatedTask;
+              }
+              return task;
+            }),
+            subColumns: col.subColumns?.map(subCol => ({
+              ...subCol,
+              tasks: subCol.tasks?.map(task => {
                 if (task.id === taskId) {
                   updatedTask = { ...task, completed: !task.completed };
                   taskColumnId = col.id;
                   return updatedTask;
                 }
                 return task;
-              }),
-              subColumns: col.subColumns?.map(subCol => ({
-                ...subCol,
-                tasks: subCol.tasks?.map(task => {
-                  if (task.id === taskId) {
-                    updatedTask = { ...task, completed: !task.completed };
-                    taskColumnId = col.id;
-                    return updatedTask;
-                  }
-                  return task;
-                }) || []
-              })) || []
-            }))
-          } : board
-        ));
+              }) || []
+            })) || []
+          }))
+        } : board
+      ));
 
-        // Emit socket event for real-time update
-        if (updatedTask && taskColumnId) {
-          emitTaskUpdated({ ...updatedTask, columnId: taskColumnId });
-        }
+      // Emit socket event for real-time update
+      if (updatedTask && taskColumnId) {
+        emitTaskUpdated({ ...updatedTask, columnId: taskColumnId });
       }
+
+      // Update backend without blocking UI
+      await boardService.updateTask(currentBoardId, taskId, {
+        completed: !existingTask.completed
+      });
     } catch (error) {
       console.error('❌ Erro ao atualizar tarefa:', error);
-    } finally {
-      setLoading(false);
+      // Revert on error
+      setBoards(prev => prev.map(board =>
+        board.id === currentBoardId ? {
+          ...board,
+          columns: board.columns.map(col => ({
+            ...col,
+            tasks: col.tasks.map(task =>
+              task.id === taskId ? { ...task, completed: existingTask.completed } : task
+            ),
+            subColumns: col.subColumns?.map(subCol => ({
+              ...subCol,
+              tasks: subCol.tasks?.map(task =>
+                task.id === taskId ? { ...task, completed: existingTask.completed } : task
+              ) || []
+            })) || []
+          }))
+        } : board
+      ));
     }
   };
 
@@ -5464,44 +5477,36 @@ const TasksPage = () => {
                           }
                         }}
                         onContextMenu={(e) => handleContextMenu(e, task.id)}
-                        className={`group kanban-card backdrop-blur-md rounded-xl ${isCompactMode ? 'p-3' : 'p-5'} transition-all duration-300 cursor-pointer hover:scale-[1.02] ${
-                          isTaskOld(task) ? 'animate-pulse' : ''
-                        }`}
+                        className="group kanban-card backdrop-blur-md cursor-pointer"
                         style={{
-                          background: `linear-gradient(135deg, ${currentTheme.colors.cardBg}99, ${currentTheme.colors.cardBg}66)`,
-                          borderWidth: selectedTasks.includes(task.id) || selectedTaskId === task.id ? '2px' : '1px',
+                          minHeight: DesignTokens.sizes.card.minHeight,
+                          padding: DesignTokens.sizes.card.padding,
+                          borderRadius: DesignTokens.borderRadius.md,
+                          backgroundColor: currentTheme.colors.cardBg,
+                          borderWidth: selectedTasks.includes(task.id) || selectedTaskId === task.id ? DesignTokens.borderWidth.medium : DesignTokens.borderWidth.thin,
                           borderStyle: 'solid',
                           borderColor: selectedTasks.includes(task.id)
                             ? currentTheme.colors.accent
                             : selectedTaskId === task.id
                             ? currentTheme.colors.primary
-                            : task.priority === 'urgent'
-                            ? currentTheme.colors.priorityUrgent
-                            : task.priority === 'high'
-                            ? currentTheme.colors.priorityHigh
-                            : task.priority === 'medium'
-                            ? currentTheme.colors.priorityMedium
-                            : currentTheme.colors.priorityLow,
-                          opacity: task.completed ? 0.75 : (!isHighlighted ? 0.3 : 1),
-                          boxShadow: selectedTasks.includes(task.id)
-                            ? `0 4px 16px ${currentTheme.colors.accent}33, 0 0 0 2px ${currentTheme.colors.accent}80`
-                            : selectedTaskId === task.id
-                            ? `0 4px 16px ${currentTheme.colors.primary}33, 0 0 0 2px ${currentTheme.colors.primary}80`
-                            : 'none'
+                            : currentTheme.colors.border,
+                          opacity: task.completed ? DesignTokens.opacity.muted : (!isHighlighted ? 0.3 : DesignTokens.opacity.active),
+                          boxShadow: DesignTokens.shadow.sm,
+                          transition: DesignTokens.transition.normal
                         }}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.background = `linear-gradient(135deg, ${currentTheme.colors.cardBgHover}99, ${currentTheme.colors.cardBgHover}66)`;
-                          e.currentTarget.style.opacity = !isHighlighted ? '0.5' : '1';
-                          if (!selectedTasks.includes(task.id) && selectedTaskId !== task.id) {
-                            e.currentTarget.style.boxShadow = `0 8px 24px ${currentTheme.colors.primary}20`;
-                          }
+                          e.currentTarget.style.borderColor = selectedTasks.includes(task.id) || selectedTaskId === task.id
+                            ? e.currentTarget.style.borderColor
+                            : currentTheme.colors.borderHover;
+                          e.currentTarget.style.boxShadow = DesignTokens.shadow.md;
                         }}
                         onMouseLeave={(e) => {
-                          e.currentTarget.style.background = `linear-gradient(135deg, ${currentTheme.colors.cardBg}99, ${currentTheme.colors.cardBg}66)`;
-                          e.currentTarget.style.opacity = task.completed ? '0.75' : (!isHighlighted ? '0.3' : '1');
-                          if (!selectedTasks.includes(task.id) && selectedTaskId !== task.id) {
-                            e.currentTarget.style.boxShadow = 'none';
-                          }
+                          e.currentTarget.style.borderColor = selectedTasks.includes(task.id)
+                            ? currentTheme.colors.accent
+                            : selectedTaskId === task.id
+                            ? currentTheme.colors.primary
+                            : currentTheme.colors.border;
+                          e.currentTarget.style.boxShadow = DesignTokens.shadow.sm;
                         }}
                       >
                         {/* Same task rendering as above - keeping original code */}
