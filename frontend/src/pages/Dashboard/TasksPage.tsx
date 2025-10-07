@@ -1946,19 +1946,30 @@ const TasksPage = () => {
 
   // Toggle checklist item directly in task (without opening modal)
   const toggleTaskChecklistItem = (taskId: string, itemId: string) => {
-    setBoards(prev => prev.map(board => 
+    setBoards(prev => prev.map(board =>
       board.id === currentBoardId ? {
         ...board,
         columns: board.columns.map(col => ({
           ...col,
-          tasks: col.tasks.map(task => 
+          tasks: col.tasks.map(task =>
             task.id === taskId && task.checklist ? {
               ...task,
               checklist: task.checklist.map(item =>
                 item.id === itemId ? { ...item, completed: !item.completed } : item
               )
             } : task
-          )
+          ),
+          subColumns: col.subColumns?.map(subCol => ({
+            ...subCol,
+            tasks: subCol.tasks?.map(task =>
+              task.id === taskId && task.checklist ? {
+                ...task,
+                checklist: task.checklist.map(item =>
+                  item.id === itemId ? { ...item, completed: !item.completed } : item
+                )
+              } : task
+            ) || []
+          })) || []
         }))
       } : board
     ));
