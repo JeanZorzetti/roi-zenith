@@ -13,6 +13,7 @@ import { errorHandler, notFound } from './middleware/errorMiddleware';
 import authRoutes from './routes/authRoutes';
 import leadRoutes from './routes/leadRoutes';
 import boardRoutes from './routes/boardRoutes';
+import crmRoutes from './routes/crmRoutes';
 
 // Load environment variables
 dotenv.config();
@@ -89,6 +90,7 @@ app.use((req, res, next) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/leads', leadRoutes);
 app.use('/api', boardRoutes);
+app.use('/api/crm', crmRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

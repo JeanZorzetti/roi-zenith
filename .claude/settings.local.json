@@ -47,7 +47,8 @@
       "Bash(git log:*)",
       "Bash(python:*)",
       "Bash(cat:*)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Bash(git revert:*)"
     ],
     "deny": [],
     "ask": []

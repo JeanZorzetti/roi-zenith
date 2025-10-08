@@ -20,7 +20,8 @@ import {
   Sparkles,
   Zap,
   Shield,
-  KanbanSquare
+  KanbanSquare,
+  Building2
 } from 'lucide-react';
 
 const DashboardLayout = () => {
@@ -56,6 +57,7 @@ const DashboardLayout = () => {
     { title: 'Analytics', description: 'Análises avançadas com IA', path: '/dashboard/analytics', type: 'page' },
     { title: 'Leads', description: 'Gestão completa de leads', path: '/dashboard/leads', type: 'page' },
     { title: 'Tarefas', description: 'Organizador Kanban de tarefas', path: '/dashboard/tasks', type: 'page' },
+    { title: 'CRM', description: 'Pipeline de vendas e relacionamentos', path: '/dashboard/crm', type: 'page' },
     { title: 'Relatórios', description: 'Documentos e insights', path: '/dashboard/reports', type: 'page' },
     { title: 'Configurações', description: 'Preferências do sistema', path: '/dashboard/settings', type: 'page' }
   ];
@@ -135,18 +137,26 @@ const DashboardLayout = () => {
       description: 'Gestão de leads',
       count: 0
     },
-    { 
-      icon: KanbanSquare, 
-      label: 'Tarefas', 
-      path: '/dashboard/tasks', 
+    {
+      icon: KanbanSquare,
+      label: 'Tarefas',
+      path: '/dashboard/tasks',
       active: location.pathname.startsWith('/dashboard/tasks'),
       description: 'Organizador Kanban',
       badge: 'Novo'
     },
-    { 
-      icon: FileText, 
-      label: 'Relatórios', 
-      path: '/dashboard/reports', 
+    {
+      icon: Building2,
+      label: 'CRM',
+      path: '/dashboard/crm',
+      active: location.pathname.startsWith('/dashboard/crm'),
+      description: 'Pipeline de Vendas',
+      badge: 'Novo'
+    },
+    {
+      icon: FileText,
+      label: 'Relatórios',
+      path: '/dashboard/reports',
       active: location.pathname.startsWith('/dashboard/reports'),
       description: 'Documentos e insights',
       count: 0
