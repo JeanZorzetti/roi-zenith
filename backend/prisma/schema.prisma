@@ -202,6 +202,39 @@ model Report {
 }
 
 // CRM Models
+model Pipeline {
+  id          String   @id @default(cuid())
+  title       String
+  description String?  @db.Text
+  color       String   @default("#3b82f6")
+  isDefault   Boolean  @default(false) @map("is_default")
+  position    Int      @default(0)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  stages      PipelineStage[]
+  deals       Deal[]
+
+  @@map("pipelines")
+}
+
+model PipelineStage {
+  id          String   @id @default(cuid())
+  title       String
+  color       String   @default("#6366f1")
+  position    Int      @default(0)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  pipelineId  String   @map("pipeline_id")
+  pipeline    Pipeline @relation(fields: [pipelineId], references: [id], onDelete: Cascade)
+  deals       Deal[]
+
+  @@map("pipeline_stages")
+}
+
 model Company {
   id          String   @id @default(cuid())
   name        String
@@ -247,7 +280,6 @@ model Deal {
   description   String?     @db.Text
   value         Decimal     @default(0) @db.Decimal(10, 2)
   currency      String      @default("BRL")
-  stage         DealStage   @default(NEW)
   probability   Int         @default(0)
   expectedCloseDate DateTime? @map("expected_close_date")
   closedDate    DateTime?   @map("closed_date")
@@ -257,6 +289,10 @@ model Deal {
   updatedAt     DateTime    @updatedAt @map("updated_at")
 
   // Relations
+  pipelineId    String      @map("pipeline_id")
+  pipeline      Pipeline    @relation(fields: [pipelineId], references: [id], onDelete: Cascade)
+  stageId       String      @map("stage_id")
+  stage         PipelineStage @relation(fields: [stageId], references: [id], onDelete: Cascade)
   companyId     String?     @map("company_id")
   company       Company?    @relation(fields: [companyId], references: [id], onDelete: SetNull)
   contactId     String?     @map("contact_id")
@@ -291,17 +327,6 @@ enum LeadStatus {
   QUALIFIED
   DEMO_SCHEDULED
   PROPOSAL_SENT
-  CLOSED_WON
-  CLOSED_LOST
-}
-
-enum DealStage {
-  NEW
-  CONTACTED
-  QUALIFIED
-  DEMO
-  PROPOSAL
-  NEGOTIATION
   CLOSED_WON
   CLOSED_LOST
 }

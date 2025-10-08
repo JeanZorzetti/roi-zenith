@@ -1,5 +1,13 @@
 import { Router } from 'express';
 import {
+  getPipelines,
+  getPipeline,
+  createPipeline,
+  updatePipeline,
+  deletePipeline,
+  createStage,
+  updateStage,
+  deleteStage,
   getDeals,
   getDeal,
   createDeal,
@@ -21,6 +29,18 @@ import {
 } from '../controllers/crmController';
 
 const router = Router();
+
+// Pipeline routes
+router.get('/pipelines', getPipelines);
+router.get('/pipelines/:pipelineId', getPipeline);
+router.post('/pipelines', createPipeline);
+router.put('/pipelines/:pipelineId', updatePipeline);
+router.delete('/pipelines/:pipelineId', deletePipeline);
+
+// Pipeline Stage routes
+router.post('/pipelines/:pipelineId/stages', createStage);
+router.put('/stages/:stageId', updateStage);
+router.delete('/stages/:stageId', deleteStage);
 
 // Deal routes
 router.get('/deals', getDeals);

@@ -3,16 +3,218 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
+// ============= PIPELINES =============
+
+export const getPipelines = async (req: Request, res: Response) => {
+  try {
+    const pipelines = await prisma.pipeline.findMany({
+      orderBy: { position: 'asc' },
+      include: {
+        stages: {
+          orderBy: { position: 'asc' }
+        },
+        _count: {
+          select: { deals: true }
+        }
+      }
+    });
+
+    res.json({ pipelines });
+  } catch (error) {
+    console.error('Error fetching pipelines:', error);
+    res.status(500).json({ error: 'Failed to fetch pipelines' });
+  }
+};
+
+export const getPipeline = async (req: Request, res: Response) => {
+  try {
+    const { pipelineId } = req.params;
+
+    const pipeline = await prisma.pipeline.findUnique({
+      where: { id: pipelineId },
+      include: {
+        stages: {
+          orderBy: { position: 'asc' }
+        },
+        deals: {
+          include: {
+            company: true,
+            contact: true,
+            stage: true
+          }
+        }
+      }
+    });
+
+    if (!pipeline) {
+      return res.status(404).json({ error: 'Pipeline not found' });
+    }
+
+    res.json({ pipeline });
+  } catch (error) {
+    console.error('Error fetching pipeline:', error);
+    res.status(500).json({ error: 'Failed to fetch pipeline' });
+  }
+};
+
+export const createPipeline = async (req: Request, res: Response) => {
+  try {
+    const { title, description, color, stages } = req.body;
+
+    const lastPipeline = await prisma.pipeline.findFirst({
+      orderBy: { position: 'desc' }
+    });
+
+    const newPipeline = await prisma.pipeline.create({
+      data: {
+        id: `pipeline-${Date.now()}`,
+        title,
+        description,
+        color: color || '#3b82f6',
+        position: (lastPipeline?.position || 0) + 1,
+        stages: {
+          create: stages?.map((stage: any, index: number) => ({
+            id: `stage-${Date.now()}-${index}`,
+            title: stage.title,
+            color: stage.color || '#6366f1',
+            position: index
+          })) || []
+        }
+      },
+      include: {
+        stages: {
+          orderBy: { position: 'asc' }
+        }
+      }
+    });
+
+    res.json({ pipeline: newPipeline });
+  } catch (error) {
+    console.error('Error creating pipeline:', error);
+    res.status(500).json({ error: 'Failed to create pipeline' });
+  }
+};
+
+export const updatePipeline = async (req: Request, res: Response) => {
+  try {
+    const { pipelineId } = req.params;
+    const updates = req.body;
+
+    const updatedPipeline = await prisma.pipeline.update({
+      where: { id: pipelineId },
+      data: {
+        ...updates,
+        updatedAt: new Date()
+      },
+      include: {
+        stages: {
+          orderBy: { position: 'asc' }
+        }
+      }
+    });
+
+    res.json({ pipeline: updatedPipeline });
+  } catch (error) {
+    console.error('Error updating pipeline:', error);
+    res.status(500).json({ error: 'Failed to update pipeline' });
+  }
+};
+
+export const deletePipeline = async (req: Request, res: Response) => {
+  try {
+    const { pipelineId } = req.params;
+
+    await prisma.pipeline.delete({
+      where: { id: pipelineId }
+    });
+
+    res.json({ message: 'Pipeline deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting pipeline:', error);
+    res.status(500).json({ error: 'Failed to delete pipeline' });
+  }
+};
+
+// ============= PIPELINE STAGES =============
+
+export const createStage = async (req: Request, res: Response) => {
+  try {
+    const { pipelineId } = req.params;
+    const { title, color } = req.body;
+
+    const lastStage = await prisma.pipelineStage.findFirst({
+      where: { pipelineId },
+      orderBy: { position: 'desc' }
+    });
+
+    const newStage = await prisma.pipelineStage.create({
+      data: {
+        id: `stage-${Date.now()}`,
+        title,
+        color: color || '#6366f1',
+        position: (lastStage?.position || 0) + 1,
+        pipelineId
+      }
+    });
+
+    res.json({ stage: newStage });
+  } catch (error) {
+    console.error('Error creating stage:', error);
+    res.status(500).json({ error: 'Failed to create stage' });
+  }
+};
+
+export const updateStage = async (req: Request, res: Response) => {
+  try {
+    const { stageId } = req.params;
+    const updates = req.body;
+
+    const updatedStage = await prisma.pipelineStage.update({
+      where: { id: stageId },
+      data: {
+        ...updates,
+        updatedAt: new Date()
+      }
+    });
+
+    res.json({ stage: updatedStage });
+  } catch (error) {
+    console.error('Error updating stage:', error);
+    res.status(500).json({ error: 'Failed to update stage' });
+  }
+};
+
+export const deleteStage = async (req: Request, res: Response) => {
+  try {
+    const { stageId } = req.params;
+
+    await prisma.pipelineStage.delete({
+      where: { id: stageId }
+    });
+
+    res.json({ message: 'Stage deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting stage:', error);
+    res.status(500).json({ error: 'Failed to delete stage' });
+  }
+};
+
 // ============= DEALS =============
 
 export const getDeals = async (req: Request, res: Response) => {
   try {
+    const { pipelineId } = req.query;
+
+    const where = pipelineId ? { pipelineId: pipelineId as string } : {};
+
     const deals = await prisma.deal.findMany({
+      where,
       orderBy: [
-        { stage: 'asc' },
         { position: 'asc' }
       ],
       include: {
+        pipeline: true,
+        stage: true,
         company: true,
         contact: true,
         activities: {
@@ -36,6 +238,8 @@ export const getDeal = async (req: Request, res: Response) => {
     const deal = await prisma.deal.findUnique({
       where: { id: dealId },
       include: {
+        pipeline: true,
+        stage: true,
         company: true,
         contact: true,
         activities: {
@@ -57,11 +261,11 @@ export const getDeal = async (req: Request, res: Response) => {
 
 export const createDeal = async (req: Request, res: Response) => {
   try {
-    const { title, description, value, currency, stage, probability, expectedCloseDate, companyId, contactId } = req.body;
+    const { title, description, value, currency, pipelineId, stageId, probability, expectedCloseDate, companyId, contactId } = req.body;
 
     // Get the last position for the stage
     const lastDeal = await prisma.deal.findFirst({
-      where: { stage },
+      where: { stageId },
       orderBy: { position: 'desc' }
     });
 
@@ -72,7 +276,8 @@ export const createDeal = async (req: Request, res: Response) => {
         description,
         value: value || 0,
         currency: currency || 'BRL',
-        stage: stage || 'NEW',
+        pipelineId,
+        stageId,
         probability: probability || 0,
         expectedCloseDate: expectedCloseDate ? new Date(expectedCloseDate) : null,
         companyId: companyId || null,
@@ -80,6 +285,8 @@ export const createDeal = async (req: Request, res: Response) => {
         position: (lastDeal?.position || 0) + 1
       },
       include: {
+        pipeline: true,
+        stage: true,
         company: true,
         contact: true
       }
@@ -105,6 +312,8 @@ export const updateDeal = async (req: Request, res: Response) => {
         updatedAt: new Date()
       },
       include: {
+        pipeline: true,
+        stage: true,
         company: true,
         contact: true,
         activities: {
@@ -139,16 +348,18 @@ export const deleteDeal = async (req: Request, res: Response) => {
 export const moveDeal = async (req: Request, res: Response) => {
   try {
     const { dealId } = req.params;
-    const { stage, position } = req.body;
+    const { stageId, position } = req.body;
 
     const updatedDeal = await prisma.deal.update({
       where: { id: dealId },
       data: {
-        stage,
+        stageId,
         position,
         updatedAt: new Date()
       },
       include: {
+        pipeline: true,
+        stage: true,
         company: true,
         contact: true
       }
