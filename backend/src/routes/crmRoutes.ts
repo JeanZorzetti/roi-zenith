@@ -27,6 +27,7 @@ import {
   updateActivity,
   deleteActivity
 } from '../controllers/crmController';
+import { seedTestDeals } from '../controllers/seedController';
 
 const router = Router();
 
@@ -67,5 +68,8 @@ router.get('/activities', getActivities);
 router.post('/activities', createActivity);
 router.put('/activities/:activityId', updateActivity);
 router.delete('/activities/:activityId', deleteActivity);
+
+// Seed route (temporary - for testing)
+router.post('/seed-test-deals', seedTestDeals);
 
 export default router;
