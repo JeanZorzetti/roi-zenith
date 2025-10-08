@@ -7,6 +7,7 @@ import dotenv from 'dotenv';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import { connectDB } from './utils/database';
+import { runAutoMigration } from './utils/autoMigrate';
 import { errorHandler, notFound } from './middleware/errorMiddleware';
 
 // Route imports
@@ -23,6 +24,11 @@ const PORT = process.env.PORT || 5000;
 
 // Connect to Database
 connectDB();
+
+// Run auto-migration (non-blocking)
+runAutoMigration().catch(err => {
+  console.log('⚠️  Auto-migração falhou (não crítico):', err.message);
+});
 
 // Security middleware
 app.use(helmet());
