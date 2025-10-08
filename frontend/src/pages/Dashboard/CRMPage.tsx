@@ -14,14 +14,16 @@ import {
   Edit2,
   Trash2,
   Settings,
-  GitBranch
+  GitBranch,
+  Palette
 } from 'lucide-react';
 import { crmService } from '../../services/crmService';
 import { Deal, Pipeline, PipelineStage, Company, Contact } from '../../types/CRM';
-import { useTheme } from '../../contexts/ThemeContext';
+import { useCRMTheme } from '../../contexts/CRMThemeContext';
+import { themes } from '../../themes/themes';
 
 const CRMPage = () => {
-  const { currentTheme } = useTheme();
+  const { currentTheme, setTheme, themeId } = useCRMTheme();
 
   // State
   const [pipelines, setPipelines] = useState<Pipeline[]>([]);
@@ -350,6 +352,25 @@ const CRMPage = () => {
                 <Plus className="h-4 w-4" />
                 <span className="text-sm">Novo Pipeline</span>
               </button>
+              <div className="flex items-center space-x-2">
+                <Palette className="h-5 w-5" style={{ color: currentTheme.colors.textMuted }} />
+                <select
+                  value={themeId}
+                  onChange={(e) => setTheme(e.target.value)}
+                  className="px-3 py-1.5 rounded-lg border focus:outline-none focus:ring-2"
+                  style={{
+                    backgroundColor: currentTheme.colors.input,
+                    borderColor: currentTheme.colors.border,
+                    color: currentTheme.colors.text
+                  }}
+                >
+                  {Object.entries(themes).map(([id, theme]) => (
+                    <option key={id} value={id}>
+                      {theme.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
 

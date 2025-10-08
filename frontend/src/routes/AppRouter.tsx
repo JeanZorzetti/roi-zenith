@@ -4,6 +4,7 @@ import MainLayout from '@/layouts/MainLayout';
 import DashboardLayout from '@/layouts/DashboardLayout';
 import LoadingScreen from '@/components/LoadingScreen';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import { CRMThemeProvider } from '@/contexts/CRMThemeContext';
 
 // Lazy load pages for better performance
 const HomePage = lazy(() => import('@/pages/Home/HomePage'));
@@ -84,7 +85,11 @@ const AppRouter = () => {
             <Route path="analytics" element={<AnalyticsPage />} />
             <Route path="leads" element={<LeadsPage />} />
             <Route path="tasks" element={<TasksPage />} />
-            <Route path="crm" element={<CRMPage />} />
+            <Route path="crm" element={
+              <CRMThemeProvider>
+                <CRMPage />
+              </CRMThemeProvider>
+            } />
             <Route path="reports" element={<ReportsPage />} />
             <Route path="settings" element={<SettingsPage />} />
             <Route path="database-test" element={<DatabaseTestPage />} />
