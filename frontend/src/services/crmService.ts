@@ -1,4 +1,4 @@
-import { Deal, Company, Contact, Activity } from '../types/CRM';
+import { Deal, Company, Contact, Activity, Pipeline, PipelineStage } from '../types/CRM';
 
 const isProduction = process.env.NODE_ENV === 'production' ||
   (typeof window !== 'undefined' && window.location.hostname.includes('roilabs.com'));
@@ -11,11 +11,182 @@ console.log(`🌍 CRM API Environment: ${isProduction ? 'PRODUCTION' : 'DEVELOPM
 console.log(`🔗 CRM API Base URL: ${API_BASE_URL}`);
 
 class CRMService {
+  // ============= PIPELINES =============
+
+  async getPipelines(): Promise<Pipeline[]> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/pipelines`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.pipelines || [];
+    } catch (error) {
+      console.error('Error fetching pipelines:', error);
+      return [];
+    }
+  }
+
+  async getPipeline(pipelineId: string): Promise<Pipeline | null> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/pipelines/${pipelineId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          return null;
+        }
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.pipeline || null;
+    } catch (error) {
+      console.error('Error fetching pipeline:', error);
+      return null;
+    }
+  }
+
+  async createPipeline(pipeline: Omit<Pipeline, 'id' | 'createdAt' | 'updatedAt'>): Promise<Pipeline | null> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/pipelines`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(pipeline),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.pipeline || null;
+    } catch (error) {
+      console.error('Error creating pipeline:', error);
+      return null;
+    }
+  }
+
+  async updatePipeline(pipelineId: string, updates: Partial<Pipeline>): Promise<boolean> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/pipelines/${pipelineId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(updates),
+      });
+
+      return response.ok;
+    } catch (error) {
+      console.error('Error updating pipeline:', error);
+      return false;
+    }
+  }
+
+  async deletePipeline(pipelineId: string): Promise<boolean> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/pipelines/${pipelineId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+
+      return response.ok;
+    } catch (error) {
+      console.error('Error deleting pipeline:', error);
+      return false;
+    }
+  }
+
+  // ============= PIPELINE STAGES =============
+
+  async createStage(pipelineId: string, stage: { title: string; color: string }): Promise<PipelineStage | null> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/pipelines/${pipelineId}/stages`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(stage),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.stage || null;
+    } catch (error) {
+      console.error('Error creating stage:', error);
+      return null;
+    }
+  }
+
+  async updateStage(stageId: string, updates: Partial<PipelineStage>): Promise<boolean> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/stages/${stageId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(updates),
+      });
+
+      return response.ok;
+    } catch (error) {
+      console.error('Error updating stage:', error);
+      return false;
+    }
+  }
+
+  async deleteStage(stageId: string): Promise<boolean> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/stages/${stageId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+
+      return response.ok;
+    } catch (error) {
+      console.error('Error deleting stage:', error);
+      return false;
+    }
+  }
+
   // ============= DEALS =============
 
-  async getDeals(): Promise<Deal[]> {
+  async getDeals(pipelineId?: string): Promise<Deal[]> {
     try {
-      const response = await fetch(`${API_BASE_URL}/deals`, {
+      const url = pipelineId
+        ? `${API_BASE_URL}/deals?pipelineId=${pipelineId}`
+        : `${API_BASE_URL}/deals`;
+
+      const response = await fetch(url, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -118,7 +289,7 @@ class CRMService {
     }
   }
 
-  async moveDeal(dealId: string, stage: string, position: number): Promise<boolean> {
+  async moveDeal(dealId: string, stageId: string, position: number): Promise<boolean> {
     try {
       const response = await fetch(`${API_BASE_URL}/deals/${dealId}/move`, {
         method: 'PATCH',
@@ -126,7 +297,7 @@ class CRMService {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
-        body: JSON.stringify({ stage, position }),
+        body: JSON.stringify({ stageId, position }),
       });
 
       return response.ok;

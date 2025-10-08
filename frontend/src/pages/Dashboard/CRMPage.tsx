@@ -12,16 +12,20 @@ import {
   Mail,
   X,
   Edit2,
-  Trash2
+  Trash2,
+  Settings,
+  GitBranch
 } from 'lucide-react';
 import { crmService } from '../../services/crmService';
-import { Deal, DealStage, STAGE_CONFIG, Company, Contact } from '../../types/CRM';
+import { Deal, Pipeline, PipelineStage, Company, Contact } from '../../types/CRM';
 import { useTheme } from '../../contexts/ThemeContext';
 
 const CRMPage = () => {
   const { currentTheme } = useTheme();
 
   // State
+  const [pipelines, setPipelines] = useState<Pipeline[]>([]);
+  const [currentPipelineId, setCurrentPipelineId] = useState<string>('');
   const [deals, setDeals] = useState<Deal[]>([]);
   const [companies, setCompanies] = useState<Company[]>([]);
   const [contacts, setContacts] = useState<Contact[]>([]);
@@ -29,6 +33,8 @@ const CRMPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showDealModal, setShowDealModal] = useState(false);
   const [editingDeal, setEditingDeal] = useState<Deal | null>(null);
+  const [showPipelineModal, setShowPipelineModal] = useState(false);
+  const [editingPipeline, setEditingPipeline] = useState<Pipeline | null>(null);
 
   // Deal form state
   const [dealForm, setDealForm] = useState({
@@ -36,11 +42,28 @@ const CRMPage = () => {
     description: '',
     value: 0,
     currency: 'BRL',
-    stage: 'NEW' as DealStage,
+    pipelineId: '',
+    stageId: '',
     probability: 0,
     expectedCloseDate: '',
     companyId: '',
     contactId: ''
+  });
+
+  // Pipeline form state
+  const [pipelineForm, setPipelineForm] = useState({
+    title: '',
+    description: '',
+    color: '#3b82f6',
+    isDefault: false,
+    position: 0,
+    stages: [
+      { title: 'Novo Lead', color: '#6366f1' },
+      { title: 'Qualificação', color: '#8b5cf6' },
+      { title: 'Proposta', color: '#ec4899' },
+      { title: 'Negociação', color: '#f59e0b' },
+      { title: 'Fechado', color: '#10b981' }
+    ]
   });
 
   // Load data
@@ -50,23 +73,39 @@ const CRMPage = () => {
 
   const loadData = async () => {
     setLoading(true);
-    const [dealsData, companiesData, contactsData] = await Promise.all([
-      crmService.getDeals(),
+    const [pipelinesData, companiesData, contactsData] = await Promise.all([
+      crmService.getPipelines(),
       crmService.getCompanies(),
       crmService.getContacts()
     ]);
-    setDeals(dealsData);
+
+    setPipelines(pipelinesData);
     setCompanies(companiesData);
     setContacts(contactsData);
+
+    // Set first pipeline as default
+    if (pipelinesData.length > 0) {
+      const firstPipeline = pipelinesData[0];
+      setCurrentPipelineId(firstPipeline.id);
+      const dealsData = await crmService.getDeals(firstPipeline.id);
+      setDeals(dealsData);
+    }
+
     setLoading(false);
   };
 
-  // Organize deals by stage
-  const pipeline = Object.keys(STAGE_CONFIG).map(stage => ({
-    stage: stage as DealStage,
-    ...STAGE_CONFIG[stage as DealStage],
-    deals: deals.filter(d => d.stage === stage)
-  }));
+  // Load deals for a specific pipeline
+  const loadDealsForPipeline = async (pipelineId: string) => {
+    const dealsData = await crmService.getDeals(pipelineId);
+    setDeals(dealsData);
+  };
+
+  // Get current pipeline and organize deals by stage
+  const currentPipeline = pipelines.find(p => p.id === currentPipelineId);
+  const pipelineColumns = currentPipeline?.stages.map(stage => ({
+    ...stage,
+    deals: deals.filter(d => d.stageId === stage.id)
+  })) || [];
 
   // Handle drag and drop
   const handleDragEnd = async (result: DropResult) => {
@@ -79,25 +118,26 @@ const CRMPage = () => {
     if (!deal) return;
 
     // Update local state immediately
-    const newStage = destination.droppableId as DealStage;
+    const newStageId = destination.droppableId;
     const updatedDeals = deals.map(d =>
-      d.id === draggableId ? { ...d, stage: newStage, position: destination.index } : d
+      d.id === draggableId ? { ...d, stageId: newStageId, position: destination.index } : d
     );
     setDeals(updatedDeals);
 
     // Update backend
-    await crmService.moveDeal(draggableId, newStage, destination.index);
+    await crmService.moveDeal(draggableId, newStageId, destination.index);
   };
 
   // Open modal to create deal
-  const openCreateDealModal = (stage: DealStage) => {
+  const openCreateDealModal = (stageId: string) => {
     setEditingDeal(null);
     setDealForm({
       title: '',
       description: '',
       value: 0,
       currency: 'BRL',
-      stage,
+      pipelineId: currentPipelineId,
+      stageId,
       probability: 0,
       expectedCloseDate: '',
       companyId: '',
@@ -114,7 +154,8 @@ const CRMPage = () => {
       description: deal.description || '',
       value: deal.value,
       currency: deal.currency,
-      stage: deal.stage,
+      pipelineId: deal.pipelineId,
+      stageId: deal.stageId,
       probability: deal.probability,
       expectedCloseDate: deal.expectedCloseDate || '',
       companyId: deal.companyId || '',
@@ -153,8 +194,91 @@ const CRMPage = () => {
 
     const success = await crmService.deleteDeal(dealId);
     if (success) {
+      await loadDealsForPipeline(currentPipelineId);
+    }
+  };
+
+  // Open modal to create pipeline
+  const openCreatePipelineModal = () => {
+    setEditingPipeline(null);
+    setPipelineForm({
+      title: '',
+      description: '',
+      color: '#3b82f6',
+      isDefault: false,
+      position: pipelines.length,
+      stages: [
+        { title: 'Novo Lead', color: '#6366f1' },
+        { title: 'Qualificação', color: '#8b5cf6' },
+        { title: 'Proposta', color: '#ec4899' },
+        { title: 'Negociação', color: '#f59e0b' },
+        { title: 'Fechado', color: '#10b981' }
+      ]
+    });
+    setShowPipelineModal(true);
+  };
+
+  // Save pipeline
+  const savePipeline = async () => {
+    if (!pipelineForm.title.trim()) {
+      alert('O título do pipeline é obrigatório!');
+      return;
+    }
+
+    if (pipelineForm.stages.length === 0) {
+      alert('O pipeline deve ter pelo menos uma etapa!');
+      return;
+    }
+
+    if (editingPipeline) {
+      // Update existing pipeline
+      const success = await crmService.updatePipeline(editingPipeline.id, pipelineForm as any);
+      if (success) {
+        await loadData();
+        setShowPipelineModal(false);
+      }
+    } else {
+      // Create new pipeline
+      const newPipeline = await crmService.createPipeline(pipelineForm as any);
+      if (newPipeline) {
+        await loadData();
+        setCurrentPipelineId(newPipeline.id);
+        setShowPipelineModal(false);
+      }
+    }
+  };
+
+  // Delete pipeline
+  const deletePipeline = async (pipelineId: string) => {
+    if (!confirm('Tem certeza que deseja excluir este pipeline? Todos os negócios associados serão perdidos!')) return;
+
+    const success = await crmService.deletePipeline(pipelineId);
+    if (success) {
       await loadData();
     }
+  };
+
+  // Add stage to pipeline form
+  const addStageToForm = () => {
+    setPipelineForm({
+      ...pipelineForm,
+      stages: [...pipelineForm.stages, { title: '', color: '#6366f1' }]
+    });
+  };
+
+  // Remove stage from pipeline form
+  const removeStageFromForm = (index: number) => {
+    setPipelineForm({
+      ...pipelineForm,
+      stages: pipelineForm.stages.filter((_, i) => i !== index)
+    });
+  };
+
+  // Update stage in pipeline form
+  const updateStageInForm = (index: number, field: 'title' | 'color', value: string) => {
+    const updatedStages = [...pipelineForm.stages];
+    updatedStages[index] = { ...updatedStages[index], [field]: value };
+    setPipelineForm({ ...pipelineForm, stages: updatedStages });
   };
 
   // Format currency
@@ -167,7 +291,8 @@ const CRMPage = () => {
 
   // Calculate pipeline metrics
   const totalValue = deals.reduce((sum, deal) => sum + Number(deal.value), 0);
-  const wonDeals = deals.filter(d => d.stage === 'CLOSED_WON');
+  const lastStage = currentPipeline?.stages[currentPipeline.stages.length - 1];
+  const wonDeals = lastStage ? deals.filter(d => d.stageId === lastStage.id) : [];
   const totalWon = wonDeals.reduce((sum, deal) => sum + Number(deal.value), 0);
 
   if (loading) {
@@ -186,13 +311,46 @@ const CRMPage = () => {
       {/* Header */}
       <div className="p-6 border-b" style={{ borderColor: currentTheme.colors.border, backgroundColor: currentTheme.colors.backgroundSecondary }}>
         <div className="flex items-center justify-between mb-4">
-          <div>
+          <div className="flex-1">
             <h1 className="text-3xl font-bold mb-2" style={{ color: currentTheme.colors.text }}>
               CRM - Pipeline de Vendas
             </h1>
-            <p style={{ color: currentTheme.colors.textMuted }}>
-              Gerencie seus negócios e relacionamentos com clientes
-            </p>
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <GitBranch className="h-5 w-5" style={{ color: currentTheme.colors.textMuted }} />
+                <select
+                  value={currentPipelineId}
+                  onChange={(e) => {
+                    setCurrentPipelineId(e.target.value);
+                    loadDealsForPipeline(e.target.value);
+                  }}
+                  className="px-3 py-1.5 rounded-lg border focus:outline-none focus:ring-2"
+                  style={{
+                    backgroundColor: currentTheme.colors.input,
+                    borderColor: currentTheme.colors.border,
+                    color: currentTheme.colors.text
+                  }}
+                >
+                  {pipelines.map(pipeline => (
+                    <option key={pipeline.id} value={pipeline.id}>
+                      {pipeline.title}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <button
+                onClick={openCreatePipelineModal}
+                className="flex items-center space-x-2 px-3 py-1.5 rounded-lg border transition-all hover:opacity-80"
+                style={{
+                  backgroundColor: currentTheme.colors.primary,
+                  borderColor: currentTheme.colors.primary,
+                  color: '#ffffff'
+                }}
+              >
+                <Plus className="h-4 w-4" />
+                <span className="text-sm">Novo Pipeline</span>
+              </button>
+            </div>
           </div>
 
           <div className="flex items-center space-x-4">
@@ -234,9 +392,9 @@ const CRMPage = () => {
       <div className="flex-1 overflow-x-auto">
         <DragDropContext onDragEnd={handleDragEnd}>
           <div className="flex h-full p-6 space-x-4">
-            {pipeline.map(column => (
+            {pipelineColumns.map(column => (
               <div
-                key={column.stage}
+                key={column.id}
                 className="flex-shrink-0 w-80 flex flex-col rounded-lg border"
                 style={{
                   backgroundColor: currentTheme.colors.backgroundSecondary,
@@ -255,7 +413,7 @@ const CRMPage = () => {
                     </span>
                   </div>
                   <button
-                    onClick={() => openCreateDealModal(column.stage)}
+                    onClick={() => openCreateDealModal(column.id)}
                     className="w-full py-2 px-3 rounded-lg border transition-all flex items-center justify-center space-x-2 hover:opacity-80"
                     style={{
                       borderColor: currentTheme.colors.border,
@@ -268,7 +426,7 @@ const CRMPage = () => {
                 </div>
 
                 {/* Deals List */}
-                <Droppable droppableId={column.stage}>
+                <Droppable droppableId={column.id}>
                   {(provided, snapshot) => (
                     <div
                       ref={provided.innerRef}
@@ -563,6 +721,182 @@ const CRMPage = () => {
                 }}
               >
                 {editingDeal ? 'Salvar Alterações' : 'Criar Negócio'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Pipeline Modal */}
+      {showPipelineModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
+          <div
+            className="w-full max-w-3xl rounded-lg shadow-2xl max-h-[90vh] overflow-y-auto"
+            style={{ backgroundColor: currentTheme.colors.cardBg }}
+          >
+            <div className="p-6 border-b" style={{ borderColor: currentTheme.colors.border }}>
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold" style={{ color: currentTheme.colors.text }}>
+                  {editingPipeline ? 'Editar Pipeline' : 'Novo Pipeline'}
+                </h2>
+                <button
+                  onClick={() => setShowPipelineModal(false)}
+                  className="p-2 rounded-lg hover:bg-opacity-20"
+                  style={{ color: currentTheme.colors.textMuted }}
+                >
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6 space-y-6">
+              {/* Pipeline Title */}
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: currentTheme.colors.text }}>
+                  Título do Pipeline *
+                </label>
+                <input
+                  type="text"
+                  value={pipelineForm.title}
+                  onChange={(e) => setPipelineForm({ ...pipelineForm, title: e.target.value })}
+                  className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2"
+                  style={{
+                    backgroundColor: currentTheme.colors.input,
+                    borderColor: currentTheme.colors.border,
+                    color: currentTheme.colors.text
+                  }}
+                  placeholder="Ex: Vendas B2B, Vendas Inbound, Vendas Enterprise"
+                />
+              </div>
+
+              {/* Pipeline Description */}
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: currentTheme.colors.text }}>
+                  Descrição
+                </label>
+                <textarea
+                  value={pipelineForm.description}
+                  onChange={(e) => setPipelineForm({ ...pipelineForm, description: e.target.value })}
+                  rows={2}
+                  className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 resize-none"
+                  style={{
+                    backgroundColor: currentTheme.colors.input,
+                    borderColor: currentTheme.colors.border,
+                    color: currentTheme.colors.text
+                  }}
+                  placeholder="Descreva o propósito deste pipeline..."
+                />
+              </div>
+
+              {/* Pipeline Color */}
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: currentTheme.colors.text }}>
+                  Cor do Pipeline
+                </label>
+                <input
+                  type="color"
+                  value={pipelineForm.color}
+                  onChange={(e) => setPipelineForm({ ...pipelineForm, color: e.target.value })}
+                  className="w-20 h-10 rounded-lg border cursor-pointer"
+                  style={{
+                    borderColor: currentTheme.colors.border
+                  }}
+                />
+              </div>
+
+              {/* Stages Configuration */}
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <label className="block text-sm font-medium" style={{ color: currentTheme.colors.text }}>
+                    Etapas do Pipeline *
+                  </label>
+                  <button
+                    onClick={addStageToForm}
+                    className="flex items-center space-x-1 px-3 py-1.5 rounded-lg border transition-all hover:opacity-80"
+                    style={{
+                      backgroundColor: currentTheme.colors.primary,
+                      borderColor: currentTheme.colors.primary,
+                      color: '#ffffff'
+                    }}
+                  >
+                    <Plus className="h-4 w-4" />
+                    <span className="text-sm">Adicionar Etapa</span>
+                  </button>
+                </div>
+
+                <div className="space-y-3">
+                  {pipelineForm.stages.map((stage, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center space-x-3 p-3 rounded-lg border"
+                      style={{
+                        backgroundColor: currentTheme.colors.backgroundSecondary,
+                        borderColor: currentTheme.colors.border
+                      }}
+                    >
+                      <div className="flex items-center space-x-2 text-sm" style={{ color: currentTheme.colors.textMuted }}>
+                        <span>{index + 1}.</span>
+                      </div>
+                      <input
+                        type="text"
+                        value={stage.title}
+                        onChange={(e) => updateStageInForm(index, 'title', e.target.value)}
+                        className="flex-1 px-3 py-2 rounded-lg border focus:outline-none focus:ring-2"
+                        style={{
+                          backgroundColor: currentTheme.colors.input,
+                          borderColor: currentTheme.colors.border,
+                          color: currentTheme.colors.text
+                        }}
+                        placeholder="Nome da etapa"
+                      />
+                      <input
+                        type="color"
+                        value={stage.color}
+                        onChange={(e) => updateStageInForm(index, 'color', e.target.value)}
+                        className="w-12 h-10 rounded-lg border cursor-pointer"
+                        style={{
+                          borderColor: currentTheme.colors.border
+                        }}
+                      />
+                      <button
+                        onClick={() => removeStageFromForm(index)}
+                        className="p-2 rounded-lg hover:bg-opacity-20"
+                        style={{ color: currentTheme.colors.error }}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+
+                {pipelineForm.stages.length === 0 && (
+                  <p className="text-sm text-center py-8" style={{ color: currentTheme.colors.textMuted }}>
+                    Nenhuma etapa configurada. Adicione pelo menos uma etapa.
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="p-6 border-t flex justify-end space-x-3" style={{ borderColor: currentTheme.colors.border }}>
+              <button
+                onClick={() => setShowPipelineModal(false)}
+                className="px-4 py-2 rounded-lg border"
+                style={{
+                  borderColor: currentTheme.colors.border,
+                  color: currentTheme.colors.textMuted
+                }}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={savePipeline}
+                className="px-4 py-2 rounded-lg font-semibold"
+                style={{
+                  backgroundColor: currentTheme.colors.primary,
+                  color: '#ffffff'
+                }}
+              >
+                {editingPipeline ? 'Salvar Alterações' : 'Criar Pipeline'}
               </button>
             </div>
           </div>

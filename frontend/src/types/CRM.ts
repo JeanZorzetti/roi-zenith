@@ -1,6 +1,28 @@
-export type DealStage = 'NEW' | 'CONTACTED' | 'QUALIFIED' | 'DEMO' | 'PROPOSAL' | 'NEGOTIATION' | 'CLOSED_WON' | 'CLOSED_LOST';
-
 export type ActivityType = 'CALL' | 'EMAIL' | 'MEETING' | 'NOTE' | 'TASK';
+
+export interface Pipeline {
+  id: string;
+  title: string;
+  description?: string;
+  color: string;
+  isDefault: boolean;
+  position: number;
+  stages: PipelineStage[];
+  deals?: Deal[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PipelineStage {
+  id: string;
+  title: string;
+  color: string;
+  position: number;
+  pipelineId: string;
+  deals?: Deal[];
+  createdAt: string;
+  updatedAt: string;
+}
 
 export interface Company {
   id: string;
@@ -37,7 +59,10 @@ export interface Deal {
   description?: string;
   value: number;
   currency: string;
-  stage: DealStage;
+  pipelineId: string;
+  pipeline?: Pipeline;
+  stageId: string;
+  stage?: PipelineStage;
   probability: number;
   expectedCloseDate?: string;
   closedDate?: string;
@@ -66,25 +91,6 @@ export interface Activity {
   createdAt: string;
   updatedAt: string;
 }
-
-export interface Pipeline {
-  stage: DealStage;
-  title: string;
-  color: string;
-  deals: Deal[];
-}
-
-// Stage labels e cores
-export const STAGE_CONFIG: Record<DealStage, { title: string; color: string }> = {
-  NEW: { title: 'Novo Lead', color: '#6366f1' },
-  CONTACTED: { title: 'Contato Feito', color: '#8b5cf6' },
-  QUALIFIED: { title: 'Qualificado', color: '#3b82f6' },
-  DEMO: { title: 'Demo Agendada', color: '#06b6d4' },
-  PROPOSAL: { title: 'Proposta Enviada', color: '#f59e0b' },
-  NEGOTIATION: { title: 'Negociação', color: '#f97316' },
-  CLOSED_WON: { title: 'Fechado - Ganho', color: '#10b981' },
-  CLOSED_LOST: { title: 'Fechado - Perdido', color: '#ef4444' }
-};
 
 export const ACTIVITY_TYPE_LABELS: Record<ActivityType, string> = {
   CALL: 'Ligação',
