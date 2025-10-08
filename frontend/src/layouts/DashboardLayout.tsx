@@ -21,7 +21,8 @@ import {
   Zap,
   Shield,
   KanbanSquare,
-  Building2
+  Building2,
+  TrendingUp
 } from 'lucide-react';
 
 const DashboardLayout = () => {
@@ -58,6 +59,7 @@ const DashboardLayout = () => {
     { title: 'Leads', description: 'Gestão completa de leads', path: '/dashboard/leads', type: 'page' },
     { title: 'Tarefas', description: 'Organizador Kanban de tarefas', path: '/dashboard/tasks', type: 'page' },
     { title: 'CRM', description: 'Pipeline de vendas e relacionamentos', path: '/dashboard/crm', type: 'page' },
+    { title: 'CRM Analytics', description: 'Análise de performance de vendas', path: '/dashboard/crm-analytics', type: 'page' },
     { title: 'Relatórios', description: 'Documentos e insights', path: '/dashboard/reports', type: 'page' },
     { title: 'Configurações', description: 'Preferências do sistema', path: '/dashboard/settings', type: 'page' }
   ];
@@ -149,8 +151,16 @@ const DashboardLayout = () => {
       icon: Building2,
       label: 'CRM',
       path: '/dashboard/crm',
-      active: location.pathname.startsWith('/dashboard/crm'),
+      active: location.pathname === '/dashboard/crm',
       description: 'Pipeline de Vendas',
+      badge: 'Novo'
+    },
+    {
+      icon: TrendingUp,
+      label: 'CRM Analytics',
+      path: '/dashboard/crm-analytics',
+      active: location.pathname === '/dashboard/crm-analytics',
+      description: 'Performance de Vendas',
       badge: 'Novo'
     },
     {

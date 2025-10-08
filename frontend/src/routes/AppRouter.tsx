@@ -32,6 +32,7 @@ const AnalyticsPage = lazy(() => import('@/pages/Dashboard/AnalyticsPage'));
 const LeadsPage = lazy(() => import('@/pages/Dashboard/LeadsPage'));
 const TasksPage = lazy(() => import('@/pages/Dashboard/TasksPage'));
 const CRMPage = lazy(() => import('@/pages/Dashboard/CRMPage'));
+const CRMAnalyticsPage = lazy(() => import('@/pages/Dashboard/CRMAnalyticsPage'));
 const ReportsPage = lazy(() => import('@/pages/Dashboard/ReportsPage'));
 const SettingsPage = lazy(() => import('@/pages/Dashboard/SettingsPage'));
 const DatabaseTestPage = lazy(() => import('@/pages/Database/DatabaseTest'));
@@ -88,6 +89,11 @@ const AppRouter = () => {
             <Route path="crm" element={
               <CRMThemeProvider>
                 <CRMPage />
+              </CRMThemeProvider>
+            } />
+            <Route path="crm-analytics" element={
+              <CRMThemeProvider>
+                <CRMAnalyticsPage />
               </CRMThemeProvider>
             } />
             <Route path="reports" element={<ReportsPage />} />
