@@ -565,26 +565,6 @@ export async function onLeadQualified(
       reputation: result.rewards.reputation,
     });
 
-    // Item drop (20% chance)
-    if (result.item) {
-      const item = ITEMS.find(i => i.id === result.item);
-      if (item) {
-        GameEvents.itemDropped(io, userId, {
-          itemId: item.id,
-          itemName: item.name,
-          rarity: item.rarity,
-          source: 'lead_qualification',
-        });
-
-        GameEvents.notification(io, userId, {
-          type: 'success',
-          title: '🎁 Item Dropado!',
-          message: `Você ganhou: ${item.name} (${item.rarity})`,
-          duration: 8000,
-        });
-      }
-    }
-
     // Notificação de qualificação
     GameEvents.notification(io, userId, {
       type: 'success',
