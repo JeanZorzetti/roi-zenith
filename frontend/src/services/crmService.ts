@@ -263,7 +263,9 @@ class CRMService {
   async updateDeal(dealId: string, updates: Partial<Deal>): Promise<boolean> {
     try {
       const userId = this.getUserId();
+      console.log('🎮 [crmService.updateDeal] getUserId() returned:', userId);
       const updatesWithUserId = { ...updates, userId };
+      console.log('🎮 [crmService.updateDeal] Sending payload:', JSON.stringify(updatesWithUserId, null, 2));
 
       const response = await fetch(`${API_BASE_URL}/deals/${dealId}`, {
         method: 'PUT',
@@ -274,6 +276,7 @@ class CRMService {
         body: JSON.stringify(updatesWithUserId),
       });
 
+      console.log('🎮 [crmService.updateDeal] Response status:', response.status);
       return response.ok;
     } catch (error) {
       console.error('Error updating deal:', error);
@@ -425,7 +428,9 @@ class CRMService {
   async createContact(contact: Omit<Contact, 'id' | 'createdAt' | 'updatedAt'>): Promise<Contact | null> {
     try {
       const userId = this.getUserId();
+      console.log('🎮 [crmService.createContact] getUserId() returned:', userId);
       const contactWithUserId = { ...contact, userId };
+      console.log('🎮 [crmService.createContact] Sending payload:', JSON.stringify(contactWithUserId, null, 2));
 
       const response = await fetch(`${API_BASE_URL}/contacts`, {
         method: 'POST',
@@ -436,11 +441,14 @@ class CRMService {
         body: JSON.stringify(contactWithUserId),
       });
 
+      console.log('🎮 [crmService.createContact] Response status:', response.status);
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const data = await response.json();
+      console.log('🎮 [crmService.createContact] Response data:', data);
       return data.contact || null;
     } catch (error) {
       console.error('Error creating contact:', error);
@@ -514,7 +522,9 @@ class CRMService {
   async createActivity(activity: Omit<Activity, 'id' | 'createdAt' | 'updatedAt'>): Promise<Activity | null> {
     try {
       const userId = this.getUserId();
+      console.log('🎮 [crmService.createActivity] getUserId() returned:', userId);
       const activityWithUserId = { ...activity, userId };
+      console.log('🎮 [crmService.createActivity] Sending payload:', JSON.stringify(activityWithUserId, null, 2));
 
       const response = await fetch(`${API_BASE_URL}/activities`, {
         method: 'POST',
@@ -525,11 +535,14 @@ class CRMService {
         body: JSON.stringify(activityWithUserId),
       });
 
+      console.log('🎮 [crmService.createActivity] Response status:', response.status);
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const data = await response.json();
+      console.log('🎮 [crmService.createActivity] Response data:', data);
       return data.activity || null;
     } catch (error) {
       console.error('Error creating activity:', error);
