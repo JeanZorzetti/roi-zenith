@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
+import { CRMEventHandlers } from '../events/gameEvents';
 
 const prisma = new PrismaClient();
 
@@ -304,6 +305,11 @@ export const updateDeal = async (req: Request, res: Response) => {
     const { dealId } = req.params;
     const updates = req.body;
 
+    // Get the old deal to compare
+    const oldDeal = await prisma.deal.findUnique({
+      where: { id: dealId }
+    });
+
     const updatedDeal = await prisma.deal.update({
       where: { id: dealId },
       data: {
@@ -322,6 +328,36 @@ export const updateDeal = async (req: Request, res: Response) => {
         }
       }
     });
+
+    // Trigger game events (non-blocking)
+    if (updates.userId) {
+      // Check if pain was discovered
+      const painWasDiscovered = !oldDeal?.painDiscovered && updates.painDiscovered;
+      if (painWasDiscovered && updates.painIntensity && updates.painCategory) {
+        CRMEventHandlers.onPainDiscovered(
+          updates.userId,
+          dealId,
+          updates.painDiscovered,
+          updates.painIntensity,
+          updates.painCategory,
+          updates.orionSolution
+        ).catch(err => {
+          console.error('Error triggering pain discovered event:', err);
+        });
+      }
+
+      // Check if solution was mapped
+      const solutionWasMapped = !oldDeal?.orionSolution && updates.orionSolution;
+      if (solutionWasMapped) {
+        CRMEventHandlers.onSolutionMapped(
+          updates.userId,
+          dealId,
+          updates.orionSolution
+        ).catch(err => {
+          console.error('Error triggering solution mapped event:', err);
+        });
+      }
+    }
 
     res.json({ deal: updatedDeal });
   } catch (error) {
@@ -470,7 +506,7 @@ export const getContacts = async (req: Request, res: Response) => {
 
 export const createContact = async (req: Request, res: Response) => {
   try {
-    const { firstName, lastName, email, phone, position, notes, companyId } = req.body;
+    const { firstName, lastName, email, phone, position, notes, companyId, userId } = req.body;
 
     const newContact = await prisma.contact.create({
       data: {
@@ -487,6 +523,14 @@ export const createContact = async (req: Request, res: Response) => {
         company: true
       }
     });
+
+    // Trigger game event (non-blocking)
+    if (userId) {
+      const contactName = `${firstName} ${lastName}`;
+      CRMEventHandlers.onContactCreated(userId, newContact.id, contactName).catch(err => {
+        console.error('Error triggering contact created event:', err);
+      });
+    }
 
     res.json({ contact: newContact });
   } catch (error) {
@@ -561,7 +605,7 @@ export const getActivities = async (req: Request, res: Response) => {
 
 export const createActivity = async (req: Request, res: Response) => {
   try {
-    const { type, subject, description, dueDate, dealId, contactId } = req.body;
+    const { type, subject, description, dueDate, dealId, contactId, userId } = req.body;
 
     const newActivity = await prisma.activity.create({
       data: {
@@ -578,6 +622,13 @@ export const createActivity = async (req: Request, res: Response) => {
         contact: true
       }
     });
+
+    // Trigger game event (non-blocking)
+    if (userId) {
+      CRMEventHandlers.onActivityCreated(userId, newActivity.id, type, contactId).catch(err => {
+        console.error('Error triggering activity created event:', err);
+      });
+    }
 
     res.json({ activity: newActivity });
   } catch (error) {

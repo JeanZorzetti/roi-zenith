@@ -17,6 +17,10 @@ import boardRoutes from './routes/boardRoutes';
 import crmRoutes from './routes/crmRoutes';
 import gameRoutes from './routes/gameRoutes';
 
+// Game socket imports
+import setupGameSocket from './sockets/gameSocket';
+import { setSocketIOInstance } from './events/gameEvents';
+
 // Load environment variables
 dotenv.config();
 
@@ -126,7 +130,12 @@ const io = new Server(server, {
   }
 });
 
-// Socket.IO connection handling
+// Initialize game socket system
+setSocketIOInstance(io);
+setupGameSocket(io);
+console.log('🎮 Game Socket.IO system initialized');
+
+// Socket.IO connection handling (for boards)
 io.on('connection', (socket) => {
   console.log(`🔗 User connected: ${socket.id}`);
 
