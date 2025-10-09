@@ -38,6 +38,16 @@ const CRMPage = () => {
   const [showPipelineModal, setShowPipelineModal] = useState(false);
   const [editingPipeline, setEditingPipeline] = useState<Pipeline | null>(null);
 
+  // State para scroll horizontal com drag
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
+  const scrollContainerRef = React.useRef<HTMLDivElement>(null);
+
+  // State para edição inline do título da coluna
+  const [editingStageId, setEditingStageId] = useState<string | null>(null);
+  const [editingStageTitle, setEditingStageTitle] = useState('');
+
   // Deal form state
   const [dealForm, setDealForm] = useState({
     title: '',
@@ -291,6 +301,46 @@ const CRMPage = () => {
     }).format(value);
   };
 
+  // Handlers para scroll horizontal com drag
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!scrollContainerRef.current) return;
+    setIsDragging(true);
+    setStartX(e.pageX - scrollContainerRef.current.offsetLeft);
+    setScrollLeft(scrollContainerRef.current.scrollLeft);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!isDragging || !scrollContainerRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - scrollContainerRef.current.offsetLeft;
+    const walk = (x - startX) * 2;
+    scrollContainerRef.current.scrollLeft = scrollLeft - walk;
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  // Handler para salvar título da etapa editado
+  const saveStageTitle = async (stageId: string, newTitle: string) => {
+    if (!newTitle.trim()) {
+      alert('O título da etapa não pode estar vazio!');
+      setEditingStageId(null);
+      return;
+    }
+
+    try {
+      const success = await crmService.updateStage(stageId, { title: newTitle });
+      if (success) {
+        await loadData();
+        setEditingStageId(null);
+      }
+    } catch (error) {
+      console.error('Erro ao atualizar título da etapa:', error);
+      alert('Erro ao atualizar título da etapa');
+    }
+  };
+
   // Calculate pipeline metrics
   const totalValue = deals.reduce((sum, deal) => sum + Number(deal.value), 0);
   const lastStage = currentPipeline?.stages[currentPipeline.stages.length - 1];
@@ -410,7 +460,18 @@ const CRMPage = () => {
       </div>
 
       {/* Pipeline */}
-      <div className="flex-1 overflow-x-auto">
+      <div
+        ref={scrollContainerRef}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+        className="flex-1 overflow-x-auto"
+        style={{
+          cursor: isDragging ? 'grabbing' : 'grab',
+          userSelect: isDragging ? 'none' : 'auto'
+        }}
+      >
         <DragDropContext onDragEnd={handleDragEnd}>
           <div className="flex h-full p-6 space-x-4">
             {pipelineColumns.map(column => (
@@ -425,11 +486,44 @@ const CRMPage = () => {
                 {/* Column Header */}
                 <div className="p-4 border-b" style={{ borderColor: currentTheme.colors.border }}>
                   <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center space-x-2">
-                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: column.color }}></div>
-                      <h3 className="font-semibold" style={{ color: currentTheme.colors.text }}>{column.title}</h3>
+                    <div className="flex items-center space-x-2 flex-1">
+                      <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: column.color }}></div>
+                      {editingStageId === column.id ? (
+                        <input
+                          type="text"
+                          value={editingStageTitle}
+                          onChange={(e) => setEditingStageTitle(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              saveStageTitle(column.id, editingStageTitle);
+                            } else if (e.key === 'Escape') {
+                              setEditingStageId(null);
+                            }
+                          }}
+                          onBlur={() => saveStageTitle(column.id, editingStageTitle)}
+                          autoFocus
+                          className="flex-1 px-2 py-1 rounded border font-semibold focus:outline-none focus:ring-2"
+                          style={{
+                            backgroundColor: currentTheme.colors.input,
+                            borderColor: currentTheme.colors.border,
+                            color: currentTheme.colors.text
+                          }}
+                        />
+                      ) : (
+                        <h3
+                          className="font-semibold cursor-pointer hover:opacity-70 transition-opacity"
+                          style={{ color: currentTheme.colors.text }}
+                          onClick={() => {
+                            setEditingStageId(column.id);
+                            setEditingStageTitle(column.title);
+                          }}
+                          title="Clique para editar"
+                        >
+                          {column.title}
+                        </h3>
+                      )}
                     </div>
-                    <span className="px-2 py-1 text-xs rounded-full" style={{ backgroundColor: column.color + '20', color: column.color }}>
+                    <span className="px-2 py-1 text-xs rounded-full flex-shrink-0" style={{ backgroundColor: column.color + '20', color: column.color }}>
                       {column.deals.length}
                     </span>
                   </div>
