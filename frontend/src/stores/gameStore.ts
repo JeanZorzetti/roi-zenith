@@ -73,7 +73,7 @@ const isProduction = process.env.NODE_ENV === 'production' ||
   (typeof window !== 'undefined' && window.location.hostname.includes('roilabs.com'));
 
 const API_URL = isProduction
-  ? 'https://back.roilabs.com.br:5000'
+  ? 'https://back.roilabs.com.br'
   : 'http://localhost:5002';
 
 export const useGameStore = create<GameStore>((set, get) => ({
