@@ -630,6 +630,75 @@ export async function onInterviewCompleted(
   }
 }
 
+/**
+ * Evento: Lead promovido de Market Research para Sales Pipeline
+ */
+export async function onResearchToSalesPromotion(
+  userId: string,
+  researchDealId: string,
+  salesDealId: string,
+  qualificationScore: number
+) {
+  try {
+    console.log(`🎉 [onResearchToSalesPromotion] Starting for userId: ${userId}`);
+    const io = getSocketIOInstance();
+
+    // Processar evento no game service
+    const result = await gameService.processCRMEvent(
+      userId,
+      'RESEARCH_TO_SALES_PROMOTION',
+      salesDealId,
+      { researchDealId, qualificationScore }
+    );
+
+    console.log(`🎉 [onResearchToSalesPromotion] Game service result:`, result);
+
+    // Emitir eventos
+    GameEvents.experienceGained(io, userId, {
+      experience: result.rewards.experience,
+      currentXP: 0,
+      totalXP: 0,
+      level: result.newLevel || 1,
+    });
+
+    GameEvents.resourcesGained(io, userId, {
+      coins: result.rewards.coins,
+      gems: result.rewards.gems,
+      energy: result.rewards.energy,
+      reputation: result.rewards.reputation,
+    });
+
+    // Notificação épica
+    GameEvents.notification(io, userId, {
+      type: 'success',
+      title: '🎉 Lead Promovido para Vendas!',
+      message: `Lead qualificado promovido com sucesso! Score: ${qualificationScore}/100 - +${result.rewards.experience} XP, +${result.rewards.reputation} reputation`,
+      duration: 8000,
+    });
+
+    // Check level up
+    if (result.leveledUp && result.newLevel) {
+      GameEvents.levelUp(io, userId, {
+        newLevel: result.newLevel,
+        skillPoints: 1,
+        maxEnergy: 5,
+        rewards: result.rewards,
+      });
+
+      GameEvents.notification(io, userId, {
+        type: 'success',
+        title: '⭐ Level Up!',
+        message: `Você alcançou o nível ${result.newLevel}!`,
+        duration: 8000,
+      });
+    }
+
+    console.log(`✅ Research to sales promotion event processed for user ${userId}`);
+  } catch (error) {
+    console.error('❌ Error processing research to sales promotion event:', error);
+  }
+}
+
 // Export all event handlers
 export const CRMEventHandlers = {
   onContactCreated,
@@ -645,6 +714,7 @@ export const CRMEventHandlers = {
   onDecisionMakerIdentified,
   onLeadQualified,
   onInterviewCompleted,
+  onResearchToSalesPromotion,
 };
 
 export default CRMEventHandlers;

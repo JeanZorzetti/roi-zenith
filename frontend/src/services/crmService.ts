@@ -593,6 +593,98 @@ class CRMService {
       return false;
     }
   }
+
+  // ============= MARKET RESEARCH =============
+
+  /**
+   * Promove um lead de Market Research para Sales Pipeline
+   */
+  async promoteDealToSales(dealId: string): Promise<{ success: boolean; salesDeal?: Deal; error?: string }> {
+    try {
+      const userId = this.getUserId();
+      console.log('🎮 [crmService.promoteDealToSales] Promoting deal:', dealId, 'userId:', userId);
+
+      const response = await fetch(`${API_BASE_URL}/deals/${dealId}/promote`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ userId }),
+      });
+
+      console.log('🎮 [crmService.promoteDealToSales] Response status:', response.status);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('🎮 [crmService.promoteDealToSales] Error:', errorData);
+        return { success: false, error: errorData.error || 'Failed to promote deal' };
+      }
+
+      const data = await response.json();
+      console.log('🎮 [crmService.promoteDealToSales] Success:', data);
+      return { success: true, salesDeal: data.salesDeal };
+    } catch (error) {
+      console.error('Error promoting deal to sales:', error);
+      return { success: false, error: 'Network error' };
+    }
+  }
+
+  /**
+   * Verifica se um deal pode ser promovido para Sales
+   */
+  async checkPromotionEligibility(dealId: string): Promise<{
+    eligible: boolean;
+    criteria: {
+      qualificationScore: boolean;
+      painPoints: boolean;
+      decisionMaker: boolean;
+      budget: boolean;
+    };
+    deal?: Deal;
+  }> {
+    try {
+      const deal = await this.getDeal(dealId);
+
+      if (!deal || deal.researchType !== 'MARKET_RESEARCH') {
+        return {
+          eligible: false,
+          criteria: {
+            qualificationScore: false,
+            painPoints: false,
+            decisionMaker: false,
+            budget: false,
+          },
+        };
+      }
+
+      const criteria = {
+        qualificationScore: (deal.qualificationScore || 0) >= 70,
+        painPoints: (deal.painPointsList || []).length >= 1,
+        decisionMaker: deal.decisionMakerIdentified === true,
+        budget: !!(deal.budgetRangeMin && deal.budgetRangeMax),
+      };
+
+      const eligible = Object.values(criteria).every(c => c === true);
+
+      return {
+        eligible,
+        criteria,
+        deal,
+      };
+    } catch (error) {
+      console.error('Error checking promotion eligibility:', error);
+      return {
+        eligible: false,
+        criteria: {
+          qualificationScore: false,
+          painPoints: false,
+          decisionMaker: false,
+          budget: false,
+        },
+      };
+    }
+  }
 }
 
 export const crmService = new CRMService();

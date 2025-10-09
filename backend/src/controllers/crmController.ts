@@ -969,11 +969,11 @@ export const promoteDealToSales = async (req: Request, res: Response) => {
       }
     });
 
-    // Trigger RESEARCH_TO_SALES_PROMOTION game event (TODO: implement in gameEvents.ts)
+    // Trigger RESEARCH_TO_SALES_PROMOTION game event
     if (userId) {
       console.log(`🎉 Triggering RESEARCH_TO_SALES_PROMOTION event for user ${userId}`);
-      // CRMEventHandlers.onResearchToSalesPromotion(userId, researchDeal.id, salesDeal.id, qualificationScore)
-      //   .catch(err => console.error('❌ Error triggering promotion event:', err));
+      CRMEventHandlers.onResearchToSalesPromotion(userId, researchDeal.id, salesDeal.id, qualificationScore)
+        .catch(err => console.error('❌ Error triggering promotion event:', err));
     }
 
     res.json({

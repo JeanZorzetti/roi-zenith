@@ -1,4 +1,9 @@
-export type ActivityType = 'CALL' | 'EMAIL' | 'MEETING' | 'NOTE' | 'TASK';
+export type ActivityType = 'CALL' | 'EMAIL' | 'MEETING' | 'NOTE' | 'TASK' | 'INTERVIEW' | 'SURVEY';
+
+// Enums para Market Research
+export type PipelineType = 'MARKET_RESEARCH' | 'SALES';
+export type ResearchType = 'MARKET_RESEARCH' | 'SALES';
+export type TargetProfile = 'B2B_ENTERPRISE' | 'B2B_SMB' | 'B2C';
 
 export interface Pipeline {
   id: string;
@@ -7,6 +12,8 @@ export interface Pipeline {
   color: string;
   isDefault: boolean;
   position: number;
+  type?: PipelineType; // Market Research or Sales
+  allowPromotion?: boolean; // Se permite promoção Research → Sales
   stages: PipelineStage[];
   deals?: Deal[];
   createdAt: string;
@@ -73,6 +80,23 @@ export interface Deal {
   contactId?: string;
   contact?: Contact;
   activities?: Activity[];
+
+  // ===== MARKET RESEARCH FIELDS =====
+  researchType?: ResearchType; // MARKET_RESEARCH ou SALES
+  targetProfile?: TargetProfile; // B2B_ENTERPRISE, B2B_SMB, B2C
+  marketSegment?: string; // Ex: "Varejo", "Indústria", "Serviços"
+  companySizeTarget?: string; // Ex: "1-10", "11-50", "51-200"
+  budgetRangeMin?: number; // Orçamento mínimo estimado
+  budgetRangeMax?: number; // Orçamento máximo estimado
+  decisionMakerIdentified?: boolean; // Se o decision maker foi identificado
+  decisionMakerName?: string; // Nome do decision maker
+  decisionMakerRole?: string; // Cargo do decision maker
+  qualificationScore?: number; // Score de qualificação (0-100)
+  researchNotes?: string; // Notas de pesquisa
+  painPointsList?: string[]; // Lista de pain points descobertos
+  promotedToSales?: boolean; // Se foi promovido para Sales
+  promotedFromDealId?: string; // ID do deal de research original
+
   createdAt: string;
   updatedAt: string;
 }
@@ -88,6 +112,12 @@ export interface Activity {
   deal?: Deal;
   contactId?: string;
   contact?: Contact;
+
+  // ===== MARKET RESEARCH FIELDS =====
+  researchFindings?: string; // Descobertas da pesquisa/entrevista
+  painPointsDiscovered?: string[]; // Pain points descobertos na atividade
+  qualificationImpact?: number; // Impacto no qualification score (-50 a +50)
+
   createdAt: string;
   updatedAt: string;
 }
@@ -97,5 +127,7 @@ export const ACTIVITY_TYPE_LABELS: Record<ActivityType, string> = {
   EMAIL: 'E-mail',
   MEETING: 'Reunião',
   NOTE: 'Nota',
-  TASK: 'Tarefa'
+  TASK: 'Tarefa',
+  INTERVIEW: 'Entrevista',
+  SURVEY: 'Pesquisa'
 };

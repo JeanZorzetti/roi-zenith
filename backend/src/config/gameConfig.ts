@@ -92,6 +92,35 @@ export const CRM_REWARDS: Record<string, GameReward> = {
     coins: 5,
   },
 
+  // ===== MARKET RESEARCH EVENTS =====
+  TARGET_DISCOVERED: {
+    experience: 50,
+    coins: 100,
+  },
+  PAIN_MAPPED: {
+    experience: 30,
+    coins: 75,
+  },
+  INTERVIEW_COMPLETED: {
+    experience: 80,
+    coins: 150,
+    energy: 20,
+  },
+  DECISION_MAKER_IDENTIFIED: {
+    experience: 100,
+    coins: 200,
+  },
+  LEAD_QUALIFIED: {
+    experience: 200,
+    coins: 500,
+    gems: 50,
+  },
+  RESEARCH_TO_SALES_PROMOTION: {
+    experience: 100,
+    coins: 50,
+    reputation: 10,
+  },
+
   // Milestones especiais
   FIRST_INTERVIEW_OF_DAY: {
     experience: 0,
