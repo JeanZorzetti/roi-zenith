@@ -240,20 +240,28 @@ class CRMService {
 
   async createDeal(deal: Omit<Deal, 'id' | 'createdAt' | 'updatedAt'>): Promise<Deal | null> {
     try {
+      const userId = this.getUserId();
+      console.log('🎮 [crmService.createDeal] getUserId() returned:', userId);
+      const dealWithUserId = { ...deal, userId };
+      console.log('🎮 [crmService.createDeal] Sending payload:', JSON.stringify(dealWithUserId, null, 2));
+
       const response = await fetch(`${API_BASE_URL}/deals`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
-        body: JSON.stringify(deal),
+        body: JSON.stringify(dealWithUserId),
       });
+
+      console.log('🎮 [crmService.createDeal] Response status:', response.status);
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const data = await response.json();
+      console.log('🎮 [crmService.createDeal] Response data:', data);
       return data.deal || null;
     } catch (error) {
       console.error('Error creating deal:', error);
