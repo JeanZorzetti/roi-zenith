@@ -303,7 +303,7 @@ export const createDeal = async (req: Request, res: Response) => {
 export const updateDeal = async (req: Request, res: Response) => {
   try {
     const { dealId } = req.params;
-    const updates = req.body;
+    const { userId, ...updates } = req.body;  // Extract userId and keep only Deal fields
 
     // Get the old deal to compare
     const oldDeal = await prisma.deal.findUnique({
@@ -330,12 +330,12 @@ export const updateDeal = async (req: Request, res: Response) => {
     });
 
     // Trigger game events (non-blocking)
-    if (updates.userId) {
+    if (userId) {
       // Check if pain was discovered
       const painWasDiscovered = !oldDeal?.painDiscovered && updates.painDiscovered;
       if (painWasDiscovered && updates.painIntensity && updates.painCategory) {
         CRMEventHandlers.onPainDiscovered(
-          updates.userId,
+          userId,
           dealId,
           updates.painDiscovered,
           updates.painIntensity,
@@ -350,7 +350,7 @@ export const updateDeal = async (req: Request, res: Response) => {
       const solutionWasMapped = !oldDeal?.orionSolution && updates.orionSolution;
       if (solutionWasMapped) {
         CRMEventHandlers.onSolutionMapped(
-          updates.userId,
+          userId,
           dealId,
           updates.orionSolution
         ).catch(err => {
@@ -506,7 +506,8 @@ export const getContacts = async (req: Request, res: Response) => {
 
 export const createContact = async (req: Request, res: Response) => {
   try {
-    const { firstName, lastName, email, phone, position, notes, companyId, userId } = req.body;
+    const { userId, ...contactData } = req.body;  // Extract userId
+    const { firstName, lastName, email, phone, position, notes, companyId } = contactData;
 
     const newContact = await prisma.contact.create({
       data: {
@@ -605,7 +606,8 @@ export const getActivities = async (req: Request, res: Response) => {
 
 export const createActivity = async (req: Request, res: Response) => {
   try {
-    const { type, subject, description, dueDate, dealId, contactId, userId } = req.body;
+    const { userId, ...activityData } = req.body;  // Extract userId
+    const { type, subject, description, dueDate, dealId, contactId } = activityData;
 
     const newActivity = await prisma.activity.create({
       data: {
