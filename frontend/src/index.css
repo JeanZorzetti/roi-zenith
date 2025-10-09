@@ -333,6 +333,16 @@
   .rotate-slow {
     animation: rotate 30s linear infinite;
   }
+
+  /* Game Notifications Animation */
+  @keyframes shrink-width {
+    from { width: 100%; }
+    to { width: 0%; }
+  }
+
+  .animate-shrink-width {
+    animation: shrink-width linear forwards;
+  }
 }
 
 @layer base {

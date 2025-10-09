@@ -1,4 +1,5 @@
 import { Deal, Company, Contact, Activity, Pipeline, PipelineStage } from '../types/CRM';
+import { useAuthStore } from '../stores/authStore';
 
 const isProduction = process.env.NODE_ENV === 'production' ||
   (typeof window !== 'undefined' && window.location.hostname.includes('roilabs.com'));
@@ -11,6 +12,11 @@ console.log(`🌍 CRM API Environment: ${isProduction ? 'PRODUCTION' : 'DEVELOPM
 console.log(`🔗 CRM API Base URL: ${API_BASE_URL}`);
 
 class CRMService {
+  // Helper to get current user ID
+  private getUserId(): string | null {
+    const state = useAuthStore.getState();
+    return state.user?.id || null;
+  }
   // ============= PIPELINES =============
 
   async getPipelines(): Promise<Pipeline[]> {
@@ -256,13 +262,16 @@ class CRMService {
 
   async updateDeal(dealId: string, updates: Partial<Deal>): Promise<boolean> {
     try {
+      const userId = this.getUserId();
+      const updatesWithUserId = { ...updates, userId };
+
       const response = await fetch(`${API_BASE_URL}/deals/${dealId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
-        body: JSON.stringify(updates),
+        body: JSON.stringify(updatesWithUserId),
       });
 
       return response.ok;
@@ -415,13 +424,16 @@ class CRMService {
 
   async createContact(contact: Omit<Contact, 'id' | 'createdAt' | 'updatedAt'>): Promise<Contact | null> {
     try {
+      const userId = this.getUserId();
+      const contactWithUserId = { ...contact, userId };
+
       const response = await fetch(`${API_BASE_URL}/contacts`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
-        body: JSON.stringify(contact),
+        body: JSON.stringify(contactWithUserId),
       });
 
       if (!response.ok) {
@@ -501,13 +513,16 @@ class CRMService {
 
   async createActivity(activity: Omit<Activity, 'id' | 'createdAt' | 'updatedAt'>): Promise<Activity | null> {
     try {
+      const userId = this.getUserId();
+      const activityWithUserId = { ...activity, userId };
+
       const response = await fetch(`${API_BASE_URL}/activities`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
-        body: JSON.stringify(activity),
+        body: JSON.stringify(activityWithUserId),
       });
 
       if (!response.ok) {

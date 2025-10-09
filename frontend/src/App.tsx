@@ -9,6 +9,7 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { UIProvider } from "@/contexts/UIContext";
 import HamburgerButton from "@/components/HamburgerButton";
+import { GameProvider } from "@/components/game/GameProvider";
 
 const queryClient = new QueryClient();
 
@@ -26,10 +27,12 @@ const App = () => {
         <UIProvider>
           <QueryClientProvider client={queryClient}>
             <TooltipProvider>
-              <Toaster />
-              <Sonner />
-              <HamburgerButton />
-              <AppRouter />
+              <GameProvider>
+                <Toaster />
+                <Sonner />
+                <HamburgerButton />
+                <AppRouter />
+              </GameProvider>
             </TooltipProvider>
           </QueryClientProvider>
         </UIProvider>
