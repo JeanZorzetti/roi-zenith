@@ -288,6 +288,13 @@ model Deal {
   createdAt     DateTime    @default(now()) @map("created_at")
   updatedAt     DateTime    @updatedAt @map("updated_at")
 
+  // Game-related fields
+  painDiscovered   String?  @map("pain_discovered") @db.Text
+  painIntensity    Int?     @map("pain_intensity")
+  painCategory     String?  @map("pain_category") @db.VarChar(50)
+  orionSolution    String?  @map("orion_solution") @db.Text
+  gameLeadLevel    Int?     @default(1) @map("game_lead_level")
+
   // Relations
   pipelineId    String      @map("pipeline_id")
   pipeline      Pipeline    @relation(fields: [pipelineId], references: [id], onDelete: Cascade)
@@ -319,6 +326,169 @@ model Activity {
   contact     Contact?      @relation(fields: [contactId], references: [id], onDelete: Cascade)
 
   @@map("activities")
+}
+
+// ============= GAME MODELS =============
+
+model GameState {
+  id          String   @id @default(cuid())
+  userId      String   @unique @map("user_id")
+
+  // Resources
+  coins       Int      @default(0)
+  gems        Int      @default(0)
+  energy      Int      @default(50)
+  maxEnergy   Int      @default(50) @map("max_energy")
+  reputation  Int      @default(0)
+
+  // Progression
+  level       Int      @default(1)
+  experience  Int      @default(0)
+  experienceToNextLevel Int @default(100) @map("experience_to_next_level")
+
+  // Stats
+  intelligence Int     @default(5)
+  charisma    Int      @default(5)
+  perception  Int      @default(5)
+  knowledge   Int      @default(5)
+  luck        Int      @default(5)
+  skillPoints Int      @default(0) @map("skill_points")
+
+  // Unlocks
+  unlockedTerritories Json @default("[]") @map("unlocked_territories")
+  unlockedPartySlots  Int  @default(1) @map("unlocked_party_slots")
+
+  // Meta
+  lastEnergyRegen DateTime @default(now()) @map("last_energy_regen")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("game_states")
+}
+
+model GameInventory {
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  itemId      String   @map("item_id") @db.VarChar(100)
+  quantity    Int      @default(1)
+  isEquipped  Boolean  @default(false) @map("is_equipped")
+  slot        String?  @db.VarChar(50) // 'primary_tool', 'secondary_tool', etc
+  acquiredAt  DateTime @default(now()) @map("acquired_at")
+
+  @@map("game_inventory")
+  @@index([userId])
+}
+
+model GameParty {
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  npcId       String   @map("npc_id") @db.VarChar(100)
+  level       Int      @default(1)
+  recruitedAt DateTime @default(now()) @map("recruited_at")
+
+  @@map("game_party")
+  @@index([userId])
+}
+
+model GameQuest {
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  questId     String   @map("quest_id") @db.VarChar(100)
+  status      String   @default("active") @db.VarChar(20) // 'active', 'completed', 'failed'
+  progress    Json     @default("{}")
+  startedAt   DateTime @default(now()) @map("started_at")
+  completedAt DateTime? @map("completed_at")
+
+  @@map("game_quests")
+  @@index([userId])
+  @@index([questId])
+}
+
+model GameAchievement {
+  id            String   @id @default(cuid())
+  userId        String   @map("user_id")
+  achievementId String   @map("achievement_id") @db.VarChar(100)
+  unlockedAt    DateTime @default(now()) @map("unlocked_at")
+
+  @@unique([userId, achievementId])
+  @@map("game_achievements")
+  @@index([userId])
+}
+
+model GameInsight {
+  id              String   @id @default(cuid())
+  userId          String   @map("user_id")
+  painText        String   @map("pain_text") @db.Text
+  painCategory    String?  @map("pain_category") @db.VarChar(50)
+  painIntensity   Int      @map("pain_intensity")
+  orionSolution   String?  @map("orion_solution") @db.Text
+  occurrences     Int      @default(1) // quantas empresas têm essa dor
+  dealIds         Json     @default("[]") @map("deal_ids") // refs aos deals
+  discoveredAt    DateTime @default(now()) @map("discovered_at")
+
+  @@map("game_insights")
+  @@index([userId])
+  @@index([painCategory])
+}
+
+model GameTransaction {
+  id                String   @id @default(cuid())
+  userId            String   @map("user_id")
+
+  // CRM Reference
+  crmAction         String?  @map("crm_action") @db.VarChar(100)
+  crmReferenceId    String?  @map("crm_reference_id")
+
+  // Rewards
+  coinsEarned       Int      @default(0) @map("coins_earned")
+  gemsEarned        Int      @default(0) @map("gems_earned")
+  energyEarned      Int      @default(0) @map("energy_earned")
+  experienceEarned  Int      @default(0) @map("experience_earned")
+  reputationEarned  Int      @default(0) @map("reputation_earned")
+
+  // Item drops
+  itemDrops         Json?    @map("item_drops")
+
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  @@map("game_transactions")
+  @@index([userId])
+  @@index([crmAction])
+}
+
+model GameLeadRelationship {
+  id                  String   @id @default(cuid())
+  userId              String   @map("user_id")
+  contactId           String   @map("contact_id")
+
+  relationshipLevel   Int      @default(0) @map("relationship_level")
+  lastInteraction     DateTime @default(now()) @map("last_interaction")
+
+  // Histórico
+  interviewsCount     Int      @default(0) @map("interviews_count")
+  interviewsSuccessful Int     @default(0) @map("interviews_successful")
+  referralsGiven      Int      @default(0) @map("referrals_given")
+
+  @@unique([userId, contactId])
+  @@map("game_lead_relationships")
+  @@index([userId])
+  @@index([contactId])
+}
+
+model GameTerritoryProgress {
+  id                 String   @id @default(cuid())
+  userId             String   @map("user_id")
+  territoryId        String   @map("territory_id") @db.VarChar(50)
+
+  explorationPercent Int      @default(0) @map("exploration_percent")
+  leadsFound         Int      @default(0) @map("leads_found")
+  leadsInterviewed   Int      @default(0) @map("leads_interviewed")
+  painsDiscovered    Int      @default(0) @map("pains_discovered")
+  bossDefeated       Boolean  @default(false) @map("boss_defeated")
+
+  @@unique([userId, territoryId])
+  @@map("game_territory_progress")
+  @@index([userId])
 }
 
 enum LeadStatus {
