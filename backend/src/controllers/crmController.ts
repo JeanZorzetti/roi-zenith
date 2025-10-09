@@ -262,13 +262,46 @@ export const getDeal = async (req: Request, res: Response) => {
 
 export const createDeal = async (req: Request, res: Response) => {
   try {
-    const { title, description, value, currency, pipelineId, stageId, probability, expectedCloseDate, companyId, contactId } = req.body;
+    const {
+      userId,
+      title,
+      description,
+      value,
+      currency,
+      pipelineId,
+      stageId,
+      probability,
+      expectedCloseDate,
+      companyId,
+      contactId,
+      // Market Research fields
+      researchType,
+      targetProfile,
+      marketSegment,
+      companySizeTarget,
+      budgetRangeMin,
+      budgetRangeMax,
+      decisionMakerIdentified,
+      decisionMakerName,
+      decisionMakerRole,
+      researchNotes,
+      painPointsList
+    } = req.body;
 
     // Get the last position for the stage
     const lastDeal = await prisma.deal.findFirst({
       where: { stageId },
       orderBy: { position: 'desc' }
     });
+
+    // Calculate initial qualification score for Market Research leads
+    let qualificationScore = 0;
+    if (researchType === 'MARKET_RESEARCH') {
+      if (targetProfile) qualificationScore += 10;
+      if (marketSegment) qualificationScore += 10;
+      if (companySizeTarget) qualificationScore += 10;
+      if (budgetRangeMin && budgetRangeMax) qualificationScore += 20;
+    }
 
     const newDeal = await prisma.deal.create({
       data: {
@@ -283,7 +316,20 @@ export const createDeal = async (req: Request, res: Response) => {
         expectedCloseDate: expectedCloseDate ? new Date(expectedCloseDate) : null,
         companyId: companyId || null,
         contactId: contactId || null,
-        position: (lastDeal?.position || 0) + 1
+        position: (lastDeal?.position || 0) + 1,
+        // Market Research fields
+        researchType: researchType || 'SALES',
+        targetProfile: targetProfile || null,
+        marketSegment: marketSegment || null,
+        companySizeTarget: companySizeTarget || null,
+        budgetRangeMin: budgetRangeMin || null,
+        budgetRangeMax: budgetRangeMax || null,
+        decisionMakerIdentified: decisionMakerIdentified || false,
+        decisionMakerName: decisionMakerName || null,
+        decisionMakerRole: decisionMakerRole || null,
+        qualificationScore,
+        researchNotes: researchNotes || null,
+        painPointsList: painPointsList || []
       },
       include: {
         pipeline: true,
@@ -292,6 +338,14 @@ export const createDeal = async (req: Request, res: Response) => {
         contact: true
       }
     });
+
+    // Trigger game events for Market Research (non-blocking)
+    if (userId && researchType === 'MARKET_RESEARCH') {
+      console.log(`🎯 Triggering TARGET_DISCOVERED event for user ${userId}, deal ${newDeal.id}`);
+      CRMEventHandlers.onTargetDiscovered(userId, newDeal.id, title).catch(err => {
+        console.error('❌ Error triggering target discovered event:', err);
+      });
+    }
 
     res.json({ deal: newDeal });
   } catch (error) {
@@ -309,6 +363,30 @@ export const updateDeal = async (req: Request, res: Response) => {
     const oldDeal = await prisma.deal.findUnique({
       where: { id: dealId }
     });
+
+    if (!oldDeal) {
+      return res.status(404).json({ error: 'Deal not found' });
+    }
+
+    // Recalculate qualification score for Market Research leads
+    if (oldDeal.researchType === 'MARKET_RESEARCH' || updates.researchType === 'MARKET_RESEARCH') {
+      let qualificationScore = oldDeal.qualificationScore || 0;
+
+      // Recalculate based on updated fields
+      const finalUpdates = { ...oldDeal, ...updates };
+      qualificationScore = 0;
+
+      if (finalUpdates.targetProfile) qualificationScore += 10;
+      if (finalUpdates.marketSegment) qualificationScore += 10;
+      if (finalUpdates.companySizeTarget) qualificationScore += 10;
+      if (finalUpdates.budgetRangeMin && finalUpdates.budgetRangeMax) qualificationScore += 20;
+      if (finalUpdates.decisionMakerIdentified) qualificationScore += 25;
+      if (finalUpdates.painPointsList && Array.isArray(finalUpdates.painPointsList) && finalUpdates.painPointsList.length > 0) {
+        qualificationScore += finalUpdates.painPointsList.length * 5;
+      }
+
+      updates.qualificationScore = qualificationScore;
+    }
 
     const updatedDeal = await prisma.deal.update({
       where: { id: dealId },
@@ -331,6 +409,8 @@ export const updateDeal = async (req: Request, res: Response) => {
 
     // Trigger game events (non-blocking)
     if (userId) {
+      // === SALES PIPELINE EVENTS ===
+
       // Check if pain was discovered
       const painWasDiscovered = !oldDeal?.painDiscovered && updates.painDiscovered;
       if (painWasDiscovered && updates.painIntensity && updates.painCategory) {
@@ -356,6 +436,47 @@ export const updateDeal = async (req: Request, res: Response) => {
         ).catch(err => {
           console.error('Error triggering solution mapped event:', err);
         });
+      }
+
+      // === MARKET RESEARCH PIPELINE EVENTS ===
+
+      if (oldDeal.researchType === 'MARKET_RESEARCH') {
+        // Check if pain point was added to list
+        const oldPainPointsList = oldDeal.painPointsList as string[] || [];
+        const newPainPointsList = updates.painPointsList as string[] || oldPainPointsList;
+        const painPointWasAdded = newPainPointsList.length > oldPainPointsList.length;
+
+        if (painPointWasAdded) {
+          const newPainPoint = newPainPointsList[newPainPointsList.length - 1];
+          console.log(`💡 Triggering PAIN_MAPPED event for user ${userId}, deal ${dealId}`);
+          CRMEventHandlers.onPainMapped(userId, dealId, newPainPoint, 5).catch(err => {
+            console.error('❌ Error triggering pain mapped event:', err);
+          });
+        }
+
+        // Check if decision maker was identified
+        const decisionMakerWasIdentified = !oldDeal.decisionMakerIdentified && updates.decisionMakerIdentified;
+        if (decisionMakerWasIdentified) {
+          console.log(`👔 Triggering DECISION_MAKER_IDENTIFIED event for user ${userId}, deal ${dealId}`);
+          CRMEventHandlers.onDecisionMakerIdentified(
+            userId,
+            dealId,
+            updates.decisionMakerName || 'Unknown',
+            updates.decisionMakerRole || 'Unknown'
+          ).catch(err => {
+            console.error('❌ Error triggering decision maker identified event:', err);
+          });
+        }
+
+        // Check if lead reached qualification threshold
+        const wasNotQualified = (oldDeal.qualificationScore || 0) < 70;
+        const isNowQualified = (updatedDeal.qualificationScore || 0) >= 70;
+        if (wasNotQualified && isNowQualified) {
+          console.log(`✅ Triggering LEAD_QUALIFIED event for user ${userId}, deal ${dealId}`);
+          CRMEventHandlers.onLeadQualified(userId, dealId, updatedDeal.qualificationScore).catch(err => {
+            console.error('❌ Error triggering lead qualified event:', err);
+          });
+        }
       }
     }
 
@@ -610,7 +731,17 @@ export const getActivities = async (req: Request, res: Response) => {
 export const createActivity = async (req: Request, res: Response) => {
   try {
     const { userId, ...activityData } = req.body;  // Extract userId
-    const { type, subject, description, dueDate, dealId, contactId } = activityData;
+    const {
+      type,
+      subject,
+      description,
+      dueDate,
+      dealId,
+      contactId,
+      researchFindings,
+      painPointsDiscovered,
+      qualificationImpact
+    } = activityData;
 
     const newActivity = await prisma.activity.create({
       data: {
@@ -620,7 +751,11 @@ export const createActivity = async (req: Request, res: Response) => {
         description,
         dueDate: dueDate ? new Date(dueDate) : null,
         dealId: dealId || null,
-        contactId: contactId || null
+        contactId: contactId || null,
+        // Market Research fields
+        researchFindings: researchFindings || null,
+        painPointsDiscovered: painPointsDiscovered || [],
+        qualificationImpact: qualificationImpact || 0
       },
       include: {
         deal: true,
@@ -628,11 +763,37 @@ export const createActivity = async (req: Request, res: Response) => {
       }
     });
 
-    // Trigger game event (non-blocking)
+    // Trigger game events (non-blocking)
     if (userId) {
-      CRMEventHandlers.onActivityCreated(userId, newActivity.id, type, contactId).catch(err => {
-        console.error('Error triggering activity created event:', err);
-      });
+      // If it's an interview, trigger the specific Market Research event
+      if (type === 'INTERVIEW') {
+        console.log(`📞 Triggering INTERVIEW_COMPLETED event for user ${userId}, activity ${newActivity.id}`);
+        CRMEventHandlers.onInterviewCompleted(userId, newActivity.id, dealId).catch((err: Error) => {
+          console.error('❌ Error triggering interview completed event:', err);
+        });
+
+        // If there are pain points discovered, update the deal
+        if (dealId && painPointsDiscovered && Array.isArray(painPointsDiscovered) && painPointsDiscovered.length > 0) {
+          const deal = await prisma.deal.findUnique({ where: { id: dealId } });
+          if (deal) {
+            const existingPainPoints = deal.painPointsList as string[] || [];
+            const updatedPainPoints = [...existingPainPoints, ...painPointsDiscovered];
+
+            await prisma.deal.update({
+              where: { id: dealId },
+              data: {
+                painPointsList: updatedPainPoints,
+                qualificationScore: (deal.qualificationScore || 0) + qualificationImpact
+              }
+            });
+          }
+        }
+      } else {
+        // Default activity event
+        CRMEventHandlers.onActivityCreated(userId, newActivity.id, type, contactId).catch((err: Error) => {
+          console.error('Error triggering activity created event:', err);
+        });
+      }
     }
 
     res.json({ activity: newActivity });
@@ -679,5 +840,149 @@ export const deleteActivity = async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error deleting activity:', error);
     res.status(500).json({ error: 'Failed to delete activity' });
+  }
+};
+
+// ============= MARKET RESEARCH → SALES PROMOTION =============
+
+/**
+ * Promote a Market Research lead to Sales pipeline
+ * POST /api/crm/deals/:dealId/promote
+ */
+export const promoteDealToSales = async (req: Request, res: Response) => {
+  try {
+    const { dealId } = req.params;
+    const { userId } = req.body;
+
+    // Get the research deal
+    const researchDeal = await prisma.deal.findUnique({
+      where: { id: dealId },
+      include: {
+        pipeline: true,
+        stage: true,
+        company: true,
+        contact: true
+      }
+    });
+
+    if (!researchDeal) {
+      return res.status(404).json({ error: 'Deal not found' });
+    }
+
+    // Validate it's a Market Research deal
+    if (researchDeal.researchType !== 'MARKET_RESEARCH') {
+      return res.status(400).json({ error: 'Deal is not a Market Research lead' });
+    }
+
+    // Validate promotion criteria
+    const qualificationScore = researchDeal.qualificationScore || 0;
+    const painPointsList = researchDeal.painPointsList as string[] || [];
+    const budgetRangeMin = researchDeal.budgetRangeMin;
+    const budgetRangeMax = researchDeal.budgetRangeMax;
+    const decisionMakerIdentified = researchDeal.decisionMakerIdentified;
+
+    const errors: string[] = [];
+    if (qualificationScore < 70) errors.push('Qualification score must be >= 70');
+    if (painPointsList.length === 0) errors.push('At least 1 pain point must be discovered');
+    if (!decisionMakerIdentified) errors.push('Decision maker must be identified');
+    if (!budgetRangeMin || !budgetRangeMax) errors.push('Budget range must be defined');
+
+    if (errors.length > 0) {
+      return res.status(400).json({
+        error: 'Promotion criteria not met',
+        details: errors,
+        currentScore: qualificationScore,
+        requirements: {
+          qualificationScore: qualificationScore >= 70,
+          painPoints: painPointsList.length > 0,
+          decisionMaker: decisionMakerIdentified,
+          budgetRange: !!budgetRangeMin && !!budgetRangeMax
+        }
+      });
+    }
+
+    // Get the Sales pipeline (first one with type SALES or isDefault = true)
+    const salesPipeline = await prisma.pipeline.findFirst({
+      where: {
+        OR: [
+          { type: 'SALES' },
+          { isDefault: true }
+        ]
+      },
+      include: {
+        stages: {
+          orderBy: { position: 'asc' }
+        }
+      }
+    });
+
+    if (!salesPipeline || salesPipeline.stages.length === 0) {
+      return res.status(500).json({ error: 'No Sales pipeline found' });
+    }
+
+    const firstSalesStage = salesPipeline.stages[0];
+
+    // Get the last position in the first sales stage
+    const lastSalesDeal = await prisma.deal.findFirst({
+      where: { stageId: firstSalesStage.id },
+      orderBy: { position: 'desc' }
+    });
+
+    // Create new Sales deal with data from Research
+    const salesDeal = await prisma.deal.create({
+      data: {
+        id: `deal-${Date.now()}`,
+        title: researchDeal.title,
+        description: `[Promoted from Research] ${researchDeal.description || ''}`,
+        value: budgetRangeMin || 0,
+        currency: researchDeal.currency,
+        pipelineId: salesPipeline.id,
+        stageId: firstSalesStage.id,
+        probability: 25, // Initial probability for qualified lead
+        expectedCloseDate: null,
+        companyId: researchDeal.companyId,
+        contactId: researchDeal.contactId,
+        position: (lastSalesDeal?.position || 0) + 1,
+        // Sales type
+        researchType: 'SALES',
+        // Copy main pain point to painDiscovered
+        painDiscovered: painPointsList[0] || null,
+        painIntensity: 7, // Default medium-high intensity
+        painCategory: researchDeal.marketSegment || 'general',
+        // Keep reference to research
+        promotedFromDealId: researchDeal.id
+      },
+      include: {
+        pipeline: true,
+        stage: true,
+        company: true,
+        contact: true
+      }
+    });
+
+    // Mark research deal as promoted
+    await prisma.deal.update({
+      where: { id: dealId },
+      data: {
+        promotedToSales: true,
+        updatedAt: new Date()
+      }
+    });
+
+    // Trigger RESEARCH_TO_SALES_PROMOTION game event (TODO: implement in gameEvents.ts)
+    if (userId) {
+      console.log(`🎉 Triggering RESEARCH_TO_SALES_PROMOTION event for user ${userId}`);
+      // CRMEventHandlers.onResearchToSalesPromotion(userId, researchDeal.id, salesDeal.id, qualificationScore)
+      //   .catch(err => console.error('❌ Error triggering promotion event:', err));
+    }
+
+    res.json({
+      message: 'Lead promoted to Sales successfully',
+      researchDeal: { id: researchDeal.id, promotedToSales: true },
+      salesDeal
+    });
+  } catch (error) {
+    console.error('Error promoting deal to sales:', error);
+    res.status(500).json({ error: 'Failed to promote deal to sales' });
   }
 };

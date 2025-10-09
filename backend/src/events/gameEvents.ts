@@ -370,6 +370,286 @@ export async function checkAndEmitQuestProgress(userId: string) {
   }
 }
 
+// ============= MARKET RESEARCH EVENT HANDLERS =============
+
+/**
+ * Evento: Target descoberto (lead criado em Market Research pipeline)
+ */
+export async function onTargetDiscovered(
+  userId: string,
+  dealId: string,
+  targetName: string
+) {
+  try {
+    console.log(`🎯 [onTargetDiscovered] Starting for userId: ${userId}, target: ${targetName}`);
+    const io = getSocketIOInstance();
+
+    // Processar evento no game service
+    const result = await gameService.processCRMEvent(
+      userId,
+      'TARGET_DISCOVERED',
+      dealId,
+      { targetName }
+    );
+
+    console.log(`🎯 [onTargetDiscovered] Game service result:`, result);
+
+    // Emitir eventos via WebSocket
+    GameEvents.experienceGained(io, userId, {
+      experience: result.rewards.experience,
+      currentXP: 0,
+      totalXP: 0,
+      level: result.newLevel || 1,
+    });
+
+    GameEvents.resourcesGained(io, userId, {
+      coins: result.rewards.coins,
+      gems: result.rewards.gems,
+      energy: result.rewards.energy,
+      reputation: result.rewards.reputation,
+    });
+
+    // Notificação
+    GameEvents.notification(io, userId, {
+      type: 'success',
+      title: '🎯 Target Descoberto',
+      message: `${targetName} adicionado ao research! +${result.rewards.experience} XP, +${result.rewards.coins} coins`,
+      duration: 5000,
+    });
+
+    console.log(`✅ Target discovered event processed for user ${userId}`);
+  } catch (error) {
+    console.error('❌ Error processing target discovered event:', error);
+  }
+}
+
+/**
+ * Evento: Pain point mapeado em Market Research
+ */
+export async function onPainMapped(
+  userId: string,
+  dealId: string,
+  painPoint: string,
+  intensity: number
+) {
+  try {
+    console.log(`💡 [onPainMapped] Starting for userId: ${userId}, pain: ${painPoint}`);
+    const io = getSocketIOInstance();
+
+    // Processar evento no game service
+    const result = await gameService.processCRMEvent(
+      userId,
+      'PAIN_MAPPED',
+      dealId,
+      { painPoint, intensity }
+    );
+
+    console.log(`💡 [onPainMapped] Game service result:`, result);
+
+    // Emitir eventos
+    GameEvents.experienceGained(io, userId, {
+      experience: result.rewards.experience,
+      currentXP: 0,
+      totalXP: 0,
+      level: result.newLevel || 1,
+    });
+
+    GameEvents.resourcesGained(io, userId, {
+      coins: result.rewards.coins,
+      gems: result.rewards.gems,
+      energy: result.rewards.energy,
+      reputation: result.rewards.reputation,
+    });
+
+    // Notificação
+    const intensityEmoji = intensity >= 7 ? '🔥' : '💡';
+    GameEvents.notification(io, userId, {
+      type: 'success',
+      title: `${intensityEmoji} Pain Point Mapeado`,
+      message: `Pain intensity ${intensity}/10 - +${result.rewards.experience} XP, +${result.rewards.coins} coins`,
+      duration: 5000,
+    });
+
+    console.log(`✅ Pain mapped event processed for user ${userId}`);
+  } catch (error) {
+    console.error('❌ Error processing pain mapped event:', error);
+  }
+}
+
+/**
+ * Evento: Decision maker identificado
+ */
+export async function onDecisionMakerIdentified(
+  userId: string,
+  dealId: string,
+  decisionMakerName: string,
+  decisionMakerRole: string
+) {
+  try {
+    console.log(`👔 [onDecisionMakerIdentified] Starting for userId: ${userId}, DM: ${decisionMakerName}`);
+    const io = getSocketIOInstance();
+
+    // Processar evento no game service
+    const result = await gameService.processCRMEvent(
+      userId,
+      'DECISION_MAKER_IDENTIFIED',
+      dealId,
+      { decisionMakerName, decisionMakerRole }
+    );
+
+    console.log(`👔 [onDecisionMakerIdentified] Game service result:`, result);
+
+    // Emitir eventos
+    GameEvents.experienceGained(io, userId, {
+      experience: result.rewards.experience,
+      currentXP: 0,
+      totalXP: 0,
+      level: result.newLevel || 1,
+    });
+
+    GameEvents.resourcesGained(io, userId, {
+      coins: result.rewards.coins,
+      gems: result.rewards.gems,
+      energy: result.rewards.energy,
+      reputation: result.rewards.reputation,
+    });
+
+    // Notificação
+    GameEvents.notification(io, userId, {
+      type: 'success',
+      title: '👔 Decision Maker Identificado',
+      message: `${decisionMakerName} (${decisionMakerRole}) identificado! +${result.rewards.experience} XP, +${result.rewards.coins} coins`,
+      duration: 6000,
+    });
+
+    console.log(`✅ Decision maker identified event processed for user ${userId}`);
+  } catch (error) {
+    console.error('❌ Error processing decision maker identified event:', error);
+  }
+}
+
+/**
+ * Evento: Lead qualificado (score >= 70)
+ */
+export async function onLeadQualified(
+  userId: string,
+  dealId: string,
+  qualificationScore: number
+) {
+  try {
+    console.log(`✅ [onLeadQualified] Starting for userId: ${userId}, score: ${qualificationScore}`);
+    const io = getSocketIOInstance();
+
+    // Processar evento no game service
+    const result = await gameService.processCRMEvent(
+      userId,
+      'LEAD_QUALIFIED',
+      dealId,
+      { qualificationScore }
+    );
+
+    console.log(`✅ [onLeadQualified] Game service result:`, result);
+
+    // Emitir eventos
+    GameEvents.experienceGained(io, userId, {
+      experience: result.rewards.experience,
+      currentXP: 0,
+      totalXP: 0,
+      level: result.newLevel || 1,
+    });
+
+    GameEvents.resourcesGained(io, userId, {
+      coins: result.rewards.coins,
+      gems: result.rewards.gems,
+      energy: result.rewards.energy,
+      reputation: result.rewards.reputation,
+    });
+
+    // Item drop (20% chance)
+    if (result.item) {
+      const item = ITEMS.find(i => i.id === result.item);
+      if (item) {
+        GameEvents.itemDropped(io, userId, {
+          itemId: item.id,
+          itemName: item.name,
+          rarity: item.rarity,
+          source: 'lead_qualification',
+        });
+
+        GameEvents.notification(io, userId, {
+          type: 'success',
+          title: '🎁 Item Dropado!',
+          message: `Você ganhou: ${item.name} (${item.rarity})`,
+          duration: 8000,
+        });
+      }
+    }
+
+    // Notificação de qualificação
+    GameEvents.notification(io, userId, {
+      type: 'success',
+      title: '✅ Lead Qualificado!',
+      message: `Score: ${qualificationScore}/100 - Lead pronto para vendas! +${result.rewards.experience} XP, +${result.rewards.coins} coins`,
+      duration: 7000,
+    });
+
+    console.log(`✅ Lead qualified event processed for user ${userId}`);
+  } catch (error) {
+    console.error('❌ Error processing lead qualified event:', error);
+  }
+}
+
+/**
+ * Evento: Interview completada (Market Research activity)
+ */
+export async function onInterviewCompleted(
+  userId: string,
+  activityId: string,
+  dealId?: string
+) {
+  try {
+    console.log(`📞 [onInterviewCompleted] Starting for userId: ${userId}`);
+    const io = getSocketIOInstance();
+
+    // Processar evento no game service
+    const result = await gameService.processCRMEvent(
+      userId,
+      'INTERVIEW_COMPLETED',
+      activityId,
+      { dealId }
+    );
+
+    console.log(`📞 [onInterviewCompleted] Game service result:`, result);
+
+    // Emitir eventos
+    GameEvents.experienceGained(io, userId, {
+      experience: result.rewards.experience,
+      currentXP: 0,
+      totalXP: 0,
+      level: result.newLevel || 1,
+    });
+
+    GameEvents.resourcesGained(io, userId, {
+      coins: result.rewards.coins,
+      gems: result.rewards.gems,
+      energy: result.rewards.energy,
+      reputation: result.rewards.reputation,
+    });
+
+    // Notificação
+    GameEvents.notification(io, userId, {
+      type: 'success',
+      title: '📞 Entrevista Concluída',
+      message: `Excelente trabalho! +${result.rewards.experience} XP, +${result.rewards.coins} coins, +${result.rewards.energy} energy`,
+      duration: 6000,
+    });
+
+    console.log(`✅ Interview completed event processed for user ${userId}`);
+  } catch (error) {
+    console.error('❌ Error processing interview completed event:', error);
+  }
+}
+
 // Export all event handlers
 export const CRMEventHandlers = {
   onContactCreated,
@@ -379,6 +659,12 @@ export const CRMEventHandlers = {
   onReferralReceived,
   onRelationshipUpgraded,
   checkAndEmitQuestProgress,
+  // Market Research events
+  onTargetDiscovered,
+  onPainMapped,
+  onDecisionMakerIdentified,
+  onLeadQualified,
+  onInterviewCompleted,
 };
 
 export default CRMEventHandlers;

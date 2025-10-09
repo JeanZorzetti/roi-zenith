@@ -14,6 +14,7 @@ import {
   updateDeal,
   deleteDeal,
   moveDeal,
+  promoteDealToSales,
   getCompanies,
   createCompany,
   updateCompany,
@@ -50,6 +51,7 @@ router.post('/deals', createDeal);
 router.put('/deals/:dealId', updateDeal);
 router.delete('/deals/:dealId', deleteDeal);
 router.patch('/deals/:dealId/move', moveDeal);
+router.post('/deals/:dealId/promote', promoteDealToSales);
 
 // Company routes
 router.get('/companies', getCompanies);
