@@ -68,7 +68,13 @@ interface GameStore {
   clearNotifications: () => void;
 }
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+// Use same API detection logic as crmService
+const isProduction = process.env.NODE_ENV === 'production' ||
+  (typeof window !== 'undefined' && window.location.hostname.includes('roilabs.com'));
+
+const API_URL = isProduction
+  ? 'https://back.roilabs.com.br:5000'
+  : 'http://localhost:5002';
 
 export const useGameStore = create<GameStore>((set, get) => ({
   // Initial state
