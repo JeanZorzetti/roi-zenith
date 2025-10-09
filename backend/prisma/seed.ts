@@ -179,9 +179,88 @@ async function main() {
     }
   });
 
+  // ========== CRM PIPELINES ==========
+
+  // Pipeline 1: Market Research
+  const marketResearchPipeline = await prisma.pipeline.upsert({
+    where: { id: 'pipeline-market-research' },
+    update: {},
+    create: {
+      id: 'pipeline-market-research',
+      title: 'Market Research',
+      description: 'Pipeline de pesquisa de mercado para descoberta de leads e pain points',
+      type: 'MARKET_RESEARCH',
+      color: '#3b82f6',
+      isDefault: false,
+      allowPromotion: true,
+      position: 0
+    }
+  });
+
+  // Market Research Stages
+  const marketResearchStages = [
+    { id: 'stage-mr-discovery', title: '🎯 Target Discovery', color: '#3b82f6', position: 0 },
+    { id: 'stage-mr-pain-mapping', title: '💡 Pain Mapping', color: '#8b5cf6', position: 1 },
+    { id: 'stage-mr-solution-fit', title: '🔍 Solution Fit', color: '#ec4899', position: 2 },
+    { id: 'stage-mr-qualification', title: '✅ Qualification', color: '#10b981', position: 3 }
+  ];
+
+  for (const stage of marketResearchStages) {
+    await prisma.pipelineStage.upsert({
+      where: { id: stage.id },
+      update: {},
+      create: {
+        id: stage.id,
+        title: stage.title,
+        color: stage.color,
+        position: stage.position,
+        pipelineId: marketResearchPipeline.id
+      }
+    });
+  }
+
+  // Pipeline 2: Sales
+  const salesPipeline = await prisma.pipeline.upsert({
+    where: { id: 'pipeline-sales' },
+    update: {},
+    create: {
+      id: 'pipeline-sales',
+      title: 'Sales Pipeline',
+      description: 'Pipeline de vendas tradicional',
+      type: 'SALES',
+      color: '#10b981',
+      isDefault: true,
+      allowPromotion: false,
+      position: 1
+    }
+  });
+
+  // Sales Stages
+  const salesStages = [
+    { id: 'stage-sales-qualification', title: '📋 Qualificação', color: '#6366f1', position: 0 },
+    { id: 'stage-sales-proposal', title: '📄 Proposta', color: '#8b5cf6', position: 1 },
+    { id: 'stage-sales-negotiation', title: '💬 Negociação', color: '#f59e0b', position: 2 },
+    { id: 'stage-sales-closing', title: '🎉 Fechamento', color: '#10b981', position: 3 }
+  ];
+
+  for (const stage of salesStages) {
+    await prisma.pipelineStage.upsert({
+      where: { id: stage.id },
+      update: {},
+      create: {
+        id: stage.id,
+        title: stage.title,
+        color: stage.color,
+        position: stage.position,
+        pipelineId: salesPipeline.id
+      }
+    });
+  }
 
   console.log('✅ Database seeded successfully!');
   console.log(`📊 Created boards: ${erpBoard.title}, ${erpTechBoard.title}, ${matchfiosBoard.title}`);
+  console.log(`🔍 Created Market Research pipeline with ${marketResearchStages.length} stages`);
+  console.log(`💰 Created Sales pipeline with ${salesStages.length} stages`);
 }
 
 main()
