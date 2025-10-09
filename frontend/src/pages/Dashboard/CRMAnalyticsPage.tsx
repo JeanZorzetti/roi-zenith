@@ -81,12 +81,18 @@ const CRMAnalyticsPage = () => {
     const totalDeals = deals.length;
     const avgDealSize = totalDeals > 0 ? totalValue / totalDeals : 0;
 
-    // Get last stage (won deals)
-    const wonDeals = currentPipeline
-      ? deals.filter(d => d.stageId === currentPipeline.stages[currentPipeline.stages.length - 1]?.id)
-      : [];
+    // Get won and lost stages
+    const wonStage = currentPipeline?.stages.find(s =>
+      s.title.toLowerCase().includes('ganho') ||
+      s.title.toLowerCase().includes('won') ||
+      s.title.toLowerCase().includes('fechado')
+    );
+    const wonDeals = wonStage ? deals.filter(d => d.stageId === wonStage.id) : [];
 
-    const lostStage = currentPipeline?.stages.find(s => s.title.toLowerCase().includes('perdido'));
+    const lostStage = currentPipeline?.stages.find(s =>
+      s.title.toLowerCase().includes('perdido') ||
+      s.title.toLowerCase().includes('lost')
+    );
     const lostDeals = lostStage ? deals.filter(d => d.stageId === lostStage.id) : [];
 
     const closedDeals = wonDeals.length + lostDeals.length;
