@@ -15,6 +15,7 @@ import authRoutes from './routes/authRoutes';
 import leadRoutes from './routes/leadRoutes';
 import boardRoutes from './routes/boardRoutes';
 import crmRoutes from './routes/crmRoutes';
+import gameRoutes from './routes/gameRoutes';
 
 // Load environment variables
 dotenv.config();
@@ -97,6 +98,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/leads', leadRoutes);
 app.use('/api', boardRoutes);
 app.use('/api/crm', crmRoutes);
+app.use('/api/game', gameRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

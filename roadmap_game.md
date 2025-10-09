@@ -868,24 +868,24 @@ model Deal {
 
 ```
 Backend Setup:
-├─ [ ] Criar schema Prisma para game tables
-├─ [ ] Migrations para novas tabelas
-├─ [ ] Criar gameRoutes.ts com rotas básicas:
+├─ [👌] Criar schema Prisma para game tables
+├─ [👌] Migrations para novas tabelas
+├─ [👌] Criar gameRoutes.ts com rotas básicas:
 │  ├─ GET /api/game/state (pegar estado do jogo)
 │  ├─ POST /api/game/init (inicializar jogo para user)
 │  ├─ GET /api/game/inventory
 │  └─ POST /api/game/battle (iniciar batalha)
-├─ [ ] Criar gameService.ts com lógica:
+├─ [👌] Criar gameService.ts com lógica:
 │  ├─ initializeGame()
 │  ├─ getGameState()
 │  ├─ addResources()
 │  ├─ levelUp()
 │  └─ processCRMEvent()
-├─ [ ] Criar gameController.ts
+├─ [👌] Criar gameController.ts
 └─ [ ] Setup Socket.io para real-time events
 
 CRM Integration:
-├─ [ ] Adicionar campos customizados ao Deal model
+├─ [👌] Adicionar campos customizados ao Deal model
 ├─ [ ] Criar trigger functions:
 │  ├─ onContactCreated → spawn lead no jogo
 │  ├─ onActivityCreated → trigger batalha
@@ -894,12 +894,12 @@ CRM Integration:
 └─ [ ] Criar webhook/event system para sincronização
 
 Config:
-├─ [ ] gameConfig.ts com todas constantes:
+├─ [👌] gameConfig.ts com todas constantes:
 │  ├─ XP_TABLE (level progression)
 │  ├─ REWARDS_TABLE (ações → recursos)
 │  ├─ ITEM_DATABASE (todos items)
 │  └─ QUEST_DATABASE (todas quests)
-└─ [ ] Seed data para items, quests, territories
+└─ [👌] Seed data para items, quests, territories
 ```
 
 #### Week 2: Frontend Foundation + Core Loop

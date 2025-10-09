@@ -13,6 +13,7 @@ import {
   ACHIEVEMENTS,
   GAME_CONSTANTS,
   GameReward,
+  Achievement,
   calculateXPForLevel,
   calculateLevelFromXP,
   getPainReward,
@@ -122,7 +123,7 @@ export class GameService {
     });
 
     if (!gameState) {
-      gameState = await this.initializeGame(userId);
+      return await this.initializeGame(userId);
     }
 
     // Regenera energy se necessário
@@ -598,7 +599,7 @@ export class GameService {
           });
 
           // Dá rewards
-          await this.addResources(userId, quest.rewards, `QUEST_${questId}_COMPLETED`);
+          await this.addResources(userId, quest.rewards, `QUEST_${quest.id}_COMPLETED`);
 
           // Dá items se tiver
           if (quest.rewards.items) {

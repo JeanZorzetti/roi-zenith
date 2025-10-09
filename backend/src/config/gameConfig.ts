@@ -1089,7 +1089,7 @@ export interface Achievement {
     key: string;
     value: number;
   };
-  rewards: GameReward & { badge?: string; title?: string };
+  rewards: GameReward & { badge?: string; title?: string; items?: string[] };
   hidden?: boolean;
 }
 
