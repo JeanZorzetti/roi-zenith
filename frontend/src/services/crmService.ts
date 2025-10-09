@@ -15,6 +15,7 @@ class CRMService {
   // Helper to get current user ID
   private getUserId(): string | null {
     const state = useAuthStore.getState();
+    console.log('🎮 [getUserId] Auth state:', { isAuthenticated: state.isAuthenticated, user: state.user, userId: state.user?.id });
     return state.user?.id || null;
   }
   // ============= PIPELINES =============
