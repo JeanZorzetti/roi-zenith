@@ -1,44 +1,36 @@
 import { create } from 'zustand';
 import { io, Socket } from 'socket.io-client';
 
-// Game State Types
+// Game State Types (matching backend structure)
 export interface GameState {
-  // Resources
-  coins: number;
-  gems: number;
-  energy: number;
-  maxEnergy: number;
-  reputation: number;
-
-  // Progression
-  level: number;
-  experience: number;
-  experienceToNextLevel: number;
-
-  // Stats
-  intelligence: number;
-  charisma: number;
-  perception: number;
-  knowledge: number;
-  luck: number;
-  skillPoints: number;
-
-  // Collections
-  inventory: Array<{ itemId: string; quantity: number; isEquipped: boolean; slot?: string }>;
-  party: Array<{ npcId: string; level: number }>;
-  activeQuests: Array<{ questId: string; progress: any; status: string }>;
-  achievements: Array<{ achievementId: string; unlockedAt: string }>;
-
-  // Territory
-  unlockedTerritories: string[];
-  territories: Array<{
-    territoryId: string;
-    explorationPercent: number;
-    leadsFound: number;
-    leadsInterviewed: number;
-    painsDiscovered: number;
-    bossDefeated: boolean;
-  }>;
+  id: string;
+  userId: string;
+  resources: {
+    coins: number;
+    gems: number;
+    energy: number;
+    maxEnergy: number;
+    reputation: number;
+  };
+  progression: {
+    level: number;
+    experience: number;
+    experienceToNextLevel: number;
+    progressPercent: number;
+  };
+  stats: {
+    intelligence: number;
+    charisma: number;
+    perception: number;
+    knowledge: number;
+    luck: number;
+    skillPoints: number;
+  };
+  unlocks: {
+    territories: string[];
+    partySlots: number;
+  };
+  lastEnergyRegen: Date;
 }
 
 export interface GameNotification {
@@ -152,25 +144,43 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Experience & Level Up
     socket.on('experience-gained', (data: { experience: number; currentXP: number; totalXP: number; level: number }) => {
       console.log('📈 Experience gained:', data);
-      set((state) => ({
-        gameState: state.gameState ? {
-          ...state.gameState,
-          experience: data.currentXP,
-          level: data.level,
-        } : null,
-      }));
+      set((state) => {
+        if (!state.gameState) return state;
+        return {
+          gameState: {
+            ...state.gameState,
+            progression: {
+              ...state.gameState.progression,
+              experience: data.currentXP,
+              level: data.level,
+            }
+          }
+        };
+      });
     });
 
     socket.on('level-up', (data: { newLevel: number; skillPoints: number; maxEnergy: number; rewards: any }) => {
       console.log('⭐ Level up!', data);
-      set((state) => ({
-        gameState: state.gameState ? {
-          ...state.gameState,
-          level: data.newLevel,
-          skillPoints: (state.gameState.skillPoints || 0) + data.skillPoints,
-          maxEnergy: data.maxEnergy,
-        } : null,
-      }));
+      set((state) => {
+        if (!state.gameState) return state;
+        return {
+          gameState: {
+            ...state.gameState,
+            progression: {
+              ...state.gameState.progression,
+              level: data.newLevel,
+            },
+            stats: {
+              ...state.gameState.stats,
+              skillPoints: state.gameState.stats.skillPoints + data.skillPoints,
+            },
+            resources: {
+              ...state.gameState.resources,
+              maxEnergy: data.maxEnergy,
+            }
+          }
+        };
+      });
 
       get().addNotification({
         type: 'success',
@@ -189,11 +199,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
         return {
           gameState: {
             ...state.gameState,
-            coins: (state.gameState.coins || 0) + (data.coins || 0),
-            gems: (state.gameState.gems || 0) + (data.gems || 0),
-            energy: (state.gameState.energy || 0) + (data.energy || 0),
-            reputation: (state.gameState.reputation || 0) + (data.reputation || 0),
-            experience: (state.gameState.experience || 0) + (data.experience || 0),
+            resources: {
+              ...state.gameState.resources,
+              coins: state.gameState.resources.coins + (data.coins || 0),
+              gems: state.gameState.resources.gems + (data.gems || 0),
+              energy: state.gameState.resources.energy + (data.energy || 0),
+              reputation: state.gameState.resources.reputation + (data.reputation || 0),
+            },
+            progression: {
+              ...state.gameState.progression,
+              experience: state.gameState.progression.experience + (data.experience || 0),
+            }
           }
         };
       });
@@ -208,55 +224,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
         message: `Você ganhou: ${data.itemName} (${data.rarity})`,
         duration: 8000,
       });
-
-      // Add item to inventory
-      set((state) => {
-        if (!state.gameState) return state;
-
-        const existingItem = state.gameState.inventory.find(item => item.itemId === data.itemId);
-
-        if (existingItem) {
-          return {
-            gameState: {
-              ...state.gameState,
-              inventory: state.gameState.inventory.map(item =>
-                item.itemId === data.itemId
-                  ? { ...item, quantity: item.quantity + 1 }
-                  : item
-              ),
-            }
-          };
-        } else {
-          return {
-            gameState: {
-              ...state.gameState,
-              inventory: [
-                ...state.gameState.inventory,
-                { itemId: data.itemId, quantity: 1, isEquipped: false }
-              ],
-            }
-          };
-        }
-      });
+      // Inventory will be fetched separately via API when needed
     });
 
     // Quests
     socket.on('quest-progress', (data: { questId: string; progress: any; completed: boolean }) => {
       console.log('📋 Quest progress:', data);
-      set((state) => {
-        if (!state.gameState) return state;
-
-        return {
-          gameState: {
-            ...state.gameState,
-            activeQuests: state.gameState.activeQuests.map(quest =>
-              quest.questId === data.questId
-                ? { ...quest, progress: data.progress, status: data.completed ? 'completed' : quest.status }
-                : quest
-            ),
-          }
-        };
-      });
+      // Quest data will be fetched separately via API when needed
     });
 
     socket.on('quest-completed', (data: { questId: string; rewards: any }) => {
@@ -278,21 +252,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         message: data.description,
         duration: 10000,
       });
-
-      // Add to achievements
-      set((state) => {
-        if (!state.gameState) return state;
-
-        return {
-          gameState: {
-            ...state.gameState,
-            achievements: [
-              ...state.gameState.achievements,
-              { achievementId: data.achievementId, unlockedAt: new Date().toISOString() }
-            ],
-          }
-        };
-      });
+      // Achievements will be fetched separately via API when needed
     });
 
     // Notifications

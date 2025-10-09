@@ -11,8 +11,8 @@ export function GameHUD() {
     return null;
   }
 
-  const xpPercentage = (gameState.experience / gameState.experienceToNextLevel) * 100;
-  const energyPercentage = (gameState.energy / gameState.maxEnergy) * 100;
+  const xpPercentage = (gameState.progression.experience / gameState.progression.experienceToNextLevel) * 100;
+  const energyPercentage = (gameState.resources.energy / gameState.resources.maxEnergy) * 100;
 
   return (
     <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-b from-black/80 via-black/60 to-transparent backdrop-blur-sm">
@@ -22,13 +22,13 @@ export function GameHUD() {
           <div className="flex items-center gap-3 min-w-[200px]">
             <Badge variant="outline" className="bg-purple-500/20 border-purple-500 text-purple-100 px-3 py-1">
               <Star className="w-4 h-4 mr-1" />
-              Nível {gameState.level}
+              Nível {gameState.progression.level}
             </Badge>
 
             <div className="flex-1 max-w-[150px]">
               <div className="flex items-center justify-between text-xs text-gray-300 mb-1">
                 <span>XP</span>
-                <span>{gameState.experience}/{gameState.experienceToNextLevel}</span>
+                <span>{gameState.progression.experience}/{gameState.progression.experienceToNextLevel}</span>
               </div>
               <Progress value={xpPercentage} className="h-2 bg-gray-700">
                 <div
@@ -44,27 +44,27 @@ export function GameHUD() {
             {/* Coins */}
             <div className="flex items-center gap-2 bg-yellow-500/10 border border-yellow-500/30 rounded-lg px-3 py-1.5">
               <Coins className="w-4 h-4 text-yellow-400" />
-              <span className="font-semibold text-yellow-100">{gameState.coins.toLocaleString()}</span>
+              <span className="font-semibold text-yellow-100">{gameState.resources.coins.toLocaleString()}</span>
             </div>
 
             {/* Gems */}
             <div className="flex items-center gap-2 bg-cyan-500/10 border border-cyan-500/30 rounded-lg px-3 py-1.5">
               <Gem className="w-4 h-4 text-cyan-400" />
-              <span className="font-semibold text-cyan-100">{gameState.gems.toLocaleString()}</span>
+              <span className="font-semibold text-cyan-100">{gameState.resources.gems.toLocaleString()}</span>
             </div>
 
             {/* Energy */}
             <div className="flex items-center gap-2 bg-green-500/10 border border-green-500/30 rounded-lg px-3 py-1.5">
               <Zap className="w-4 h-4 text-green-400" />
               <span className="font-semibold text-green-100">
-                {gameState.energy}/{gameState.maxEnergy}
+                {gameState.resources.energy}/{gameState.resources.maxEnergy}
               </span>
             </div>
 
             {/* Reputation */}
             <div className="flex items-center gap-2 bg-orange-500/10 border border-orange-500/30 rounded-lg px-3 py-1.5">
               <Trophy className="w-4 h-4 text-orange-400" />
-              <span className="font-semibold text-orange-100">{gameState.reputation.toLocaleString()}</span>
+              <span className="font-semibold text-orange-100">{gameState.resources.reputation.toLocaleString()}</span>
             </div>
           </div>
 
@@ -86,9 +86,9 @@ export function GameHUD() {
           </div>
 
           {/* Skill Points (if any) */}
-          {gameState.skillPoints > 0 && (
+          {gameState.stats.skillPoints > 0 && (
             <Badge variant="default" className="bg-blue-500 hover:bg-blue-600 cursor-pointer animate-pulse">
-              🎯 {gameState.skillPoints} Skill Point{gameState.skillPoints > 1 ? 's' : ''} disponível
+              🎯 {gameState.stats.skillPoints} Skill Point{gameState.stats.skillPoints > 1 ? 's' : ''} disponível
             </Badge>
           )}
         </div>

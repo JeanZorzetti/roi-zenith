@@ -307,7 +307,7 @@ interface GameState {
 - [x] Tipos TypeScript definidos
 
 ### Frontend (TODO)
-- [ ] Socket.IO client instalado (`npm install socket.io-client`)
+- [x] Socket.IO client instalado (`npm install socket.io-client`)
 - [ ] Conectar ao namespace `/game` no login
 - [ ] Implementar listeners para eventos de jogo
 - [ ] Criar componente GameHUD com level, XP, resources
