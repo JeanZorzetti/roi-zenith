@@ -527,10 +527,13 @@ export const createContact = async (req: Request, res: Response) => {
 
     // Trigger game event (non-blocking)
     if (userId) {
+      console.log(`🎮 Triggering contact created event for user ${userId}`);
       const contactName = `${firstName} ${lastName}`;
       CRMEventHandlers.onContactCreated(userId, newContact.id, contactName).catch(err => {
-        console.error('Error triggering contact created event:', err);
+        console.error('❌ Error triggering contact created event:', err);
       });
+    } else {
+      console.log('⚠️ No userId provided, skipping game event');
     }
 
     res.json({ contact: newContact });

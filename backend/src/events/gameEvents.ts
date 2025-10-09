@@ -27,15 +27,19 @@ export function getSocketIOInstance(): Server {
  */
 export async function onContactCreated(userId: string, contactId: string, contactName: string) {
   try {
+    console.log(`🎮 [onContactCreated] Starting for userId: ${userId}, contactName: ${contactName}`);
     const io = getSocketIOInstance();
+    console.log(`🎮 [onContactCreated] Socket.IO instance obtained`);
 
     // Processar evento no game service
+    console.log(`🎮 [onContactCreated] Calling gameService.processCRMEvent...`);
     const result = await gameService.processCRMEvent(
       userId,
       'CONTACT_CREATED',
       contactId,
       { contactName }
     );
+    console.log(`🎮 [onContactCreated] Game service result:`, result);
 
     // Emitir eventos via WebSocket
     GameEvents.contactCreated(io, userId, {

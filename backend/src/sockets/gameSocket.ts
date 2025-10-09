@@ -43,8 +43,10 @@ export function setupGameSocket(io: Server) {
 
 // Helper function to emit game events to specific users
 export function emitGameEvent(io: Server, userId: string, event: string, data: any) {
+  console.log(`🎮 [emitGameEvent] Emitting '${event}' to user ${userId} in room game:${userId}`);
   const gameNamespace = io.of('/game');
   gameNamespace.to(`game:${userId}`).emit(event, data);
+  console.log(`🎮 [emitGameEvent] Event '${event}' emitted successfully`);
 }
 
 // Specific game event emitters
