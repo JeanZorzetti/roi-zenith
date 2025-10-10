@@ -11,10 +11,10 @@ const notificationIcons = {
 };
 
 const notificationColors = {
-  success: 'border-green-500 bg-green-500/10 text-green-100',
-  info: 'border-blue-500 bg-blue-500/10 text-blue-100',
-  warning: 'border-yellow-500 bg-yellow-500/10 text-yellow-100',
-  error: 'border-red-500 bg-red-500/10 text-red-100',
+  success: 'border-green-500 bg-green-800 text-white',
+  info: 'border-blue-500 bg-blue-800 text-white',
+  warning: 'border-yellow-500 bg-yellow-800 text-gray-900',
+  error: 'border-red-500 bg-red-800 text-white',
 };
 
 function GameNotificationItem({ notification }: { notification: GameNotification }) {
@@ -38,7 +38,7 @@ function GameNotificationItem({ notification }: { notification: GameNotification
           <X className="h-4 w-4" />
         </button>
       </AlertTitle>
-      <AlertDescription className="text-sm opacity-90">
+      <AlertDescription className="text-sm font-medium">
         {notification.message}
       </AlertDescription>
 
