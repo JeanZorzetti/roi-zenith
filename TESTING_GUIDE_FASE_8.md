@@ -9,12 +9,12 @@
 
 Antes de iniciar os testes em produção:
 
-- [ ] Aplicação está deployada e acessível via URL de produção
-- [ ] Backend está rodando corretamente (verificar health check)
-- [ ] Database está operacional e conectado
-- [ ] Usuário de teste está criado e autenticado
-- [ ] Console do navegador está aberto (F12) para monitorar requisições
-- [ ] Logs do servidor estão sendo monitorados (Vercel/Railway logs)
+- [x] Aplicação está deployada e acessível via URL de produção
+- [x] Backend está rodando corretamente (verificar health check)
+- [x] Database está operacional e conectado
+- [x] Usuário de teste está criado e autenticado
+- [x] Console do navegador está aberto (F12) para monitorar requisições
+- [x] Logs do servidor estão sendo monitorados (Vercel/Railway logs)
 
 ### URLs de Produção
 
