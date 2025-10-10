@@ -471,7 +471,7 @@ const CRMPage = () => {
                 >
                   {pipelines.map(pipeline => (
                     <option key={pipeline.id} value={pipeline.id}>
-                      {pipeline.title}
+                      {pipeline.type === 'MARKET_RESEARCH' ? '🔍 ' : '💰 '}{pipeline.title}
                     </option>
                   ))}
                 </select>
@@ -671,10 +671,27 @@ const CRMPage = () => {
                                 opacity: snapshot.isDragging ? 0.8 : 1
                               }}
                             >
+                              {/* Header com Badge de Tipo */}
                               <div className="flex items-start justify-between mb-3">
-                                <h4 className="font-semibold flex-1" style={{ color: currentTheme.colors.text }}>
-                                  {deal.title}
-                                </h4>
+                                <div className="flex-1">
+                                  <div className="flex items-center space-x-2 mb-1">
+                                    <h4 className="font-semibold" style={{ color: currentTheme.colors.text }}>
+                                      {deal.title}
+                                    </h4>
+                                    {/* Badge: Research vs Sales */}
+                                    {deal.researchType === 'MARKET_RESEARCH' ? (
+                                      <span className="px-2 py-0.5 text-xs font-semibold rounded-full flex items-center space-x-1" style={{ backgroundColor: '#3b82f620', color: '#3b82f6' }}>
+                                        <span>🔍</span>
+                                        <span>Research</span>
+                                      </span>
+                                    ) : (
+                                      <span className="px-2 py-0.5 text-xs font-semibold rounded-full flex items-center space-x-1" style={{ backgroundColor: '#10b98120', color: '#10b981' }}>
+                                        <span>💰</span>
+                                        <span>Sales</span>
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
                                 <div className="flex items-center space-x-1">
                                   <button
                                     onClick={(e) => {
@@ -700,13 +717,79 @@ const CRMPage = () => {
                               </div>
 
                               <div className="space-y-2 text-sm">
-                                <div className="flex items-center justify-between">
-                                  <span style={{ color: currentTheme.colors.textMuted }}>Valor:</span>
-                                  <span className="font-bold" style={{ color: currentTheme.colors.success }}>
-                                    {formatCurrency(Number(deal.value))}
-                                  </span>
-                                </div>
+                                {/* Campos específicos de Market Research */}
+                                {deal.researchType === 'MARKET_RESEARCH' ? (
+                                  <>
+                                    {/* Qualification Score Progress Bar */}
+                                    <div>
+                                      <div className="flex items-center justify-between mb-1">
+                                        <span className="text-xs" style={{ color: currentTheme.colors.textMuted }}>Qualification Score:</span>
+                                        <span className="text-xs font-semibold" style={{ color: deal.qualificationScore >= 70 ? currentTheme.colors.success : currentTheme.colors.warning }}>
+                                          {deal.qualificationScore || 0}%
+                                        </span>
+                                      </div>
+                                      <div className="w-full h-2 rounded-full" style={{ backgroundColor: currentTheme.colors.border }}>
+                                        <div
+                                          className="h-2 rounded-full transition-all"
+                                          style={{
+                                            width: `${deal.qualificationScore || 0}%`,
+                                            backgroundColor: deal.qualificationScore >= 70 ? currentTheme.colors.success : currentTheme.colors.warning
+                                          }}
+                                        ></div>
+                                      </div>
+                                    </div>
 
+                                    {/* Target Profile Badge */}
+                                    {deal.targetProfile && (
+                                      <div className="flex items-center justify-between">
+                                        <span className="text-xs" style={{ color: currentTheme.colors.textMuted }}>Target:</span>
+                                        <span className="px-2 py-0.5 text-xs rounded" style={{ backgroundColor: currentTheme.colors.primary + '20', color: currentTheme.colors.primary }}>
+                                          {deal.targetProfile.replace('_', ' ')}
+                                        </span>
+                                      </div>
+                                    )}
+
+                                    {/* Pain Points Count */}
+                                    {deal.painPointsList && deal.painPointsList.length > 0 && (
+                                      <div className="flex items-center justify-between">
+                                        <span className="text-xs" style={{ color: currentTheme.colors.textMuted }}>Pain Points:</span>
+                                        <span className="text-xs font-semibold" style={{ color: currentTheme.colors.error }}>
+                                          {deal.painPointsList.length} descobertos
+                                        </span>
+                                      </div>
+                                    )}
+                                  </>
+                                ) : (
+                                  <>
+                                    {/* Campos de Sales (já existentes) */}
+                                    <div className="flex items-center justify-between">
+                                      <span style={{ color: currentTheme.colors.textMuted }}>Valor:</span>
+                                      <span className="font-bold" style={{ color: currentTheme.colors.success }}>
+                                        {formatCurrency(Number(deal.value))}
+                                      </span>
+                                    </div>
+
+                                    {deal.expectedCloseDate && (
+                                      <div className="flex items-center space-x-2">
+                                        <Calendar className="h-4 w-4" style={{ color: currentTheme.colors.textMuted }} />
+                                        <span style={{ color: currentTheme.colors.text }}>
+                                          {new Date(deal.expectedCloseDate).toLocaleDateString('pt-BR')}
+                                        </span>
+                                      </div>
+                                    )}
+
+                                    <div className="pt-2 border-t" style={{ borderColor: currentTheme.colors.border }}>
+                                      <div className="flex items-center justify-between">
+                                        <span className="text-xs" style={{ color: currentTheme.colors.textMuted }}>Probabilidade:</span>
+                                        <span className="text-xs font-semibold" style={{ color: currentTheme.colors.primary }}>
+                                          {deal.probability}%
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </>
+                                )}
+
+                                {/* Campos comuns a ambos */}
                                 {deal.company && (
                                   <div className="flex items-center space-x-2">
                                     <Building2 className="h-4 w-4" style={{ color: currentTheme.colors.textMuted }} />
@@ -722,24 +805,6 @@ const CRMPage = () => {
                                     </span>
                                   </div>
                                 )}
-
-                                {deal.expectedCloseDate && (
-                                  <div className="flex items-center space-x-2">
-                                    <Calendar className="h-4 w-4" style={{ color: currentTheme.colors.textMuted }} />
-                                    <span style={{ color: currentTheme.colors.text }}>
-                                      {new Date(deal.expectedCloseDate).toLocaleDateString('pt-BR')}
-                                    </span>
-                                  </div>
-                                )}
-
-                                <div className="pt-2 border-t" style={{ borderColor: currentTheme.colors.border }}>
-                                  <div className="flex items-center justify-between">
-                                    <span className="text-xs" style={{ color: currentTheme.colors.textMuted }}>Probabilidade:</span>
-                                    <span className="text-xs font-semibold" style={{ color: currentTheme.colors.primary }}>
-                                      {deal.probability}%
-                                    </span>
-                                  </div>
-                                </div>
                               </div>
                             </div>
                           )}
