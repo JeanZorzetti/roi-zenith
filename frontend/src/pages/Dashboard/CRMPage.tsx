@@ -555,6 +555,20 @@ const CRMPage = () => {
                     </option>
                   ))}
                 </select>
+                {pipelines.length > 1 && (
+                  <button
+                    onClick={() => deletePipeline(currentPipelineId)}
+                    className="p-1.5 rounded-lg border transition-all hover:opacity-80"
+                    style={{
+                      backgroundColor: currentTheme.colors.error + '10',
+                      borderColor: currentTheme.colors.error,
+                      color: currentTheme.colors.error
+                    }}
+                    title="Excluir pipeline atual"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                )}
               </div>
               <button
                 onClick={openCreatePipelineModal}
