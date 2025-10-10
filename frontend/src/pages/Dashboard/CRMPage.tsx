@@ -65,7 +65,20 @@ const CRMPage = () => {
     probability: 0,
     expectedCloseDate: '',
     companyId: '',
-    contactId: ''
+    contactId: '',
+    // Market Research fields
+    researchType: 'SALES' as 'MARKET_RESEARCH' | 'SALES',
+    targetProfile: '' as 'B2B_ENTERPRISE' | 'B2B_SMB' | 'B2C' | '',
+    marketSegment: '',
+    companySizeTarget: '',
+    budgetRangeMin: 0,
+    budgetRangeMax: 0,
+    decisionMakerIdentified: false,
+    decisionMakerName: '',
+    decisionMakerRole: '',
+    qualificationScore: 0,
+    researchNotes: '',
+    painPointsList: [] as string[]
   });
 
   // Pipeline form state
@@ -159,7 +172,20 @@ const CRMPage = () => {
       probability: 0,
       expectedCloseDate: '',
       companyId: '',
-      contactId: ''
+      contactId: '',
+      // Market Research fields
+      researchType: 'SALES',
+      targetProfile: '',
+      marketSegment: '',
+      companySizeTarget: '',
+      budgetRangeMin: 0,
+      budgetRangeMax: 0,
+      decisionMakerIdentified: false,
+      decisionMakerName: '',
+      decisionMakerRole: '',
+      qualificationScore: 0,
+      researchNotes: '',
+      painPointsList: []
     });
     setShowDealModal(true);
   };
@@ -177,7 +203,20 @@ const CRMPage = () => {
       probability: deal.probability,
       expectedCloseDate: deal.expectedCloseDate || '',
       companyId: deal.companyId || '',
-      contactId: deal.contactId || ''
+      contactId: deal.contactId || '',
+      // Market Research fields
+      researchType: deal.researchType || 'SALES',
+      targetProfile: deal.targetProfile || '',
+      marketSegment: deal.marketSegment || '',
+      companySizeTarget: deal.companySizeTarget || '',
+      budgetRangeMin: deal.budgetRangeMin || 0,
+      budgetRangeMax: deal.budgetRangeMax || 0,
+      decisionMakerIdentified: deal.decisionMakerIdentified || false,
+      decisionMakerName: deal.decisionMakerName || '',
+      decisionMakerRole: deal.decisionMakerRole || '',
+      qualificationScore: deal.qualificationScore || 0,
+      researchNotes: deal.researchNotes || '',
+      painPointsList: deal.painPointsList || []
     });
     setShowDealModal(true);
   };
@@ -893,7 +932,182 @@ const CRMPage = () => {
                 />
               </div>
 
-              {/* Value and Probability */}
+              {/* Research Type */}
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: currentTheme.colors.text }}>
+                  Tipo de Negócio *
+                </label>
+                <select
+                  value={dealForm.researchType}
+                  onChange={(e) => setDealForm({ ...dealForm, researchType: e.target.value as 'MARKET_RESEARCH' | 'SALES' })}
+                  className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2"
+                  style={{
+                    backgroundColor: currentTheme.colors.input,
+                    borderColor: currentTheme.colors.border,
+                    color: currentTheme.colors.text
+                  }}
+                >
+                  <option value="SALES">💰 Sales (Vendas)</option>
+                  <option value="MARKET_RESEARCH">🔍 Market Research (Pesquisa de Mercado)</option>
+                </select>
+              </div>
+
+              {/* Campos dinâmicos baseados em researchType */}
+              {dealForm.researchType === 'MARKET_RESEARCH' ? (
+                <>
+                  {/* Market Research Fields */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-2" style={{ color: currentTheme.colors.text }}>
+                        Target Profile
+                      </label>
+                      <select
+                        value={dealForm.targetProfile}
+                        onChange={(e) => setDealForm({ ...dealForm, targetProfile: e.target.value as any })}
+                        className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2"
+                        style={{
+                          backgroundColor: currentTheme.colors.input,
+                          borderColor: currentTheme.colors.border,
+                          color: currentTheme.colors.text
+                        }}
+                      >
+                        <option value="">Selecione...</option>
+                        <option value="B2B_ENTERPRISE">B2B Enterprise</option>
+                        <option value="B2B_SMB">B2B SMB</option>
+                        <option value="B2C">B2C</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-2" style={{ color: currentTheme.colors.text }}>
+                        Segmento de Mercado
+                      </label>
+                      <input
+                        type="text"
+                        value={dealForm.marketSegment}
+                        onChange={(e) => setDealForm({ ...dealForm, marketSegment: e.target.value })}
+                        className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2"
+                        style={{
+                          backgroundColor: currentTheme.colors.input,
+                          borderColor: currentTheme.colors.border,
+                          color: currentTheme.colors.text
+                        }}
+                        placeholder="Ex: SaaS, E-commerce..."
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-2" style={{ color: currentTheme.colors.text }}>
+                        Budget Mínimo (R$)
+                      </label>
+                      <input
+                        type="number"
+                        value={dealForm.budgetRangeMin}
+                        onChange={(e) => setDealForm({ ...dealForm, budgetRangeMin: Number(e.target.value) })}
+                        className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2"
+                        style={{
+                          backgroundColor: currentTheme.colors.input,
+                          borderColor: currentTheme.colors.border,
+                          color: currentTheme.colors.text
+                        }}
+                        placeholder="0.00"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-2" style={{ color: currentTheme.colors.text }}>
+                        Budget Máximo (R$)
+                      </label>
+                      <input
+                        type="number"
+                        value={dealForm.budgetRangeMax}
+                        onChange={(e) => setDealForm({ ...dealForm, budgetRangeMax: Number(e.target.value) })}
+                        className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2"
+                        style={{
+                          backgroundColor: currentTheme.colors.input,
+                          borderColor: currentTheme.colors.border,
+                          color: currentTheme.colors.text
+                        }}
+                        placeholder="0.00"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="flex items-center space-x-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={dealForm.decisionMakerIdentified}
+                        onChange={(e) => setDealForm({ ...dealForm, decisionMakerIdentified: e.target.checked })}
+                        className="w-4 h-4 rounded"
+                      />
+                      <span className="text-sm font-medium" style={{ color: currentTheme.colors.text }}>
+                        Decision Maker Identificado
+                      </span>
+                    </label>
+                  </div>
+
+                  {dealForm.decisionMakerIdentified && (
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium mb-2" style={{ color: currentTheme.colors.text }}>
+                          Nome do Decision Maker
+                        </label>
+                        <input
+                          type="text"
+                          value={dealForm.decisionMakerName}
+                          onChange={(e) => setDealForm({ ...dealForm, decisionMakerName: e.target.value })}
+                          className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2"
+                          style={{
+                            backgroundColor: currentTheme.colors.input,
+                            borderColor: currentTheme.colors.border,
+                            color: currentTheme.colors.text
+                          }}
+                          placeholder="Nome completo"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium mb-2" style={{ color: currentTheme.colors.text }}>
+                          Cargo do Decision Maker
+                        </label>
+                        <input
+                          type="text"
+                          value={dealForm.decisionMakerRole}
+                          onChange={(e) => setDealForm({ ...dealForm, decisionMakerRole: e.target.value })}
+                          className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2"
+                          style={{
+                            backgroundColor: currentTheme.colors.input,
+                            borderColor: currentTheme.colors.border,
+                            color: currentTheme.colors.text
+                          }}
+                          placeholder="Ex: CEO, CTO..."
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2" style={{ color: currentTheme.colors.text }}>
+                      Notas de Pesquisa
+                    </label>
+                    <textarea
+                      value={dealForm.researchNotes}
+                      onChange={(e) => setDealForm({ ...dealForm, researchNotes: e.target.value })}
+                      rows={3}
+                      className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 resize-none"
+                      style={{
+                        backgroundColor: currentTheme.colors.input,
+                        borderColor: currentTheme.colors.border,
+                        color: currentTheme.colors.text
+                      }}
+                      placeholder="Observações sobre a pesquisa de mercado..."
+                    />
+                  </div>
+                </>
+              ) : (
+                <>
+                  {/* Sales Fields */}
+                  {/* Value and Probability */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-2" style={{ color: currentTheme.colors.text }}>
