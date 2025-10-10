@@ -15,17 +15,21 @@ import {
   Trash2,
   Settings,
   GitBranch,
-  Palette
+  Palette,
+  Users
 } from 'lucide-react';
 import { crmService } from '../../services/crmService';
 import { Deal, Pipeline, PipelineStage, Company, Contact } from '../../types/CRM';
 import { useCRMTheme } from '../../contexts/CRMThemeContext';
 import { themes } from '../../themes/themes';
+import { ContactsList } from '../../components/crm/ContactsList';
+import { ContactModal } from '../../components/crm/ContactModal';
 
 const CRMPage = () => {
   const { currentTheme, setTheme, themeId } = useCRMTheme();
 
   // State
+  const [activeTab, setActiveTab] = useState<'pipeline' | 'contacts'>('pipeline');
   const [pipelines, setPipelines] = useState<Pipeline[]>([]);
   const [currentPipelineId, setCurrentPipelineId] = useState<string>('');
   const [deals, setDeals] = useState<Deal[]>([]);
@@ -37,6 +41,8 @@ const CRMPage = () => {
   const [editingDeal, setEditingDeal] = useState<Deal | null>(null);
   const [showPipelineModal, setShowPipelineModal] = useState(false);
   const [editingPipeline, setEditingPipeline] = useState<Pipeline | null>(null);
+  const [showContactModal, setShowContactModal] = useState(false);
+  const [editingContact, setEditingContact] = useState<Contact | null>(null);
 
   // State para scroll horizontal com drag
   const [isDragging, setIsDragging] = useState(false);
@@ -341,6 +347,53 @@ const CRMPage = () => {
     }
   };
 
+  // Contact management functions
+  const openCreateContactModal = () => {
+    setEditingContact(null);
+    setShowContactModal(true);
+  };
+
+  const openEditContactModal = (contact: Contact) => {
+    setEditingContact(contact);
+    setShowContactModal(true);
+  };
+
+  const saveContact = async (contactData: Omit<Contact, 'id' | 'createdAt' | 'updatedAt'>) => {
+    try {
+      if (editingContact) {
+        const success = await crmService.updateContact(editingContact.id, contactData);
+        if (success) {
+          await loadData();
+          setShowContactModal(false);
+          setEditingContact(null);
+        }
+      } else {
+        const newContact = await crmService.createContact(contactData);
+        if (newContact) {
+          await loadData();
+          setShowContactModal(false);
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao salvar contato:', error);
+      alert('Erro ao salvar contato');
+    }
+  };
+
+  const deleteContact = async (contactId: string) => {
+    if (!confirm('Tem certeza que deseja excluir este contato?')) return;
+
+    try {
+      const success = await crmService.deleteContact(contactId);
+      if (success) {
+        await loadData();
+      }
+    } catch (error) {
+      console.error('Erro ao excluir contato:', error);
+      alert('Erro ao excluir contato');
+    }
+  };
+
   // Calculate pipeline metrics
   const totalValue = deals.reduce((sum, deal) => sum + Number(deal.value), 0);
   const lastStage = currentPipeline?.stages[currentPipeline.stages.length - 1];
@@ -365,10 +418,43 @@ const CRMPage = () => {
         <div className="flex items-center justify-between mb-4">
           <div className="flex-1">
             <h1 className="text-3xl font-bold mb-2" style={{ color: currentTheme.colors.text }}>
-              CRM - Pipeline de Vendas
+              CRM - {activeTab === 'pipeline' ? 'Pipeline de Vendas' : 'Contatos'}
             </h1>
+
+            {/* Tab Navigation */}
+            <div className="flex items-center space-x-2 mb-3">
+              <button
+                onClick={() => setActiveTab('pipeline')}
+                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all ${
+                  activeTab === 'pipeline' ? 'font-semibold' : 'hover:opacity-70'
+                }`}
+                style={{
+                  backgroundColor: activeTab === 'pipeline' ? currentTheme.colors.primary : 'transparent',
+                  color: activeTab === 'pipeline' ? '#ffffff' : currentTheme.colors.textMuted
+                }}
+              >
+                <GitBranch className="h-4 w-4" />
+                <span>Pipeline</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('contacts')}
+                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all ${
+                  activeTab === 'contacts' ? 'font-semibold' : 'hover:opacity-70'
+                }`}
+                style={{
+                  backgroundColor: activeTab === 'contacts' ? currentTheme.colors.primary : 'transparent',
+                  color: activeTab === 'contacts' ? '#ffffff' : currentTheme.colors.textMuted
+                }}
+              >
+                <Users className="h-4 w-4" />
+                <span>Contatos</span>
+              </button>
+            </div>
+
             <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
+              {activeTab === 'pipeline' && (
+                <>
+                  <div className="flex items-center space-x-2">
                 <GitBranch className="h-5 w-5" style={{ color: currentTheme.colors.textMuted }} />
                 <select
                   value={currentPipelineId}
@@ -421,6 +507,22 @@ const CRMPage = () => {
                   ))}
                 </select>
               </div>
+                </>
+              )}
+              {activeTab === 'contacts' && (
+                <button
+                  onClick={openCreateContactModal}
+                  className="flex items-center space-x-2 px-3 py-1.5 rounded-lg border transition-all hover:opacity-80"
+                  style={{
+                    backgroundColor: currentTheme.colors.primary,
+                    borderColor: currentTheme.colors.primary,
+                    color: '#ffffff'
+                  }}
+                >
+                  <Plus className="h-4 w-4" />
+                  <span className="text-sm">Novo Contato</span>
+                </button>
+              )}
             </div>
           </div>
 
@@ -442,25 +544,28 @@ const CRMPage = () => {
         </div>
 
         {/* Search */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5" style={{ color: currentTheme.colors.textMuted }} />
-          <input
-            type="text"
-            placeholder="Buscar negócios..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 rounded-lg border focus:outline-none focus:ring-2"
-            style={{
-              backgroundColor: currentTheme.colors.input,
-              borderColor: currentTheme.colors.border,
-              color: currentTheme.colors.text
-            }}
-          />
-        </div>
+        {activeTab === 'pipeline' && (
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5" style={{ color: currentTheme.colors.textMuted }} />
+            <input
+              type="text"
+              placeholder="Buscar negócios..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 rounded-lg border focus:outline-none focus:ring-2"
+              style={{
+                backgroundColor: currentTheme.colors.input,
+                borderColor: currentTheme.colors.border,
+                color: currentTheme.colors.text
+              }}
+            />
+          </div>
+        )}
       </div>
 
-      {/* Pipeline */}
-      <div
+      {/* Pipeline View */}
+      {activeTab === 'pipeline' && (
+        <div
         ref={scrollContainerRef}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
@@ -648,7 +753,19 @@ const CRMPage = () => {
             ))}
           </div>
         </DragDropContext>
-      </div>
+        </div>
+      )}
+
+      {/* Contacts View */}
+      {activeTab === 'contacts' && (
+        <div className="flex-1 overflow-y-auto p-6" style={{ backgroundColor: currentTheme.colors.background }}>
+          <ContactsList
+            contacts={contacts}
+            onEdit={openEditContactModal}
+            onDelete={deleteContact}
+          />
+        </div>
+      )}
 
       {/* Deal Modal */}
       {showDealModal && (
@@ -1017,6 +1134,18 @@ const CRMPage = () => {
           </div>
         </div>
       )}
+
+      {/* Contact Modal */}
+      <ContactModal
+        isOpen={showContactModal}
+        onClose={() => {
+          setShowContactModal(false);
+          setEditingContact(null);
+        }}
+        onSave={saveContact}
+        contact={editingContact}
+        companies={companies}
+      />
     </div>
   );
 };
