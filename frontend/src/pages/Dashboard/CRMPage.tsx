@@ -162,7 +162,22 @@ const CRMPage = () => {
     setDeals(updatedDeals);
 
     // Update backend
-    await crmService.moveDeal(draggableId, newStageId, destination.index);
+    try {
+      const success = await crmService.moveDeal(draggableId, newStageId, destination.index);
+      if (!success) {
+        console.error('❌ Failed to persist deal move to backend');
+        // Revert local state on failure
+        setDeals(deals);
+        alert('Erro ao mover o card. Tente novamente.');
+      } else {
+        console.log('✅ Deal moved successfully to backend:', { dealId: draggableId, stageId: newStageId, position: destination.index });
+      }
+    } catch (error) {
+      console.error('❌ Error moving deal:', error);
+      // Revert local state on error
+      setDeals(deals);
+      alert('Erro ao mover o card. Tente novamente.');
+    }
   };
 
   // Open modal to create deal

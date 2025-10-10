@@ -312,6 +312,8 @@ class CRMService {
 
   async moveDeal(dealId: string, stageId: string, position: number): Promise<boolean> {
     try {
+      console.log('🔄 [crmService.moveDeal] Moving deal:', { dealId, stageId, position });
+
       const response = await fetch(`${API_BASE_URL}/deals/${dealId}/move`, {
         method: 'PATCH',
         headers: {
@@ -321,9 +323,16 @@ class CRMService {
         body: JSON.stringify({ stageId, position }),
       });
 
+      console.log('🔄 [crmService.moveDeal] Response status:', response.status);
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('🔄 [crmService.moveDeal] Error response:', errorData);
+      }
+
       return response.ok;
     } catch (error) {
-      console.error('Error moving deal:', error);
+      console.error('🔄 [crmService.moveDeal] Network error:', error);
       return false;
     }
   }
