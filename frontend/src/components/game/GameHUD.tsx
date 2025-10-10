@@ -1,5 +1,4 @@
 import { useGameStore } from '@/stores/gameStore';
-import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Coins, Gem, Zap, Trophy, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -30,12 +29,12 @@ export function GameHUD() {
                 <span>XP</span>
                 <span>{gameState.progression.experience}/{gameState.progression.experienceToNextLevel}</span>
               </div>
-              <Progress value={xpPercentage} className="h-2 bg-gray-700">
+              <div className="relative h-2 w-full overflow-hidden rounded-full bg-gray-700">
                 <div
                   className="h-full bg-gradient-to-r from-purple-500 to-purple-600 transition-all duration-500 ease-out rounded-full"
                   style={{ width: `${xpPercentage}%` }}
                 />
-              </Progress>
+              </div>
             </div>
           </div>
 
@@ -73,7 +72,7 @@ export function GameHUD() {
             <Zap className="w-4 h-4 text-green-400" />
             <div className="flex-1">
               <div className="text-xs text-gray-300 mb-1">Energia</div>
-              <Progress value={energyPercentage} className="h-1.5 bg-gray-700">
+              <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-gray-700">
                 <div
                   className={cn(
                     "h-full transition-all duration-300 rounded-full",
@@ -81,7 +80,7 @@ export function GameHUD() {
                   )}
                   style={{ width: `${energyPercentage}%` }}
                 />
-              </Progress>
+              </div>
             </div>
           </div>
 
