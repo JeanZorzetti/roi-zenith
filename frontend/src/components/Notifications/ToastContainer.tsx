@@ -56,15 +56,15 @@ const ToastItem: React.FC<ToastItemProps> = ({ toast, onClose }) => {
   const getColorClasses = () => {
     switch (toast.type) {
       case 'success':
-        return 'bg-green-900/90 border-green-500 text-white';
+        return 'bg-green-800 border-green-500 text-white';
       case 'info':
-        return 'bg-blue-900/90 border-blue-500 text-white';
+        return 'bg-blue-800 border-blue-500 text-white';
       case 'warning':
-        return 'bg-yellow-900/90 border-yellow-500 text-white';
+        return 'bg-yellow-800 border-yellow-500 text-gray-900';
       case 'error':
-        return 'bg-red-900/90 border-red-500 text-white';
+        return 'bg-red-800 border-red-500 text-white';
       default:
-        return 'bg-gray-900/90 border-gray-500 text-white';
+        return 'bg-gray-800 border-gray-500 text-white';
     }
   };
 
@@ -107,7 +107,7 @@ const ToastItem: React.FC<ToastItemProps> = ({ toast, onClose }) => {
 
         {/* Mensagem */}
         {toast.message && (
-          <div className="text-sm opacity-90 mt-1">
+          <div className="text-sm text-white font-medium mt-1">
             {toast.message}
           </div>
         )}
