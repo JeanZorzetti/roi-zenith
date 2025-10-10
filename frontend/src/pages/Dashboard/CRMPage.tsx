@@ -24,6 +24,8 @@ import { useCRMTheme } from '../../contexts/CRMThemeContext';
 import { themes } from '../../themes/themes';
 import { ContactsList } from '../../components/crm/ContactsList';
 import { ContactModal } from '../../components/crm/ContactModal';
+import PromoteToSalesButton from '../../components/crm/PromoteToSalesButton';
+import PromotionModal from '../../components/crm/PromotionModal';
 
 const CRMPage = () => {
   const { currentTheme, setTheme, themeId } = useCRMTheme();
@@ -43,6 +45,10 @@ const CRMPage = () => {
   const [editingPipeline, setEditingPipeline] = useState<Pipeline | null>(null);
   const [showContactModal, setShowContactModal] = useState(false);
   const [editingContact, setEditingContact] = useState<Contact | null>(null);
+  const [showPromotionModal, setShowPromotionModal] = useState(false);
+  const [promotingDeal, setPromotingDeal] = useState<Deal | null>(null);
+  const [promotionEligibility, setPromotionEligibility] = useState<any>(null);
+  const [isPromoting, setIsPromoting] = useState(false);
 
   // State para scroll horizontal com drag
   const [isDragging, setIsDragging] = useState(false);
@@ -430,6 +436,41 @@ const CRMPage = () => {
     } catch (error) {
       console.error('Erro ao excluir contato:', error);
       alert('Erro ao excluir contato');
+    }
+  };
+
+  // Promotion to Sales functions
+  const handlePromoteClick = async (deal: Deal) => {
+    setPromotingDeal(deal);
+
+    // Check eligibility
+    const eligibility = await crmService.checkPromotionEligibility(deal.id);
+    setPromotionEligibility(eligibility);
+    setShowPromotionModal(true);
+  };
+
+  const confirmPromotion = async () => {
+    if (!promotingDeal) return;
+
+    setIsPromoting(true);
+    try {
+      const result = await crmService.promoteDealToSales(promotingDeal.id);
+      if (result.success) {
+        // Refresh data
+        await loadData();
+        setShowPromotionModal(false);
+        setPromotingDeal(null);
+        setPromotionEligibility(null);
+        // Show success message
+        alert('Lead promovido para Sales com sucesso! 🎉');
+      } else {
+        alert('Erro ao promover lead: ' + result.error);
+      }
+    } catch (error) {
+      console.error('Erro ao promover deal:', error);
+      alert('Erro ao promover lead para Sales');
+    } finally {
+      setIsPromoting(false);
     }
   };
 
@@ -845,6 +886,18 @@ const CRMPage = () => {
                                   </div>
                                 )}
                               </div>
+
+                              {/* Promote to Sales Button */}
+                              {deal.researchType === 'MARKET_RESEARCH' && (
+                                <div className="mt-3 pt-3 border-t" style={{ borderColor: currentTheme.colors.border }}>
+                                  <PromoteToSalesButton
+                                    deal={deal}
+                                    isLastStage={deal.stageId === lastStage?.id}
+                                    onClick={() => handlePromoteClick(deal)}
+                                    theme={currentTheme}
+                                  />
+                                </div>
+                              )}
                             </div>
                           )}
                         </Draggable>
@@ -1472,6 +1525,21 @@ const CRMPage = () => {
         onSave={saveContact}
         contact={editingContact}
         companies={companies}
+      />
+
+      {/* Promotion Modal */}
+      <PromotionModal
+        isOpen={showPromotionModal}
+        onClose={() => {
+          setShowPromotionModal(false);
+          setPromotingDeal(null);
+          setPromotionEligibility(null);
+        }}
+        onConfirm={confirmPromotion}
+        deal={promotingDeal}
+        eligibility={promotionEligibility}
+        theme={currentTheme}
+        isLoading={isPromoting}
       />
     </div>
   );

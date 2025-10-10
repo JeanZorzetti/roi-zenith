@@ -294,41 +294,41 @@ Transformar o CRM atual (focado em Sales) em um sistema híbrido que suporte:
 
 ---
 
-### 🎨 FASE 7: FRONTEND - PROMOTE TO SALES
-**Status**: ⏸️ Não Iniciado
+### ✅ FASE 7: FRONTEND - PROMOTE TO SALES
+**Status**: ✅ Concluída
 **Objetivo**: Implementar funcionalidade de promoção Research → Sales
 
-#### Task 7.1: Criar componente PromoteToSalesButton
-- [ ] Criar `frontend/src/components/crm/PromoteToSalesButton.tsx`
-- [ ] Exibir apenas se:
-  - Deal.researchType === MARKET_RESEARCH
-  - Deal está na última etapa do pipeline de Research
-- [ ] Ao clicar, chamar `crmService.checkPromotionEligibility(dealId)`
-- [ ] Se não elegível: mostrar modal com critérios não atendidos
-- [ ] Se elegível: mostrar modal de confirmação
+#### Task 7.1: Criar componente PromoteToSalesButton ✅
+- [x] Criar `frontend/src/components/crm/PromoteToSalesButton.tsx` ✅
+- [x] Exibir apenas se: ✅
+  - Deal.researchType === MARKET_RESEARCH ✅
+  - Deal está na última etapa do pipeline de Research ✅
+- [x] Ao clicar, chamar `crmService.checkPromotionEligibility(dealId)` ✅
+- [x] Se não elegível: mostrar modal com critérios não atendidos ✅
+- [x] Se elegível: mostrar modal de confirmação ✅
 
-#### Task 7.2: Criar componente PromotionModal
-- [ ] Criar `frontend/src/components/crm/PromotionModal.tsx`
-- [ ] Exibir checklist de critérios:
-  - ✅ Qualification Score >= 70
-  - ✅ Pain Points: X descobertos
-  - ✅ Decision Maker identificado
-  - ✅ Budget range definido
-- [ ] Preview do deal que será criado no Sales pipeline
-- [ ] Botão "Confirm Promotion"
-- [ ] Ao confirmar: chamar `crmService.promoteDealToSales(dealId)`
-- [ ] Mostrar notificação de gamificação (já implementado via socket)
-- [ ] Refresh da página/pipelines após promoção
+#### Task 7.2: Criar componente PromotionModal ✅
+- [x] Criar `frontend/src/components/crm/PromotionModal.tsx` ✅
+- [x] Exibir checklist de critérios: ✅
+  - ✅ Qualification Score >= 70 ✅
+  - ✅ Pain Points: X descobertos ✅
+  - ✅ Decision Maker identificado ✅
+  - ✅ Budget range definido ✅
+- [x] Preview do deal que será criado no Sales pipeline ✅
+- [x] Botão "Confirm Promotion" ✅
+- [x] Ao confirmar: chamar `crmService.promoteDealToSales(dealId)` ✅
+- [x] Mostrar notificação de gamificação (já implementado via socket) ✅
+- [x] Refresh da página/pipelines após promoção ✅
 
-#### Task 7.3: Integrar na Deal Card
-- [ ] Adicionar PromoteToSalesButton no card (canto superior direito ou footer)
-- [ ] Estilo destacado (botão dourado/épico)
-- [ ] Tooltip: "Promover para Vendas 🚀"
+#### Task 7.3: Integrar na Deal Card ✅
+- [x] Adicionar PromoteToSalesButton no card (footer com border-top) ✅
+- [x] Estilo destacado (botão gradient laranja/dourado) ✅
+- [x] Tooltip: "Promover para Vendas 🚀" ✅
 
 **Arquivos afetados:**
-- `frontend/src/components/crm/PromoteToSalesButton.tsx` (novo)
-- `frontend/src/components/crm/PromotionModal.tsx` (novo)
-- `frontend/src/pages/Dashboard/CRMPage.tsx`
+- `frontend/src/components/crm/PromoteToSalesButton.tsx` (novo) ✅
+- `frontend/src/components/crm/PromotionModal.tsx` (novo) ✅
+- `frontend/src/pages/Dashboard/CRMPage.tsx` ✅
 
 ---
 
@@ -486,8 +486,8 @@ Para um lead ser promovido de Market Research para Sales, deve atender **TODOS**
 ### Fase 6: Frontend - Dual Pipeline UI ✅
 - [x] 3/3 tarefas completas (100%)
 
-### Fase 7: Frontend - Promote to Sales
-- [ ] 0/3 tarefas completas (0%)
+### Fase 7: Frontend - Promote to Sales ✅
+- [x] 3/3 tarefas completas (100%)
 
 ### Fase 8: Testes e Refinamento
 - [ ] 0/8 tarefas completas (0%)
@@ -497,7 +497,7 @@ Para um lead ser promovido de Market Research para Sales, deve atender **TODOS**
 
 ---
 
-**PROGRESSO TOTAL: 28/41 tarefas completas (68.3%)** 🚀
+**PROGRESSO TOTAL: 31/41 tarefas completas (75.6%)** 🚀
 
 ---
 
@@ -509,6 +509,7 @@ Para um lead ser promovido de Market Research para Sales, deve atender **TODOS**
 - Promoção cria novo deal (não modifica o original) para manter histórico
 - Eventos de gamificação são non-blocking (não falham a operação de CRM se derem erro)
 - UI diferenciada para Research vs Sales com badges visuais e campos específicos
+- Botão de promoção só aparece em deals de Market Research na última etapa do pipeline
 
 ### Melhorias Futuras (pós-MVP)
 - Analytics de conversão Research → Sales
@@ -516,9 +517,8 @@ Para um lead ser promovido de Market Research para Sales, deve atender **TODOS**
 - Auto-qualification usando AI/scoring
 - Templates de entrevista
 - Integração com LinkedIn para enrichment de dados
-- Campos dinâmicos completos no Deal Modal para Market Research
 
 ---
 
-**Última atualização:** 2025-01-10 00:45 UTC
-**Versão:** 1.5 - FASE 0, FASE 1, FASE 2, FASE 3, FASE 4, FASE 5 e FASE 6 concluídas ✅
+**Última atualização:** 2025-01-10 01:15 UTC
+**Versão:** 1.6 - FASE 0, FASE 1, FASE 2, FASE 3, FASE 4, FASE 5, FASE 6 e FASE 7 concluídas ✅
