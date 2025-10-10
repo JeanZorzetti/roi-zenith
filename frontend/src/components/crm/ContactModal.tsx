@@ -143,7 +143,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({
               type="text"
               value={formData.firstName}
               onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none ${
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 bg-white ${
                 errors.firstName ? 'border-red-500' : 'border-gray-300'
               }`}
               placeholder="João"
@@ -164,7 +164,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({
               type="text"
               value={formData.lastName}
               onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none ${
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 bg-white ${
                 errors.lastName ? 'border-red-500' : 'border-gray-300'
               }`}
               placeholder="Silva"
@@ -184,7 +184,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({
               type="email"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none ${
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 bg-white ${
                 errors.email ? 'border-red-500' : 'border-gray-300'
               }`}
               placeholder="joao@empresa.com"
@@ -204,7 +204,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({
               type="tel"
               value={formData.phone}
               onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 bg-white"
               placeholder="(11) 99999-9999"
               disabled={loading}
             />
@@ -219,7 +219,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({
               type="text"
               value={formData.position}
               onChange={(e) => setFormData({ ...formData, position: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 bg-white"
               placeholder="Gerente de TI"
               disabled={loading}
             />
@@ -233,7 +233,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({
             <select
               value={formData.companyId}
               onChange={(e) => setFormData({ ...formData, companyId: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 bg-white"
               disabled={loading}
             >
               <option value="">Selecione uma empresa</option>
@@ -254,7 +254,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none text-gray-900 bg-white"
               placeholder="Informações adicionais sobre o contato..."
               disabled={loading}
             />
