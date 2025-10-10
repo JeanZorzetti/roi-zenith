@@ -1210,6 +1210,54 @@ const CRMPage = () => {
                   </select>
                 </div>
               </div>
+                </>
+              )}
+
+              {/* Company and Contact - Campos comuns */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2" style={{ color: currentTheme.colors.text }}>
+                    Empresa
+                  </label>
+                  <select
+                    value={dealForm.companyId}
+                    onChange={(e) => setDealForm({ ...dealForm, companyId: e.target.value })}
+                    className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2"
+                    style={{
+                      backgroundColor: currentTheme.colors.input,
+                      borderColor: currentTheme.colors.border,
+                      color: currentTheme.colors.text
+                    }}
+                  >
+                    <option value="">Selecione...</option>
+                    {companies.map(company => (
+                      <option key={company.id} value={company.id}>{company.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2" style={{ color: currentTheme.colors.text }}>
+                    Contato
+                  </label>
+                  <select
+                    value={dealForm.contactId}
+                    onChange={(e) => setDealForm({ ...dealForm, contactId: e.target.value })}
+                    className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2"
+                    style={{
+                      backgroundColor: currentTheme.colors.input,
+                      borderColor: currentTheme.colors.border,
+                      color: currentTheme.colors.text
+                    }}
+                  >
+                    <option value="">Selecione...</option>
+                    {contacts.map(contact => (
+                      <option key={contact.id} value={contact.id}>
+                        {contact.firstName} {contact.lastName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
             </div>
 
             <div className="p-6 border-t flex justify-end space-x-3" style={{ borderColor: currentTheme.colors.border }}>
