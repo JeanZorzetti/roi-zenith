@@ -1038,7 +1038,7 @@ const CRMPage = () => {
               {dealForm.researchType === 'MARKET_RESEARCH' ? (
                 <>
                   {/* Market Research Fields */}
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-3 gap-4">
                     <div>
                       <label className="block text-sm font-medium mb-2" style={{ color: currentTheme.colors.text }}>
                         Target Profile
@@ -1075,6 +1075,29 @@ const CRMPage = () => {
                         }}
                         placeholder="Ex: SaaS, E-commerce..."
                       />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-2" style={{ color: currentTheme.colors.text }}>
+                        Company Size Target
+                      </label>
+                      <select
+                        value={dealForm.companySizeTarget}
+                        onChange={(e) => setDealForm({ ...dealForm, companySizeTarget: e.target.value })}
+                        className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2"
+                        style={{
+                          backgroundColor: currentTheme.colors.input,
+                          borderColor: currentTheme.colors.border,
+                          color: currentTheme.colors.text
+                        }}
+                      >
+                        <option value="">Selecione...</option>
+                        <option value="1-10">1-10 funcionários</option>
+                        <option value="11-50">11-50 funcionários</option>
+                        <option value="51-200">51-200 funcionários</option>
+                        <option value="201-500">201-500 funcionários</option>
+                        <option value="501-1000">501-1000 funcionários</option>
+                        <option value="1000+">1000+ funcionários</option>
+                      </select>
                     </div>
                   </div>
 
@@ -1167,6 +1190,57 @@ const CRMPage = () => {
                       </div>
                     </div>
                   )}
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2" style={{ color: currentTheme.colors.text }}>
+                      Pain Points List
+                    </label>
+                    <div className="space-y-2">
+                      {dealForm.painPointsList.map((painPoint, index) => (
+                        <div key={index} className="flex items-center space-x-2">
+                          <input
+                            type="text"
+                            value={painPoint}
+                            onChange={(e) => {
+                              const newPainPoints = [...dealForm.painPointsList];
+                              newPainPoints[index] = e.target.value;
+                              setDealForm({ ...dealForm, painPointsList: newPainPoints });
+                            }}
+                            className="flex-1 px-4 py-2 rounded-lg border focus:outline-none focus:ring-2"
+                            style={{
+                              backgroundColor: currentTheme.colors.input,
+                              borderColor: currentTheme.colors.border,
+                              color: currentTheme.colors.text
+                            }}
+                            placeholder="Descreva o pain point..."
+                          />
+                          <button
+                            onClick={() => {
+                              const newPainPoints = dealForm.painPointsList.filter((_, i) => i !== index);
+                              setDealForm({ ...dealForm, painPointsList: newPainPoints });
+                            }}
+                            className="p-2 rounded-lg hover:opacity-80"
+                            style={{ color: currentTheme.colors.error }}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      ))}
+                      <button
+                        onClick={() => {
+                          setDealForm({ ...dealForm, painPointsList: [...dealForm.painPointsList, ''] });
+                        }}
+                        className="w-full py-2 px-3 rounded-lg border transition-all hover:opacity-80 flex items-center justify-center space-x-2"
+                        style={{
+                          borderColor: currentTheme.colors.border,
+                          color: currentTheme.colors.textMuted
+                        }}
+                      >
+                        <Plus className="h-4 w-4" />
+                        <span className="text-sm">Adicionar Pain Point (+5 pontos cada)</span>
+                      </button>
+                    </div>
+                  </div>
 
                   <div>
                     <label className="block text-sm font-medium mb-2" style={{ color: currentTheme.colors.text }}>
