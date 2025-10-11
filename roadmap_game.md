@@ -1048,14 +1048,14 @@ Boss Battles:
 └─ [👌] Victory rewards (guaranteed epic+)
 ```
 
-#### Week 4: Equipment + Party + Quests ⏳ 30% COMPLETA
+#### Week 4: Equipment + Party + Quests ⏳ 50% COMPLETA
 
 **Objetivos:**
 
 - ✅ Sistema de inventário completo
-- ⏳ Equipamentos funcionais (falta item database)
+- ✅ Equipamentos funcionais (falta item database)
 - ⏳ Party system (2-3 NPCs)
-- ⏳ Quest system básico
+- ✅ Quest system básico
 
 **Tasks:**
 
@@ -1093,12 +1093,12 @@ Party System:
 └─ [ ] Backend: POST /api/game/recruit
 
 Quest System:
-├─ [ ] Criar QuestSystem.ts:
+├─ [👌] Criar QuestSystem.ts:
 │  ├─ getActiveQuests()
 │  ├─ updateQuestProgress()
 │  ├─ completeQuest()
 │  └─ claimRewards()
-├─ [ ] Quest UI:
+├─ [👌] Quest UI:
 │  ├─ Active quests list
 │  ├─ Progress bars
 │  ├─ Objectives checklist
@@ -1107,7 +1107,7 @@ Quest System:
 │  ├─ Main quest (5 capítulos)
 │  ├─ Daily quests (4-5)
 │  └─ Weekly challenges (3)
-└─ [ ] Auto-track de progresso (hooks em ações)
+└─ [👌] Auto-track de progresso (hooks em ações)
 ```
 
 #### Deliverable Fase 2:
@@ -1336,12 +1336,12 @@ Status: ✅ 100% completo - MVP totalmente funcional!
 ```
 Critérios de Sucesso:
 ├─ [👌] Todos territórios exploráveis (Week 3 completa!)
-├─ [⏳] Todos sistemas implementados (Week 4 30% completa)
+├─ [⏳] Todos sistemas implementados (Week 4 50% completa)
 ├─ [ ] Main quest completa (Week 4)
 └─ [ ] Conteúdo para 1-2 meses (Week 4)
 
 KPI: 1 vendedora consegue jogar por 1 semana sem repetição
-Status: Week 3 (100%) ✅ | Week 4 (30%) ⏳ - Equipment System pronto!
+Status: Week 3 (100%) ✅ | Week 4 (50%) ⏳ - Equipment + Quest Systems prontos!
 ```
 
 ### Milestone 3: Production Ready (Fim Semana 6)
