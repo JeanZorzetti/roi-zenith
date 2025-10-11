@@ -1011,40 +1011,40 @@ Socket.IO Client Integration:
 
 ```
 World Map:
-├─ [ ] Implementar WorldMapScene.ts completo:
+├─ [👌] Implementar WorldMapScene.ts completo:
 │  ├─ Renderizar 6 territórios
 │  ├─ Navegação entre territórios
 │  ├─ Estados: locked, unlocked, completed
 │  ├─ Visual: pixel art map
 │  └─ Hover info (nome, level, leads count)
-├─ [ ] Sistema de unlock de territórios:
+├─ [👌] Sistema de unlock de territórios:
 │  ├─ Check reputation requirement
 │  └─ Unlock animation
-└─ [ ] Territory detail view:
+└─ [👌] Territory detail view:
    ├─ Leads disponíveis (lista)
    ├─ Progress bar (exploração)
    └─ Boss status
 
 Exploration:
-├─ [ ] Ações de exploração:
+├─ [👌] Ações de exploração:
 │  ├─ Cold Outreach (10 energy)
 │  ├─ Network Event (20 energy)
 │  ├─ Indicação (5 energy)
 │  └─ Inbound (automático)
-├─ [ ] Lead generation:
+├─ [👌] Lead generation:
 │  ├─ Random lead spawning
 │  ├─ Lead quality (cold/warm/hot)
 │  └─ Lead visual no mapa
 └─ [ ] Backend: POST /api/game/explore
 
 Boss Battles:
-├─ [ ] Boss variants:
+├─ [👌] Boss variants:
 │  ├─ 6 bosses (1 por território)
 │  ├─ Stats elevados (HP, objeções)
 │  └─ Mechanics especiais
-├─ [ ] Unlock condition (80% território)
-├─ [ ] Boss battle scene (igual batalha normal mas harder)
-└─ [ ] Victory rewards (guaranteed epic+)
+├─ [👌] Unlock condition (80% território)
+├─ [👌] Boss battle scene (igual batalha normal mas harder)
+└─ [👌] Victory rewards (guaranteed epic+)
 ```
 
 #### Week 4: Equipment + Party + Quests
