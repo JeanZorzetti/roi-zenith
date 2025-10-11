@@ -65,11 +65,11 @@ const PromotionModal: React.FC<PromotionModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
       <div
-        className="w-full max-w-2xl rounded-lg shadow-2xl"
+        className="w-full max-w-2xl rounded-lg shadow-2xl max-h-[90vh] flex flex-col"
         style={{ backgroundColor: theme.colors.cardBg }}
       >
         {/* Header */}
-        <div className="p-6 border-b" style={{ borderColor: theme.colors.border }}>
+        <div className="p-6 border-b flex-shrink-0" style={{ borderColor: theme.colors.border }}>
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div
@@ -102,7 +102,7 @@ const PromotionModal: React.FC<PromotionModalProps> = ({
         </div>
 
         {/* Content */}
-        <div className="p-6 space-y-6">
+        <div className="p-6 space-y-6 overflow-y-auto flex-1">
           {/* Criteria Checklist */}
           <div>
             <h3 className="text-lg font-semibold mb-4" style={{ color: theme.colors.text }}>
@@ -238,7 +238,7 @@ const PromotionModal: React.FC<PromotionModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t flex justify-end space-x-3" style={{ borderColor: theme.colors.border }}>
+        <div className="p-6 border-t flex justify-end space-x-3 flex-shrink-0" style={{ borderColor: theme.colors.border }}>
           <button
             onClick={onClose}
             className="px-4 py-2 rounded-lg border"
