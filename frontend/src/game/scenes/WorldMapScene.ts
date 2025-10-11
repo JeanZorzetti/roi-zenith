@@ -65,11 +65,11 @@ export class WorldMapScene extends Phaser.Scene {
     }).setOrigin(0.5);
 
     // Inventory button (top right)
-    const invBtn = this.add.rectangle(width - 120, 50, 140, 50, 0x1e293b, 0.9);
+    const invBtn = this.add.rectangle(width - 280, 50, 140, 50, 0x1e293b, 0.9);
     invBtn.setStrokeStyle(2, 0x3b82f6);
     invBtn.setInteractive({ useHandCursor: true });
 
-    const invText = this.add.text(width - 120, 50, '📦 Inventário', {
+    const invText = this.add.text(width - 280, 50, '📦 Inventário', {
       fontSize: '14px',
       color: COLORS.textLight,
       fontFamily: 'Arial, sans-serif'
@@ -85,6 +85,29 @@ export class WorldMapScene extends Phaser.Scene {
 
     invBtn.on('pointerout', () => {
       invBtn.setFillStyle(0x1e293b, 0.9);
+    });
+
+    // Quests button (top right, next to inventory)
+    const questBtn = this.add.rectangle(width - 120, 50, 140, 50, 0x1e293b, 0.9);
+    questBtn.setStrokeStyle(2, 0x3b82f6);
+    questBtn.setInteractive({ useHandCursor: true });
+
+    const questText = this.add.text(width - 120, 50, '📜 Quests', {
+      fontSize: '14px',
+      color: COLORS.textLight,
+      fontFamily: 'Arial, sans-serif'
+    }).setOrigin(0.5);
+
+    questBtn.on('pointerdown', () => {
+      this.scene.start(SCENE_KEYS.QUESTS);
+    });
+
+    questBtn.on('pointerover', () => {
+      questBtn.setFillStyle(0x2d3748);
+    });
+
+    questBtn.on('pointerout', () => {
+      questBtn.setFillStyle(0x1e293b, 0.9);
     });
   }
 

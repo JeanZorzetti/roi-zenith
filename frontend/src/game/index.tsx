@@ -6,6 +6,7 @@ import { TerritoryDetailScene } from './scenes/TerritoryDetailScene';
 import { UIScene } from './scenes/UIScene';
 import { BattleScene } from './scenes/BattleScene';
 import { InventoryScene } from './scenes/InventoryScene';
+import { QuestScene } from './scenes/QuestScene';
 import { GAME_CONFIG } from './config/gameConfig';
 
 export class MarketResearchGame {
@@ -27,6 +28,7 @@ export class MarketResearchGame {
         TerritoryDetailScene,
         BattleScene,
         InventoryScene,
+        QuestScene,
         UIScene
       ],
       scale: {
