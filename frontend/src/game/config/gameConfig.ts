@@ -24,7 +24,12 @@ export const COLORS = {
   text: '#e4e4e7',
   textSecondary: '#9ca3af',
   textMuted: '#9ca3af',
-  border: '#374151'
+  textLight: '#e4e4e7',
+  textDim: '#6b7280',
+  border: '#374151',
+  accent: '#3b82f6',
+  panelDark: '#16213e',
+  panelLight: '#1e293b'
 };
 
 export const SCENE_KEYS = {
@@ -33,5 +38,8 @@ export const SCENE_KEYS = {
   WORLD_MAP: 'WorldMapScene',
   TERRITORY_DETAIL: 'TerritoryDetailScene',
   BATTLE: 'BattleScene',
+  INVENTORY: 'InventoryScene',
+  PARTY: 'PartyScene',
+  QUESTS: 'QuestScene',
   UI: 'UIScene'
 };

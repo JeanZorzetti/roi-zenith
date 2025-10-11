@@ -63,6 +63,29 @@ export class WorldMapScene extends Phaser.Scene {
       color: COLORS.textSecondary,
       fontFamily: 'Arial, sans-serif'
     }).setOrigin(0.5);
+
+    // Inventory button (top right)
+    const invBtn = this.add.rectangle(width - 120, 50, 140, 50, 0x1e293b, 0.9);
+    invBtn.setStrokeStyle(2, 0x3b82f6);
+    invBtn.setInteractive({ useHandCursor: true });
+
+    const invText = this.add.text(width - 120, 50, '📦 Inventário', {
+      fontSize: '14px',
+      color: COLORS.textLight,
+      fontFamily: 'Arial, sans-serif'
+    }).setOrigin(0.5);
+
+    invBtn.on('pointerdown', () => {
+      this.scene.start(SCENE_KEYS.INVENTORY);
+    });
+
+    invBtn.on('pointerover', () => {
+      invBtn.setFillStyle(0x2d3748);
+    });
+
+    invBtn.on('pointerout', () => {
+      invBtn.setFillStyle(0x1e293b, 0.9);
+    });
   }
 
   private initializeTerritories(): void {
