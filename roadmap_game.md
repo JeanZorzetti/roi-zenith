@@ -1035,7 +1035,7 @@ Exploration:
 │  ├─ Random lead spawning
 │  ├─ Lead quality (cold/warm/hot)
 │  └─ Lead visual no mapa
-└─ [ ] Backend: POST /api/game/explore
+└─ [👌] Backend: POST /api/game/explore
 
 Boss Battles:
 ├─ [👌] Boss variants:
