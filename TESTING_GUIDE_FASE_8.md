@@ -364,16 +364,16 @@ Testar fluxo completo de promoção Research → Sales em produção
 - [x] Barra de progresso anima
 
 ### Database
-- [ ] Contatos são salvos corretamente
-- [ ] Deals são criados no pipeline correto
-- [ ] Deal original é marcado como promovido (promotedToSales: true)
-- [ ] Novo deal tem referência ao original (promotedFromDealId)
+- [x] Contatos são salvos corretamente
+- [x] Deals são criados no pipeline correto
+- [x] Deal original é marcado como promovido (promotedToSales: true)
+- [x] Novo deal tem referência ao original (promotedFromDealId)
 
 ### Logs e Monitoramento
-- [ ] Logs do backend estão acessíveis
-- [ ] Eventos de gamificação são registrados
-- [ ] Erros são capturados (se houver)
-- [ ] Performance é aceitável (< 2s load time)
+- [x] Logs do backend estão acessíveis
+- [x] Eventos de gamificação são registrados
+- [x] Erros são capturados (se houver)
+- [x] Performance é aceitável (< 2s load time)
 
 ---
 
