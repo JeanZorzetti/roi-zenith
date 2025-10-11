@@ -1,7 +1,7 @@
 // Game configuration constants
 export const GAME_CONFIG = {
-  width: 800,
-  height: 600,
+  width: 1200,
+  height: 800,
   backgroundColor: '#1a1a2e',
   pixelArt: true,
   physics: {

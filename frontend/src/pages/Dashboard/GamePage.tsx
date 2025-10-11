@@ -69,26 +69,10 @@ const GamePage: React.FC = () => {
 
   return (
     <div
-      className="min-h-screen flex flex-col items-center justify-center p-8"
+      className="min-h-screen flex flex-col items-center justify-center p-4"
       style={{ backgroundColor: currentTheme.colors.background }}
     >
-      {/* Header */}
-      <div className="mb-8 text-center">
-        <h1
-          className="text-4xl font-bold mb-2"
-          style={{ color: currentTheme.colors.text }}
-        >
-          🎮 Market Research Quest
-        </h1>
-        <p
-          className="text-lg"
-          style={{ color: currentTheme.colors.textMuted }}
-        >
-          Transforme ações do CRM em progresso no jogo
-        </p>
-      </div>
-
-      {/* Game Container */}
+      {/* Game Container - Larger and centered */}
       <div
         className="rounded-lg shadow-2xl overflow-hidden border-4"
         style={{
