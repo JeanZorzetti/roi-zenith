@@ -145,8 +145,8 @@ export class BattleScene extends Phaser.Scene {
     // Player panel (right) - moved down more
     this.createPlayerPanel(width * 0.75, 200);
 
-    // Battle log (center) - centered horizontally, moved down
-    this.createBattleLog(width / 2, 360);
+    // Battle log (center) - centered horizontally, moved down more
+    this.createBattleLog(width / 2, 420);
 
     // Action cards (bottom)
     this.createActionCards(width, height);
