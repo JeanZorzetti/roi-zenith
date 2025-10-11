@@ -31,6 +31,7 @@ export const SCENE_KEYS = {
   BOOT: 'BootScene',
   MENU: 'MenuScene',
   WORLD_MAP: 'WorldMapScene',
+  TERRITORY_DETAIL: 'TerritoryDetailScene',
   BATTLE: 'BattleScene',
   UI: 'UIScene'
 };

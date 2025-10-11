@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { BootScene } from './scenes/BootScene';
 import { MenuScene } from './scenes/MenuScene';
 import { WorldMapScene } from './scenes/WorldMapScene';
+import { TerritoryDetailScene } from './scenes/TerritoryDetailScene';
 import { UIScene } from './scenes/UIScene';
 import { BattleScene } from './scenes/BattleScene';
 import { GAME_CONFIG } from './config/gameConfig';
@@ -22,6 +23,7 @@ export class MarketResearchGame {
         BootScene,
         MenuScene,
         WorldMapScene,
+        TerritoryDetailScene,
         BattleScene,
         UIScene
       ],

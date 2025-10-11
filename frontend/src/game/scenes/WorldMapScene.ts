@@ -340,38 +340,9 @@ export class WorldMapScene extends Phaser.Scene {
     console.log(`🎮 [WorldMapScene] Entering territory: ${territory.name}`);
     this.hideTooltip();
 
-    // For now, launch a test battle for Varejo
-    if (territory.id === 'varejo') {
-      this.scene.pause(SCENE_KEYS.WORLD_MAP);
-      this.scene.launch(SCENE_KEYS.BATTLE, {
-        leadName: 'João Silva',
-        leadCompany: 'Loja ABC',
-        leadLevel: 5,
-        contactId: 'test-contact-id',
-        dealId: 'test-deal-id',
-        territoryId: territory.id
-      });
-    } else {
-      // TODO: Launch TerritoryDetailScene for other territories
-      console.log(`🚧 [WorldMapScene] Territory detail view not implemented yet for ${territory.name}`);
-
-      // Placeholder: Show a message
-      const message = this.add.text(600, 400,
-        `${territory.emoji} ${territory.name}\n\nTerritório em desenvolvimento!\nEm breve você poderá explorá-lo.`,
-        {
-          fontSize: '16px',
-          color: '#ffffff',
-          fontFamily: 'Arial, sans-serif',
-          align: 'center',
-          backgroundColor: '#1a1a2e',
-          padding: { x: 20, y: 20 }
-        }
-      ).setOrigin(0.5);
-
-      this.time.delayedCall(2000, () => {
-        message.destroy();
-      });
-    }
+    // Launch TerritoryDetailScene for all territories
+    this.scene.pause(SCENE_KEYS.WORLD_MAP);
+    this.scene.launch(SCENE_KEYS.TERRITORY_DETAIL, territory);
   }
 
   private createInstructions(width: number, height: number): void {
