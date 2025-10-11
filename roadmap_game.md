@@ -1048,28 +1048,29 @@ Boss Battles:
 └─ [👌] Victory rewards (guaranteed epic+)
 ```
 
-#### Week 4: Equipment + Party + Quests
+#### Week 4: Equipment + Party + Quests ⏳ 30% COMPLETA
 
 **Objetivos:**
-- Sistema de inventário completo
-- Equipamentos funcionais
-- Party system (2-3 NPCs)
-- Quest system básico
+
+- ✅ Sistema de inventário completo
+- ⏳ Equipamentos funcionais (falta item database)
+- ⏳ Party system (2-3 NPCs)
+- ⏳ Quest system básico
 
 **Tasks:**
 
 ```
 Equipment System:
-├─ [ ] Criar InventorySystem.ts:
+├─ [👌] Criar InventorySystem.ts:
 │  ├─ addItem()
 │  ├─ equipItem()
 │  ├─ unequipItem()
 │  └─ calculateEquippedStats()
-├─ [ ] Inventory UI:
+├─ [👌] Inventory UI:
 │  ├─ Item list
 │  ├─ Equipment slots (5 slots)
 │  ├─ Item details/tooltip
-│  └─ Equip/unequip drag-and-drop
+│  └─ Equip/unequip (click)
 ├─ [ ] Item database (20-30 items):
 │  ├─ 5 rarities (common → mythic)
 │  ├─ Stats por item
@@ -1335,12 +1336,12 @@ Status: ✅ 100% completo - MVP totalmente funcional!
 ```
 Critérios de Sucesso:
 ├─ [👌] Todos territórios exploráveis (Week 3 completa!)
-├─ [ ] Todos sistemas implementados (falta Week 4)
+├─ [⏳] Todos sistemas implementados (Week 4 30% completa)
 ├─ [ ] Main quest completa (Week 4)
 └─ [ ] Conteúdo para 1-2 meses (Week 4)
 
 KPI: 1 vendedora consegue jogar por 1 semana sem repetição
-Status: Week 3 (50% completa) ✅ | Week 4 (0%) ⏳
+Status: Week 3 (100%) ✅ | Week 4 (30%) ⏳ - Equipment System pronto!
 ```
 
 ### Milestone 3: Production Ready (Fim Semana 6)
