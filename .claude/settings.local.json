@@ -49,7 +49,8 @@
       "Bash(cat:*)",
       "Bash(python3:*)",
       "Bash(git revert:*)",
-      "Bash(bash:*)"
+      "Bash(bash:*)",
+      "Bash(Todos os negócios associados serão perdidos!\"\n- 🛡️ Proteção contra exclusão do último pipeline\n\n## Stack Técnico:\n- **Backend:** Endpoint DELETE /api/crm/pipelines/:pipelineId (já existia)\n- **Frontend Service:** crmService.deletePipeline() (já existia - linhas 111-126)\n- **UI Component:** CRMPage.tsx (botão adicionado)\n- **Ícone:** Lucide React (Trash2)\n\n## Arquivos Modificados:\n- frontend/src/pages/Dashboard/CRMPage.tsx (linhas 558-571)\n\n## Resultado:\n🎯 Usuários agora podem excluir pipelines facilmente através de um botão intuitivo\n🛡️ Com proteção para não excluir o último pipeline\n⚠️ Com confirmação para evitar exclusões acidentais\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")"
     ],
     "deny": [],
     "ask": []

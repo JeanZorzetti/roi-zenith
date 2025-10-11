@@ -464,12 +464,12 @@ const CRMPage = () => {
     setShowPromotionModal(true);
   };
 
-  const confirmPromotion = async () => {
+  const confirmPromotion = async (targetPipelineId: string) => {
     if (!promotingDeal) return;
 
     setIsPromoting(true);
     try {
-      const result = await crmService.promoteDealToSales(promotingDeal.id);
+      const result = await crmService.promoteDealToSales(promotingDeal.id, targetPipelineId);
       if (result.success) {
         // Refresh data
         await loadData();
@@ -477,7 +477,7 @@ const CRMPage = () => {
         setPromotingDeal(null);
         setPromotionEligibility(null);
         // Show success message
-        alert('Lead promovido para Sales com sucesso! 🎉');
+        alert('Lead movido para Sales com sucesso! 🎉');
       } else {
         alert('Erro ao promover lead: ' + result.error);
       }
@@ -570,6 +570,32 @@ const CRMPage = () => {
                     </option>
                   ))}
                 </select>
+                <button
+                  onClick={() => {
+                    const pipeline = pipelines.find(p => p.id === currentPipelineId);
+                    if (pipeline) {
+                      setEditingPipeline(pipeline);
+                      setPipelineForm({
+                        title: pipeline.title,
+                        description: pipeline.description || '',
+                        color: pipeline.color,
+                        isDefault: pipeline.isDefault,
+                        position: pipeline.position,
+                        stages: pipeline.stages.map(s => ({ title: s.title, color: s.color }))
+                      });
+                      setShowPipelineModal(true);
+                    }
+                  }}
+                  className="p-1.5 rounded-lg border transition-all hover:opacity-80"
+                  style={{
+                    backgroundColor: currentTheme.colors.primary + '10',
+                    borderColor: currentTheme.colors.primary,
+                    color: currentTheme.colors.primary
+                  }}
+                  title="Editar pipeline atual"
+                >
+                  <Edit2 className="h-4 w-4" />
+                </button>
                 {pipelines.length > 1 && (
                   <button
                     onClick={() => deletePipeline(currentPipelineId)}
@@ -1643,6 +1669,7 @@ const CRMPage = () => {
         eligibility={promotionEligibility}
         theme={currentTheme}
         isLoading={isPromoting}
+        salesPipelines={pipelines.filter(p => p.type === 'SALES')}
       />
     </div>
   );

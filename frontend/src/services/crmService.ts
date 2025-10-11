@@ -608,10 +608,10 @@ class CRMService {
   /**
    * Promove um lead de Market Research para Sales Pipeline
    */
-  async promoteDealToSales(dealId: string): Promise<{ success: boolean; salesDeal?: Deal; error?: string }> {
+  async promoteDealToSales(dealId: string, targetPipelineId?: string): Promise<{ success: boolean; deal?: Deal; error?: string }> {
     try {
       const userId = this.getUserId();
-      console.log('🎮 [crmService.promoteDealToSales] Promoting deal:', dealId, 'userId:', userId);
+      console.log('🎮 [crmService.promoteDealToSales] Moving deal:', dealId, 'to pipeline:', targetPipelineId, 'userId:', userId);
 
       const response = await fetch(`${API_BASE_URL}/deals/${dealId}/promote`, {
         method: 'POST',
@@ -619,7 +619,7 @@ class CRMService {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
-        body: JSON.stringify({ userId }),
+        body: JSON.stringify({ userId, targetPipelineId }),
       });
 
       console.log('🎮 [crmService.promoteDealToSales] Response status:', response.status);
@@ -627,12 +627,12 @@ class CRMService {
       if (!response.ok) {
         const errorData = await response.json();
         console.error('🎮 [crmService.promoteDealToSales] Error:', errorData);
-        return { success: false, error: errorData.error || 'Failed to promote deal' };
+        return { success: false, error: errorData.error || 'Failed to move deal' };
       }
 
       const data = await response.json();
       console.log('🎮 [crmService.promoteDealToSales] Success:', data);
-      return { success: true, salesDeal: data.salesDeal };
+      return { success: true, deal: data.deal };
     } catch (error) {
       console.error('Error promoting deal to sales:', error);
       return { success: false, error: 'Network error' };

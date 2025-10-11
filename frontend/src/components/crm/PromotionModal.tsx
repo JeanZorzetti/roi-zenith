@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { X, CheckCircle, XCircle, AlertCircle, TrendingUp } from 'lucide-react';
-import { Deal } from '../../types/CRM';
+import { Deal, Pipeline } from '../../types/CRM';
 
 interface PromotionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: () => void;
+  onConfirm: (targetPipelineId: string) => void;
   deal: Deal | null;
   eligibility: {
     eligible: boolean;
@@ -18,6 +18,7 @@ interface PromotionModalProps {
   } | null;
   theme: any;
   isLoading?: boolean;
+  salesPipelines?: Pipeline[];
 }
 
 const PromotionModal: React.FC<PromotionModalProps> = ({
@@ -27,8 +28,13 @@ const PromotionModal: React.FC<PromotionModalProps> = ({
   deal,
   eligibility,
   theme,
-  isLoading = false
+  isLoading = false,
+  salesPipelines = []
 }) => {
+  const [selectedPipelineId, setSelectedPipelineId] = useState<string>(
+    salesPipelines[0]?.id || ''
+  );
+
   if (!isOpen || !deal || !eligibility) return null;
 
   const criteriaList = [
@@ -134,6 +140,34 @@ const PromotionModal: React.FC<PromotionModalProps> = ({
             </div>
           </div>
 
+          {/* Seleção de Pipeline de Destino */}
+          {eligibility.eligible && salesPipelines.length > 0 && (
+            <div>
+              <label className="block text-sm font-medium mb-2" style={{ color: theme.colors.text }}>
+                Pipeline de Destino *
+              </label>
+              <select
+                value={selectedPipelineId}
+                onChange={(e) => setSelectedPipelineId(e.target.value)}
+                className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2"
+                style={{
+                  backgroundColor: theme.colors.input,
+                  borderColor: theme.colors.border,
+                  color: theme.colors.text
+                }}
+              >
+                {salesPipelines.map(pipeline => (
+                  <option key={pipeline.id} value={pipeline.id}>
+                    💰 {pipeline.title}
+                  </option>
+                ))}
+              </select>
+              <p className="text-xs mt-1" style={{ color: theme.colors.textMuted }}>
+                O deal será MOVIDO (não copiado) para a primeira etapa desta pipeline
+              </p>
+            </div>
+          )}
+
           {/* Preview do Deal no Sales Pipeline */}
           {eligibility.eligible && (
             <div
@@ -218,19 +252,19 @@ const PromotionModal: React.FC<PromotionModalProps> = ({
           </button>
           {eligibility.eligible && (
             <button
-              onClick={onConfirm}
-              disabled={isLoading}
+              onClick={() => onConfirm(selectedPipelineId)}
+              disabled={isLoading || !selectedPipelineId}
               className="px-6 py-2 rounded-lg font-semibold transition-all hover:scale-105"
               style={{
-                background: isLoading
+                background: isLoading || !selectedPipelineId
                   ? theme.colors.textMuted
                   : 'linear-gradient(135deg, #f59e0b 0%, #f97316 100%)',
                 color: '#ffffff',
                 border: '2px solid #fbbf24',
-                opacity: isLoading ? 0.6 : 1
+                opacity: isLoading || !selectedPipelineId ? 0.6 : 1
               }}
             >
-              {isLoading ? 'Promovendo...' : 'Confirmar Promoção 🚀'}
+              {isLoading ? 'Promovendo...' : 'Mover para Sales 🚀'}
             </button>
           )}
         </div>

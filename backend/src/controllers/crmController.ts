@@ -852,7 +852,7 @@ export const deleteActivity = async (req: Request, res: Response) => {
 export const promoteDealToSales = async (req: Request, res: Response) => {
   try {
     const { dealId } = req.params;
-    const { userId } = req.body;
+    const { userId, targetPipelineId } = req.body;
 
     // Get the research deal
     const researchDeal = await prisma.deal.findUnique({
@@ -901,14 +901,9 @@ export const promoteDealToSales = async (req: Request, res: Response) => {
       });
     }
 
-    // Get the Sales pipeline (first one with type SALES or isDefault = true)
+    // Get the target Sales pipeline (or first SALES pipeline if not specified)
     const salesPipeline = await prisma.pipeline.findFirst({
-      where: {
-        OR: [
-          { type: 'SALES' },
-          { isDefault: true }
-        ]
-      },
+      where: targetPipelineId ? { id: targetPipelineId } : { type: 'SALES' },
       include: {
         stages: {
           orderBy: { position: 'asc' }
@@ -917,7 +912,7 @@ export const promoteDealToSales = async (req: Request, res: Response) => {
     });
 
     if (!salesPipeline || salesPipeline.stages.length === 0) {
-      return res.status(500).json({ error: 'No Sales pipeline found' });
+      return res.status(500).json({ error: 'Target Sales pipeline not found' });
     }
 
     const firstSalesStage = salesPipeline.stages[0];
@@ -928,29 +923,28 @@ export const promoteDealToSales = async (req: Request, res: Response) => {
       orderBy: { position: 'desc' }
     });
 
-    // Create new Sales deal with data from Research
-    const salesDeal = await prisma.deal.create({
+    // MOVE the deal (update existing, not create new)
+    const movedDeal = await prisma.deal.update({
+      where: { id: dealId },
       data: {
-        id: `deal-${Date.now()}`,
-        title: researchDeal.title,
-        description: `[Promoted from Research] ${researchDeal.description || ''}`,
-        value: budgetRangeMin || 0,
-        currency: researchDeal.currency,
+        // Move to Sales pipeline
         pipelineId: salesPipeline.id,
         stageId: firstSalesStage.id,
-        probability: 25, // Initial probability for qualified lead
-        expectedCloseDate: null,
-        companyId: researchDeal.companyId,
-        contactId: researchDeal.contactId,
         position: (lastSalesDeal?.position || 0) + 1,
-        // Sales type
+        // Change type to SALES
         researchType: 'SALES',
+        // Set initial Sales values
+        value: budgetRangeMin || 0,
+        probability: 25, // Initial probability for qualified lead
+        description: `[Promoted from Research] ${researchDeal.description || ''}`,
         // Copy main pain point to painDiscovered
         painDiscovered: painPointsList[0] || null,
         painIntensity: 7, // Default medium-high intensity
         painCategory: researchDeal.marketSegment || 'general',
-        // Keep reference to research
-        promotedFromDealId: researchDeal.id
+        // Mark as promoted
+        promotedToSales: true,
+        promotedFromDealId: researchDeal.id, // Self-reference for tracking
+        updatedAt: new Date()
       },
       include: {
         pipeline: true,
@@ -960,26 +954,17 @@ export const promoteDealToSales = async (req: Request, res: Response) => {
       }
     });
 
-    // Mark research deal as promoted
-    await prisma.deal.update({
-      where: { id: dealId },
-      data: {
-        promotedToSales: true,
-        updatedAt: new Date()
-      }
-    });
-
     // Trigger RESEARCH_TO_SALES_PROMOTION game event
     if (userId) {
       console.log(`🎉 Triggering RESEARCH_TO_SALES_PROMOTION event for user ${userId}`);
-      CRMEventHandlers.onResearchToSalesPromotion(userId, researchDeal.id, salesDeal.id, qualificationScore)
+      CRMEventHandlers.onResearchToSalesPromotion(userId, dealId, dealId, qualificationScore)
         .catch(err => console.error('❌ Error triggering promotion event:', err));
     }
 
     res.json({
-      message: 'Lead promoted to Sales successfully',
-      researchDeal: { id: researchDeal.id, promotedToSales: true },
-      salesDeal
+      success: true,
+      message: 'Lead moved to Sales successfully',
+      deal: movedDeal
     });
   } catch (error) {
     console.error('Error promoting deal to sales:', error);
