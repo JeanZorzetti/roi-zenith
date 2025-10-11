@@ -102,7 +102,7 @@ export class TerritoryDetailScene extends Phaser.Scene {
 
   private createTerritoryInfoPanel(): void {
     const panelX = 150;
-    const panelY = 180;
+    const panelY = 240;
     const panelWidth = 240;
     const panelHeight = 400;
 
@@ -199,7 +199,7 @@ export class TerritoryDetailScene extends Phaser.Scene {
 
   private createLeadsList(): void {
     const listX = 600;
-    const listY = 150;
+    const listY = 190;
     const cardWidth = 480;
     const cardHeight = 80;
 
@@ -321,7 +321,7 @@ export class TerritoryDetailScene extends Phaser.Scene {
 
   private createExplorationPanel(): void {
     const panelX = 1050;
-    const panelY = 180;
+    const panelY = 240;
     const panelWidth = 240;
     const panelHeight = 560;
 
