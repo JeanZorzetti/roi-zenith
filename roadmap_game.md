@@ -882,16 +882,22 @@ Backend Setup:
 │  ├─ levelUp()
 │  └─ processCRMEvent()
 ├─ [👌] Criar gameController.ts
-└─ [ ] Setup Socket.io para real-time events
+└─ [⏳] Setup Socket.io para real-time events (PARCIAL: Socket.IO configurado, gameSocket.ts criado, falta testar real-time em produção)
 
 CRM Integration:
 ├─ [👌] Adicionar campos customizados ao Deal model
-├─ [ ] Criar trigger functions:
-│  ├─ onContactCreated → spawn lead no jogo
-│  ├─ onActivityCreated → trigger batalha
-│  ├─ onDealUpdated (pain fields) → reward resources
-│  └─ onReferralReceived → bonus energy
-└─ [ ] Criar webhook/event system para sincronização
+├─ [👌] Criar trigger functions:
+│  ├─ [👌] onContactCreated → spawn lead no jogo
+│  ├─ [👌] onActivityCreated → trigger batalha
+│  ├─ [👌] onDealUpdated (pain fields) → reward resources
+│  ├─ [👌] onReferralReceived → bonus energy
+│  ├─ [👌] onTargetDiscovered → Market Research
+│  ├─ [👌] onPainMapped → Pain points
+│  ├─ [👌] onDecisionMakerIdentified → DM identificado
+│  ├─ [👌] onLeadQualified → Score >= 70
+│  ├─ [👌] onInterviewCompleted → Entrevista concluída
+│  └─ [👌] onResearchToSalesPromotion → Promoção para vendas
+└─ [⏳] Criar webhook/event system para sincronização (PARCIAL: eventos implementados, falta testar em produção)
 
 Config:
 ├─ [👌] gameConfig.ts com todas constantes:
