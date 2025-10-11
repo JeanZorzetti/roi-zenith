@@ -55,7 +55,17 @@ export class WorldMapScene extends Phaser.Scene {
 
         box.on('pointerdown', () => {
           console.log(`🎮 [WorldMapScene] Entering territory: ${territory.name}`);
-          // TODO: Open territory detail view or start exploration
+          // For now, clicking on Varejo starts a test battle
+          if (territory.name === '🏪 VAREJO') {
+            this.scene.pause(SCENE_KEYS.WORLD_MAP);
+            this.scene.launch(SCENE_KEYS.BATTLE, {
+              leadName: 'João Silva',
+              leadCompany: 'Loja ABC',
+              leadLevel: 5,
+              contactId: 'test-contact-id',
+              dealId: 'test-deal-id'
+            });
+          }
         });
       }
     });

@@ -22,6 +22,7 @@ export const COLORS = {
   background: '#1a1a2e',
   cardBg: '#16213e',
   text: '#e4e4e7',
+  textSecondary: '#9ca3af',
   textMuted: '#9ca3af',
   border: '#374151'
 };

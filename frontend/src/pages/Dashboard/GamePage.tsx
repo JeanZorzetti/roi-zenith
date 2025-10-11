@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { MarketResearchGame } from '../../game';
 import { useTheme } from '../../contexts/ThemeContext';
+import { gameSocketService } from '../../game/services/gameSocketService';
 
 const GamePage: React.FC = () => {
   const gameContainerRef = useRef<HTMLDivElement>(null);
@@ -17,6 +18,9 @@ const GamePage: React.FC = () => {
         gameInstanceRef.current = new MarketResearchGame(gameContainerRef.current);
         setIsLoading(false);
         console.log('🎮 [GamePage] Game initialized successfully');
+
+        // Set game instance in socket service
+        gameSocketService.setGameInstance(gameInstanceRef.current);
       } catch (error) {
         console.error('❌ [GamePage] Error initializing game:', error);
         setIsLoading(false);
@@ -33,14 +37,35 @@ const GamePage: React.FC = () => {
     };
   }, []);
 
-  // TODO: Connect Socket.IO to receive game events
-  // useEffect(() => {
-  //   const socket = io(BACKEND_URL);
-  //   socket.on('game:notification', (data) => {
-  //     // Show notification
-  //   });
-  //   return () => socket.disconnect();
-  // }, []);
+  // Connect Socket.IO to receive game events
+  useEffect(() => {
+    // Get user ID from localStorage (set during login)
+    const userDataStr = localStorage.getItem('user');
+    if (!userDataStr) {
+      console.warn('⚠️ [GamePage] No user data found, skipping Socket.IO connection');
+      return;
+    }
+
+    try {
+      const userData = JSON.parse(userDataStr);
+      const userId = userData.id || userData.userId;
+
+      if (!userId) {
+        console.warn('⚠️ [GamePage] No user ID in userData, skipping Socket.IO connection');
+        return;
+      }
+
+      console.log('🔌 [GamePage] Connecting to game socket...');
+      gameSocketService.connect(userId);
+
+      return () => {
+        console.log('🔌 [GamePage] Disconnecting from game socket...');
+        gameSocketService.disconnect();
+      };
+    } catch (error) {
+      console.error('❌ [GamePage] Error parsing user data:', error);
+    }
+  }, []);
 
   return (
     <div
