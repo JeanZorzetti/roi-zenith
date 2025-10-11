@@ -31,6 +31,9 @@ router.post('/pain-discovered', gameController.painDiscovered);
 router.get('/territory/:territoryId', gameController.getTerritoryProgress);
 router.get('/relationship/:contactId', gameController.getRelationship);
 
+// Exploration
+router.post('/explore', gameController.explore);
+
 // Config (públic data - items, npcs, territories, etc)
 router.get('/config', gameController.getConfig);
 

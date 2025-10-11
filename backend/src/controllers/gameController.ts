@@ -323,6 +323,45 @@ export class GameController {
       return res.status(500).json({ error: 'Internal server error' });
     }
   }
+
+  /**
+   * POST /api/game/explore
+   * Processa ação de exploração em um território
+   */
+  async explore(req: Request, res: Response) {
+    try {
+      const userId = req.user?.id;
+      const { territoryId, actionType } = req.body;
+
+      if (!userId) {
+        return res.status(401).json({ error: 'Not authenticated' });
+      }
+
+      if (!territoryId || !actionType) {
+        return res.status(400).json({ error: 'Territory ID and action type are required' });
+      }
+
+      // Validate action type
+      const validActions = ['cold_outreach', 'network_event', 'indicacao', 'inbound'];
+      if (!validActions.includes(actionType)) {
+        return res.status(400).json({ error: 'Invalid action type' });
+      }
+
+      const result = await gameService.explore(userId, territoryId, actionType);
+
+      return res.json({
+        success: result.success,
+        leadGenerated: result.leadGenerated,
+        lead: result.lead,
+        rewards: result.rewards,
+        territoryProgress: result.territoryProgress,
+        message: result.message
+      });
+    } catch (error) {
+      console.error('Error processing exploration:', error);
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+  }
 }
 
 export default new GameController();

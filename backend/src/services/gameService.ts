@@ -803,6 +803,160 @@ export class GameService {
       },
     });
   }
+
+  // ============= EXPLORATION =============
+
+  /**
+   * Processa ação de exploração
+   */
+  async explore(
+    userId: string,
+    territoryId: string,
+    actionType: 'cold_outreach' | 'network_event' | 'indicacao' | 'inbound'
+  ): Promise<{
+    success: boolean;
+    leadGenerated: boolean;
+    lead?: {
+      id: string;
+      name: string;
+      company: string;
+      quality: 'hot' | 'warm' | 'cold';
+    };
+    rewards: GameReward;
+    territoryProgress: number;
+    message: string;
+  }> {
+    // Energy costs and success rates
+    const actionConfig = {
+      cold_outreach: { energy: 10, successRate: 0.30, progressGain: 3 },
+      network_event: { energy: 20, successRate: 0.60, progressGain: 8 },
+      indicacao: { energy: 5, successRate: 0.80, progressGain: 5 },
+      inbound: { energy: 0, successRate: 1.0, progressGain: 10 }
+    };
+
+    const config = actionConfig[actionType];
+    if (!config) {
+      throw new Error('Invalid action type');
+    }
+
+    // Validate and spend energy
+    if (config.energy > 0) {
+      const hasEnergy = await this.spendResources(userId, 0, 0, config.energy);
+      if (!hasEnergy) {
+        return {
+          success: false,
+          leadGenerated: false,
+          rewards: { experience: 0, coins: 0 },
+          territoryProgress: 0,
+          message: 'Energia insuficiente!'
+        };
+      }
+    }
+
+    // Get current territory progress
+    const currentProgress = await this.getTerritoryProgress(userId, territoryId);
+    const currentExploration = currentProgress?.explorationPercent || 0;
+    const currentLeads = currentProgress?.leadsFound || 0;
+
+    // Roll for success
+    const roll = Math.random();
+    const success = roll <= config.successRate;
+
+    if (!success) {
+      // Failed exploration - still gain small progress
+      const newExploration = Math.min(100, currentExploration + 1);
+      await this.updateTerritoryProgress(userId, territoryId, {
+        explorationPercent: newExploration
+      });
+
+      return {
+        success: false,
+        leadGenerated: false,
+        rewards: { experience: 5, coins: 0 },
+        territoryProgress: newExploration,
+        message: 'Exploração sem sucesso. Continue tentando!'
+      };
+    }
+
+    // Success! Generate lead
+    const leadQuality = this.rollLeadQuality();
+    const lead = this.generateLead(territoryId, leadQuality);
+
+    // Calculate rewards
+    const rewards: GameReward = {
+      experience: leadQuality === 'hot' ? 30 : leadQuality === 'warm' ? 20 : 10,
+      coins: leadQuality === 'hot' ? 15 : leadQuality === 'warm' ? 10 : 5,
+      gems: leadQuality === 'hot' ? 2 : 0
+    };
+
+    // Add rewards
+    await this.addResources(userId, rewards, 'EXPLORATION', territoryId);
+
+    // Update territory progress
+    const newExploration = Math.min(100, currentExploration + config.progressGain);
+    await this.updateTerritoryProgress(userId, territoryId, {
+      explorationPercent: newExploration,
+      leadsFound: currentLeads + 1
+    });
+
+    return {
+      success: true,
+      leadGenerated: true,
+      lead,
+      rewards,
+      territoryProgress: newExploration,
+      message: `Lead ${leadQuality.toUpperCase()} descoberto!`
+    };
+  }
+
+  /**
+   * Roll lead quality (hot/warm/cold)
+   */
+  private rollLeadQuality(): 'hot' | 'warm' | 'cold' {
+    const roll = Math.random();
+    if (roll < 0.15) return 'hot';   // 15% chance
+    if (roll < 0.45) return 'warm';  // 30% chance
+    return 'cold';                    // 55% chance
+  }
+
+  /**
+   * Generate mock lead data
+   */
+  private generateLead(territoryId: string, quality: 'hot' | 'warm' | 'cold'): {
+    id: string;
+    name: string;
+    company: string;
+    quality: 'hot' | 'warm' | 'cold';
+  } {
+    // Territory-specific company names
+    const companyPrefixes: Record<string, string[]> = {
+      varejo: ['Loja', 'Mercado', 'Supermercado', 'Boutique', 'Shopping'],
+      industria: ['Fábrica', 'Indústria', 'Manufatura', 'Metalúrgica', 'Química'],
+      servicos: ['Consultoria', 'Agência', 'Escritório', 'Grupo', 'Rede'],
+      saude: ['Clínica', 'Hospital', 'Laboratório', 'Centro Médico', 'Policlínica'],
+      corporativo: ['Corporação', 'Holding', 'Empresa', 'Companhia', 'Conglomerado'],
+      startups: ['Tech', 'Hub', 'Labs', 'Ventures', 'Digital']
+    };
+
+    const names = [
+      'João Silva', 'Maria Santos', 'Pedro Oliveira', 'Ana Costa', 'Carlos Souza',
+      'Juliana Lima', 'Ricardo Alves', 'Fernanda Rocha', 'Lucas Martins', 'Camila Ferreira'
+    ];
+
+    const suffixes = ['SA', 'Ltda', 'EIRELI', 'ME', 'Tech', 'Group', 'Corp', 'Brasil'];
+
+    const prefixes = companyPrefixes[territoryId] || ['Empresa'];
+    const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+    const suffix = suffixes[Math.floor(Math.random() * suffixes.length)];
+    const name = names[Math.floor(Math.random() * names.length)];
+
+    return {
+      id: `lead_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      name,
+      company: `${prefix} ${suffix}`,
+      quality
+    };
+  }
 }
 
 export default new GameService();
