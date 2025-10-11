@@ -115,38 +115,37 @@ export class BattleScene extends Phaser.Scene {
   create(): void {
     const { width, height } = this.cameras.main;
 
-    // STOP UIScene completely (not pause)
-    this.scene.stop(SCENE_KEYS.UI);
+    // Pause UIScene to avoid overlap
+    this.scene.pause(SCENE_KEYS.UI);
 
-    // Background - darker
-    this.add.rectangle(0, 0, width, height, 0x0f0f1e).setOrigin(0);
+    // Background
+    this.add.rectangle(0, 0, width, height, 0x1a1a2e).setOrigin(0);
 
-    // Title bar - larger
-    const titleBar = this.add.rectangle(width / 2, 40, width - 40, 70, 0x1a1a2e, 0.98).setOrigin(0.5);
-    titleBar.setStrokeStyle(3, 0x6c5ce7);
+    // Title bar
+    const titleBar = this.add.rectangle(width / 2, 30, width - 40, 50, 0x2d2d44, 0.95).setOrigin(0.5);
+    titleBar.setStrokeStyle(2, 0x6c5ce7);
 
-    this.add.text(width / 2, 28, '⚔️ ENTREVISTA DE PESQUISA', {
-      fontSize: '22px',
+    this.add.text(width / 2, 20, 'ENTREVISTA DE PESQUISA', {
+      fontSize: '18px',
       color: COLORS.primary,
       fontFamily: 'Arial, sans-serif',
       fontStyle: 'bold'
     }).setOrigin(0.5);
 
-    this.add.text(width / 2, 54, `Fase ${this.currentPhase}: ${this.phaseNames[this.currentPhase - 1]}`, {
-      fontSize: '14px',
-      color: COLORS.warning,
-      fontFamily: 'Arial, sans-serif',
-      fontStyle: 'bold'
+    this.add.text(width / 2, 40, `Fase ${this.currentPhase}: ${this.phaseNames[this.currentPhase - 1]}`, {
+      fontSize: '12px',
+      color: COLORS.textSecondary,
+      fontFamily: 'Arial, sans-serif'
     }).setOrigin(0.5);
 
-    // Lead panel (left) - moved down
-    this.createLeadPanel(width * 0.25, 160);
+    // Lead info panel (left side)
+    this.createLeadPanel(150, 140);
 
-    // Player panel (right) - moved down
-    this.createPlayerPanel(width * 0.75, 160);
+    // Player info panel (right side)
+    this.createPlayerPanel(width - 150, 140);
 
-    // Battle log (center) - larger and moved down
-    this.createBattleLog(width / 2, 310);
+    // Battle log panel (center)
+    this.createBattleLog(width / 2, 240);
 
     // Action cards (bottom)
     this.createActionCards(width, height);
@@ -156,62 +155,62 @@ export class BattleScene extends Phaser.Scene {
   }
 
   private createLeadPanel(x: number, y: number): void {
-    const panelWidth = 280;
-    const panelHeight = 200;
+    const panelWidth = 240;
+    const panelHeight = 140;
 
-    const panel = this.add.rectangle(x, y, panelWidth, panelHeight, 0x1a1a2e, 0.98).setOrigin(0.5);
-    panel.setStrokeStyle(3, 0xe74c3c);
+    const panel = this.add.rectangle(x, y, panelWidth, panelHeight, 0x2d2d44, 0.95).setOrigin(0.5);
+    panel.setStrokeStyle(2, 0xe74c3c);
 
-    // Icon
-    this.add.text(x, y - 85, '🏢', {
-      fontSize: '32px'
+    // Title
+    this.add.text(x, y - 60, '🏢 LEAD', {
+      fontSize: '14px',
+      color: '#e74c3c',
+      fontFamily: 'Arial, sans-serif',
+      fontStyle: 'bold'
     }).setOrigin(0.5);
 
     // Name
-    this.add.text(x, y - 55, this.leadName, {
-      fontSize: '18px',
-      color: '#ffffff',
+    this.add.text(x, y - 40, this.leadName, {
+      fontSize: '16px',
+      color: COLORS.text,
       fontFamily: 'Arial, sans-serif',
       fontStyle: 'bold'
     }).setOrigin(0.5);
 
     // Company
-    this.add.text(x, y - 36, this.leadCompany, {
-      fontSize: '12px',
+    this.add.text(x, y - 25, this.leadCompany, {
+      fontSize: '11px',
       color: COLORS.textSecondary,
       fontFamily: 'Arial, sans-serif'
     }).setOrigin(0.5);
 
     // HP Label
-    this.add.text(x, y - 10, 'HP:', {
-      fontSize: '14px',
-      color: '#ffffff',
-      fontFamily: 'Arial, sans-serif',
-      fontStyle: 'bold'
-    }).setOrigin(0.5);
+    this.add.text(x - 100, y - 5, 'HP:', {
+      fontSize: '12px',
+      color: COLORS.text,
+      fontFamily: 'Arial, sans-serif'
+    });
 
-    // HP Bar background - CENTERED
-    const hpBarWidth = 200;
-    const hpBarBg = this.add.rectangle(x, y + 10, hpBarWidth, 20, 0x2d2d2d).setOrigin(0.5);
-    hpBarBg.setStrokeStyle(2, 0x555555);
+    // HP Bar background
+    const hpBarBg = this.add.rectangle(x + 10, y - 5, 160, 16, 0x3d3d3d).setOrigin(0, 0.5);
+    hpBarBg.setStrokeStyle(1, 0x555555);
 
-    // HP Bar fill - CENTERED
-    const hpBar = this.add.rectangle(x - hpBarWidth/2, y + 10, hpBarWidth, 20, 0xe74c3c).setOrigin(0, 0.5);
-    hpBar.setData('maxWidth', hpBarWidth);
+    // HP Bar fill
+    const hpBar = this.add.rectangle(x + 10, y - 5, 160, 16, 0xe74c3c).setOrigin(0, 0.5);
+    hpBar.setData('maxWidth', 160);
     this.registry.set('leadHPBar', hpBar);
 
-    // HP Text - centered on bar
-    const hpText = this.add.text(x, y + 10, `${this.leadHP}/${this.maxLeadHP}`, {
-      fontSize: '12px',
+    // HP Text
+    const hpText = this.add.text(x + 90, y - 5, `${this.leadHP}/${this.maxLeadHP}`, {
+      fontSize: '11px',
       color: '#ffffff',
-      fontFamily: 'Arial, sans-serif',
-      fontStyle: 'bold'
+      fontFamily: 'Arial, sans-serif'
     }).setOrigin(0.5);
     this.registry.set('leadHPText', hpText);
 
     // Level
-    this.add.text(x, y + 45, `Nível ${this.leadLevel}`, {
-      fontSize: '15px',
+    this.add.text(x, y + 20, `Nível ${this.leadLevel}`, {
+      fontSize: '13px',
       color: COLORS.secondary,
       fontFamily: 'Arial, sans-serif',
       fontStyle: 'bold'
@@ -219,126 +218,123 @@ export class BattleScene extends Phaser.Scene {
 
     // Relationship
     const relColor = this.relationship > 50 ? '#2ecc71' : this.relationship < 0 ? '#e74c3c' : '#f59e0b';
-    const relText = this.add.text(x, y + 75, `Relacionamento: ${this.relationship}%`, {
-      fontSize: '13px',
+    const relText = this.add.text(x, y + 45, `Relacionamento: ${this.relationship}%`, {
+      fontSize: '12px',
       color: relColor,
-      fontFamily: 'Arial, sans-serif',
-      fontStyle: 'bold'
+      fontFamily: 'Arial, sans-serif'
     }).setOrigin(0.5);
     this.registry.set('relationshipText', relText);
   }
 
   private createPlayerPanel(x: number, y: number): void {
-    const panelWidth = 280;
-    const panelHeight = 200;
+    const panelWidth = 240;
+    const panelHeight = 140;
 
-    const panel = this.add.rectangle(x, y, panelWidth, panelHeight, 0x1a1a2e, 0.98).setOrigin(0.5);
-    panel.setStrokeStyle(3, 0x00b894);
-
-    // Icon
-    this.add.text(x, y - 85, '🔍', {
-      fontSize: '32px'
-    }).setOrigin(0.5);
+    const panel = this.add.rectangle(x, y, panelWidth, panelHeight, 0x2d2d44, 0.95).setOrigin(0.5);
+    panel.setStrokeStyle(2, 0x00b894);
 
     // Title
-    this.add.text(x, y - 55, 'PESQUISADOR(A)', {
-      fontSize: '18px',
-      color: '#ffffff',
+    this.add.text(x, y - 60, '🔍 PESQUISADOR(A)', {
+      fontSize: '14px',
+      color: '#00b894',
       fontFamily: 'Arial, sans-serif',
       fontStyle: 'bold'
     }).setOrigin(0.5);
 
     // Subtitle
-    this.add.text(x, y - 36, 'Você', {
-      fontSize: '12px',
-      color: COLORS.textSecondary,
-      fontFamily: 'Arial, sans-serif'
+    this.add.text(x, y - 40, 'Você', {
+      fontSize: '16px',
+      color: COLORS.text,
+      fontFamily: 'Arial, sans-serif',
+      fontStyle: 'bold'
     }).setOrigin(0.5);
 
     // Foco Label
-    this.add.text(x, y - 10, 'Foco:', {
-      fontSize: '14px',
-      color: '#ffffff',
-      fontFamily: 'Arial, sans-serif',
-      fontStyle: 'bold'
-    }).setOrigin(0.5);
+    this.add.text(x - 100, y - 15, 'Foco:', {
+      fontSize: '12px',
+      color: COLORS.text,
+      fontFamily: 'Arial, sans-serif'
+    });
 
-    // Foco Bar background - CENTERED
-    const focoBarWidth = 200;
-    const focoBarBg = this.add.rectangle(x, y + 10, focoBarWidth, 20, 0x2d2d2d).setOrigin(0.5);
-    focoBarBg.setStrokeStyle(2, 0x555555);
+    // Foco Bar background
+    const focoBarBg = this.add.rectangle(x + 10, y - 15, 160, 16, 0x3d3d3d).setOrigin(0, 0.5);
+    focoBarBg.setStrokeStyle(1, 0x555555);
 
-    // Foco Bar fill - CENTERED
-    const focoBar = this.add.rectangle(x - focoBarWidth/2, y + 10, focoBarWidth, 20, 0x00b894).setOrigin(0, 0.5);
-    focoBar.setData('maxWidth', focoBarWidth);
+    // Foco Bar fill
+    const focoBar = this.add.rectangle(x + 10, y - 15, 160, 16, 0x00b894).setOrigin(0, 0.5);
+    focoBar.setData('maxWidth', 160);
     this.registry.set('playerHPBar', focoBar);
 
-    // Foco Text - centered on bar
-    const focoText = this.add.text(x, y + 10, `${this.playerHP}/${this.maxPlayerHP}`, {
-      fontSize: '12px',
+    // Foco Text
+    const focoText = this.add.text(x + 90, y - 15, `${this.playerHP}/${this.maxPlayerHP}`, {
+      fontSize: '11px',
       color: '#ffffff',
-      fontFamily: 'Arial, sans-serif',
-      fontStyle: 'bold'
+      fontFamily: 'Arial, sans-serif'
     }).setOrigin(0.5);
     this.registry.set('playerHPText', focoText);
 
     // Discovery Label
-    this.add.text(x, y + 40, 'Descoberta:', {
-      fontSize: '14px',
-      color: '#ffffff',
-      fontFamily: 'Arial, sans-serif',
-      fontStyle: 'bold'
-    }).setOrigin(0.5);
+    this.add.text(x - 100, y + 15, 'Descoberta:', {
+      fontSize: '12px',
+      color: COLORS.text,
+      fontFamily: 'Arial, sans-serif'
+    });
 
-    // Discovery Bar background - CENTERED
-    const discBarWidth = 200;
-    const discBarBg = this.add.rectangle(x, y + 60, discBarWidth, 20, 0x2d2d2d).setOrigin(0.5);
-    discBarBg.setStrokeStyle(2, 0x555555);
+    // Discovery Bar background
+    const discBarBg = this.add.rectangle(x + 10, y + 15, 160, 16, 0x3d3d3d).setOrigin(0, 0.5);
+    discBarBg.setStrokeStyle(1, 0x555555);
 
-    // Discovery Bar fill - CENTERED
-    const discBar = this.add.rectangle(x - discBarWidth/2, y + 60, 0, 20, 0xfdcb6e).setOrigin(0, 0.5);
-    discBar.setData('maxWidth', discBarWidth);
+    // Discovery Bar fill
+    const discBar = this.add.rectangle(x + 10, y + 15, 0, 16, 0xfdcb6e).setOrigin(0, 0.5);
+    discBar.setData('maxWidth', 160);
     this.registry.set('discoveryBar', discBar);
 
-    // Discovery percentage - centered on bar
-    const discText = this.add.text(x, y + 60, `${this.discoveryProgress}%`, {
-      fontSize: '12px',
+    // Discovery percentage
+    const discText = this.add.text(x + 90, y + 15, `${this.discoveryProgress}%`, {
+      fontSize: '11px',
       color: '#ffffff',
+      fontFamily: 'Arial, sans-serif'
+    }).setOrigin(0.5);
+    this.registry.set('discoveryText', discText);
+
+    // Progress indicator
+    this.add.text(x, y + 45, `Progresso: ${this.discoveryProgress}%`, {
+      fontSize: '12px',
+      color: COLORS.warning,
       fontFamily: 'Arial, sans-serif',
       fontStyle: 'bold'
     }).setOrigin(0.5);
-    this.registry.set('discoveryText', discText);
   }
 
   private createBattleLog(x: number, y: number): void {
-    const logWidth = 600;
-    const logHeight = 120;
+    const logWidth = 500;
+    const logHeight = 100;
 
-    const logPanel = this.add.rectangle(x, y, logWidth, logHeight, 0x1a1a2e, 0.95).setOrigin(0.5);
-    logPanel.setStrokeStyle(2, 0x6c5ce7);
+    const logPanel = this.add.rectangle(x, y, logWidth, logHeight, 0x2d2d44, 0.9).setOrigin(0.5);
+    logPanel.setStrokeStyle(2, 0x555555);
 
-    this.add.text(x, y - 55, '📋 Log de Entrevista', {
-      fontSize: '15px',
-      color: COLORS.primary,
+    this.add.text(x, y - 40, '📝 Log de Entrevista', {
+      fontSize: '13px',
+      color: COLORS.text,
       fontFamily: 'Arial, sans-serif',
       fontStyle: 'bold'
     }).setOrigin(0.5);
 
-    const messageText = this.add.text(x, y, 'Selecione uma ação para começar a entrevista...', {
-      fontSize: '14px',
+    const messageText = this.add.text(x, y + 5, 'Selecione uma ação para começar a entrevista...', {
+      fontSize: '12px',
       color: COLORS.textSecondary,
       fontFamily: 'Arial, sans-serif',
       align: 'center',
-      wordWrap: { width: logWidth - 60 }
+      wordWrap: { width: logWidth - 40 }
     }).setOrigin(0.5);
     this.registry.set('battleLog', messageText);
   }
 
   private createActionCards(width: number, height: number): void {
-    const startY = height - 130;
-    const cardWidth = 160;
-    const cardHeight = 110;
-    const spacing = 20;
+    const startY = height - 140;
+    const cardWidth = 140;
+    const cardHeight = 100;
+    const spacing = 15;
     const totalWidth = (cardWidth * 3) + (spacing * 2);
     const startX = (width - totalWidth) / 2;
 
@@ -353,16 +349,16 @@ export class BattleScene extends Phaser.Scene {
   private createActionCard(card: ActionCard, x: number, y: number, width: number, height: number): void {
     const cardContainer = this.add.container(x, y);
 
-    const bg = this.add.rectangle(0, 0, width, height, 0x1a1a2e, 1);
-    bg.setStrokeStyle(4, 0x6c5ce7);
+    const bg = this.add.rectangle(0, 0, width, height, 0x2d2d44, 0.98);
+    bg.setStrokeStyle(3, 0x6c5ce7);
     bg.setInteractive({ useHandCursor: true });
 
-    const icon = this.add.text(0, -35, card.icon, {
-      fontSize: '36px'
+    const icon = this.add.text(0, -30, card.icon, {
+      fontSize: '28px'
     }).setOrigin(0.5);
 
     const name = this.add.text(0, -5, card.name, {
-      fontSize: '14px',
+      fontSize: '12px',
       color: COLORS.primary,
       fontFamily: 'Arial, sans-serif',
       fontStyle: 'bold',
@@ -370,17 +366,16 @@ export class BattleScene extends Phaser.Scene {
       wordWrap: { width: width - 20 }
     }).setOrigin(0.5);
 
-    const desc = this.add.text(0, 18, card.description, {
-      fontSize: '11px',
+    const desc = this.add.text(0, 15, card.description, {
+      fontSize: '10px',
       color: COLORS.textSecondary,
       fontFamily: 'Arial, sans-serif',
       align: 'center',
       wordWrap: { width: width - 20 }
     }).setOrigin(0.5);
 
-    const costText = card.energyCost > 0 ? `⚡ ${card.energyCost}` : '⚡ Grátis';
-    const cost = this.add.text(0, 42, costText, {
-      fontSize: '12px',
+    const cost = this.add.text(0, 38, card.energyCost > 0 ? `⚡ ${card.energyCost}` : '⚡ Grátis', {
+      fontSize: '10px',
       color: card.energyCost > 0 ? COLORS.warning : COLORS.success,
       fontFamily: 'Arial, sans-serif',
       fontStyle: 'bold'
@@ -390,25 +385,23 @@ export class BattleScene extends Phaser.Scene {
 
     // Hover effects
     bg.on('pointerover', () => {
-      bg.setStrokeStyle(4, 0xfdcb6e);
-      bg.setFillStyle(0x2d2d44);
+      bg.setStrokeStyle(3, 0xfdcb6e);
+      bg.setFillStyle(0x3d3d5c, 0.98);
       this.tweens.add({
         targets: cardContainer,
-        y: y - 10,
-        scale: 1.05,
-        duration: 200,
+        y: y - 8,
+        duration: 150,
         ease: 'Back.easeOut'
       });
     });
 
     bg.on('pointerout', () => {
-      bg.setStrokeStyle(4, 0x6c5ce7);
-      bg.setFillStyle(0x1a1a2e);
+      bg.setStrokeStyle(3, 0x6c5ce7);
+      bg.setFillStyle(0x2d2d44, 0.98);
       this.tweens.add({
         targets: cardContainer,
         y: y,
-        scale: 1,
-        duration: 200,
+        duration: 150,
         ease: 'Back.easeIn'
       });
     });
