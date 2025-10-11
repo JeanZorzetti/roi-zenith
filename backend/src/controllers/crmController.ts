@@ -99,7 +99,7 @@ export const createPipeline = async (req: Request, res: Response) => {
 export const updatePipeline = async (req: Request, res: Response) => {
   try {
     const { pipelineId } = req.params;
-    const updates = req.body;
+    const { stages, ...updates } = req.body; // Remove stages from updates (can't update relation directly)
 
     const updatedPipeline = await prisma.pipeline.update({
       where: { id: pipelineId },
