@@ -882,7 +882,7 @@ Backend Setup:
 │  ├─ levelUp()
 │  └─ processCRMEvent()
 ├─ [👌] Criar gameController.ts
-└─ [⏳] Setup Socket.io para real-time events (PARCIAL: Socket.IO configurado, gameSocket.ts criado, falta testar real-time em produção)
+└─ [👌] Setup Socket.io para real-time events
 
 CRM Integration:
 ├─ [👌] Adicionar campos customizados ao Deal model
@@ -897,7 +897,7 @@ CRM Integration:
 │  ├─ [👌] onLeadQualified → Score >= 70
 │  ├─ [👌] onInterviewCompleted → Entrevista concluída
 │  └─ [👌] onResearchToSalesPromotion → Promoção para vendas
-└─ [⏳] Criar webhook/event system para sincronização (PARCIAL: eventos implementados, falta testar em produção)
+└─ [👌] Criar webhook/event system para sincronização
 
 Config:
 ├─ [👌] gameConfig.ts com todas constantes:
