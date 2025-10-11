@@ -139,14 +139,14 @@ export class BattleScene extends Phaser.Scene {
       fontStyle: 'bold'
     }).setOrigin(0.5);
 
-    // Lead panel (left) - moved down
-    this.createLeadPanel(width * 0.25, 160);
+    // Lead panel (left) - moved down more
+    this.createLeadPanel(width * 0.25, 200);
 
-    // Player panel (right) - moved down
-    this.createPlayerPanel(width * 0.75, 160);
+    // Player panel (right) - moved down more
+    this.createPlayerPanel(width * 0.75, 200);
 
-    // Battle log (center) - larger and moved down
-    this.createBattleLog(width / 2, 310);
+    // Battle log (center) - centered horizontally, moved down
+    this.createBattleLog(width / 2, 360);
 
     // Action cards (bottom)
     this.createActionCards(width, height);
