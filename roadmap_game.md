@@ -1114,12 +1114,20 @@ Quest System:
 │  ├─ Daily quests (5 quests)
 │  └─ Weekly challenges (3 challenges)
 ├─ [👌] Auto-track de progresso (hooks em ações)
-└─ [👌] Integração de databases no jogo (gameDataInitializer.ts):
-   ├─ Adapter itemDatabase → InventorySystem
-   ├─ Adapter questDatabase → QuestSystem
-   ├─ BootScene: Inicialização automática
-   ├─ 4 starter items dados ao player
-   └─ 13 quests visíveis no jogo (Main/Daily/Weekly)
+├─ [👌] Integração de databases no jogo (gameDataInitializer.ts):
+│  ├─ Adapter itemDatabase → InventorySystem
+│  ├─ Adapter questDatabase → QuestSystem
+│  ├─ BootScene: Inicialização automática
+│  ├─ 4 starter items dados ao player
+│  └─ 13 quests visíveis no jogo (Main/Daily/Weekly)
+└─ [👌] Loot system TOTALMENTE integrado:
+   ├─ BattleScene: Items dropam ao vencer entrevistas (15-40% chance)
+   ├─ TerritoryDetailScene: Items dropam nas explorações (Cold Outreach, Network Event, etc)
+   ├─ Drop chance baseado em territory/lead level
+   ├─ Weighted rarity rolls (common→legendary)
+   ├─ Items raros com efeito visual brilhante
+   ├─ Mensagens mostram items dropados
+   └─ Auto-add ao inventário
 ```
 
 #### Deliverable Fase 2:
