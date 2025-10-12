@@ -3,6 +3,8 @@ import { SCENE_KEYS, COLORS } from '../config/gameConfig';
 import { LootSystem, LOOT_TABLES } from '../systems/LootSystem';
 import { getRandomItemDrop } from '../data/gameDataInitializer';
 import inventorySystem from '../systems/InventorySystem';
+import { AnimationSystem } from '../systems/AnimationSystem';
+import { AudioSystem } from '../systems/AudioSystem';
 
 interface BattleData {
   leadName: string;
@@ -43,6 +45,10 @@ export class BattleScene extends Phaser.Scene {
   private selectedAction: ActionCard | null = null;
 
   private returnScene: string = SCENE_KEYS.WORLD_MAP; // Default return scene
+
+  // Animation and Audio systems
+  private animationSystem!: AnimationSystem;
+  private audioSystem!: AudioSystem;
 
   constructor() {
     super({ key: SCENE_KEYS.BATTLE });
@@ -126,11 +132,18 @@ export class BattleScene extends Phaser.Scene {
   create(): void {
     const { width, height } = this.cameras.main;
 
+    // Initialize animation and audio systems
+    this.animationSystem = new AnimationSystem(this);
+    this.audioSystem = new AudioSystem(this);
+
     // STOP UIScene completely (not pause)
     this.scene.stop(SCENE_KEYS.UI);
 
     // Background - darker
     this.add.rectangle(0, 0, width, height, 0x0f0f1e).setOrigin(0);
+
+    // Fade in transition
+    this.animationSystem.fadeIn(500);
 
     // Title bar - larger
     const titleBar = this.add.rectangle(width / 2, 40, width - 40, 70, 0x1a1a2e, 0.98).setOrigin(0.5);
@@ -461,6 +474,7 @@ export class BattleScene extends Phaser.Scene {
   private executeAction(card: ActionCard): void {
     const roll = Math.random() * 100;
     const success = roll <= card.discoveryChance;
+    const isCritical = roll <= card.discoveryChance * 0.2; // 20% of success chance is critical
 
     this.relationship = Math.max(-100, Math.min(100, this.relationship + card.relationshipChange));
 
@@ -472,15 +486,29 @@ export class BattleScene extends Phaser.Scene {
     const damage = success ? 20 + Math.floor(Math.random() * 15) : 5 + Math.floor(Math.random() * 5);
     this.leadHP = Math.max(0, this.leadHP - damage);
 
+    // Damage pop animation
+    const { width } = this.cameras.main;
+    this.animationSystem.damagePopEffect(width * 0.25, 200, damage, isCritical);
+
+    // Play sound effects
+    if (success) {
+      this.audioSystem.playSFX(this.audioSystem.SFX.HIT);
+      if (isCritical) {
+        this.audioSystem.playSFX(this.audioSystem.SFX.SUCCESS);
+      }
+    }
+
     const logText = this.registry.get('battleLog') as Phaser.GameObjects.Text;
     let message = `${card.icon} ${card.name}\n\n`;
 
     if (success) {
-      message += `✅ Sucesso! Descoberta +${Math.floor(20 + (card.discoveryChance / 5))}%\n`;
+      message += isCritical ? `🌟 CRÍTICO! ` : `✅ Sucesso! `;
+      message += `Descoberta +${Math.floor(20 + (card.discoveryChance / 5))}%\n`;
       message += `${this.leadName} compartilhou insights valiosos!`;
     } else {
       message += `⚠️ O lead ficou evasivo...\n`;
       message += `Tente uma abordagem diferente.`;
+      this.audioSystem.playSFX(this.audioSystem.SFX.ERROR);
     }
 
     logText.setText(message);
@@ -538,17 +566,34 @@ export class BattleScene extends Phaser.Scene {
   private showVictoryScreen(): void {
     const { width, height } = this.cameras.main;
 
+    // Victory confetti effect
+    this.animationSystem.victoryConfetti(width, height);
+
+    // Victory sound and flash
+    this.audioSystem.playSFX(this.audioSystem.SFX.VICTORY);
+    this.animationSystem.screenFlash(300, 0.3);
+
     const overlay = this.add.rectangle(0, 0, width, height, 0x000000, 0.85).setOrigin(0);
 
     const panel = this.add.rectangle(width / 2, height / 2, 450, 400, 0x2d2d44, 1).setOrigin(0.5);
     panel.setStrokeStyle(4, 0x00b894);
 
-    this.add.text(width / 2, height / 2 - 170, '🎉 ENTREVISTA CONCLUÍDA!', {
+    const title = this.add.text(width / 2, height / 2 - 170, '🎉 ENTREVISTA CONCLUÍDA!', {
       fontSize: '26px',
       color: '#00b894',
       fontFamily: 'Arial, sans-serif',
       fontStyle: 'bold'
     }).setOrigin(0.5);
+
+    // Title bounce animation
+    this.tweens.add({
+      targets: title,
+      scale: 1.1,
+      duration: 500,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut'
+    });
 
     this.add.text(width / 2, height / 2 - 125, 'Você descobriu insights valiosos!', {
       fontSize: '15px',
@@ -567,26 +612,61 @@ export class BattleScene extends Phaser.Scene {
       fontStyle: 'bold'
     }).setOrigin(0.5);
 
-    this.add.text(width / 2, height / 2 - 50, `+${xpGain} XP`, {
+    const xpText = this.add.text(width / 2, height / 2 - 50, `+${xpGain} XP`, {
       fontSize: '14px',
       color: COLORS.primary,
       fontFamily: 'Arial, sans-serif',
       fontStyle: 'bold'
-    }).setOrigin(0.5);
+    }).setOrigin(0.5).setAlpha(0);
 
-    this.add.text(width / 2, height / 2 - 25, `💰 +${coinsGain} Coins`, {
+    const coinsText = this.add.text(width / 2, height / 2 - 25, `💰 +${coinsGain} Coins`, {
       fontSize: '14px',
       color: COLORS.warning,
       fontFamily: 'Arial, sans-serif',
       fontStyle: 'bold'
-    }).setOrigin(0.5);
+    }).setOrigin(0.5).setAlpha(0);
 
-    this.add.text(width / 2, height / 2, `💎 +${gemsGain} Gems`, {
+    const gemsText = this.add.text(width / 2, height / 2, `💎 +${gemsGain} Gems`, {
       fontSize: '14px',
       color: COLORS.success,
       fontFamily: 'Arial, sans-serif',
       fontStyle: 'bold'
-    }).setOrigin(0.5);
+    }).setOrigin(0.5).setAlpha(0);
+
+    // Stagger reward animations
+    this.tweens.add({
+      targets: xpText,
+      alpha: 1,
+      scale: 1.2,
+      duration: 300,
+      delay: 200,
+      ease: 'Back.easeOut',
+      onComplete: () => {
+        this.animationSystem.xpGainEffect(width / 2 + 100, height / 2 - 50, xpGain);
+      }
+    });
+
+    this.tweens.add({
+      targets: coinsText,
+      alpha: 1,
+      scale: 1.2,
+      duration: 300,
+      delay: 400,
+      ease: 'Back.easeOut',
+      onComplete: () => {
+        this.animationSystem.coinCollectEffect(width / 2 + 120, height / 2 - 25, coinsGain);
+        this.audioSystem.playSFX(this.audioSystem.SFX.COIN);
+      }
+    });
+
+    this.tweens.add({
+      targets: gemsText,
+      alpha: 1,
+      scale: 1.2,
+      duration: 300,
+      delay: 600,
+      ease: 'Back.easeOut'
+    });
 
     // LOOT SYSTEM: Roll for item drop
     const lootSystem = new LootSystem();
