@@ -101,10 +101,14 @@ export class TerritoryDetailScene extends Phaser.Scene {
   }
 
   private createTerritoryInfoPanel(): void {
-    const panelX = 150;
-    const panelY = 380;
+    const { width, height } = this.cameras.main;
+    const centerX = width / 2;
+    const centerY = height / 2;
+
     const panelWidth = 240;
     const panelHeight = 400;
+    const panelX = centerX - 500; // Left panel
+    const panelY = centerY + 50;
 
     // Background
     const bg = this.add.rectangle(panelX, panelY, panelWidth, panelHeight, 0x1a1a2e, 0.98);
@@ -198,8 +202,12 @@ export class TerritoryDetailScene extends Phaser.Scene {
   }
 
   private createLeadsList(): void {
-    const listX = 600;
-    const listY = 280;
+    const { width, height } = this.cameras.main;
+    const centerX = width / 2;
+    const centerY = height / 2;
+
+    const listX = centerX;
+    const listY = centerY - 120;
     const cardWidth = 480;
     const cardHeight = 80;
 
@@ -320,10 +328,14 @@ export class TerritoryDetailScene extends Phaser.Scene {
   }
 
   private createExplorationPanel(): void {
-    const panelX = 1050;
-    const panelY = 380;
+    const { width, height } = this.cameras.main;
+    const centerX = width / 2;
+    const centerY = height / 2;
+
     const panelWidth = 240;
     const panelHeight = 560;
+    const panelX = centerX + 500; // Right panel
+    const panelY = centerY + 70;
 
     // Background
     const bg = this.add.rectangle(panelX, panelY, panelWidth, panelHeight, 0x1a1a2e, 0.98);
@@ -409,8 +421,12 @@ export class TerritoryDetailScene extends Phaser.Scene {
   }
 
   private createBossBattleButton(): void {
-    const buttonX = 600;
-    const buttonY = 680;
+    const { width, height } = this.cameras.main;
+    const centerX = width / 2;
+    const centerY = height / 2;
+
+    const buttonX = centerX;
+    const buttonY = centerY + 280;
     const buttonWidth = 300;
     const buttonHeight = 60;
 
@@ -619,7 +635,8 @@ export class TerritoryDetailScene extends Phaser.Scene {
   }
 
   private showMessage(text: string, color: string): void {
-    const message = this.add.text(600, 400, text, {
+    const { width, height } = this.cameras.main;
+    const message = this.add.text(width / 2, height / 2, text, {
       fontSize: '18px',
       color: '#ffffff',
       fontFamily: 'Arial, sans-serif',
