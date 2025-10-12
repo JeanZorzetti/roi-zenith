@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { SCENE_KEYS, COLORS } from '../config/gameConfig';
 import { initializeStarterInventory, initializeQuestSystem } from '../data/gameDataInitializer';
+import { assetManager } from '../systems/AssetManager';
 
 export class BootScene extends Phaser.Scene {
   constructor() {
@@ -71,6 +72,11 @@ export class BootScene extends Phaser.Scene {
       // Initialize systems with data from databases
       initializeStarterInventory();
       initializeQuestSystem(playerLevel);
+
+      // Initialize asset manager and generate all sprites
+      console.log('🎨 [BootScene] Generating visual assets...');
+      assetManager.initialize(this);
+      console.log('✅ [BootScene] Visual assets generated');
 
       this.registry.set('gameDataInitialized', true);
       console.log('✅ [BootScene] Game data initialized');

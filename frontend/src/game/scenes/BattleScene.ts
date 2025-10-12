@@ -5,6 +5,8 @@ import { getRandomItemDrop } from '../data/gameDataInitializer';
 import inventorySystem from '../systems/InventorySystem';
 import { AnimationSystem } from '../systems/AnimationSystem';
 import { AudioSystem } from '../systems/AudioSystem';
+import { assetManager } from '../systems/AssetManager';
+import { SpriteGenerator } from '../systems/SpriteGenerator';
 
 interface BattleData {
   leadName: string;
@@ -186,10 +188,20 @@ export class BattleScene extends Phaser.Scene {
     const panel = this.add.rectangle(x, y, panelWidth, panelHeight, 0x1a1a2e, 0.98).setOrigin(0.5);
     panel.setStrokeStyle(3, 0xe74c3c);
 
-    // Icon
-    this.add.text(x, y - 85, '🏢', {
-      fontSize: '32px'
-    }).setOrigin(0.5);
+    // NPC Sprite (instead of icon)
+    const territoryId = this.registry.get('currentTerritory') || 'varejo';
+    const npcSpriteId = assetManager.getNPCByTerritory(territoryId);
+    const npcSprite = assetManager.cloneSprite(npcSpriteId, x, y - 85);
+
+    if (npcSprite) {
+      npcSprite.setScale(0.5); // Scale down to fit panel
+      SpriteGenerator.createAnimatedSprite(this, npcSprite, 'idle');
+    } else {
+      // Fallback to icon if sprite not found
+      this.add.text(x, y - 85, '🏢', {
+        fontSize: '32px'
+      }).setOrigin(0.5);
+    }
 
     // Name
     this.add.text(x, y - 55, this.leadName, {
@@ -259,10 +271,18 @@ export class BattleScene extends Phaser.Scene {
     const panel = this.add.rectangle(x, y, panelWidth, panelHeight, 0x1a1a2e, 0.98).setOrigin(0.5);
     panel.setStrokeStyle(3, 0x00b894);
 
-    // Icon
-    this.add.text(x, y - 85, '🔍', {
-      fontSize: '32px'
-    }).setOrigin(0.5);
+    // Player Sprite (instead of icon)
+    const playerSprite = assetManager.cloneSprite('player_idle', x, y - 85);
+
+    if (playerSprite) {
+      playerSprite.setScale(0.5); // Scale down to fit panel
+      SpriteGenerator.createAnimatedSprite(this, playerSprite, 'idle');
+    } else {
+      // Fallback to icon if sprite not found
+      this.add.text(x, y - 85, '🔍', {
+        fontSize: '32px'
+      }).setOrigin(0.5);
+    }
 
     // Title
     this.add.text(x, y - 55, 'PESQUISADOR(A)', {
