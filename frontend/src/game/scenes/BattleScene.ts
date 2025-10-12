@@ -189,7 +189,7 @@ export class BattleScene extends Phaser.Scene {
     const territoryId = this.registry.get('currentTerritory') || 'varejo';
     const npcSpriteId = assetManager.getNPCByTerritory(territoryId);
     console.log(`🎨 [BattleScene] Loading NPC sprite: ${npcSpriteId} for territory: ${territoryId}`);
-    const npcSprite = assetManager.cloneSprite(npcSpriteId, x, y - 85);
+    const npcSprite = assetManager.cloneSprite(npcSpriteId, x, y - 85, this);
 
     if (npcSprite) {
       console.log(`✅ [BattleScene] NPC sprite loaded successfully!`);
@@ -273,7 +273,7 @@ export class BattleScene extends Phaser.Scene {
 
     // Player Sprite (instead of icon)
     console.log(`🎨 [BattleScene] Loading Player sprite: player_idle`);
-    const playerSprite = assetManager.cloneSprite('player_idle', x, y - 85);
+    const playerSprite = assetManager.cloneSprite('player_idle', x, y - 85, this);
 
     if (playerSprite) {
       console.log(`✅ [BattleScene] Player sprite loaded successfully!`);

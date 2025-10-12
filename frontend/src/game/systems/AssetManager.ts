@@ -210,23 +210,54 @@ export class AssetManager {
   /**
    * Clone a sprite (for creating instances)
    */
-  public cloneSprite(id: string, x: number = 0, y: number = 0): Phaser.GameObjects.Container | null {
-    console.log(`🎨 [AssetManager] Attempting to clone sprite: ${id}`);
-    console.log(`🎨 [AssetManager] Available sprites:`, Array.from(this.sprites.keys()));
+  /**
+   * Generate sprite on-demand for current scene (instead of cloning)
+   * This fixes the issue where sprites from BootScene can't be cloned to BattleScene
+   */
+  public cloneSprite(id: string, x: number = 0, y: number = 0, scene?: Phaser.Scene): Phaser.GameObjects.Container | null {
+    console.log(`🎨 [AssetManager] Generating sprite: ${id} for current scene`);
 
+    // Use provided scene or fall back to cached scene
+    const targetScene = scene || this.scene;
+    if (!targetScene) {
+      console.error(`❌ [AssetManager] No scene available!`);
+      return null;
+    }
+
+    // Generate sprite directly for this scene instead of cloning
+    let sprite: Phaser.GameObjects.Container | null = null;
+
+    if (id === 'player_idle' || id === 'player_walk' || id === 'player_attack') {
+      sprite = SpriteGenerator.generatePlayerSprite(targetScene, 64);
+    } else if (id.startsWith('npc_')) {
+      // Extract style from ID (e.g., npc_business_1 -> business)
+      const styleMatch = id.match(/npc_(\w+)_/);
+      if (styleMatch) {
+        const style = styleMatch[1] as 'business' | 'tech' | 'creative' | 'corporate' | 'startup';
+        const seedMatch = id.match(/_(\d+)$/);
+        const seed = seedMatch ? parseInt(seedMatch[1]) * 100 : 0;
+        sprite = SpriteGenerator.generateNPCSprite(targetScene, style, seed, 64);
+      }
+    }
+
+    if (!sprite) {
+      console.error(`❌ [AssetManager] Could not generate sprite: ${id}`);
+      return null;
+    }
+
+    // Position the sprite
+    sprite.setPosition(x, y);
+    console.log(`✅ [AssetManager] Generated sprite with ${sprite.length} children at (${x}, ${y})`);
+
+    return sprite;
+  }
+
+  /**
+   * DEPRECATED: Old clone method - keeping for reference
+   */
+  private oldCloneSprite(id: string, x: number = 0, y: number = 0): Phaser.GameObjects.Container | null {
     const original = this.sprites.get(id);
-    if (!original) {
-      console.error(`❌ [AssetManager] Sprite "${id}" not found in cache!`);
-      return null;
-    }
-    if (!this.scene) {
-      console.error(`❌ [AssetManager] No scene available for cloning!`);
-      return null;
-    }
-
-    console.log(`✅ [AssetManager] Found original sprite, creating clone at (${x}, ${y})`);
-    console.log(`📦 [AssetManager] Original container has ${original.length} children`);
-    console.log(`📦 [AssetManager] Original.list:`, original.list.map((c: any) => c.type));
+    if (!original || !this.scene) return null;
 
     // Create a new container at position
     const clone = this.scene.add.container(x, y);
