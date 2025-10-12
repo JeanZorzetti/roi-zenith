@@ -96,11 +96,16 @@ class GameSocketService {
   private handleResourceUpdate(data: ResourceUpdate) {
     if (!this.gameInstance) return;
 
-    const uiScene = this.gameInstance.getUIScene();
-    if (uiScene) {
-      // UIScene will handle the update via its own methods
-      // This is just a placeholder - UIScene needs updateResources method
-      console.log('🔄 Updating UI with new resources:', data);
+    // Update game registry with new resources
+    const game = this.gameInstance.getGame();
+    if (game) {
+      if (data.coins !== undefined) game.registry.set('playerCoins', data.coins);
+      if (data.gems !== undefined) game.registry.set('playerGems', data.gems);
+      if (data.energy !== undefined) game.registry.set('playerEnergy', data.energy);
+      if (data.experience !== undefined) game.registry.set('playerXP', data.experience);
+      if (data.level !== undefined) game.registry.set('playerLevel', data.level);
+
+      console.log('🔄 Updating game registry with new resources:', data);
     }
 
     // Show notification toast

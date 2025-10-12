@@ -47,7 +47,6 @@ export class MenuScene extends Phaser.Scene {
     startButton.on('pointerdown', () => {
       console.log('🎮 [MenuScene] Starting World Map...');
       this.scene.start(SCENE_KEYS.WORLD_MAP);
-      this.scene.launch(SCENE_KEYS.UI); // Launch UI overlay
     });
 
     // Achievements button
