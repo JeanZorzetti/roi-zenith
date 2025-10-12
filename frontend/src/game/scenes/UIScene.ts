@@ -35,15 +35,19 @@ export class UIScene extends Phaser.Scene {
 
   create() {
     const width = this.cameras.main.width;
+    const height = this.cameras.main.height;
+
+    // Position HUD at bottom instead of top
+    const hudY = height - 80;
 
     // Background panel
-    const panel = this.add.rectangle(0, 0, width, 80, 0x16213e, 0.95);
+    const panel = this.add.rectangle(0, hudY, width, 80, 0x16213e, 0.95);
     panel.setOrigin(0, 0);
     panel.setDepth(1000);
 
-    // Resources section (top-left)
+    // Resources section (bottom-left)
     const resourcesX = 20;
-    const resourcesY = 15;
+    const resourcesY = hudY + 15;
 
     // Coins
     const coinsIcon = this.add.text(resourcesX, resourcesY, '💰', {
@@ -81,9 +85,9 @@ export class UIScene extends Phaser.Scene {
     });
     this.energyText.setDepth(1001);
 
-    // Level section (top-right)
+    // Level section (bottom-right)
     const levelX = width - 120;
-    const levelY = 15;
+    const levelY = hudY + 15;
 
     const levelLabel = this.add.text(levelX, levelY, 'LEVEL', {
       font: '12px monospace',
@@ -99,7 +103,7 @@ export class UIScene extends Phaser.Scene {
 
     // XP Bar
     const xpBarX = 20;
-    const xpBarY = 50;
+    const xpBarY = hudY + 50;
     const xpBarWidth = width - 40;
     const xpBarHeight = 8;
 
@@ -151,13 +155,16 @@ export class UIScene extends Phaser.Scene {
     this.energyText.setText(`${this.gameState.energy}/${this.gameState.maxEnergy}`);
     this.levelText.setText(this.gameState.level.toString());
 
+    const height = this.cameras.main.height;
+    const hudY = height - 80;
+
     // Update XP bar
     const xpPercent = this.gameState.experience / this.gameState.experienceToNextLevel;
     const xpBarWidth = (this.cameras.main.width - 40) * xpPercent;
 
     this.xpBar.clear();
     this.xpBar.fillStyle(0x8b5cf6, 1);
-    this.xpBar.fillRect(20, 50, xpBarWidth, 8);
+    this.xpBar.fillRect(20, hudY + 50, xpBarWidth, 8);
 
     // Update Energy bar
     const energyPercent = this.gameState.energy / this.gameState.maxEnergy;
@@ -165,7 +172,7 @@ export class UIScene extends Phaser.Scene {
 
     this.energyBar.clear();
     this.energyBar.fillStyle(0x60a5fa, 1);
-    this.energyBar.fillRect(290, 40, energyBarWidth, 6);
+    this.energyBar.fillRect(290, hudY + 40, energyBarWidth, 6);
   }
 
   // Public method to update game state from outside
