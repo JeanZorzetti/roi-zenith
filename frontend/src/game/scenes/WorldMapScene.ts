@@ -45,6 +45,17 @@ export class WorldMapScene extends Phaser.Scene {
 
     // Listen for territory updates from backend
     this.registry.events.on('territory-unlocked', this.handleTerritoryUnlocked, this);
+
+    // Listen for resize events
+    this.scale.on('resize', this.handleResize, this);
+  }
+
+  private handleResize(gameSize: Phaser.Structs.Size): void {
+    const width = gameSize.width;
+    const height = gameSize.height;
+
+    // Restart scene to re-layout everything
+    this.scene.restart();
   }
 
   private createTitleBar(width: number): void {
@@ -440,5 +451,6 @@ export class WorldMapScene extends Phaser.Scene {
 
   shutdown(): void {
     this.registry.events.off('territory-unlocked', this.handleTerritoryUnlocked, this);
+    this.scale.off('resize', this.handleResize, this);
   }
 }

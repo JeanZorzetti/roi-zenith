@@ -16,8 +16,8 @@ export class MarketResearchGame {
   constructor(parentElement: string | HTMLElement) {
     const config: Phaser.Types.Core.GameConfig = {
       type: Phaser.AUTO,
-      width: GAME_CONFIG.width,
-      height: GAME_CONFIG.height,
+      width: '100%',
+      height: '100%',
       backgroundColor: GAME_CONFIG.backgroundColor,
       parent: parentElement,
       pixelArt: GAME_CONFIG.pixelArt,
@@ -34,8 +34,10 @@ export class MarketResearchGame {
         // UIScene removed - using global React HUD instead
       ],
       scale: {
-        mode: Phaser.Scale.FIT,
-        autoCenter: Phaser.Scale.CENTER_BOTH
+        mode: Phaser.Scale.RESIZE,
+        autoCenter: Phaser.Scale.NO_CENTER,
+        width: '100%',
+        height: '100%'
       }
     };
 

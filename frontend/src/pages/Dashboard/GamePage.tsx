@@ -104,20 +104,19 @@ const GamePage: React.FC = () => {
 
   return (
     <div
-      className="min-h-screen flex flex-col items-center justify-center p-4"
+      className="w-full h-screen flex flex-col"
       style={{ backgroundColor: currentTheme.colors.background }}
     >
-      {/* Game Container - Larger and centered */}
+      {/* Game Container - Fullscreen */}
       <div
-        className="rounded-lg shadow-2xl overflow-hidden border-4"
+        className="relative flex-1 overflow-hidden"
         style={{
-          borderColor: currentTheme.colors.primary,
           backgroundColor: '#1a1a2e'
         }}
       >
         {isLoading && (
           <div
-            className="absolute inset-0 flex items-center justify-center"
+            className="absolute inset-0 flex items-center justify-center z-50"
             style={{ backgroundColor: 'rgba(0, 0, 0, 0.8)' }}
           >
             <div className="text-center">
@@ -127,93 +126,20 @@ const GamePage: React.FC = () => {
           </div>
         )}
 
-        <div ref={gameContainerRef} id="game-container" />
+        <div ref={gameContainerRef} id="game-container" className="w-full h-full" />
       </div>
 
-      {/* Instructions */}
-      <div
-        className="mt-8 max-w-3xl p-6 rounded-lg"
+      {/* Back to CRM Button - Fixed at bottom right */}
+      <a
+        href="/crm"
+        className="fixed bottom-4 right-4 z-50 inline-flex items-center space-x-2 px-4 py-2 rounded-lg font-semibold transition-all hover:scale-105 shadow-lg"
         style={{
-          backgroundColor: currentTheme.colors.cardBg,
-          borderColor: currentTheme.colors.border
+          backgroundColor: currentTheme.colors.primary,
+          color: '#ffffff'
         }}
       >
-        <h2
-          className="text-2xl font-bold mb-4"
-          style={{ color: currentTheme.colors.text }}
-        >
-          📖 Como Jogar
-        </h2>
-
-        <div
-          className="space-y-3"
-          style={{ color: currentTheme.colors.textMuted }}
-        >
-          <div className="flex items-start space-x-3">
-            <span className="text-2xl">1️⃣</span>
-            <p>
-              <strong style={{ color: currentTheme.colors.text }}>Adicione Contatos no CRM</strong> →
-              Leads aparecem no mapa do jogo (+10 XP, +5 coins)
-            </p>
-          </div>
-
-          <div className="flex items-start space-x-3">
-            <span className="text-2xl">2️⃣</span>
-            <p>
-              <strong style={{ color: currentTheme.colors.text }}>Realize Entrevistas</strong> →
-              Triggers batalhas no jogo para descobrir dores (+50 XP, +25 coins)
-            </p>
-          </div>
-
-          <div className="flex items-start space-x-3">
-            <span className="text-2xl">3️⃣</span>
-            <p>
-              <strong style={{ color: currentTheme.colors.text }}>Descubra Dores</strong> →
-              Ganhe XP, coins, gems e items baseado na intensidade
-            </p>
-          </div>
-
-          <div className="flex items-start space-x-3">
-            <span className="text-2xl">4️⃣</span>
-            <p>
-              <strong style={{ color: currentTheme.colors.text }}>Qualifique Leads (Score ≥ 70%)</strong> →
-              Promova para Sales e ganhe rewards épicas (+100 XP, +10 reputation)
-            </p>
-          </div>
-        </div>
-
-        <div
-          className="mt-6 p-4 rounded-lg"
-          style={{
-            backgroundColor: currentTheme.colors.warning + '20',
-            borderLeft: `4px solid ${currentTheme.colors.warning}`
-          }}
-        >
-          <p
-            className="font-semibold"
-            style={{ color: currentTheme.colors.text }}
-          >
-            💡 Dica: Cada ação no CRM alimenta seu progresso no jogo!
-          </p>
-          <p style={{ color: currentTheme.colors.textMuted }}>
-            Quanto mais você trabalha na pesquisa de mercado, mais você evolui no jogo.
-          </p>
-        </div>
-      </div>
-
-      {/* Back to CRM Link */}
-      <div className="mt-8">
-        <a
-          href="/crm"
-          className="inline-flex items-center space-x-2 px-6 py-3 rounded-lg font-semibold transition-all hover:scale-105"
-          style={{
-            backgroundColor: currentTheme.colors.primary,
-            color: '#ffffff'
-          }}
-        >
-          <span>← Voltar para o CRM</span>
-        </a>
-      </div>
+        <span>← CRM</span>
+      </a>
     </div>
   );
 };
