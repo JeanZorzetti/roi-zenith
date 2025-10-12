@@ -16,7 +16,7 @@ export class InventoryScene extends Phaser.Scene {
   }
 
   create(): void {
-    const { width, height } = GAME_CONFIG;
+    const { width, height } = this.cameras.main;
 
     // Background
     this.add.rectangle(0, 0, width, height, COLORS.background).setOrigin(0);
@@ -44,10 +44,14 @@ export class InventoryScene extends Phaser.Scene {
    * Create equipment slots panel (left side)
    */
   private createEquipmentPanel(): void {
-    const panelX = 80;
-    const panelY = 120;
+    const { width, height } = this.cameras.main;
+    const centerX = width / 2;
+    const centerY = height / 2;
+
     const panelWidth = 280;
     const panelHeight = 600;
+    const panelX = centerX - 520; // Left panel
+    const panelY = centerY - panelHeight / 2 + 40;
 
     // Panel background
     const panel = this.add.rectangle(panelX, panelY, panelWidth, panelHeight, COLORS.panelDark, 0.9);
@@ -136,10 +140,14 @@ export class InventoryScene extends Phaser.Scene {
    * Create inventory list (center)
    */
   private createInventoryList(): void {
-    const listX = 400;
-    const listY = 120;
+    const { width, height } = this.cameras.main;
+    const centerX = width / 2;
+    const centerY = height / 2;
+
     const listWidth = 500;
     const listHeight = 600;
+    const listX = centerX - listWidth / 2; // Center panel
+    const listY = centerY - listHeight / 2 + 40;
 
     // Panel background
     const panel = this.add.rectangle(listX, listY, listWidth, listHeight, COLORS.panelDark, 0.9);
@@ -207,10 +215,14 @@ export class InventoryScene extends Phaser.Scene {
    * Create stats panel (right side)
    */
   private createStatsPanel(): void {
-    const panelX = 940;
-    const panelY = 120;
+    const { width, height } = this.cameras.main;
+    const centerX = width / 2;
+    const centerY = height / 2;
+
     const panelWidth = 240;
     const panelHeight = 600;
+    const panelX = centerX + 280; // Right panel
+    const panelY = centerY - panelHeight / 2 + 40;
 
     // Panel background
     const panel = this.add.rectangle(panelX, panelY, panelWidth, panelHeight, COLORS.panelDark, 0.9);
@@ -286,8 +298,14 @@ export class InventoryScene extends Phaser.Scene {
 
     // Render inventory items
     const items = inventorySystem.getAllItems();
-    const startX = 420;
-    const startY = 220;
+    const { width, height } = this.cameras.main;
+    const centerX = width / 2;
+    const centerY = height / 2;
+
+    const listWidth = 500;
+    const listX = centerX - listWidth / 2;
+    const startX = listX + 20;
+    const startY = centerY - 200;
     const cardWidth = 230;
     const cardHeight = 70;
     const gap = 10;

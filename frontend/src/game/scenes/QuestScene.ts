@@ -14,7 +14,7 @@ export class QuestScene extends Phaser.Scene {
   }
 
   create(): void {
-    const { width, height } = GAME_CONFIG;
+    const { width, height } = this.cameras.main;
 
     // Background
     this.add.rectangle(0, 0, width, height, COLORS.background).setOrigin(0);
@@ -45,19 +45,23 @@ export class QuestScene extends Phaser.Scene {
    * Create quest type tabs
    */
   private createTabs(): void {
-    const tabs: Array<{ type: QuestType; label: string; x: number }> = [
-      { type: 'main', label: '📖 Main', x: 300 },
-      { type: 'daily', label: '📅 Daily', x: 600 },
-      { type: 'weekly', label: '🎯 Weekly', x: 900 },
+    const { width } = this.cameras.main;
+    const centerX = width / 2;
+
+    const tabs: Array<{ type: QuestType; label: string; offset: number }> = [
+      { type: 'main', label: '📖 Main', offset: -200 },
+      { type: 'daily', label: '📅 Daily', offset: 0 },
+      { type: 'weekly', label: '🎯 Weekly', offset: 200 },
     ];
 
     tabs.forEach(tab => {
       const isSelected = this.selectedTab === tab.type;
-      const button = this.add.rectangle(tab.x, 120, 180, 50, isSelected ? COLORS.accent : COLORS.panelDark, 0.9);
+      const tabX = centerX + tab.offset;
+      const button = this.add.rectangle(tabX, 120, 180, 50, isSelected ? COLORS.accent : COLORS.panelDark, 0.9);
       button.setStrokeStyle(2, isSelected ? COLORS.accent : COLORS.border);
       button.setInteractive({ useHandCursor: true });
 
-      const buttonText = this.add.text(tab.x, 120, tab.label, {
+      const buttonText = this.add.text(tabX, 120, tab.label, {
         fontSize: '16px',
         color: isSelected ? COLORS.textLight : COLORS.textDim,
         fontFamily: 'Arial',
@@ -86,10 +90,14 @@ export class QuestScene extends Phaser.Scene {
    * Create quest list area
    */
   private createQuestList(): void {
-    const listX = 100;
-    const listY = 200;
+    const { width, height } = this.cameras.main;
+    const centerX = width / 2;
+    const centerY = height / 2;
+
     const listWidth = 1000;
     const listHeight = 520;
+    const listX = centerX - listWidth / 2;
+    const listY = centerY - listHeight / 2 + 60;
 
     // Panel background
     const panel = this.add.rectangle(listX, listY, listWidth, listHeight, COLORS.panelDark, 0.9);
@@ -123,11 +131,16 @@ export class QuestScene extends Phaser.Scene {
     // Get quests by selected tab
     const quests = questSystem.getQuestsByType(this.selectedTab);
 
-    const startX = 120;
-    const startY = 260;
+    const { width, height } = this.cameras.main;
+    const centerX = width / 2;
+    const centerY = height / 2;
+
+    const listWidth = 1000;
     const cardWidth = 960;
     const cardHeight = 140;
     const gap = 20;
+    const startX = centerX - listWidth / 2 + 20;
+    const startY = centerY - 200;
 
     quests.forEach((quest, index) => {
       const y = startY + index * (cardHeight + gap);
@@ -140,8 +153,9 @@ export class QuestScene extends Phaser.Scene {
 
     // No quests message
     if (quests.length === 0) {
+      const { width, height } = this.cameras.main;
       this.add
-        .text(GAME_CONFIG.width / 2, 400, 'No quests available', {
+        .text(width / 2, height / 2, 'No quests available', {
           fontSize: '18px',
           color: COLORS.textDim,
           fontFamily: 'Arial',
