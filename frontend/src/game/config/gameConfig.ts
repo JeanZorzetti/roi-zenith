@@ -41,5 +41,7 @@ export const SCENE_KEYS = {
   INVENTORY: 'InventoryScene',
   PARTY: 'PartyScene',
   QUESTS: 'QuestScene',
-  UI: 'UIScene'
+  UI: 'UIScene',
+  SETTINGS: 'SettingsScene',
+  ACHIEVEMENTS: 'AchievementScene'
 };

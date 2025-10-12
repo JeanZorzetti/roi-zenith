@@ -50,6 +50,52 @@ export class MenuScene extends Phaser.Scene {
       this.scene.launch(SCENE_KEYS.UI); // Launch UI overlay
     });
 
+    // Achievements button
+    const achievementsBtn = this.add.text(width / 2 - 120, height / 2 + 120, '🏆 Conquistas', {
+      font: '16px monospace',
+      color: '#fdcb6e',
+      backgroundColor: '#16213e',
+      padding: { x: 15, y: 8 }
+    });
+    achievementsBtn.setOrigin(0.5);
+    achievementsBtn.setInteractive({ useHandCursor: true });
+
+    achievementsBtn.on('pointerover', () => {
+      achievementsBtn.setStyle({ color: '#ffffff', backgroundColor: '#fdcb6e' });
+    });
+
+    achievementsBtn.on('pointerout', () => {
+      achievementsBtn.setStyle({ color: '#fdcb6e', backgroundColor: '#16213e' });
+    });
+
+    achievementsBtn.on('pointerdown', () => {
+      this.scene.pause(SCENE_KEYS.MENU);
+      this.scene.launch(SCENE_KEYS.ACHIEVEMENTS, { returnScene: SCENE_KEYS.MENU });
+    });
+
+    // Settings button
+    const settingsBtn = this.add.text(width / 2 + 120, height / 2 + 120, '⚙️ Configurações', {
+      font: '16px monospace',
+      color: '#6c5ce7',
+      backgroundColor: '#16213e',
+      padding: { x: 15, y: 8 }
+    });
+    settingsBtn.setOrigin(0.5);
+    settingsBtn.setInteractive({ useHandCursor: true });
+
+    settingsBtn.on('pointerover', () => {
+      settingsBtn.setStyle({ color: '#ffffff', backgroundColor: '#6c5ce7' });
+    });
+
+    settingsBtn.on('pointerout', () => {
+      settingsBtn.setStyle({ color: '#6c5ce7', backgroundColor: '#16213e' });
+    });
+
+    settingsBtn.on('pointerdown', () => {
+      this.scene.pause(SCENE_KEYS.MENU);
+      this.scene.launch(SCENE_KEYS.SETTINGS, { returnScene: SCENE_KEYS.MENU });
+    });
+
     // Instructions
     const instructions = this.add.text(width / 2, height - 100,
       'Conecte ações do CRM com progresso no jogo\n' +
@@ -61,7 +107,7 @@ export class MenuScene extends Phaser.Scene {
     instructions.setOrigin(0.5);
 
     // Version
-    const version = this.add.text(width - 10, height - 10, 'v0.1.0 - MVP', {
+    const version = this.add.text(width - 10, height - 10, 'v1.0.0 - Week 5', {
       font: '12px monospace',
       color: '#4b5563'
     });
