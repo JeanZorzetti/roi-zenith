@@ -138,9 +138,6 @@ export class BattleScene extends Phaser.Scene {
     this.animationSystem = new AnimationSystem(this);
     this.audioSystem = new AudioSystem(this);
 
-    // STOP UIScene completely (not pause)
-    this.scene.stop(SCENE_KEYS.UI);
-
     // Background - darker
     this.add.rectangle(0, 0, width, height, 0x0f0f1e).setOrigin(0);
 
@@ -774,7 +771,6 @@ export class BattleScene extends Phaser.Scene {
 
     continueBtn.on('pointerdown', () => {
       this.scene.stop(SCENE_KEYS.BATTLE);
-      this.scene.resume(SCENE_KEYS.UI);
       this.scene.resume(this.returnScene);
     });
   }
@@ -828,7 +824,6 @@ export class BattleScene extends Phaser.Scene {
 
     retryBtn.on('pointerdown', () => {
       this.scene.stop(SCENE_KEYS.BATTLE);
-      this.scene.resume(SCENE_KEYS.UI);
       this.scene.resume(this.returnScene);
     });
   }
