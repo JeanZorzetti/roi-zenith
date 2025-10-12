@@ -7,6 +7,9 @@ interface BattleData {
   leadLevel: number;
   contactId?: string;
   dealId?: string;
+  territoryId?: string;
+  isBoss?: boolean;
+  returnScene?: string; // Track which scene to return to
 }
 
 interface ActionCard {
@@ -36,6 +39,8 @@ export class BattleScene extends Phaser.Scene {
   private actionCards: ActionCard[] = [];
   private selectedAction: ActionCard | null = null;
 
+  private returnScene: string = SCENE_KEYS.WORLD_MAP; // Default return scene
+
   constructor() {
     super({ key: SCENE_KEYS.BATTLE });
   }
@@ -49,6 +54,9 @@ export class BattleScene extends Phaser.Scene {
     this.currentPhase = 1;
     this.relationship = 0;
     this.discoveryProgress = 0;
+
+    // Track which scene to return to
+    this.returnScene = data.returnScene || SCENE_KEYS.WORLD_MAP;
 
     this.initializeActionCards();
   }
@@ -599,7 +607,7 @@ export class BattleScene extends Phaser.Scene {
     continueBtn.on('pointerdown', () => {
       this.scene.stop(SCENE_KEYS.BATTLE);
       this.scene.resume(SCENE_KEYS.UI);
-      this.scene.resume(SCENE_KEYS.WORLD_MAP);
+      this.scene.resume(this.returnScene);
     });
   }
 
@@ -653,7 +661,7 @@ export class BattleScene extends Phaser.Scene {
     retryBtn.on('pointerdown', () => {
       this.scene.stop(SCENE_KEYS.BATTLE);
       this.scene.resume(SCENE_KEYS.UI);
-      this.scene.resume(SCENE_KEYS.WORLD_MAP);
+      this.scene.resume(this.returnScene);
     });
   }
 }

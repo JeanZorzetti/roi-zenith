@@ -615,7 +615,8 @@ export class TerritoryDetailScene extends Phaser.Scene {
       leadLevel: lead.level,
       contactId: lead.id,
       dealId: `deal-${lead.id}`,
-      territoryId: this.territory.id
+      territoryId: this.territory.id,
+      returnScene: SCENE_KEYS.TERRITORY_DETAIL
     });
   }
 
@@ -630,7 +631,8 @@ export class TerritoryDetailScene extends Phaser.Scene {
       contactId: `boss-${this.territory.id}`,
       dealId: `boss-deal-${this.territory.id}`,
       territoryId: this.territory.id,
-      isBoss: true
+      isBoss: true,
+      returnScene: SCENE_KEYS.TERRITORY_DETAIL
     });
   }
 
