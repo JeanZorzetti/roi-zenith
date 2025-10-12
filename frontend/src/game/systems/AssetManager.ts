@@ -314,6 +314,10 @@ export class AssetManager {
     });
 
     clone.setSize(original.width, original.height);
+
+    console.log(`✅ [AssetManager] Clone created with ${clone.length} children`);
+    console.log(`✅ [AssetManager] Clone visible: ${clone.visible}, alpha: ${clone.alpha}, depth: ${clone.depth}`);
+
     return clone;
   }
 

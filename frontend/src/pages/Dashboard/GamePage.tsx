@@ -76,18 +76,20 @@ const GamePage: React.FC = () => {
   useEffect(() => {
     // Get user ID from localStorage (set during login)
     console.log('🔍 [GamePage] Checking localStorage for user data...');
-    console.log('🔍 [GamePage] localStorage keys:', Object.keys(localStorage));
 
-    const userDataStr = localStorage.getItem('user');
+    // Try multiple possible keys for user data
+    const userDataStr = localStorage.getItem('roi_labs_user') || localStorage.getItem('user');
+
     if (!userDataStr) {
-      console.warn('⚠️ [GamePage] No user data found in localStorage["user"], skipping Socket.IO connection');
-      console.log('💡 [GamePage] Try checking localStorage["currentUser"] or other keys');
+      console.warn('⚠️ [GamePage] No user data found in localStorage, skipping Socket.IO connection');
       return;
     }
 
+    console.log('✅ [GamePage] Found user data in localStorage!');
+
     try {
       const userData = JSON.parse(userDataStr);
-      const userId = userData.id || userData.userId;
+      const userId = userData.id || userData.userId || userData._id;
 
       if (!userId) {
         console.warn('⚠️ [GamePage] No user ID in userData, skipping Socket.IO connection');
