@@ -191,7 +191,7 @@ export function initializeQuestSystem(playerLevel: number = 1): void {
   });
 
   // Initialize quest system with ALL quests at once
-  questSystem.initialize({ quests: systemQuests });
+  questSystem.initialize(systemQuests);
 
   console.log(`📋 Quest system initialized with ${QUEST_DATABASE.length} quests!`);
 }
