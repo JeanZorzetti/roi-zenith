@@ -149,13 +149,28 @@ export class WorldMapScene extends Phaser.Scene {
     // Get player reputation from registry (set by UIScene or backend)
     const playerReputation = this.registry.get('playerReputation') || 0;
 
+    // Calculate center positions based on screen size
+    const { width, height } = this.cameras.main;
+    const centerX = width / 2;
+    const centerY = height / 2;
+
+    // Grid layout: 3 columns, 2 rows (centered)
+    const cardWidth = 220;
+    const cardHeight = 200;
+    const gapX = 80;
+    const gapY = 60;
+
+    // Starting positions for 3x2 grid
+    const startX = centerX - (cardWidth + gapX);
+    const startY = centerY - (cardHeight / 2 + gapY / 2) + 40; // +40 to account for title bar
+
     this.territories = [
       {
         id: 'varejo',
         name: 'Varejo',
         emoji: '🏪',
-        x: 250,
-        y: 220,
+        x: startX,
+        y: startY,
         color: 0x10b981, // Green
         reputationRequired: 0,
         level: 1,
@@ -169,8 +184,8 @@ export class WorldMapScene extends Phaser.Scene {
         id: 'industria',
         name: 'Indústria',
         emoji: '🏭',
-        x: 550,
-        y: 220,
+        x: startX + cardWidth + gapX,
+        y: startY,
         color: 0xef4444, // Red
         reputationRequired: 10,
         level: 2,
@@ -184,8 +199,8 @@ export class WorldMapScene extends Phaser.Scene {
         id: 'servicos',
         name: 'Serviços',
         emoji: '💼',
-        x: 850,
-        y: 220,
+        x: startX + (cardWidth + gapX) * 2,
+        y: startY,
         color: 0x8b5cf6, // Purple
         reputationRequired: 25,
         level: 3,
@@ -199,8 +214,8 @@ export class WorldMapScene extends Phaser.Scene {
         id: 'saude',
         name: 'Saúde',
         emoji: '🏥',
-        x: 250,
-        y: 480,
+        x: startX,
+        y: startY + cardHeight + gapY,
         color: 0x06b6d4, // Cyan
         reputationRequired: 50,
         level: 4,
@@ -214,8 +229,8 @@ export class WorldMapScene extends Phaser.Scene {
         id: 'corporativo',
         name: 'Corporativo',
         emoji: '🏢',
-        x: 550,
-        y: 480,
+        x: startX + cardWidth + gapX,
+        y: startY + cardHeight + gapY,
         color: 0xf59e0b, // Amber
         reputationRequired: 100,
         level: 5,
@@ -229,8 +244,8 @@ export class WorldMapScene extends Phaser.Scene {
         id: 'startups',
         name: 'Startups',
         emoji: '🦄',
-        x: 850,
-        y: 480,
+        x: startX + (cardWidth + gapX) * 2,
+        y: startY + cardHeight + gapY,
         color: 0xec4899, // Pink
         reputationRequired: 200,
         level: 6,
