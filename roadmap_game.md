@@ -1048,14 +1048,15 @@ Boss Battles:
 └─ [👌] Victory rewards (guaranteed epic+)
 ```
 
-#### Week 4: Equipment + Party + Quests ⏳ 70% COMPLETA
+#### Week 4: Equipment + Party + Quests ✅ 100% COMPLETA
 
 **Objetivos:**
 
 - ✅ Sistema de inventário completo
-- ✅ Equipamentos funcionais (falta item database)
+- ✅ Equipamentos funcionais com item database completo
 - ✅ Party system COMPLETO (UI + 5 NPCs)
-- ✅ Quest system básico
+- ✅ Quest system completo (Main + Daily + Weekly)
+- ✅ Loot system implementado
 
 **Tasks:**
 
@@ -1071,14 +1072,14 @@ Equipment System:
 │  ├─ Equipment slots (5 slots)
 │  ├─ Item details/tooltip
 │  └─ Equip/unequip (click)
-├─ [ ] Item database (20-30 items):
-│  ├─ 5 rarities (common → mythic)
-│  ├─ Stats por item
-│  └─ Sprites para items
-└─ [ ] Loot system:
-   ├─ Drop chance calculation
-   ├─ Rarity roll
-   └─ Loot animation
+├─ [👌] Item database (30 items):
+│  ├─ 5 rarities (common → legendary)
+│  ├─ Stats por item (intelligence, charisma, perception, knowledge, luck)
+│  └─ 5 slots: PRIMARY_TOOL, SECONDARY_TOOL, KNOWLEDGE_BASE, COMMUNICATION, PROFESSIONAL
+└─ [👌] Loot system (LootSystem.ts):
+   ├─ Drop chance calculation (8 predefined loot tables)
+   ├─ Rarity roll (weighted probabilities + guaranteed minimums)
+   └─ Loot animation (createLootAnimation helper)
 
 Party System:
 ├─ [👌] Party UI (PartyScene.ts):
@@ -1095,7 +1096,7 @@ Party System:
 ├─ [👌] Party bonuses:
 │  ├─ Passive effects (xpBonus, coinBonus, energyRegen, etc)
 │  └─ Active skills (com cooldowns)
-└─ [ ] Backend: POST /api/game/recruit
+└─ [👌] Backend: POST /api/game/recruit (já implementado em gameService.ts)
 
 Quest System:
 ├─ [👌] Criar QuestSystem.ts:
@@ -1108,10 +1109,10 @@ Quest System:
 │  ├─ Progress bars
 │  ├─ Objectives checklist
 │  └─ Rewards preview
-├─ [ ] Quest database:
-│  ├─ Main quest (5 capítulos)
-│  ├─ Daily quests (4-5)
-│  └─ Weekly challenges (3)
+├─ [👌] Quest database (questDatabase.ts):
+│  ├─ Main quest (5 capítulos completos com narrativa)
+│  ├─ Daily quests (5 quests)
+│  └─ Weekly challenges (3 challenges)
 └─ [👌] Auto-track de progresso (hooks em ações)
 ```
 
@@ -1336,17 +1337,25 @@ Status: ✅ 100% completo - MVP totalmente funcional!
 🎮 Acesso: https://www.roilabs.com.br/dashboard/game
 ```
 
-### Milestone 2: Feature Complete (Fim Semana 4) ⏳ EM PROGRESSO
+### Milestone 2: Feature Complete (Fim Semana 4) ✅ COMPLETO
 
 ```
 Critérios de Sucesso:
 ├─ [👌] Todos territórios exploráveis (Week 3 completa!)
-├─ [⏳] Todos sistemas implementados (Week 4 50% completa)
-├─ [ ] Main quest completa (Week 4)
-└─ [ ] Conteúdo para 1-2 meses (Week 4)
+├─ [👌] Todos sistemas implementados (Week 4 100% completa!)
+├─ [👌] Main quest completa (5 capítulos + narrativa)
+└─ [👌] Conteúdo para 1-2 meses (30 items, 13 quests, loot system)
 
 KPI: 1 vendedora consegue jogar por 1 semana sem repetição
-Status: Week 3 (100%) ✅ | Week 4 (50%) ⏳ - Equipment + Quest Systems prontos!
+Status: ✅ 100% completo - Fase 2 totalmente implementada!
+
+📦 Implementado:
+   - 30 items (5 rarities, 5 slots)
+   - 5 Main Quest chapters com narrativa completa
+   - 5 Daily Quests + 3 Weekly Challenges
+   - Loot System completo (8 loot tables, rarity rolls, animations)
+   - Party System funcional (5 NPCs recrutáveis)
+   - Backend recruit endpoint implementado
 ```
 
 ### Milestone 3: Production Ready (Fim Semana 6)
