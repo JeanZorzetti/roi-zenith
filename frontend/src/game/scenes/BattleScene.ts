@@ -191,12 +191,15 @@ export class BattleScene extends Phaser.Scene {
     // NPC Sprite (instead of icon)
     const territoryId = this.registry.get('currentTerritory') || 'varejo';
     const npcSpriteId = assetManager.getNPCByTerritory(territoryId);
+    console.log(`🎨 [BattleScene] Loading NPC sprite: ${npcSpriteId} for territory: ${territoryId}`);
     const npcSprite = assetManager.cloneSprite(npcSpriteId, x, y - 85);
 
     if (npcSprite) {
+      console.log(`✅ [BattleScene] NPC sprite loaded successfully!`);
       npcSprite.setScale(0.5); // Scale down to fit panel
       SpriteGenerator.createAnimatedSprite(this, npcSprite, 'idle');
     } else {
+      console.warn(`⚠️ [BattleScene] NPC sprite NOT found, using fallback icon`);
       // Fallback to icon if sprite not found
       this.add.text(x, y - 85, '🏢', {
         fontSize: '32px'
@@ -272,12 +275,15 @@ export class BattleScene extends Phaser.Scene {
     panel.setStrokeStyle(3, 0x00b894);
 
     // Player Sprite (instead of icon)
+    console.log(`🎨 [BattleScene] Loading Player sprite: player_idle`);
     const playerSprite = assetManager.cloneSprite('player_idle', x, y - 85);
 
     if (playerSprite) {
+      console.log(`✅ [BattleScene] Player sprite loaded successfully!`);
       playerSprite.setScale(0.5); // Scale down to fit panel
       SpriteGenerator.createAnimatedSprite(this, playerSprite, 'idle');
     } else {
+      console.warn(`⚠️ [BattleScene] Player sprite NOT found, using fallback icon`);
       // Fallback to icon if sprite not found
       this.add.text(x, y - 85, '🔍', {
         fontSize: '32px'
