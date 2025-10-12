@@ -1113,7 +1113,13 @@ Quest System:
 │  ├─ Main quest (5 capítulos completos com narrativa)
 │  ├─ Daily quests (5 quests)
 │  └─ Weekly challenges (3 challenges)
-└─ [👌] Auto-track de progresso (hooks em ações)
+├─ [👌] Auto-track de progresso (hooks em ações)
+└─ [👌] Integração de databases no jogo (gameDataInitializer.ts):
+   ├─ Adapter itemDatabase → InventorySystem
+   ├─ Adapter questDatabase → QuestSystem
+   ├─ BootScene: Inicialização automática
+   ├─ 4 starter items dados ao player
+   └─ 13 quests visíveis no jogo (Main/Daily/Weekly)
 ```
 
 #### Deliverable Fase 2:
