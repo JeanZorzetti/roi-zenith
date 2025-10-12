@@ -64,8 +64,31 @@ export class WorldMapScene extends Phaser.Scene {
       fontFamily: 'Arial, sans-serif'
     }).setOrigin(0.5);
 
+    // Party button (top right)
+    const partyBtn = this.add.rectangle(width - 420, 50, 130, 50, 0x1e293b, 0.9);
+    partyBtn.setStrokeStyle(2, 0x3b82f6);
+    partyBtn.setInteractive({ useHandCursor: true });
+
+    const partyText = this.add.text(width - 420, 50, '👥 Party', {
+      fontSize: '14px',
+      color: COLORS.textLight,
+      fontFamily: 'Arial, sans-serif'
+    }).setOrigin(0.5);
+
+    partyBtn.on('pointerdown', () => {
+      this.scene.start(SCENE_KEYS.PARTY);
+    });
+
+    partyBtn.on('pointerover', () => {
+      partyBtn.setFillStyle(0x2d3748);
+    });
+
+    partyBtn.on('pointerout', () => {
+      partyBtn.setFillStyle(0x1e293b, 0.9);
+    });
+
     // Inventory button (top right)
-    const invBtn = this.add.rectangle(width - 280, 50, 140, 50, 0x1e293b, 0.9);
+    const invBtn = this.add.rectangle(width - 280, 50, 130, 50, 0x1e293b, 0.9);
     invBtn.setStrokeStyle(2, 0x3b82f6);
     invBtn.setInteractive({ useHandCursor: true });
 
@@ -88,11 +111,11 @@ export class WorldMapScene extends Phaser.Scene {
     });
 
     // Quests button (top right, next to inventory)
-    const questBtn = this.add.rectangle(width - 120, 50, 140, 50, 0x1e293b, 0.9);
+    const questBtn = this.add.rectangle(width - 140, 50, 120, 50, 0x1e293b, 0.9);
     questBtn.setStrokeStyle(2, 0x3b82f6);
     questBtn.setInteractive({ useHandCursor: true });
 
-    const questText = this.add.text(width - 120, 50, '📜 Quests', {
+    const questText = this.add.text(width - 140, 50, '📜 Quests', {
       fontSize: '14px',
       color: COLORS.textLight,
       fontFamily: 'Arial, sans-serif'

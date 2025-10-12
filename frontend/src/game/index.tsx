@@ -7,6 +7,7 @@ import { UIScene } from './scenes/UIScene';
 import { BattleScene } from './scenes/BattleScene';
 import { InventoryScene } from './scenes/InventoryScene';
 import { QuestScene } from './scenes/QuestScene';
+import { PartyScene } from './scenes/PartyScene';
 import { GAME_CONFIG } from './config/gameConfig';
 
 export class MarketResearchGame {
@@ -28,7 +29,8 @@ export class MarketResearchGame {
         TerritoryDetailScene,
         BattleScene,
         InventoryScene,
-        QuestScene
+        QuestScene,
+        PartyScene
         // UIScene removed - using global React HUD instead
       ],
       scale: {

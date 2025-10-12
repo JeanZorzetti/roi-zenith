@@ -1048,13 +1048,13 @@ Boss Battles:
 └─ [👌] Victory rewards (guaranteed epic+)
 ```
 
-#### Week 4: Equipment + Party + Quests ⏳ 50% COMPLETA
+#### Week 4: Equipment + Party + Quests ⏳ 70% COMPLETA
 
 **Objetivos:**
 
 - ✅ Sistema de inventário completo
 - ✅ Equipamentos funcionais (falta item database)
-- ⏳ Party system (2-3 NPCs)
+- ✅ Party system COMPLETO (UI + 5 NPCs)
 - ✅ Quest system básico
 
 **Tasks:**
@@ -1081,15 +1081,20 @@ Equipment System:
    └─ Loot animation
 
 Party System:
-├─ [ ] Party UI:
+├─ [👌] Party UI (PartyScene.ts):
 │  ├─ Lista de NPCs disponíveis
 │  ├─ Stats de cada NPC
 │  ├─ Recruit button (custo coins)
 │  └─ Active party (visual)
-├─ [ ] NPC database (5 NPCs iniciais)
-├─ [ ] Party bonuses:
-│  ├─ Passive effects
-│  └─ Active skills (em batalha)
+├─ [👌] NPC database (5 NPCs):
+│  ├─ Ana Silva (Researcher) - Lvl 1, 100 coins, +15% XP
+│  ├─ Carlos Mendes (Analyst) - Lvl 5, 250 coins, +20% coins
+│  ├─ Beatriz Costa (Negotiator) - Lvl 8, 400 coins, +25% relationship
+│  ├─ Rafael Oliveira (Strategist) - Lvl 12, 600 coins, +30% energy regen
+│  └─ Mariana Santos (Scout) - Lvl 15, 800 coins, +35% discovery
+├─ [👌] Party bonuses:
+│  ├─ Passive effects (xpBonus, coinBonus, energyRegen, etc)
+│  └─ Active skills (com cooldowns)
 └─ [ ] Backend: POST /api/game/recruit
 
 Quest System:

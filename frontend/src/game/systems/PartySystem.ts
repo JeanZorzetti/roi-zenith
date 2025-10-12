@@ -30,14 +30,20 @@ export class PartySystem {
   private availableNPCs: Map<string, NPC> = new Map();
   private recruitedNPCs: Map<string, PartyMember> = new Map();
   private maxPartySize: number = 3;
+  private initialized: boolean = false;
 
   /**
    * Initialize with NPC database
    */
   public initialize(npcs: NPC[]): void {
+    if (this.initialized) return;
+
     npcs.forEach(npc => {
       this.availableNPCs.set(npc.id, npc);
     });
+
+    this.initialized = true;
+    console.log(`🎮 [PartySystem] Initialized with ${npcs.length} NPCs`);
   }
 
   /**
@@ -149,6 +155,13 @@ export class PartySystem {
       current: this.recruitedNPCs.size,
       max: this.maxPartySize,
     };
+  }
+
+  /**
+   * Get max party size
+   */
+  public getMaxPartySize(): number {
+    return this.maxPartySize;
   }
 
   /**
