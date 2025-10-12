@@ -225,11 +225,17 @@ export class AssetManager {
     }
 
     console.log(`✅ [AssetManager] Found original sprite, creating clone at (${x}, ${y})`);
+    console.log(`📦 [AssetManager] Original container has ${original.length} children`);
+    console.log(`📦 [AssetManager] Original.list:`, original.list.map((c: any) => c.type));
+
     // Create a new container at position
     const clone = this.scene.add.container(x, y);
 
     // Clone all children from original
+    let clonedCount = 0;
     original.each((child: Phaser.GameObjects.GameObject) => {
+      clonedCount++;
+      console.log(`🔄 [AssetManager] Cloning child #${clonedCount}:`, child.type);
       if (child instanceof Phaser.GameObjects.Rectangle) {
         const rect = this.scene!.add.rectangle(
           (child as any).x,
