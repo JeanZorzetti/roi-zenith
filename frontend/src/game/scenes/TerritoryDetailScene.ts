@@ -1,5 +1,7 @@
 import Phaser from 'phaser';
 import { SCENE_KEYS, COLORS } from '../config/gameConfig';
+import { LootSystem, LOOT_TABLES } from '../systems/LootSystem';
+import inventorySystem from '../systems/InventorySystem';
 
 interface Territory {
   id: string;
@@ -581,20 +583,47 @@ export class TerritoryDetailScene extends Phaser.Scene {
     const success = roll <= action.successChance;
 
     if (success) {
+      // LOOT SYSTEM: Roll for item drop
+      const lootSystem = new LootSystem();
+      const playerLevel = this.registry.get('playerLevel') || 1;
+      const playerLuck = this.registry.get('playerLuck') || 0;
+
+      lootSystem.setLuckMultiplier(playerLuck);
+
+      // Use appropriate loot table based on territory level
+      const lootTable = this.territory.level < 3
+        ? LOOT_TABLES.COMMON_EXPLORATION
+        : this.territory.level < 5
+          ? LOOT_TABLES.UNCOMMON_EXPLORATION
+          : LOOT_TABLES.RARE_EXPLORATION;
+
+      const loot = lootSystem.generateLoot(lootTable, playerLevel);
+
       // Find an undiscovered lead and reveal it
       const undiscoveredLead = this.leads.find(l => !l.discovered);
       if (undiscoveredLead) {
         undiscoveredLead.discovered = true;
         undiscoveredLead.quality = action.leadQuality;
 
+        // Build success message with loot
+        let message = `✅ Sucesso! Lead descoberto: ${undiscoveredLead.name}`;
+
+        // Add loot to inventory and show in message
+        if (loot.items.length > 0) {
+          loot.items.forEach(drop => {
+            inventorySystem.addItem(drop.item);
+            message += `\n${drop.item.icon} ${drop.item.name}`;
+          });
+        }
+
         // Show success message
-        this.showMessage(`✅ Sucesso! Lead descoberto: ${undiscoveredLead.name}`, COLORS.success);
+        this.showMessage(message, COLORS.success);
 
         // Update exploration progress
         this.territory.explorationProgress = Math.min(100, this.territory.explorationProgress + 10);
 
         // Refresh scene
-        this.time.delayedCall(1500, () => {
+        this.time.delayedCall(2500, () => {
           this.scene.restart(this.territory);
         });
       } else {
