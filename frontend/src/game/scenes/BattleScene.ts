@@ -1,5 +1,8 @@
 import Phaser from 'phaser';
 import { SCENE_KEYS, COLORS } from '../config/gameConfig';
+import { LootSystem, LOOT_TABLES } from '../systems/LootSystem';
+import { getRandomItemDrop } from '../data/gameDataInitializer';
+import inventorySystem from '../systems/InventorySystem';
 
 interface BattleData {
   leadName: string;
@@ -537,17 +540,17 @@ export class BattleScene extends Phaser.Scene {
 
     const overlay = this.add.rectangle(0, 0, width, height, 0x000000, 0.85).setOrigin(0);
 
-    const panel = this.add.rectangle(width / 2, height / 2, 450, 350, 0x2d2d44, 1).setOrigin(0.5);
+    const panel = this.add.rectangle(width / 2, height / 2, 450, 400, 0x2d2d44, 1).setOrigin(0.5);
     panel.setStrokeStyle(4, 0x00b894);
 
-    this.add.text(width / 2, height / 2 - 130, '🎉 ENTREVISTA CONCLUÍDA!', {
+    this.add.text(width / 2, height / 2 - 170, '🎉 ENTREVISTA CONCLUÍDA!', {
       fontSize: '26px',
       color: '#00b894',
       fontFamily: 'Arial, sans-serif',
       fontStyle: 'bold'
     }).setOrigin(0.5);
 
-    this.add.text(width / 2, height / 2 - 85, 'Você descobriu insights valiosos!', {
+    this.add.text(width / 2, height / 2 - 125, 'Você descobriu insights valiosos!', {
       fontSize: '15px',
       color: COLORS.text,
       fontFamily: 'Arial, sans-serif'
@@ -557,33 +560,92 @@ export class BattleScene extends Phaser.Scene {
     const coinsGain = 25 + (this.leadLevel * 5);
     const gemsGain = Math.floor(this.discoveryProgress / 20);
 
-    this.add.text(width / 2, height / 2 - 45, 'Recompensas:', {
+    this.add.text(width / 2, height / 2 - 85, 'Recompensas:', {
       fontSize: '16px',
       color: COLORS.warning,
       fontFamily: 'Arial, sans-serif',
       fontStyle: 'bold'
     }).setOrigin(0.5);
 
-    this.add.text(width / 2, height / 2 - 10, `+${xpGain} XP`, {
+    this.add.text(width / 2, height / 2 - 50, `+${xpGain} XP`, {
       fontSize: '14px',
       color: COLORS.primary,
       fontFamily: 'Arial, sans-serif',
       fontStyle: 'bold'
     }).setOrigin(0.5);
 
-    this.add.text(width / 2, height / 2 + 15, `💰 +${coinsGain} Coins`, {
+    this.add.text(width / 2, height / 2 - 25, `💰 +${coinsGain} Coins`, {
       fontSize: '14px',
       color: COLORS.warning,
       fontFamily: 'Arial, sans-serif',
       fontStyle: 'bold'
     }).setOrigin(0.5);
 
-    this.add.text(width / 2, height / 2 + 40, `💎 +${gemsGain} Gems`, {
+    this.add.text(width / 2, height / 2, `💎 +${gemsGain} Gems`, {
       fontSize: '14px',
       color: COLORS.success,
       fontFamily: 'Arial, sans-serif',
       fontStyle: 'bold'
     }).setOrigin(0.5);
+
+    // LOOT SYSTEM: Roll for item drop
+    const lootSystem = new LootSystem();
+    const playerLevel = this.registry.get('playerLevel') || 1;
+    const playerLuck = this.registry.get('playerLuck') || 0;
+
+    // Set luck multiplier (cada ponto de luck = +0.5% drop chance)
+    lootSystem.setLuckMultiplier(playerLuck);
+
+    // Use appropriate loot table based on lead level
+    const lootTable = this.leadLevel < 5
+      ? LOOT_TABLES.COMMON_EXPLORATION
+      : this.leadLevel < 10
+        ? LOOT_TABLES.UNCOMMON_EXPLORATION
+        : LOOT_TABLES.RARE_EXPLORATION;
+
+    const loot = lootSystem.generateLoot(lootTable, playerLevel);
+
+    // Display item drops
+    let yOffset = 25;
+    if (loot.items.length > 0) {
+      loot.items.forEach((drop, index) => {
+        const rarityColor = drop.isRare ? '#f59e0b' : '#94a3b8';
+        const itemText = this.add.text(
+          width / 2,
+          height / 2 + yOffset + (index * 20),
+          `${drop.item.icon} ${drop.item.name}`,
+          {
+            fontSize: '13px',
+            color: rarityColor,
+            fontFamily: 'Arial, sans-serif',
+            fontStyle: drop.isRare ? 'bold' : 'normal'
+          }
+        ).setOrigin(0.5);
+
+        // Add item to inventory
+        inventorySystem.addItem(drop.item);
+
+        // Shine effect for rare items
+        if (drop.isRare) {
+          this.tweens.add({
+            targets: itemText,
+            alpha: 0.5,
+            duration: 500,
+            yoyo: true,
+            repeat: -1
+          });
+        }
+      });
+      yOffset += (loot.items.length * 20) + 10;
+    } else {
+      // No item dropped
+      this.add.text(width / 2, height / 2 + yOffset, '(Nenhum item dropado)', {
+        fontSize: '12px',
+        color: COLORS.textMuted,
+        fontFamily: 'Arial, sans-serif'
+      }).setOrigin(0.5);
+      yOffset += 25;
+    }
 
     const continueBtn = this.add.text(width / 2, height / 2 + 110, '✅ Continuar', {
       fontSize: '16px',
