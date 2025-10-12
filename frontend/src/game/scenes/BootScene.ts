@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { SCENE_KEYS, COLORS } from '../config/gameConfig';
+import { initializeStarterInventory, initializeQuestSystem } from '../data/gameDataInitializer';
 
 export class BootScene extends Phaser.Scene {
   constructor() {
@@ -59,7 +60,25 @@ export class BootScene extends Phaser.Scene {
   }
 
   create() {
-    console.log('🎮 [BootScene] Boot complete, starting MenuScene...');
+    console.log('🎮 [BootScene] Boot complete, initializing game data...');
+
+    // Initialize game data (only if not already initialized)
+    const alreadyInitialized = this.registry.get('gameDataInitialized');
+    if (!alreadyInitialized) {
+      // Get player level from registry (default to 1)
+      const playerLevel = this.registry.get('playerLevel') || 1;
+
+      // Initialize systems with data from databases
+      initializeStarterInventory();
+      initializeQuestSystem(playerLevel);
+
+      this.registry.set('gameDataInitialized', true);
+      console.log('✅ [BootScene] Game data initialized');
+    } else {
+      console.log('⏭️ [BootScene] Game data already initialized, skipping');
+    }
+
+    console.log('🎮 [BootScene] Starting MenuScene...');
     this.scene.start(SCENE_KEYS.MENU);
   }
 }
