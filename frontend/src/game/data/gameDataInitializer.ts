@@ -173,7 +173,8 @@ export function convertToSystemQuest(dbQuest: DatabaseQuest): QuestSystemQuest {
 export function initializeQuestSystem(playerLevel: number = 1): void {
   console.log('📋 Initializing quest system from questDatabase...');
 
-  QUEST_DATABASE.forEach(dbQuest => {
+  // Convert all quests to system format
+  const systemQuests: QuestSystemQuest[] = QUEST_DATABASE.map(dbQuest => {
     const systemQuest = convertToSystemQuest(dbQuest);
 
     // Determine initial status based on level and prerequisites
@@ -185,9 +186,12 @@ export function initializeQuestSystem(playerLevel: number = 1): void {
       systemQuest.status = 'active'; // Available immediately
     }
 
-    questSystem.initialize({ quests: [systemQuest] });
-    console.log(`  ✅ Added quest: ${systemQuest.name} (${systemQuest.status})`);
+    console.log(`  ✅ Converted quest: ${systemQuest.name} (${systemQuest.status})`);
+    return systemQuest;
   });
+
+  // Initialize quest system with ALL quests at once
+  questSystem.initialize({ quests: systemQuests });
 
   console.log(`📋 Quest system initialized with ${QUEST_DATABASE.length} quests!`);
 }
