@@ -75,9 +75,13 @@ const GamePage: React.FC = () => {
   // Connect Socket.IO to receive game events
   useEffect(() => {
     // Get user ID from localStorage (set during login)
+    console.log('🔍 [GamePage] Checking localStorage for user data...');
+    console.log('🔍 [GamePage] localStorage keys:', Object.keys(localStorage));
+
     const userDataStr = localStorage.getItem('user');
     if (!userDataStr) {
-      console.warn('⚠️ [GamePage] No user data found, skipping Socket.IO connection');
+      console.warn('⚠️ [GamePage] No user data found in localStorage["user"], skipping Socket.IO connection');
+      console.log('💡 [GamePage] Try checking localStorage["currentUser"] or other keys');
       return;
     }
 

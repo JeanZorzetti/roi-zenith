@@ -211,9 +211,20 @@ export class AssetManager {
    * Clone a sprite (for creating instances)
    */
   public cloneSprite(id: string, x: number = 0, y: number = 0): Phaser.GameObjects.Container | null {
-    const original = this.sprites.get(id);
-    if (!original || !this.scene) return null;
+    console.log(`🎨 [AssetManager] Attempting to clone sprite: ${id}`);
+    console.log(`🎨 [AssetManager] Available sprites:`, Array.from(this.sprites.keys()));
 
+    const original = this.sprites.get(id);
+    if (!original) {
+      console.error(`❌ [AssetManager] Sprite "${id}" not found in cache!`);
+      return null;
+    }
+    if (!this.scene) {
+      console.error(`❌ [AssetManager] No scene available for cloning!`);
+      return null;
+    }
+
+    console.log(`✅ [AssetManager] Found original sprite, creating clone at (${x}, ${y})`);
     // Create a new container at position
     const clone = this.scene.add.container(x, y);
 
