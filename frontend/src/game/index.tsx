@@ -28,8 +28,8 @@ export class MarketResearchGame {
         TerritoryDetailScene,
         BattleScene,
         InventoryScene,
-        QuestScene,
-        UIScene
+        QuestScene
+        // UIScene removed - using global React HUD instead
       ],
       scale: {
         mode: Phaser.Scale.FIT,

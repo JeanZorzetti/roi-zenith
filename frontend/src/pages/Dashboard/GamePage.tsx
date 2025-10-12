@@ -14,17 +14,52 @@ const GamePage: React.FC = () => {
     if (gameContainerRef.current && !gameInstanceRef.current) {
       console.log('🎮 [GamePage] Initializing Market Research Quest...');
 
-      try {
-        gameInstanceRef.current = new MarketResearchGame(gameContainerRef.current);
-        setIsLoading(false);
-        console.log('🎮 [GamePage] Game initialized successfully');
+      const initializeGame = async () => {
+        try {
+          // Create game instance
+          gameInstanceRef.current = new MarketResearchGame(gameContainerRef.current!);
+          console.log('🎮 [GamePage] Game initialized successfully');
 
-        // Set game instance in socket service
-        gameSocketService.setGameInstance(gameInstanceRef.current);
-      } catch (error) {
-        console.error('❌ [GamePage] Error initializing game:', error);
-        setIsLoading(false);
-      }
+          // Set game instance in socket service
+          gameSocketService.setGameInstance(gameInstanceRef.current);
+
+          // Fetch initial game state from backend
+          const token = localStorage.getItem('token');
+          if (token) {
+            console.log('📡 [GamePage] Fetching game state from backend...');
+            const response = await fetch('/api/game/state', {
+              headers: {
+                'Authorization': `Bearer ${token}`
+              }
+            });
+
+            if (response.ok) {
+              const data = await response.json();
+              console.log('✅ [GamePage] Game state loaded:', data.state);
+
+              // Initialize WorldMapScene with player data
+              const worldMapScene = gameInstanceRef.current.getGame()?.scene.getScene('WorldMapScene');
+              if (worldMapScene && data.state) {
+                worldMapScene.registry.set('playerLevel', data.state.level || 1);
+                worldMapScene.registry.set('playerReputation', data.state.reputation || 0);
+                worldMapScene.registry.set('playerCoins', data.state.coins || 0);
+                worldMapScene.registry.set('playerGems', data.state.gems || 0);
+                worldMapScene.registry.set('playerEnergy', data.state.energy || 50);
+                console.log('✅ [GamePage] Game registry updated with backend state');
+              }
+            } else {
+              console.warn('⚠️ [GamePage] Failed to fetch game state, using defaults');
+            }
+          }
+
+          setIsLoading(false);
+        } catch (error) {
+          console.error('❌ [GamePage] Error initializing game:', error);
+          setIsLoading(false);
+        }
+      };
+
+      initializeGame();
     }
 
     // Cleanup game on unmount
