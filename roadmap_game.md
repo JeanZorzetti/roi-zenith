@@ -655,7 +655,11 @@ roi-zenith-main/
 │  │  │  │  ├─ MenuScene.ts        # Menu principal
 │  │  │  │  ├─ WorldMapScene.ts    # Mapa de territórios
 │  │  │  │  ├─ BattleScene.ts      # Cena de batalha (entrevista)
-│  │  │  │  └─ UIScene.ts          # HUD overlay
+│  │  │  │  ├─ InventoryScene.ts   # Gerenciamento de items
+│  │  │  │  ├─ QuestScene.ts       # Quests UI
+│  │  │  │  ├─ PartyScene.ts       # NPCs recrutáveis
+│  │  │  │  ├─ SettingsScene.ts    # Configurações
+│  │  │  │  └─ AchievementScene.ts # Galeria de conquistas
 │  │  │  ├─ entities/
 │  │  │  │  ├─ Player.ts           # Classe do jogador
 │  │  │  │  ├─ Lead.ts             # Classe de lead (NPC)

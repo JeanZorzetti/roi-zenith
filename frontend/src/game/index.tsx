@@ -3,7 +3,6 @@ import { BootScene } from './scenes/BootScene';
 import { MenuScene } from './scenes/MenuScene';
 import { WorldMapScene } from './scenes/WorldMapScene';
 import { TerritoryDetailScene } from './scenes/TerritoryDetailScene';
-import { UIScene } from './scenes/UIScene';
 import { BattleScene } from './scenes/BattleScene';
 import { InventoryScene } from './scenes/InventoryScene';
 import { QuestScene } from './scenes/QuestScene';
@@ -59,14 +58,6 @@ export class MarketResearchGame {
 
   getGame(): Phaser.Game | null {
     return this.game;
-  }
-
-  // Helper to get UI scene for external updates
-  getUIScene(): UIScene | null {
-    if (this.game) {
-      return this.game.scene.getScene('UIScene') as UIScene;
-    }
-    return null;
   }
 }
 
