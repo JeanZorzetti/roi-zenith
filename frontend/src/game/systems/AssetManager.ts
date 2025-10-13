@@ -238,6 +238,26 @@ export class AssetManager {
         const seed = seedMatch ? parseInt(seedMatch[1]) * 100 : 0;
         sprite = SpriteGenerator.generateNPCSprite(targetScene, style, seed, 64);
       }
+    } else if (id.startsWith('item_')) {
+      // Extract item ID and find in database
+      const itemId = id.replace('item_', '');
+      const item = ITEM_DATABASE.find(i => i.id === itemId);
+
+      if (item) {
+        // Determine item type based on slot
+        let itemType: 'weapon' | 'armor' | 'accessory' | 'consumable' = 'accessory';
+        if (item.slot === 'PRIMARY_TOOL') itemType = 'weapon';
+        else if (item.slot === 'KNOWLEDGE_BASE' || item.slot === 'COMMUNICATION') itemType = 'armor';
+        else itemType = 'accessory';
+
+        sprite = SpriteGenerator.generateItemSprite(
+          targetScene,
+          itemType,
+          item.rarity,
+          item.icon,
+          48
+        );
+      }
     }
 
     if (!sprite) {
