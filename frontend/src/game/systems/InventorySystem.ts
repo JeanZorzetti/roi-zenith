@@ -259,6 +259,13 @@ export class InventorySystem {
   }
 
   /**
+   * Sort inventory by name (alphabetically)
+   */
+  public sortByName(): void {
+    this.inventory.sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  /**
    * Get current inventory state (for saving)
    */
   public getState(): InventoryState {

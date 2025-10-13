@@ -13,6 +13,11 @@ export class InventoryScene extends Phaser.Scene {
   private statsText: Phaser.GameObjects.Text | null = null;
   private assetManager: AssetManager | null = null;
 
+  // Filter state
+  private currentSlotFilter: string | null = null;
+  private currentRarityFilter: Item['rarity'] | null = null;
+  private filterButtons: Map<string, Phaser.GameObjects.Container> = new Map();
+
   constructor() {
     super({ key: SCENE_KEYS.INVENTORY });
   }
@@ -220,50 +225,219 @@ export class InventoryScene extends Phaser.Scene {
       })
       .setOrigin(0.5);
 
-    // Sort buttons
-    this.createSortButtons(listX + 20, listY + 50);
+    // Filter and Sort controls
+    this.createFilterAndSortControls(listX + 20, listY + 50);
   }
 
   /**
-   * Create sort buttons
+   * Create filter and sort controls
    */
-  private createSortButtons(x: number, y: number): void {
-    const buttonWidth = 120;
-    const buttonHeight = 30;
-    const gap = 10;
+  private createFilterAndSortControls(x: number, y: number): void {
+    const buttonWidth = 80;
+    const buttonHeight = 26;
+    const gap = 6;
 
-    // Sort by Rarity button
-    const rarityBtn = this.add.rectangle(x, y, buttonWidth, buttonHeight, COLORS.accent, 0.8);
-    rarityBtn.setOrigin(0);
-    rarityBtn.setInteractive({ useHandCursor: true });
-    rarityBtn.setStrokeStyle(1, COLORS.border);
-
-    const rarityText = this.add.text(x + buttonWidth / 2, y + buttonHeight / 2, 'Raridade', {
-      fontSize: '12px',
-      color: COLORS.textLight,
+    // Row 1: Sort buttons
+    const sortLabel = this.add.text(x, y, 'Ordenar:', {
+      fontSize: '11px',
+      color: COLORS.textDim,
       fontFamily: 'Arial',
-    }).setOrigin(0.5);
+    });
 
-    rarityBtn.on('pointerdown', () => {
+    this.createControlButton(x + 65, y, buttonWidth, buttonHeight, 'Raridade', () => {
       inventorySystem.sortByRarity();
       this.refreshInventory();
     });
 
-    // Sort by Level button
-    const levelBtn = this.add.rectangle(x + buttonWidth + gap, y, buttonWidth, buttonHeight, COLORS.accent, 0.8);
-    levelBtn.setOrigin(0);
-    levelBtn.setInteractive({ useHandCursor: true });
-    levelBtn.setStrokeStyle(1, COLORS.border);
+    this.createControlButton(x + 65 + buttonWidth + gap, y, buttonWidth, buttonHeight, 'Nível', () => {
+      inventorySystem.sortByLevel();
+      this.refreshInventory();
+    });
 
-    const levelText = this.add.text(x + buttonWidth + gap + buttonWidth / 2, y + buttonHeight / 2, 'Nível', {
-      fontSize: '12px',
+    this.createControlButton(x + 65 + (buttonWidth + gap) * 2, y, buttonWidth, buttonHeight, 'Nome', () => {
+      inventorySystem.sortByName();
+      this.refreshInventory();
+    });
+
+    // Row 2: Slot filters
+    const filterY = y + buttonHeight + 8;
+    const slotLabel = this.add.text(x, filterY, 'Slot:', {
+      fontSize: '11px',
+      color: COLORS.textDim,
+      fontFamily: 'Arial',
+    });
+
+    const slotFilters = [
+      { label: 'Todos', value: null },
+      { label: 'Arma', value: 'PRIMARY_TOOL' },
+      { label: 'Cabeça', value: 'KNOWLEDGE_BASE' },
+      { label: 'Corpo', value: 'COMMUNICATION' },
+      { label: 'Acess.', value: 'ACCESSORY' },
+    ];
+
+    slotFilters.forEach((filter, index) => {
+      const btn = this.createToggleButton(
+        x + 40 + index * (buttonWidth + gap),
+        filterY,
+        buttonWidth,
+        buttonHeight,
+        filter.label,
+        () => {
+          this.currentSlotFilter = filter.value;
+          this.updateFilterButtons();
+          this.refreshInventory();
+        },
+        `slot_${filter.value || 'all'}`
+      );
+    });
+
+    // Row 3: Rarity filters
+    const rarityY = filterY + buttonHeight + 8;
+    const rarityLabel = this.add.text(x, rarityY, 'Raridade:', {
+      fontSize: '11px',
+      color: COLORS.textDim,
+      fontFamily: 'Arial',
+    });
+
+    const rarityFilters: Array<{ label: string; value: Item['rarity'] | null }> = [
+      { label: 'Todas', value: null },
+      { label: 'Comum', value: 'common' },
+      { label: 'Incomum', value: 'uncommon' },
+      { label: 'Raro', value: 'rare' },
+      { label: 'Épico', value: 'epic' },
+    ];
+
+    rarityFilters.forEach((filter, index) => {
+      const btn = this.createToggleButton(
+        x + 65 + index * (buttonWidth + gap),
+        rarityY,
+        buttonWidth,
+        buttonHeight,
+        filter.label,
+        () => {
+          this.currentRarityFilter = filter.value;
+          this.updateFilterButtons();
+          this.refreshInventory();
+        },
+        `rarity_${filter.value || 'all'}`
+      );
+    });
+  }
+
+  /**
+   * Create a standard control button (sort buttons)
+   */
+  private createControlButton(
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    label: string,
+    onClick: () => void
+  ): void {
+    const btn = this.add.rectangle(x, y, width, height, COLORS.accent, 0.7);
+    btn.setOrigin(0);
+    btn.setInteractive({ useHandCursor: true });
+    btn.setStrokeStyle(1, COLORS.border);
+
+    const text = this.add.text(x + width / 2, y + height / 2, label, {
+      fontSize: '10px',
       color: COLORS.textLight,
       fontFamily: 'Arial',
     }).setOrigin(0.5);
 
-    levelBtn.on('pointerdown', () => {
-      inventorySystem.sortByLevel();
-      this.refreshInventory();
+    btn.on('pointerdown', onClick);
+
+    btn.on('pointerover', () => {
+      btn.setFillStyle(COLORS.accent, 1);
+    });
+
+    btn.on('pointerout', () => {
+      btn.setFillStyle(COLORS.accent, 0.7);
+    });
+  }
+
+  /**
+   * Create a toggle button (filter buttons)
+   */
+  private createToggleButton(
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    label: string,
+    onClick: () => void,
+    id: string
+  ): Phaser.GameObjects.Container {
+    const container = this.add.container(x, y);
+
+    const btn = this.add.rectangle(0, 0, width, height, COLORS.panelLight, 0.6);
+    btn.setOrigin(0);
+    btn.setInteractive({ useHandCursor: true });
+    btn.setStrokeStyle(1, COLORS.border);
+
+    const text = this.add.text(width / 2, height / 2, label, {
+      fontSize: '10px',
+      color: COLORS.textLight,
+      fontFamily: 'Arial',
+    }).setOrigin(0.5);
+
+    container.add([btn, text]);
+
+    // Store references for toggling
+    container.setData('btn', btn);
+    container.setData('text', text);
+    container.setData('active', false);
+
+    btn.on('pointerdown', onClick);
+
+    btn.on('pointerover', () => {
+      if (!container.getData('active')) {
+        btn.setFillStyle(COLORS.panelLight, 0.8);
+      }
+    });
+
+    btn.on('pointerout', () => {
+      if (!container.getData('active')) {
+        btn.setFillStyle(COLORS.panelLight, 0.6);
+      }
+    });
+
+    this.filterButtons.set(id, container);
+
+    return container;
+  }
+
+  /**
+   * Update filter button states
+   */
+  private updateFilterButtons(): void {
+    // Update slot filter buttons
+    this.filterButtons.forEach((container, id) => {
+      const btn = container.getData('btn') as Phaser.GameObjects.Rectangle;
+      const text = container.getData('text') as Phaser.GameObjects.Text;
+
+      let isActive = false;
+
+      if (id.startsWith('slot_')) {
+        const filterValue = id === 'slot_all' ? null : id.replace('slot_', '');
+        isActive = this.currentSlotFilter === filterValue;
+      } else if (id.startsWith('rarity_')) {
+        const filterValue = id === 'rarity_all' ? null : id.replace('rarity_', '');
+        isActive = this.currentRarityFilter === filterValue;
+      }
+
+      container.setData('active', isActive);
+
+      if (isActive) {
+        btn.setFillStyle(COLORS.accent, 0.9);
+        btn.setStrokeStyle(2, COLORS.accent);
+        text.setColor(`#${COLORS.textLight.toString()}`);
+      } else {
+        btn.setFillStyle(COLORS.panelLight, 0.6);
+        btn.setStrokeStyle(1, COLORS.border);
+        text.setColor(COLORS.textLight);
+      }
     });
   }
 
@@ -369,16 +543,27 @@ export class InventoryScene extends Phaser.Scene {
       }
     });
 
-    // Render inventory items with improved layout
-    const items = inventorySystem.getAllItems();
-    const { width, height } = this.cameras.main;
+    // Render inventory items with improved layout and filters
+    let items = inventorySystem.getAllItems();
+
+    // Apply slot filter
+    if (this.currentSlotFilter) {
+      items = items.filter(item => item.slot === this.currentSlotFilter);
+    }
+
+    // Apply rarity filter
+    if (this.currentRarityFilter) {
+      items = items.filter(item => item.rarity === this.currentRarityFilter);
+    }
+
+    const { width, height} = this.cameras.main;
     const centerX = width / 2;
     const centerY = height / 2;
 
     const listWidth = 500;
     const listX = centerX - listWidth / 2;
     const startX = listX + 20;
-    const startY = centerY - 200;
+    const startY = centerY - 110; // Adjusted for filter controls
     const cardWidth = 230;
     const cardHeight = 85; // Increased height for better spacing
     const gap = 12; // Increased gap
@@ -390,8 +575,8 @@ export class InventoryScene extends Phaser.Scene {
       const x = startX + col * (cardWidth + gap);
       const y = startY + row * (cardHeight + gap);
 
-      // Only show first 6 rows (12 items) with improved spacing
-      if (row < 6) {
+      // Only show first 5 rows (10 items) with improved spacing (reduced due to filter controls)
+      if (row < 5) {
         this.createItemCard(x, y, cardWidth, cardHeight, item);
       }
     });
