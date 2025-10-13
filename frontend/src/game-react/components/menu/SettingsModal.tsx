@@ -1,12 +1,13 @@
 // ============= SETTINGS MODAL =============
 // Modal de configurações do jogo
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog } from '../ui/Dialog';
 import { Button } from '../ui/Button';
 import { Tabs } from '../ui/Tabs';
 import { Section } from '../layout/Section';
 import { Volume2, VolumeX, Music, Music2, Gamepad2, Globe, Palette } from 'lucide-react';
+import { useAudio } from '../../hooks/useAudio';
 import clsx from 'clsx';
 
 interface SettingsModalProps {
@@ -16,14 +17,15 @@ interface SettingsModalProps {
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
   const [activeTab, setActiveTab] = useState<'audio' | 'gameplay' | 'graphics' | 'language'>('audio');
+  const audio = useAudio();
 
-  // Settings state (em produção, isso virá de um store)
+  // Settings state (audio vem do useAudio, resto do localStorage)
   const [settings, setSettings] = useState({
-    // Audio
-    masterVolume: 80,
-    musicVolume: 70,
-    sfxVolume: 90,
-    isMuted: false,
+    // Audio (sincronizado com useAudio)
+    masterVolume: audio.settings.masterVolume * 100,
+    musicVolume: audio.settings.musicVolume * 100,
+    sfxVolume: audio.settings.sfxVolume * 100,
+    isMuted: audio.settings.masterMuted,
 
     // Gameplay
     autoSave: true,
@@ -40,18 +42,32 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
     language: 'pt-BR' as 'pt-BR' | 'en-US' | 'es-ES',
   });
 
+  // Sync audio settings with useAudio hook
+  useEffect(() => {
+    audio.setMasterVolume(settings.masterVolume / 100);
+    audio.setMusicVolume(settings.musicVolume / 100);
+    audio.setSfxVolume(settings.sfxVolume / 100);
+    if (settings.isMuted !== audio.settings.masterMuted) {
+      audio.toggleMasterMute();
+    }
+  }, [settings.masterVolume, settings.musicVolume, settings.sfxVolume, settings.isMuted]);
+
   const handleSave = () => {
-    // Salvar configurações no localStorage
-    localStorage.setItem('game-settings', JSON.stringify(settings));
+    // Salvar configurações no localStorage (áudio já é salvo pelo useAudio)
+    const { masterVolume, musicVolume, sfxVolume, isMuted, ...otherSettings } = settings;
+    localStorage.setItem('game-settings', JSON.stringify(otherSettings));
+
+    // Play confirmation sound
+    audio.playSfx('click');
     onClose();
   };
 
   const handleReset = () => {
     // Reset para valores padrão
     setSettings({
-      masterVolume: 80,
-      musicVolume: 70,
-      sfxVolume: 90,
+      masterVolume: 70,
+      musicVolume: 50,
+      sfxVolume: 70,
       isMuted: false,
       autoSave: true,
       tutorials: true,
@@ -62,6 +78,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
       particles: true,
       language: 'pt-BR',
     });
+    audio.resetSettings();
   };
 
   // Slider component

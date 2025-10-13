@@ -108,10 +108,129 @@
   }
 }
 
+@keyframes attack-slash {
+  0% {
+    transform: translateX(0) scale(1);
+  }
+  50% {
+    transform: translateX(20px) scale(1.1);
+  }
+  100% {
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes skill-flash {
+  0%, 100% {
+    opacity: 1;
+    filter: brightness(1);
+  }
+  50% {
+    opacity: 0.8;
+    filter: brightness(1.5) saturate(1.5);
+  }
+}
+
+@keyframes damage-number {
+  0% {
+    transform: translateY(0) scale(0.8);
+    opacity: 0;
+  }
+  50% {
+    transform: translateY(-20px) scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-40px) scale(0.8);
+    opacity: 0;
+  }
+}
+
+@keyframes level-up {
+  0% {
+    transform: scale(0.5) rotate(-10deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2) rotate(5deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes confetti {
+  0% {
+    transform: translateY(-100%) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+@keyframes victory-bounce {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  25% {
+    transform: translateY(-20px) scale(1.1);
+  }
+  50% {
+    transform: translateY(-10px) scale(1.05);
+  }
+  75% {
+    transform: translateY(-5px) scale(1.02);
+  }
+}
+
+@keyframes defeat-fade {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0.3;
+    transform: scale(0.95);
+    filter: grayscale(1);
+  }
+}
+
 .animate-shake {
   animation: shake 0.5s ease-in-out;
 }
 
 .animate-float {
   animation: float 3s ease-in-out infinite;
+}
+
+.animate-attack-slash {
+  animation: attack-slash 0.6s ease-out;
+}
+
+.animate-skill-flash {
+  animation: skill-flash 0.8s ease-in-out;
+}
+
+.animate-damage-number {
+  animation: damage-number 1.5s ease-out forwards;
+}
+
+.animate-level-up {
+  animation: level-up 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.animate-confetti {
+  animation: confetti 3s linear forwards;
+}
+
+.animate-victory-bounce {
+  animation: victory-bounce 1s ease-in-out;
+}
+
+.animate-defeat-fade {
+  animation: defeat-fade 1.5s ease-out forwards;
 }

@@ -1,28 +1,71 @@
 // ============= VICTORY MODAL =============
 // Modal de vitória na batalha
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { BattleRewards } from '../../types/battle.types';
 import { Dialog } from '../ui/Dialog';
 import { Button } from '../ui/Button';
 import { motion } from 'framer-motion';
-import { Trophy, TrendingUp, Coins, Package, Sparkles } from 'lucide-react';
+import { Trophy, TrendingUp, Coins, Package, Sparkles, Zap } from 'lucide-react';
 
 interface VictoryModalProps {
   isOpen: boolean;
   rewards: BattleRewards;
   onContinue: () => void;
+  leveledUp?: boolean;
+  newLevel?: number;
 }
 
 export const VictoryModal: React.FC<VictoryModalProps> = ({
   isOpen,
   rewards,
   onContinue,
+  leveledUp = false,
+  newLevel = 1,
 }) => {
+  const [confetti, setConfetti] = useState<Array<{ id: number; left: string; delay: number }>>([]);
+
+  useEffect(() => {
+    if (isOpen) {
+      // Generate confetti particles
+      const particles = Array.from({ length: 30 }, (_, i) => ({
+        id: i,
+        left: `${Math.random() * 100}%`,
+        delay: Math.random() * 0.5,
+      }));
+      setConfetti(particles);
+    }
+  }, [isOpen]);
+
+  const confettiColors = [
+    'bg-yellow-400',
+    'bg-orange-400',
+    'bg-blue-400',
+    'bg-purple-400',
+    'bg-pink-400',
+    'bg-green-400',
+  ];
+
   return (
     <Dialog isOpen={isOpen} onClose={onContinue} size="md">
       <Dialog.Body>
-        <div className="text-center space-y-6 py-6">
+        {/* Confetti */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {confetti.map((particle) => (
+            <motion.div
+              key={particle.id}
+              initial={{ y: -20, opacity: 1 }}
+              animate={{ y: '100vh', opacity: 0, rotate: 360 }}
+              transition={{ duration: 3, delay: particle.delay, ease: 'linear' }}
+              className={`absolute w-3 h-3 ${
+                confettiColors[particle.id % confettiColors.length]
+              } rounded-sm`}
+              style={{ left: particle.left, top: -20 }}
+            />
+          ))}
+        </div>
+
+        <div className="text-center space-y-6 py-6 relative">
           {/* Ícone de vitória */}
           <motion.div
             initial={{ scale: 0, rotate: -180 }}
@@ -117,11 +160,47 @@ export const VictoryModal: React.FC<VictoryModalProps> = ({
             )}
           </motion.div>
 
+          {/* Level Up Notification */}
+          {leveledUp && (
+            <motion.div
+              initial={{ scale: 0, opacity: 0, rotate: -10 }}
+              animate={{ scale: 1, opacity: 1, rotate: 0 }}
+              transition={{
+                delay: 0.9,
+                type: 'spring',
+                stiffness: 200,
+                damping: 12,
+              }}
+              className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-4 border-2 border-blue-400"
+            >
+              <div className="flex items-center gap-3 justify-center">
+                <motion.div
+                  animate={{ rotate: [0, 360] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+                >
+                  <Zap className="w-8 h-8 text-yellow-300" />
+                </motion.div>
+                <div>
+                  <p className="text-yellow-300 font-bold text-lg">LEVEL UP!</p>
+                  <p className="text-white text-sm">
+                    Você alcançou o nível <span className="font-bold">{newLevel}</span>
+                  </p>
+                </div>
+                <motion.div
+                  animate={{ rotate: [0, -360] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+                >
+                  <Sparkles className="w-8 h-8 text-yellow-300" />
+                </motion.div>
+              </div>
+            </motion.div>
+          )}
+
           {/* Botão continuar */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 1 }}
+            transition={{ delay: leveledUp ? 1.2 : 1 }}
           >
             <Button
               variant="primary"
