@@ -18,6 +18,7 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      "@game-react": path.resolve(__dirname, "./src/game-react"),
     },
   },
   define: {

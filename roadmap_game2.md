@@ -5,7 +5,7 @@
 **Engine Atual**: Phaser.js 3.70.0
 **Engine Nova**: React 19 + TypeScript + Zustand
 **Tempo Estimado**: 3 semanas (15 dias úteis)
-**Progresso**: 0% ⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜
+**Progresso**: 7% ⬛⬜⬜⬜⬜⬜⬜⬜⬜⬜ (DIA 1/15 completo)
 
 ---
 
@@ -196,24 +196,28 @@ frontend/src/
 
 ### 🗓️ **SEMANA 1: Fundações e Core Systems** (Dias 1-5)
 
-#### **DIA 1: Setup e Infraestrutura** ⏳
-- [ ] Criar pasta `frontend/src/game-react/`
-- [ ] Instalar dependências:
+#### **DIA 1: Setup e Infraestrutura** ✅
+- [x] Criar pasta `frontend/src/game-react/`
+- [x] Instalar dependências:
   ```bash
   npm install zustand immer @radix-ui/react-dialog @radix-ui/react-dropdown-menu @radix-ui/react-tooltip @radix-ui/react-tabs framer-motion @dnd-kit/core @dnd-kit/sortable lucide-react clsx tailwind-merge
   ```
-- [ ] Configurar `vite.config.ts` para alias `@game-react`
-- [ ] Criar estrutura de pastas completa
-- [ ] Setup `GameApp.tsx` (componente raiz)
-- [ ] Setup rotas básicas (Menu, WorldMap, Battle, Inventory, Settings)
-- [ ] Criar `gameStore.ts` (Zustand store principal)
-- [ ] Criar tipos TypeScript base (`game.types.ts`, `player.types.ts`)
+- [x] Configurar `vite.config.ts` para alias `@game-react`
+- [x] Criar estrutura de pastas completa
+- [x] Setup `GameApp.tsx` (componente raiz)
+- [x] Setup rotas básicas (Menu, WorldMap, Battle, Inventory, Settings)
+- [x] Criar `gameStore.ts` (Zustand store principal)
+- [x] Criar `playerStore.ts` (Zustand store do player)
+- [x] Criar tipos TypeScript base (`game.types.ts`, `player.types.ts`, `item.types.ts`)
+- [x] Copiar Systems do Phaser (8 arquivos)
+- [x] Copiar Data do Phaser (6 arquivos)
 
 **Deliverables**:
 - ✅ Estrutura de pastas completa
 - ✅ Dependencies instaladas
 - ✅ Store Zustand funcionando
 - ✅ Rotas básicas navegáveis
+- ✅ Systems e Data migrados
 
 ---
 
