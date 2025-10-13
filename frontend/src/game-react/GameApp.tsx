@@ -3,12 +3,14 @@
 
 import React from 'react';
 import { useGameStore } from './store/gameStore';
+import { ToastContainer } from './components/ui/Toast';
+import { InventoryScreen } from './components/inventory/InventoryScreen';
+import { MenuScreen } from './components/menu/MenuScreen';
+import { WorldMapScreen } from './components/world/WorldMapScreen';
+import { BattleScreen } from './components/battle/BattleScreen';
+import './styles/game.css';
 
 // Placeholder screens (will be created later)
-const MenuScreen = () => <div className="flex items-center justify-center h-screen bg-gray-900 text-white text-4xl">Menu Screen</div>;
-const WorldMapScreen = () => <div className="flex items-center justify-center h-screen bg-gray-900 text-white text-4xl">World Map Screen</div>;
-const BattleScreen = () => <div className="flex items-center justify-center h-screen bg-gray-900 text-white text-4xl">Battle Screen</div>;
-const InventoryScreen = () => <div className="flex items-center justify-center h-screen bg-gray-900 text-white text-4xl">Inventory Screen</div>;
 const SettingsScreen = () => <div className="flex items-center justify-center h-screen bg-gray-900 text-white text-4xl">Settings Screen</div>;
 const AchievementsScreen = () => <div className="flex items-center justify-center h-screen bg-gray-900 text-white text-4xl">Achievements Screen</div>;
 
@@ -38,6 +40,7 @@ export const GameApp: React.FC = () => {
   return (
     <div className="game-app w-full h-screen overflow-hidden">
       {renderScreen()}
+      <ToastContainer />
     </div>
   );
 };
