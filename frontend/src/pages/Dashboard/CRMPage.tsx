@@ -24,6 +24,7 @@ import { useCRMTheme } from '../../contexts/CRMThemeContext';
 import { themes } from '../../themes/themes';
 import { ContactsList } from '../../components/crm/ContactsList';
 import { ContactModal } from '../../components/crm/ContactModal';
+import { CompanyModal } from '../../components/crm/CompanyModal';
 import PromoteToSalesButton from '../../components/crm/PromoteToSalesButton';
 import PromotionModal from '../../components/crm/PromotionModal';
 
@@ -45,6 +46,8 @@ const CRMPage = () => {
   const [editingPipeline, setEditingPipeline] = useState<Pipeline | null>(null);
   const [showContactModal, setShowContactModal] = useState(false);
   const [editingContact, setEditingContact] = useState<Contact | null>(null);
+  const [showCompanyModal, setShowCompanyModal] = useState(false);
+  const [editingCompany, setEditingCompany] = useState<Company | null>(null);
   const [showPromotionModal, setShowPromotionModal] = useState(false);
   const [promotingDeal, setPromotingDeal] = useState<Deal | null>(null);
   const [promotionEligibility, setPromotionEligibility] = useState<any>(null);
@@ -451,6 +454,53 @@ const CRMPage = () => {
     } catch (error) {
       console.error('Erro ao excluir contato:', error);
       alert('Erro ao excluir contato');
+    }
+  };
+
+  // Company management functions
+  const openCreateCompanyModal = () => {
+    setEditingCompany(null);
+    setShowCompanyModal(true);
+  };
+
+  const openEditCompanyModal = (company: Company) => {
+    setEditingCompany(company);
+    setShowCompanyModal(true);
+  };
+
+  const saveCompany = async (companyData: Omit<Company, 'id' | 'createdAt' | 'updatedAt'>) => {
+    try {
+      if (editingCompany) {
+        const success = await crmService.updateCompany(editingCompany.id, companyData);
+        if (success) {
+          await loadData();
+          setShowCompanyModal(false);
+          setEditingCompany(null);
+        }
+      } else {
+        const newCompany = await crmService.createCompany(companyData);
+        if (newCompany) {
+          await loadData();
+          setShowCompanyModal(false);
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao salvar empresa:', error);
+      alert('Erro ao salvar empresa');
+    }
+  };
+
+  const deleteCompany = async (companyId: string) => {
+    if (!confirm('Tem certeza que deseja excluir esta empresa?')) return;
+
+    try {
+      const success = await crmService.deleteCompany(companyId);
+      if (success) {
+        await loadData();
+      }
+    } catch (error) {
+      console.error('Erro ao excluir empresa:', error);
+      alert('Erro ao excluir empresa');
     }
   };
 
@@ -1398,9 +1448,27 @@ const CRMPage = () => {
               {/* Company and Contact - Campos comuns */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2" style={{ color: currentTheme.colors.text }}>
-                    Empresa
-                  </label>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="block text-sm font-medium" style={{ color: currentTheme.colors.text }}>
+                      Empresa
+                    </label>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        openCreateCompanyModal();
+                      }}
+                      className="flex items-center space-x-1 px-2 py-1 rounded-lg border transition-all hover:opacity-80"
+                      style={{
+                        backgroundColor: currentTheme.colors.primary + '10',
+                        borderColor: currentTheme.colors.primary,
+                        color: currentTheme.colors.primary
+                      }}
+                      title="Adicionar nova empresa"
+                    >
+                      <Plus className="h-3 w-3" />
+                    </button>
+                  </div>
                   <select
                     value={dealForm.companyId}
                     onChange={(e) => setDealForm({ ...dealForm, companyId: e.target.value })}
@@ -1418,9 +1486,27 @@ const CRMPage = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2" style={{ color: currentTheme.colors.text }}>
-                    Contato
-                  </label>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="block text-sm font-medium" style={{ color: currentTheme.colors.text }}>
+                      Contato
+                    </label>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        openCreateContactModal();
+                      }}
+                      className="flex items-center space-x-1 px-2 py-1 rounded-lg border transition-all hover:opacity-80"
+                      style={{
+                        backgroundColor: currentTheme.colors.primary + '10',
+                        borderColor: currentTheme.colors.primary,
+                        color: currentTheme.colors.primary
+                      }}
+                      title="Adicionar novo contato"
+                    >
+                      <Plus className="h-3 w-3" />
+                    </button>
+                  </div>
                   <select
                     value={dealForm.contactId}
                     onChange={(e) => setDealForm({ ...dealForm, contactId: e.target.value })}
@@ -1654,6 +1740,17 @@ const CRMPage = () => {
         onSave={saveContact}
         contact={editingContact}
         companies={companies}
+      />
+
+      {/* Company Modal */}
+      <CompanyModal
+        isOpen={showCompanyModal}
+        onClose={() => {
+          setShowCompanyModal(false);
+          setEditingCompany(null);
+        }}
+        onSave={saveCompany}
+        company={editingCompany}
       />
 
       {/* Promotion Modal */}
