@@ -137,7 +137,7 @@ export class ItemManager {
     power *= 1 + (item.level - 1) * 0.15;
 
     return Math.floor(power);
-  },
+  }
 
   /**
    * Compare two items (for sorting/comparison UI)
