@@ -1265,6 +1265,20 @@ Special Features:
 │  ├─ UI completa integrada no menu ✅
 │  ├─ Accessible via Menu Scene ✅
 │  └─ Fully functional ✅
+├─ [ ] Inventory UX/UI Improvements (🎯 HIGH PRIORITY):
+│  ├─ Item sprites visuais (usando SpriteGenerator) ⏳
+│  ├─ Hover tooltips com stats detalhados ⏳
+│  ├─ Drag & drop para equipar items ⏳
+│  ├─ Visual feedback ao equipar/desequipar ⏳
+│  ├─ Filter por slot/rarity ⏳
+│  ├─ Sort por nível/rarity/nome ⏳
+│  ├─ Item comparison (compare stats) ⏳
+│  ├─ Equipment preview (vê stats antes de equipar) ⏳
+│  ├─ Rarity colors & glow effects ⏳
+│  ├─ Grid layout mais espaçoso ⏳
+│  ├─ Item cards maiores e mais legíveis ⏳
+│  ├─ Animações smooth de transição ⏳
+│  └─ Stats diff highlighting (+/-) ⏳
 ├─ [ ] Insight Codex UI (⏳ pending)
 ├─ [ ] Market Intelligence Dashboard (⏳ pending)
 ├─ [ ] Relationship Tracker visual (⏳ pending)
