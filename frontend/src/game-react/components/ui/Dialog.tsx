@@ -7,47 +7,52 @@ import { clsx } from 'clsx';
 import { X } from 'lucide-react';
 
 export interface DialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  isOpen: boolean;
+  onClose: () => void;
   children: React.ReactNode;
+  size?: 'sm' | 'md' | 'lg' | 'xl';
 }
 
-export const Dialog: React.FC<DialogProps> = ({ open, onOpenChange, children }) => {
+const sizeClasses = {
+  sm: 'max-w-sm',
+  md: 'max-w-md',
+  lg: 'max-w-lg',
+  xl: 'max-w-xl',
+};
+
+export const Dialog: React.FC<DialogProps> & {
+  Header: typeof DialogHeader;
+  Title: typeof DialogTitle;
+  Description: typeof DialogDescription;
+  Body: typeof DialogBody;
+  Footer: typeof DialogFooter;
+} = ({ isOpen, onClose, children, size = 'md' }) => {
   return (
-    <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
-      {children}
+    <DialogPrimitive.Root open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogPrimitive.Portal>
+        <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
+        <DialogPrimitive.Content
+          className={clsx(
+            'fixed left-1/2 top-1/2 z-50 w-full -translate-x-1/2 -translate-y-1/2',
+            'bg-gray-900 border border-gray-700 rounded-lg shadow-2xl',
+            'data-[state=open]:animate-in data-[state=closed]:animate-out',
+            'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+            'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
+            sizeClasses[size]
+          )}
+        >
+          {children}
+          <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 hover:opacity-100 transition-opacity">
+            <X className="h-4 w-4 text-gray-400" />
+            <span className="sr-only">Close</span>
+          </DialogPrimitive.Close>
+        </DialogPrimitive.Content>
+      </DialogPrimitive.Portal>
     </DialogPrimitive.Root>
   );
 };
 
-export const DialogTrigger = DialogPrimitive.Trigger;
-
-export const DialogContent: React.FC<{ children: React.ReactNode; className?: string }> = ({
-  children,
-  className,
-}) => {
-  return (
-    <DialogPrimitive.Portal>
-      <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/80 animate-in fade-in-0" />
-      <DialogPrimitive.Content
-        className={clsx(
-          'fixed left-1/2 top-1/2 z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2',
-          'bg-gray-900 border border-gray-700 rounded-lg shadow-2xl',
-          'animate-in fade-in-0 zoom-in-95 slide-in-from-left-1/2 slide-in-from-top-1/2',
-          className
-        )}
-      >
-        {children}
-        <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 hover:opacity-100 transition-opacity">
-          <X className="h-4 w-4 text-gray-400" />
-          <span className="sr-only">Close</span>
-        </DialogPrimitive.Close>
-      </DialogPrimitive.Content>
-    </DialogPrimitive.Portal>
-  );
-};
-
-export const DialogHeader: React.FC<{ children: React.ReactNode; className?: string }> = ({
+const DialogHeader: React.FC<{ children: React.ReactNode; className?: string }> = ({
   children,
   className,
 }) => (
@@ -56,7 +61,7 @@ export const DialogHeader: React.FC<{ children: React.ReactNode; className?: str
   </div>
 );
 
-export const DialogTitle: React.FC<{ children: React.ReactNode; className?: string }> = ({
+const DialogTitle: React.FC<{ children: React.ReactNode; className?: string }> = ({
   children,
   className,
 }) => (
@@ -65,7 +70,7 @@ export const DialogTitle: React.FC<{ children: React.ReactNode; className?: stri
   </DialogPrimitive.Title>
 );
 
-export const DialogDescription: React.FC<{ children: React.ReactNode; className?: string }> = ({
+const DialogDescription: React.FC<{ children: React.ReactNode; className?: string }> = ({
   children,
   className,
 }) => (
@@ -74,12 +79,12 @@ export const DialogDescription: React.FC<{ children: React.ReactNode; className?
   </DialogPrimitive.Description>
 );
 
-export const DialogBody: React.FC<{ children: React.ReactNode; className?: string }> = ({
+const DialogBody: React.FC<{ children: React.ReactNode; className?: string }> = ({
   children,
   className,
 }) => <div className={clsx('px-6 py-4', className)}>{children}</div>;
 
-export const DialogFooter: React.FC<{ children: React.ReactNode; className?: string }> = ({
+const DialogFooter: React.FC<{ children: React.ReactNode; className?: string }> = ({
   children,
   className,
 }) => (
@@ -87,3 +92,10 @@ export const DialogFooter: React.FC<{ children: React.ReactNode; className?: str
     {children}
   </div>
 );
+
+// Attach sub-components
+Dialog.Header = DialogHeader;
+Dialog.Title = DialogTitle;
+Dialog.Description = DialogDescription;
+Dialog.Body = DialogBody;
+Dialog.Footer = DialogFooter;
