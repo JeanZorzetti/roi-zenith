@@ -81,7 +81,7 @@ export const MenuScreen: React.FC = () => {
       {/* Background animado */}
       <div className="absolute inset-0 overflow-hidden">
         {/* Partículas flutuantes */}
-        {[...Array(20)].map((_, i) => (
+        {Array.from({ length: 20 }).map((_, i) => (
           <motion.div
             key={i}
             className="absolute w-1 h-1 bg-blue-400 rounded-full opacity-30"
