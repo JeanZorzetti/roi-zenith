@@ -6,8 +6,8 @@ const GamePage: React.FC = () => {
   const { currentTheme } = useTheme();
 
   return (
-    <div className="w-full h-screen flex flex-col">
-      {/* Game Container - Fullscreen */}
+    <div className="w-full h-screen flex flex-col bg-gray-900">
+      {/* Game Container - Fullscreen React Game (v2.0) */}
       <div className="relative flex-1 overflow-hidden">
         <GameApp />
       </div>
