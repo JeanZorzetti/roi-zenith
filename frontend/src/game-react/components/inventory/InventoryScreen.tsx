@@ -21,18 +21,20 @@ export const InventoryScreen: React.FC = () => {
 
   // Header with back button and resources
   const header = (
-    <div className="flex items-center justify-between p-4">
+    <div className="flex items-center justify-between p-responsive">
       <button
         onClick={() => setScreen('worldmap')}
-        className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+        className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors touch-target min-w-[80px]"
       >
         <ArrowLeft className="w-5 h-5" />
-        <span className="font-semibold">Back</span>
+        <span className="font-semibold hidden sm:inline">Back</span>
       </button>
 
-      <h1 className="text-2xl font-bold text-white">Inventory</h1>
+      <h1 className="text-responsive-2xl font-bold text-white">Inventory</h1>
 
-      <ResourceDisplay compact />
+      <div className="hidden sm:block">
+        <ResourceDisplay compact />
+      </div>
     </div>
   );
 
@@ -77,14 +79,14 @@ export const InventoryScreen: React.FC = () => {
         onChange={(tabId) => setActiveTab(tabId as 'all' | 'equipment' | 'stats')}
       />
 
-      <div className="flex-1 overflow-auto p-4">
+      <div className="flex-1 overflow-auto p-responsive">
         {activeTab === 'all' && (
           <Panel
             title={`Items (${occupancy.current}/${occupancy.max})`}
             className="flex flex-col h-full"
           >
             <InventoryFilters />
-            <div className="flex-1 overflow-hidden mt-4">
+            <div className="flex-1 overflow-hidden mt-2 sm:mt-4">
               <InventoryGrid />
             </div>
           </Panel>

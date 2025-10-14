@@ -234,3 +234,176 @@
 .animate-defeat-fade {
   animation: defeat-fade 1.5s ease-out forwards;
 }
+
+/* ============= RESPONSIVE DESIGN ============= */
+
+/* Mobile-first approach with responsive breakpoints */
+
+/* Base styles (mobile-first) */
+:root {
+  --touch-target-min: 44px; /* Minimum touch target size (iOS/Android guidelines) */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+}
+
+/* Touch-friendly base styles */
+.touch-target {
+  min-height: var(--touch-target-min);
+  min-width: var(--touch-target-min);
+  padding: 0.75rem;
+}
+
+/* Small devices (phones, 0-640px) */
+@media (max-width: 640px) {
+  /* Typography */
+  .text-responsive-xs { font-size: 0.75rem; }
+  .text-responsive-sm { font-size: 0.875rem; }
+  .text-responsive-base { font-size: 1rem; }
+  .text-responsive-lg { font-size: 1.125rem; }
+  .text-responsive-xl { font-size: 1.25rem; }
+  .text-responsive-2xl { font-size: 1.5rem; }
+
+  /* Spacing */
+  .p-responsive { padding: var(--spacing-sm); }
+  .px-responsive { padding-left: var(--spacing-sm); padding-right: var(--spacing-sm); }
+  .py-responsive { padding-top: var(--spacing-sm); padding-bottom: var(--spacing-sm); }
+  .gap-responsive { gap: var(--spacing-sm); }
+
+  /* Layout */
+  .container-responsive { max-width: 100%; padding: 0.5rem; }
+  .grid-responsive-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+  .grid-responsive-2 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+
+  /* Touch targets */
+  button, .btn, a.btn { min-height: 48px; font-size: 1rem; }
+
+  /* Game panels */
+  .game-panel { padding: 0.75rem; }
+  .game-card { padding: 0.5rem; }
+
+  /* Hide on mobile */
+  .hidden-mobile { display: none !important; }
+
+  /* Stack vertically on mobile */
+  .stack-mobile { flex-direction: column !important; }
+
+  /* Full width on mobile */
+  .full-width-mobile { width: 100% !important; }
+}
+
+/* Medium devices (tablets, 641px-768px) */
+@media (min-width: 641px) and (max-width: 768px) {
+  /* Typography */
+  .text-responsive-xs { font-size: 0.75rem; }
+  .text-responsive-sm { font-size: 0.875rem; }
+  .text-responsive-base { font-size: 1rem; }
+  .text-responsive-lg { font-size: 1.125rem; }
+  .text-responsive-xl { font-size: 1.375rem; }
+  .text-responsive-2xl { font-size: 1.75rem; }
+
+  /* Spacing */
+  .p-responsive { padding: var(--spacing-md); }
+  .px-responsive { padding-left: var(--spacing-md); padding-right: var(--spacing-md); }
+  .py-responsive { padding-top: var(--spacing-md); padding-bottom: var(--spacing-md); }
+  .gap-responsive { gap: var(--spacing-md); }
+
+  /* Layout */
+  .container-responsive { max-width: 768px; padding: 1rem; }
+  .grid-responsive-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+  .grid-responsive-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+  /* Game panels */
+  .game-panel { padding: 0.875rem; }
+  .game-card { padding: 0.625rem; }
+}
+
+/* Large devices (desktops, 769px-1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  /* Typography */
+  .text-responsive-xs { font-size: 0.75rem; }
+  .text-responsive-sm { font-size: 0.875rem; }
+  .text-responsive-base { font-size: 1rem; }
+  .text-responsive-lg { font-size: 1.25rem; }
+  .text-responsive-xl { font-size: 1.5rem; }
+  .text-responsive-2xl { font-size: 2rem; }
+
+  /* Spacing */
+  .p-responsive { padding: var(--spacing-lg); }
+  .px-responsive { padding-left: var(--spacing-lg); padding-right: var(--spacing-lg); }
+  .py-responsive { padding-top: var(--spacing-lg); padding-bottom: var(--spacing-lg); }
+  .gap-responsive { gap: var(--spacing-lg); }
+
+  /* Layout */
+  .container-responsive { max-width: 1024px; padding: 1.5rem; }
+  .grid-responsive-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+  .grid-responsive-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .grid-responsive-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+  /* Game panels */
+  .game-panel { padding: 1rem; }
+  .game-card { padding: 0.75rem; }
+
+  /* Show on tablet+ */
+  .hidden-mobile { display: block; }
+}
+
+/* Extra large devices (large desktops, 1025px+) */
+@media (min-width: 1025px) {
+  /* Typography */
+  .text-responsive-xs { font-size: 0.75rem; }
+  .text-responsive-sm { font-size: 0.875rem; }
+  .text-responsive-base { font-size: 1rem; }
+  .text-responsive-lg { font-size: 1.25rem; }
+  .text-responsive-xl { font-size: 1.5rem; }
+  .text-responsive-2xl { font-size: 2.25rem; }
+
+  /* Spacing */
+  .p-responsive { padding: var(--spacing-xl); }
+  .px-responsive { padding-left: var(--spacing-xl); padding-right: var(--spacing-xl); }
+  .py-responsive { padding-top: var(--spacing-xl); padding-bottom: var(--spacing-xl); }
+  .gap-responsive { gap: var(--spacing-xl); }
+
+  /* Layout */
+  .container-responsive { max-width: 1280px; padding: 2rem; }
+  .grid-responsive-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+  .grid-responsive-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .grid-responsive-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .grid-responsive-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+  /* Game panels */
+  .game-panel { padding: 1.25rem; }
+  .game-card { padding: 0.875rem; }
+}
+
+/* Portrait orientation adjustments */
+@media (orientation: portrait) and (max-width: 768px) {
+  .portrait-stack { flex-direction: column !important; }
+  .portrait-full-width { width: 100% !important; }
+}
+
+/* Landscape orientation adjustments */
+@media (orientation: landscape) and (max-height: 600px) {
+  .landscape-compact { padding: 0.5rem !important; }
+  .landscape-hide { display: none !important; }
+}
+
+/* High DPI displays (retina) */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .game-card, .game-panel {
+    border-width: 0.5px;
+  }
+}
+
+/* Reduced motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

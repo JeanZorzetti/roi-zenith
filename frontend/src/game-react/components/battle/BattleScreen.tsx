@@ -159,25 +159,26 @@ export const BattleScreen: React.FC = () => {
       <GameLayout>
         <div className="h-full bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 overflow-hidden">
           {/* Header */}
-          <div className="flex items-center justify-center gap-3 py-4 border-b border-gray-800">
-            <Swords className="w-6 h-6 text-red-500" />
-            <h1 className="text-2xl font-bold text-white">BATALHA</h1>
-            <span className="px-3 py-1 bg-gray-800 text-gray-400 text-sm font-semibold rounded-full">
+          <div className="flex items-center justify-center gap-2 sm:gap-3 py-3 sm:py-4 border-b border-gray-800">
+            <Swords className="w-5 h-5 sm:w-6 sm:h-6 text-red-500" />
+            <h1 className="text-responsive-2xl font-bold text-white">BATALHA</h1>
+            <span className="px-2 sm:px-3 py-1 bg-gray-800 text-gray-400 text-xs sm:text-sm font-semibold rounded-full">
               Turno {turnCount}
             </span>
           </div>
 
-          {/* Battlefield */}
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_350px] gap-6 p-6 h-[calc(100%-4rem)]">
-            {/* Left: Arena */}
-            <div className="flex flex-col gap-6">
-              {/* Characters */}
-              <div className="grid grid-cols-2 gap-6 flex-1">
+          {/* Battlefield - Responsive Layout */}
+          <div className="flex flex-col lg:grid lg:grid-cols-[1fr_350px] gap-3 sm:gap-4 lg:gap-6 p-responsive h-[calc(100%-4rem)]">
+            {/* Arena Section */}
+            <div className="flex flex-col gap-3 sm:gap-4 lg:gap-6 flex-1">
+              {/* Characters - Stack vertically on mobile, side by side on desktop */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 lg:gap-6 flex-1">
                 {/* Player */}
                 <motion.div
                   initial={{ opacity: 0, x: -50 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.5 }}
+                  className="full-width-mobile"
                 >
                   <CharacterDisplay
                     character={player}
@@ -192,6 +193,7 @@ export const BattleScreen: React.FC = () => {
                   initial={{ opacity: 0, x: 50 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.5 }}
+                  className="full-width-mobile"
                 >
                   <CharacterDisplay
                     character={enemy}
@@ -202,14 +204,14 @@ export const BattleScreen: React.FC = () => {
                 </motion.div>
               </div>
 
-              {/* Battle Log */}
-              <div className="h-48">
+              {/* Battle Log - Smaller on mobile */}
+              <div className="h-32 sm:h-40 lg:h-48 hidden-mobile">
                 <BattleLog events={battleLog} />
               </div>
             </div>
 
-            {/* Right: Actions */}
-            <div className="bg-gray-900 rounded-lg border border-gray-800 p-6">
+            {/* Actions Panel - Full width on mobile, sidebar on desktop */}
+            <div className="bg-gray-900 rounded-lg border border-gray-800 p-3 sm:p-4 lg:p-6 full-width-mobile">
               <BattleActions
                 onAttack={attack}
                 onUseSkill={useSkill}
@@ -217,6 +219,11 @@ export const BattleScreen: React.FC = () => {
                 skills={player.skills}
                 disabled={!isPlayerTurn || isAnimating}
               />
+            </div>
+
+            {/* Battle Log - Show below actions on mobile */}
+            <div className="h-32 lg:hidden">
+              <BattleLog events={battleLog} />
             </div>
           </div>
         </div>
