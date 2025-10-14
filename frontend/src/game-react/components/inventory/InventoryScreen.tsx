@@ -23,7 +23,7 @@ export const InventoryScreen: React.FC = () => {
   const header = (
     <div className="flex items-center justify-between p-4">
       <button
-        onClick={() => setScreen('menu')}
+        onClick={() => setScreen('worldmap')}
         className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
       >
         <ArrowLeft className="w-5 h-5" />

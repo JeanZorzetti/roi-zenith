@@ -72,8 +72,8 @@ export const MenuScreen: React.FC = () => {
   };
 
   const handleStartGame = () => {
-    // Por enquanto, vai direto para o inventory como demo
-    setScreen('inventory');
+    // Ir para o World Map após começar o jogo
+    setScreen('worldmap');
   };
 
   return (
