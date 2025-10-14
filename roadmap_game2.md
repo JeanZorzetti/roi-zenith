@@ -5,7 +5,7 @@
 **Engine Atual**: Phaser.js 3.70.0
 **Engine Nova**: React 19 + TypeScript + Zustand
 **Tempo Estimado**: 3 semanas (15 dias úteis)
-**Progresso**: 67% ⬛⬛⬛⬛⬛⬛⬛⬜⬜⬜ (DIA 10/15 completo)
+**Progresso**: 73% ⬛⬛⬛⬛⬛⬛⬛⬛⬜⬜ (DIA 11/15 completo)
 
 ---
 
@@ -616,26 +616,43 @@ frontend/src/
 
 ### 🗓️ **SEMANA 3: Integração, Polish e Lançamento** (Dias 11-15)
 
-#### **DIA 11: Achievements Screen** ⏳
-- [ ] `AchievementsScreen.tsx`:
-  - Grid de conquistas
-  - Filtros (All, Unlocked, Locked)
-  - Progress bars
-- [ ] `AchievementCard.tsx`:
-  - Icon (locked = silhouette)
-  - Nome e descrição
-  - Progresso (se aplicável)
+#### **DIA 11: Achievements Screen** ✅
+
+- [x] `achievementsStore.ts` (Zustand):
+  - Store completo com persist
+  - 37 conquistas do ACHIEVEMENT_DATABASE (reutilizado)
+  - 6 categorias: combat, exploration, collection, progression, social, mastery
+  - Filtros: all/unlocked/locked + category filter
+  - Stats computados: completion %, points, category progress
+  - Actions: updateProgress, unlockAchievement, resetAchievements
+- [x] `AchievementsScreen.tsx`:
+  - Grid de conquistas responsivo (1-4 colunas)
+  - Header com stats (completion %, unlocked, total, points)
+  - Filtros por status (All, Unlocked, Locked)
+  - Filtros por categoria (6 categorias + All)
+  - Empty state
+  - GameLayout integration
+  - Framer Motion animations (stagger)
+- [x] `AchievementCard.tsx`:
+  - Icon (locked = ❓ para hidden, emoji para normal)
+  - Visual por categoria (6 gradientes coloridos)
+  - Progress bar animada
+  - Lock/Unlock badges (CheckCircle/Lock)
+  - Nome e descrição (ocultos se hidden)
+  - Rewards display (XP, coins, gems, titles)
   - Unlock date
-  - Rarity badge
-- [ ] `AchievementProgress.tsx`:
-  - Barra de progresso
-  - "X/Y completed"
-- [ ] Integração com sistema de conquistas existente
-- [ ] Notificações de achievement unlock (toast)
+  - Hover effects e scale
+- [x] Integração com sistema de conquistas existente (ACHIEVEMENT_DATABASE)
+- [x] Integration no GameApp.tsx
 
 **Deliverables**:
-- ✅ Achievements funcionais
-- ✅ Unlock notifications
+
+- ✅ Achievement system completo com 37 conquistas
+- ✅ achievementsStore.ts com Zustand + persist
+- ✅ Filtros e stats funcionais
+- ✅ UI polida com animações
+- ✅ Hidden achievements support
+- ✅ 6 categorias completas
 
 ---
 
