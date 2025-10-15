@@ -1,7 +1,7 @@
 // ============= ITEM CARD =============
 // Individual item card with rarity styling and interactions
 
-import React from 'react';
+import React, { memo, useCallback, useMemo } from 'react';
 import { Item } from '../../types/item.types';
 import { useInventory } from '../../hooks/useInventory';
 import { ItemTooltip } from './ItemTooltip';
@@ -17,25 +17,28 @@ interface ItemCardProps {
   isEquipped?: boolean;
 }
 
-export const ItemCard: React.FC<ItemCardProps> = ({ item, onClick, isEquipped = false }) => {
+const ItemCardComponent: React.FC<ItemCardProps> = ({ item, onClick, isEquipped = false }) => {
   const { equipItem, getItemPowerLevel } = useInventory();
 
-  const handleClick = () => {
+  const handleClick = useCallback(() => {
     if (onClick) {
       onClick(item);
     } else if (item.slot) {
       // Default behavior: equip item
       equipItem(item.id);
     }
-  };
+  }, [onClick, item, equipItem]);
 
-  // Get icon component from Lucide
-  const IconComponent = item.icon
-    ? (LucideIcons[item.icon as keyof typeof LucideIcons] as React.ComponentType<any>)
-    : LucideIcons.Package;
+  // Memoize icon component lookup
+  const IconComponent = useMemo(() => {
+    return item.icon
+      ? (LucideIcons[item.icon as keyof typeof LucideIcons] as React.ComponentType<any>)
+      : LucideIcons.Package;
+  }, [item.icon]);
 
-  const powerLevel = getItemPowerLevel(item);
-  const rarityGlow = ItemManager.getRarityGlow(item.rarity);
+  // Memoize expensive calculations
+  const powerLevel = useMemo(() => getItemPowerLevel(item), [item, getItemPowerLevel]);
+  const rarityGlow = useMemo(() => ItemManager.getRarityGlow(item.rarity), [item.rarity]);
 
   return (
     <ItemTooltip item={item}>
@@ -102,3 +105,12 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, onClick, isEquipped = 
     </ItemTooltip>
   );
 };
+
+// Memoize to prevent unnecessary re-renders
+export const ItemCard = memo(ItemCardComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.item.id === nextProps.item.id &&
+    prevProps.isEquipped === nextProps.isEquipped &&
+    prevProps.item.level === nextProps.item.level
+  );
+});

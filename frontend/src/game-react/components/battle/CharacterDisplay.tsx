@@ -1,7 +1,7 @@
 // ============= CHARACTER DISPLAY =============
 // Display de personagem na batalha
 
-import React from 'react';
+import React, { memo } from 'react';
 import { Character } from '../../types/battle.types';
 import { HealthBar } from './HealthBar';
 import { motion } from 'framer-motion';
@@ -16,7 +16,7 @@ interface CharacterDisplayProps {
   isDamaged?: boolean;
 }
 
-export const CharacterDisplay: React.FC<CharacterDisplayProps> = ({
+const CharacterDisplayComponent: React.FC<CharacterDisplayProps> = ({
   character,
   isEnemy = false,
   isActive = false,
@@ -119,3 +119,14 @@ export const CharacterDisplay: React.FC<CharacterDisplayProps> = ({
     </div>
   );
 };
+
+// Memoize component to prevent unnecessary re-renders
+export const CharacterDisplay = memo(CharacterDisplayComponent, (prevProps, nextProps) => {
+  // Only re-render if these props change
+  return (
+    prevProps.character.stats.currentHp === nextProps.character.stats.currentHp &&
+    prevProps.isActive === nextProps.isActive &&
+    prevProps.isDamaged === nextProps.isDamaged &&
+    prevProps.character.statusEffects.length === nextProps.character.statusEffects.length
+  );
+});

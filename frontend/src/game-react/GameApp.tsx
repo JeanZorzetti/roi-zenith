@@ -1,19 +1,31 @@
 // ============= GAME APP =============
-// Main React game component
+// Main React game component with code splitting
 
-import React, { useEffect } from 'react';
+import React, { useEffect, lazy, Suspense } from 'react';
 import { useGameStore } from './store/gameStore';
 import { ToastContainer, useToast } from './components/ui/Toast';
-import { InventoryScreen } from './components/inventory/InventoryScreen';
-import { MenuScreen } from './components/menu/MenuScreen';
-import { WorldMapScreen } from './components/world/WorldMapScreen';
-import { BattleScreen } from './components/battle/BattleScreen';
-import { AchievementsScreen } from './components/achievements/AchievementsScreen';
 import { useGameLoop } from './hooks/useGameLoop';
 import { useAutoSave } from './hooks/useAutoSave';
 import './styles/game.css';
 
-// Placeholder screens (will be created later)
+// Loading component for lazy-loaded screens
+const LoadingScreen = () => (
+  <div className="flex items-center justify-center h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900">
+    <div className="text-center">
+      <div className="inline-block animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500 mb-4"></div>
+      <p className="text-white text-xl font-semibold">Carregando...</p>
+    </div>
+  </div>
+);
+
+// Lazy load screens for code splitting
+const MenuScreen = lazy(() => import('./components/menu/MenuScreen').then(m => ({ default: m.MenuScreen })));
+const WorldMapScreen = lazy(() => import('./components/world/WorldMapScreen').then(m => ({ default: m.WorldMapScreen })));
+const BattleScreen = lazy(() => import('./components/battle/BattleScreen').then(m => ({ default: m.BattleScreen })));
+const InventoryScreen = lazy(() => import('./components/inventory/InventoryScreen').then(m => ({ default: m.InventoryScreen })));
+const AchievementsScreen = lazy(() => import('./components/achievements/AchievementsScreen').then(m => ({ default: m.AchievementsScreen })));
+
+// Placeholder settings screen
 const SettingsScreen = () => <div className="flex items-center justify-center h-screen bg-gray-900 text-white text-4xl">Settings Screen</div>;
 
 export const GameApp: React.FC = () => {
@@ -68,7 +80,9 @@ export const GameApp: React.FC = () => {
 
   return (
     <div className="game-app w-full h-screen overflow-hidden">
-      {renderScreen()}
+      <Suspense fallback={<LoadingScreen />}>
+        {renderScreen()}
+      </Suspense>
       <ToastContainer />
     </div>
   );

@@ -280,7 +280,8 @@ const InvitePage = () => {
 
       // Redirecionar para o quadro
       setTimeout(() => {
-        navigate(`/dashboard/tasks?board=${invite.board!.id}&guest=true`);
+        const boardId = invite.board!.id;
+        navigate('/dashboard/tasks?board=' + boardId + '&guest=true');
       }, 2000);
 
       setInvite(prev => ({ ...prev, message: 'Convite aceito com sucesso! Redirecionando...' }));
@@ -352,6 +353,14 @@ const InvitePage = () => {
     );
   }
 
+  // Compute className values outside JSX to avoid esbuild template literal issues
+  const boardColorClass = 'w-10 h-10 ' + (invite.board?.color || 'bg-blue-500') + ' rounded-xl flex items-center justify-center';
+  const permissionClass = 'px-2 py-1 rounded text-xs ' + (
+    invite.member?.permission === 'edit'
+      ? 'bg-green-500/20 text-green-400'
+      : 'bg-blue-500/20 text-blue-400'
+  );
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black flex items-center justify-center p-4">
       <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-8 w-full max-w-md">
@@ -366,7 +375,7 @@ const InvitePage = () => {
         <div className="space-y-4 mb-6">
           <div className="bg-gray-800/30 rounded-xl p-4">
             <div className="flex items-center space-x-3 mb-3">
-              <div className={`w-10 h-10 ${invite.board?.color || 'bg-blue-500'} rounded-xl flex items-center justify-center`}>
+              <div className={boardColorClass}>
                 <Users className="h-5 w-5 text-white" />
               </div>
               <div>
@@ -380,11 +389,7 @@ const InvitePage = () => {
                 <Mail className="h-4 w-4" />
                 <span>{invite.member?.email}</span>
               </div>
-              <div className={`px-2 py-1 rounded text-xs ${
-                invite.member?.permission === 'edit'
-                  ? 'bg-green-500/20 text-green-400'
-                  : 'bg-blue-500/20 text-blue-400'
-              }`}>
+              <div className={permissionClass}>
                 {invite.member?.permission === 'edit' ? '✏️ Editor' : '👀 Visualizador'}
               </div>
             </div>
@@ -409,7 +414,10 @@ const InvitePage = () => {
             <CheckCircle2 className="h-12 w-12 text-green-400 mx-auto mb-4" />
             <p className="text-green-400 font-medium">Convite já aceito!</p>
             <button
-              onClick={() => navigate(`/dashboard/tasks?board=${invite.board?.id}&guest=true`)}
+              onClick={() => {
+                const boardId = invite.board?.id || '';
+                navigate('/dashboard/tasks?board=' + boardId + '&guest=true');
+              }}
               className="mt-4 w-full bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-500 hover:to-secondary-500 px-4 py-3 rounded-lg text-white transition-all duration-300"
             >
               Acessar Quadro

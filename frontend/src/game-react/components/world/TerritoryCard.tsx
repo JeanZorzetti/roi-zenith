@@ -1,7 +1,7 @@
 // ============= TERRITORY CARD =============
 // Card de território no mapa mundial
 
-import React from 'react';
+import React, { memo, useMemo } from 'react';
 import { Territory } from '../../store/worldMapStore';
 import { motion } from 'framer-motion';
 import { Lock, CheckCircle, Circle } from 'lucide-react';
@@ -13,18 +13,21 @@ interface TerritoryCardProps {
   onClick: () => void;
 }
 
-export const TerritoryCard: React.FC<TerritoryCardProps> = ({ territory, onClick }) => {
-  const Icon = (LucideIcons[territory.icon as keyof typeof LucideIcons] as React.ComponentType<any>) || LucideIcons.Map;
+const colorClasses: Record<string, string> = {
+  blue: 'from-blue-600 to-blue-800 border-blue-500',
+  purple: 'from-purple-600 to-purple-800 border-purple-500',
+  green: 'from-green-600 to-green-800 border-green-500',
+  orange: 'from-orange-600 to-orange-800 border-orange-500',
+  red: 'from-red-600 to-red-800 border-red-500',
+};
 
-  const colorClasses: Record<string, string> = {
-    blue: 'from-blue-600 to-blue-800 border-blue-500',
-    purple: 'from-purple-600 to-purple-800 border-purple-500',
-    green: 'from-green-600 to-green-800 border-green-500',
-    orange: 'from-orange-600 to-orange-800 border-orange-500',
-    red: 'from-red-600 to-red-800 border-red-500',
-  };
+const TerritoryCardComponent: React.FC<TerritoryCardProps> = ({ territory, onClick }) => {
+  const Icon = useMemo(
+    () => (LucideIcons[territory.icon as keyof typeof LucideIcons] as React.ComponentType<any>) || LucideIcons.Map,
+    [territory.icon]
+  );
 
-  const gradientClass = colorClasses[territory.color] || colorClasses.blue;
+  const gradientClass = useMemo(() => colorClasses[territory.color] || colorClasses.blue, [territory.color]);
 
   const itemVariants = {
     hidden: { opacity: 0, scale: 0.9 },
@@ -139,3 +142,13 @@ export const TerritoryCard: React.FC<TerritoryCardProps> = ({ territory, onClick
     </motion.button>
   );
 };
+
+// Memoize to prevent re-renders when territory hasn't changed
+export const TerritoryCard = memo(TerritoryCardComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.territory.id === nextProps.territory.id &&
+    prevProps.territory.progress === nextProps.territory.progress &&
+    prevProps.territory.isCurrent === nextProps.territory.isCurrent &&
+    prevProps.territory.isUnlocked === nextProps.territory.isUnlocked
+  );
+});
