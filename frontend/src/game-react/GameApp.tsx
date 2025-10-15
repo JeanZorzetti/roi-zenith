@@ -5,8 +5,10 @@ import React, { useEffect, lazy, Suspense } from 'react';
 import { useGameStore } from './store/gameStore';
 import { ToastContainer, useToast } from './components/ui/Toast';
 import { ErrorBoundary } from './components/ui/ErrorBoundary';
+import { CRMStatsHUD } from './components/ui/CRMStatsHUD';
 import { useGameLoop } from './hooks/useGameLoop';
 import { useAutoSave } from './hooks/useAutoSave';
+import { useCRMRewards } from './hooks/useCRMRewards';
 import './styles/game.css';
 
 // Loading component for lazy-loaded screens
@@ -51,6 +53,15 @@ export const GameApp: React.FC = () => {
     saveOnUnload: true,
   });
 
+  // Initialize CRM rewards tracking
+  useCRMRewards({
+    enabled: true,
+    trackDeals: true,
+    trackActivities: true,
+    trackContacts: true,
+    pollInterval: 30000, // Poll every 30 seconds
+  });
+
   // Game initialization
   useEffect(() => {
     // Game initialized silently
@@ -78,10 +89,16 @@ export const GameApp: React.FC = () => {
 
   return (
     <ErrorBoundary>
-      <div className="game-app w-full h-screen overflow-hidden">
+      <div className="game-app w-full h-screen overflow-hidden relative">
+        {/* CRM Stats HUD - Always visible */}
+        <CRMStatsHUD />
+
+        {/* Game Screens */}
         <Suspense fallback={<LoadingScreen />}>
           {renderScreen()}
         </Suspense>
+
+        {/* Toast Notifications */}
         <ToastContainer />
       </div>
     </ErrorBoundary>
