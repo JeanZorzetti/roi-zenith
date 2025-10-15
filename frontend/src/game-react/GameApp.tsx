@@ -5,7 +5,6 @@ import React, { useEffect, lazy, Suspense } from 'react';
 import { useGameStore } from './store/gameStore';
 import { ToastContainer, useToast } from './components/ui/Toast';
 import { ErrorBoundary } from './components/ui/ErrorBoundary';
-import { CRMStatsHUD } from './components/ui/CRMStatsHUD';
 import { useGameLoop } from './hooks/useGameLoop';
 import { useAutoSave } from './hooks/useAutoSave';
 import { useCRMRewards } from './hooks/useCRMRewards';
@@ -89,10 +88,7 @@ export const GameApp: React.FC = () => {
 
   return (
     <ErrorBoundary>
-      <div className="game-app w-full h-screen overflow-hidden relative">
-        {/* CRM Stats HUD - Always visible */}
-        <CRMStatsHUD />
-
+      <div className="game-app w-full h-screen overflow-hidden">
         {/* Game Screens */}
         <Suspense fallback={<LoadingScreen />}>
           {renderScreen()}
