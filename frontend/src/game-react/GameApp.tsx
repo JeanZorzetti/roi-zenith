@@ -4,6 +4,7 @@
 import React, { useEffect, lazy, Suspense } from 'react';
 import { useGameStore } from './store/gameStore';
 import { ToastContainer, useToast } from './components/ui/Toast';
+import { ErrorBoundary } from './components/ui/ErrorBoundary';
 import { useGameLoop } from './hooks/useGameLoop';
 import { useAutoSave } from './hooks/useAutoSave';
 import './styles/game.css';
@@ -79,12 +80,14 @@ export const GameApp: React.FC = () => {
   };
 
   return (
-    <div className="game-app w-full h-screen overflow-hidden">
-      <Suspense fallback={<LoadingScreen />}>
-        {renderScreen()}
-      </Suspense>
-      <ToastContainer />
-    </div>
+    <ErrorBoundary>
+      <div className="game-app w-full h-screen overflow-hidden">
+        <Suspense fallback={<LoadingScreen />}>
+          {renderScreen()}
+        </Suspense>
+        <ToastContainer />
+      </div>
+    </ErrorBoundary>
   );
 };
 
