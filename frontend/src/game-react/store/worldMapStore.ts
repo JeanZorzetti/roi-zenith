@@ -53,7 +53,7 @@ interface WorldMapState {
   getAvailableQuests: (territoryId: string) => Quest[];
 }
 
-// Mock data inicial
+// Initial clean territories (production-ready)
 const initialTerritories: Territory[] = [
   {
     id: 'varejo',
@@ -63,36 +63,10 @@ const initialTerritories: Territory[] = [
     color: 'blue',
     isUnlocked: true,
     isCurrent: true,
-    progress: 45,
+    progress: 0,
     totalQuests: 10,
-    completedQuests: 4,
-    quests: [
-      {
-        id: 'varejo_001',
-        title: 'Primeiros Clientes',
-        description: 'Atenda seus primeiros 5 clientes',
-        status: 'completed',
-        difficulty: 'easy',
-        rewards: { exp: 100, coins: 50 },
-      },
-      {
-        id: 'varejo_002',
-        title: 'Estoque Organizado',
-        description: 'Organize o estoque da loja',
-        status: 'in_progress',
-        difficulty: 'medium',
-        rewards: { exp: 200, coins: 100 },
-      },
-      {
-        id: 'varejo_003',
-        title: 'Vendas Avançadas',
-        description: 'Realize 20 vendas bem-sucedidas',
-        status: 'available',
-        difficulty: 'hard',
-        rewards: { exp: 500, coins: 250, items: ['item_001'] },
-        requirements: { level: 3 },
-      },
-    ],
+    completedQuests: 0,
+    quests: [],
   },
   {
     id: 'b2b',
@@ -100,22 +74,12 @@ const initialTerritories: Territory[] = [
     description: 'Vendas corporativas e parcerias estratégicas',
     icon: 'Briefcase',
     color: 'purple',
-    isUnlocked: true,
+    isUnlocked: false,
     isCurrent: false,
-    progress: 20,
+    progress: 0,
     totalQuests: 12,
-    completedQuests: 2,
-    quests: [
-      {
-        id: 'b2b_001',
-        title: 'Primeiro Contrato',
-        description: 'Feche seu primeiro contrato B2B',
-        status: 'available',
-        difficulty: 'medium',
-        rewards: { exp: 300, coins: 200 },
-        requirements: { level: 5 },
-      },
-    ],
+    completedQuests: 0,
+    quests: [],
   },
   {
     id: 'ecommerce',
@@ -123,7 +87,7 @@ const initialTerritories: Territory[] = [
     description: 'Vendas online e marketing digital',
     icon: 'ShoppingCart',
     color: 'green',
-    isUnlocked: true,
+    isUnlocked: false,
     isCurrent: false,
     progress: 0,
     totalQuests: 15,

@@ -14,8 +14,7 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     mode === 'development' && componentTagger(),
-    // Temporarily disabled removeConsolePlugin due to esbuild transform issues
-    // mode === 'production' && removeConsolePlugin(),
+    mode === 'production' && removeConsolePlugin(),
   ].filter(Boolean),
   resolve: {
     alias: {

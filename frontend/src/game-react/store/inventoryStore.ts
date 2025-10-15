@@ -65,7 +65,6 @@ export const useInventoryStore = create<InventoryState>((set, get) => ({
     // Auto-sort after adding
     get().sortInventory();
 
-    console.log(`Added item: ${item.name} (${item.rarity})`);
     return true;
   },
 
@@ -116,7 +115,6 @@ export const useInventoryStore = create<InventoryState>((set, get) => ({
       items: state.items.filter((i) => i.id !== itemId),
     }));
 
-    console.log(`Equipped: ${item.name} to ${item.slot}`);
     return true;
   },
 
@@ -150,7 +148,6 @@ export const useInventoryStore = create<InventoryState>((set, get) => ({
     // Auto-sort after unequipping
     get().sortInventory();
 
-    console.log(`Unequipped: ${item.name} from ${slot}`);
     return true;
   },
 

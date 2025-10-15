@@ -36,10 +36,10 @@ export const GameApp: React.FC = () => {
   // Initialize game loop with energy regeneration
   useGameLoop({
     onEnergyUpdate: (energy, maxEnergy) => {
-      console.log(`⚡ Energy regenerated: ${energy}/${maxEnergy}`);
+      // Energy regenerated silently
     },
     onAutoSave: () => {
-      console.log('💾 Auto-save triggered from game loop');
+      // Auto-save triggered silently
     },
   });
 
@@ -51,12 +51,9 @@ export const GameApp: React.FC = () => {
     saveOnUnload: true,
   });
 
-  // Welcome message on mount
+  // Game initialization
   useEffect(() => {
-    console.log('🎮 Game initialized with React v2.0');
-    console.log('🔄 Game loop active');
-    console.log('💾 Auto-save enabled (every 5 minutes)');
-    console.log('⚡ Energy regeneration active (1 per 5 minutes)');
+    // Game initialized silently
   }, []);
 
   // Screen router
