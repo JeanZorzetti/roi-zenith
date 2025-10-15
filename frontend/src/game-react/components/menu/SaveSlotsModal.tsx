@@ -31,25 +31,25 @@ export const SaveSlotsModal: React.FC<SaveSlotsModalProps> = ({
   isNewGame,
   onStartGame,
 }) => {
-  // Mock data - em produção, isso virá do localStorage ou backend
+  // Clean empty slots - production ready
   const [saveSlots] = useState<SaveSlot[]>([
     {
       id: 1,
-      playerName: 'Player 1',
-      level: 15,
-      playtime: 240, // 4 horas
-      lastPlayed: new Date('2025-01-10'),
-      territory: 'Varejo Avançado',
-      isEmpty: false,
+      playerName: '',
+      level: 0,
+      playtime: 0,
+      lastPlayed: new Date(),
+      territory: '',
+      isEmpty: true,
     },
     {
       id: 2,
-      playerName: 'Aventureiro',
-      level: 8,
-      playtime: 120,
-      lastPlayed: new Date('2025-01-08'),
-      territory: 'B2B Iniciante',
-      isEmpty: false,
+      playerName: '',
+      level: 0,
+      playtime: 0,
+      lastPlayed: new Date(),
+      territory: '',
+      isEmpty: true,
     },
     {
       id: 3,
