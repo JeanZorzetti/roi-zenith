@@ -27,7 +27,6 @@ import { ContactModal } from '../../components/crm/ContactModal';
 import { CompanyModal } from '../../components/crm/CompanyModal';
 import PromoteToSalesButton from '../../components/crm/PromoteToSalesButton';
 import PromotionModal from '../../components/crm/PromotionModal';
-import { CRMStatsHUD } from '../../game-react/components/ui/CRMStatsHUD';
 
 const CRMPage = () => {
   const { currentTheme, setTheme, themeId } = useCRMTheme();
@@ -559,9 +558,6 @@ const CRMPage = () => {
 
   return (
     <div className="h-screen flex flex-col overflow-hidden" style={{ backgroundColor: currentTheme.colors.background }}>
-      {/* CRM Stats HUD - Only visible on CRM page */}
-      <CRMStatsHUD />
-
       {/* Header */}
       <div className="p-6 border-b" style={{ borderColor: currentTheme.colors.border, backgroundColor: currentTheme.colors.backgroundSecondary }}>
         <div className="flex items-center justify-between mb-4">
