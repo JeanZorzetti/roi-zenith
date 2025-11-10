@@ -25,6 +25,7 @@ import { themes } from '../../themes/themes';
 import { ContactsList } from '../../components/crm/ContactsList';
 import { ContactModal } from '../../components/crm/ContactModal';
 import { CompanyModal } from '../../components/crm/CompanyModal';
+import { CustomSelect } from '../../components/crm/CustomSelect';
 import PromoteToSalesButton from '../../components/crm/PromoteToSalesButton';
 import PromotionModal from '../../components/crm/PromotionModal';
 
@@ -1469,21 +1470,17 @@ const CRMPage = () => {
                       <Plus className="h-3 w-3" />
                     </button>
                   </div>
-                  <select
+                  <CustomSelect
                     value={dealForm.companyId}
-                    onChange={(e) => setDealForm({ ...dealForm, companyId: e.target.value })}
-                    className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2"
-                    style={{
-                      backgroundColor: currentTheme.colors.input,
-                      borderColor: currentTheme.colors.border,
-                      color: currentTheme.colors.text
-                    }}
-                  >
-                    <option value="">Selecione...</option>
-                    {companies.map(company => (
-                      <option key={company.id} value={company.id}>{company.name}</option>
-                    ))}
-                  </select>
+                    onChange={(value) => setDealForm({ ...dealForm, companyId: value })}
+                    options={companies.map(company => ({
+                      value: company.id,
+                      label: company.name
+                    }))}
+                    placeholder="Selecione..."
+                    theme={currentTheme}
+                    searchable={true}
+                  />
                 </div>
                 <div>
                   <div className="flex items-center justify-between mb-2">
@@ -1507,23 +1504,17 @@ const CRMPage = () => {
                       <Plus className="h-3 w-3" />
                     </button>
                   </div>
-                  <select
+                  <CustomSelect
                     value={dealForm.contactId}
-                    onChange={(e) => setDealForm({ ...dealForm, contactId: e.target.value })}
-                    className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2"
-                    style={{
-                      backgroundColor: currentTheme.colors.input,
-                      borderColor: currentTheme.colors.border,
-                      color: currentTheme.colors.text
-                    }}
-                  >
-                    <option value="">Selecione...</option>
-                    {contacts.map(contact => (
-                      <option key={contact.id} value={contact.id}>
-                        {contact.firstName} {contact.lastName}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={(value) => setDealForm({ ...dealForm, contactId: value })}
+                    options={contacts.map(contact => ({
+                      value: contact.id,
+                      label: `${contact.firstName} ${contact.lastName}`
+                    }))}
+                    placeholder="Selecione..."
+                    theme={currentTheme}
+                    searchable={true}
+                  />
                 </div>
               </div>
             </div>
