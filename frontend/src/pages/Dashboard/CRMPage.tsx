@@ -1643,11 +1643,17 @@ const CRMPage = () => {
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <label className="block text-sm font-medium" style={{ color: currentTheme.colors.text }}>
-                    Etapas do Pipeline *
+                    Etapas do Pipeline * ({pipelineForm.stages.length} etapas)
                   </label>
                   <button
                     type="button"
-                    onClick={addStageToForm}
+                    onClick={() => {
+                      console.log('🔴 CLICK - Estado ANTES:', JSON.stringify(pipelineForm.stages.length));
+                      addStageToForm();
+                      setTimeout(() => {
+                        console.log('🔴 CLICK - Estado DEPOIS (100ms):', JSON.stringify(pipelineForm.stages.length));
+                      }, 100);
+                    }}
                     className="flex items-center space-x-1 px-3 py-1.5 rounded-lg border transition-all hover:opacity-80"
                     style={{
                       backgroundColor: currentTheme.colors.primary,
@@ -1660,6 +1666,7 @@ const CRMPage = () => {
                   </button>
                 </div>
 
+                {(() => { console.log('🟢 RENDER - pipelineForm.stages:', pipelineForm.stages.length, pipelineForm.stages.map(s => s.title)); return null; })()}
                 <div className="space-y-3">
                   {pipelineForm.stages.map((stage, index) => (
                     <div
