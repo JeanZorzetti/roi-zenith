@@ -1584,7 +1584,10 @@ const CRMPage = () => {
                 <input
                   type="text"
                   value={pipelineForm.title}
-                  onChange={(e) => setPipelineForm({ ...pipelineForm, title: e.target.value })}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setPipelineForm(prev => ({ ...prev, title: value }));
+                  }}
                   className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2"
                   style={{
                     backgroundColor: currentTheme.colors.input,
@@ -1602,7 +1605,10 @@ const CRMPage = () => {
                 </label>
                 <textarea
                   value={pipelineForm.description}
-                  onChange={(e) => setPipelineForm({ ...pipelineForm, description: e.target.value })}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setPipelineForm(prev => ({ ...prev, description: value }));
+                  }}
                   rows={2}
                   className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 resize-none"
                   style={{
@@ -1622,7 +1628,10 @@ const CRMPage = () => {
                 <input
                   type="color"
                   value={pipelineForm.color}
-                  onChange={(e) => setPipelineForm({ ...pipelineForm, color: e.target.value })}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setPipelineForm(prev => ({ ...prev, color: value }));
+                  }}
                   className="w-20 h-10 rounded-lg border cursor-pointer"
                   style={{
                     borderColor: currentTheme.colors.border
