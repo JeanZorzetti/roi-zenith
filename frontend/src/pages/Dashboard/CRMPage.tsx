@@ -351,6 +351,18 @@ const CRMPage = () => {
         stages: newStages
       };
     });
+    // Scroll para mostrar a nova etapa
+    setTimeout(() => {
+      const stagesContainer = document.querySelector('[data-stages-container]');
+      if (stagesContainer) {
+        stagesContainer.scrollTop = stagesContainer.scrollHeight;
+      }
+      // Também scroll do modal
+      const modal = document.querySelector('[data-pipeline-modal]');
+      if (modal) {
+        modal.scrollTop = modal.scrollHeight;
+      }
+    }, 50);
   };
 
   // Remove stage from pipeline form
@@ -1557,6 +1569,7 @@ const CRMPage = () => {
       {showPipelineModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
           <div
+            data-pipeline-modal
             className="w-full max-w-3xl rounded-lg shadow-2xl max-h-[90vh] overflow-y-auto"
             style={{ backgroundColor: currentTheme.colors.cardBg }}
           >
@@ -1667,7 +1680,7 @@ const CRMPage = () => {
                 </div>
 
                 {(() => { console.log('🟢 RENDER - pipelineForm.stages:', pipelineForm.stages.length, pipelineForm.stages.map(s => s.title)); return null; })()}
-                <div className="space-y-3">
+                <div data-stages-container className="space-y-3">
                   {pipelineForm.stages.map((stage, index) => (
                     <div
                       key={index}
