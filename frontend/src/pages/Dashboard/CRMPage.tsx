@@ -342,32 +342,24 @@ const CRMPage = () => {
 
   // Add stage to pipeline form
   const addStageToForm = () => {
-    console.log('🔧 Adding new stage to pipeline form');
-    setPipelineForm(prevForm => {
-      const newStages = [...prevForm.stages, { title: '', color: '#6366f1' }];
-      console.log('🔧 New stages count:', newStages.length);
-      return {
-        ...prevForm,
-        stages: newStages
-      };
-    });
+    setPipelineForm(prevForm => ({
+      ...prevForm,
+      stages: [...prevForm.stages, { title: '', color: '#6366f1' }]
+    }));
     // Scroll para mostrar a nova etapa
     setTimeout(() => {
       const modal = document.querySelector('[data-pipeline-modal]');
-      console.log('🔧 Modal element:', modal);
       if (modal) {
         modal.scrollTo({
           top: modal.scrollHeight,
           behavior: 'smooth'
         });
-        console.log('🔧 Scrolled modal to:', modal.scrollHeight);
       }
     }, 100);
   };
 
   // Remove stage from pipeline form
   const removeStageFromForm = (index: number) => {
-    console.log('🔧 Removing stage at index:', index);
     setPipelineForm(prevForm => ({
       ...prevForm,
       stages: prevForm.stages.filter((_, i) => i !== index)
@@ -1679,7 +1671,6 @@ const CRMPage = () => {
                   </button>
                 </div>
 
-                {(() => { console.log('🟢 RENDER - pipelineForm.stages:', pipelineForm.stages.length, pipelineForm.stages.map(s => s.title)); return null; })()}
                 <div data-stages-container className="space-y-3">
                   {pipelineForm.stages.map((stage, index) => (
                     <div

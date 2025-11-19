@@ -99,19 +99,49 @@ export const createPipeline = async (req: Request, res: Response) => {
 export const updatePipeline = async (req: Request, res: Response) => {
   try {
     const { pipelineId } = req.params;
-    const { stages, ...updates } = req.body; // Remove stages from updates (can't update relation directly)
+    const { stages, ...updates } = req.body;
 
-    const updatedPipeline = await prisma.pipeline.update({
-      where: { id: pipelineId },
-      data: {
-        ...updates,
-        updatedAt: new Date()
-      },
-      include: {
-        stages: {
-          orderBy: { position: 'asc' }
+    // Use transaction to update pipeline and stages atomically
+    const updatedPipeline = await prisma.$transaction(async (tx) => {
+      // Update pipeline basic info
+      await tx.pipeline.update({
+        where: { id: pipelineId },
+        data: {
+          ...updates,
+          updatedAt: new Date()
+        }
+      });
+
+      // If stages are provided, sync them
+      if (stages && Array.isArray(stages)) {
+        // Delete all existing stages for this pipeline
+        await tx.pipelineStage.deleteMany({
+          where: { pipelineId }
+        });
+
+        // Create new stages with correct positions
+        for (let i = 0; i < stages.length; i++) {
+          const stage = stages[i];
+          await tx.pipelineStage.create({
+            data: {
+              pipelineId,
+              title: stage.title,
+              color: stage.color || '#6366f1',
+              position: i
+            }
+          });
         }
       }
+
+      // Return updated pipeline with stages
+      return tx.pipeline.findUnique({
+        where: { id: pipelineId },
+        include: {
+          stages: {
+            orderBy: { position: 'asc' }
+          }
+        }
+      });
     });
 
     res.json({ pipeline: updatedPipeline });
