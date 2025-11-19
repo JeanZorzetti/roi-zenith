@@ -114,22 +114,69 @@ export const updatePipeline = async (req: Request, res: Response) => {
 
       // If stages are provided, sync them
       if (stages && Array.isArray(stages)) {
-        // Delete all existing stages for this pipeline
-        await tx.pipelineStage.deleteMany({
-          where: { pipelineId }
+        // Get existing stages
+        const existingStages = await tx.pipelineStage.findMany({
+          where: { pipelineId },
+          orderBy: { position: 'asc' }
         });
 
-        // Create new stages with correct positions
+        // Create a map of existing stages by id
+        const existingStageIds = new Set(existingStages.map(s => s.id));
+        const newStageIds = new Set(stages.filter((s: any) => s.id).map((s: any) => s.id));
+
+        // Delete stages that are no longer in the list (only if they have no deals)
+        for (const existingStage of existingStages) {
+          if (!newStageIds.has(existingStage.id)) {
+            // Check if stage has deals
+            const dealCount = await tx.deal.count({
+              where: { stageId: existingStage.id }
+            });
+
+            if (dealCount > 0) {
+              // Move deals to the first stage instead of deleting
+              const firstNewStage = stages[0];
+              if (firstNewStage && firstNewStage.id) {
+                await tx.deal.updateMany({
+                  where: { stageId: existingStage.id },
+                  data: { stageId: firstNewStage.id }
+                });
+              }
+            }
+
+            // Now safe to delete the stage
+            await tx.pipelineStage.delete({
+              where: { id: existingStage.id }
+            });
+          }
+        }
+
+        // Update existing stages and create new ones
         for (let i = 0; i < stages.length; i++) {
           const stage = stages[i];
-          await tx.pipelineStage.create({
-            data: {
-              pipelineId,
-              title: stage.title,
-              color: stage.color || '#6366f1',
-              position: i
-            }
-          });
+
+          if (stage.id && existingStageIds.has(stage.id)) {
+            // Update existing stage
+            await tx.pipelineStage.update({
+              where: { id: stage.id },
+              data: {
+                title: stage.title,
+                color: stage.color || '#6366f1',
+                position: i
+              }
+            });
+          } else {
+            // Create new stage
+            const newStage = await tx.pipelineStage.create({
+              data: {
+                pipelineId,
+                title: stage.title,
+                color: stage.color || '#6366f1',
+                position: i
+              }
+            });
+            // Update the stage object with the new id for potential deal migration
+            stage.id = newStage.id;
+          }
         }
       }
 

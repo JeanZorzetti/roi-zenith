@@ -92,7 +92,14 @@ const CRMPage = () => {
   });
 
   // Pipeline form state
-  const [pipelineForm, setPipelineForm] = useState({
+  const [pipelineForm, setPipelineForm] = useState<{
+    title: string;
+    description: string;
+    color: string;
+    isDefault: boolean;
+    position: number;
+    stages: Array<{ id?: string; title: string; color: string }>;
+  }>({
     title: '',
     description: '',
     color: '#3b82f6',
@@ -644,7 +651,7 @@ const CRMPage = () => {
                         color: pipeline.color,
                         isDefault: pipeline.isDefault,
                         position: pipeline.position,
-                        stages: pipeline.stages.map(s => ({ title: s.title, color: s.color }))
+                        stages: pipeline.stages.map(s => ({ id: s.id, title: s.title, color: s.color }))
                       });
                       setShowPipelineModal(true);
                     }
@@ -1652,13 +1659,7 @@ const CRMPage = () => {
                   </label>
                   <button
                     type="button"
-                    onClick={() => {
-                      console.log('🔴 CLICK - Estado ANTES:', JSON.stringify(pipelineForm.stages.length));
-                      addStageToForm();
-                      setTimeout(() => {
-                        console.log('🔴 CLICK - Estado DEPOIS (100ms):', JSON.stringify(pipelineForm.stages.length));
-                      }, 100);
-                    }}
+                    onClick={addStageToForm}
                     className="flex items-center space-x-1 px-3 py-1.5 rounded-lg border transition-all hover:opacity-80"
                     style={{
                       backgroundColor: currentTheme.colors.primary,
