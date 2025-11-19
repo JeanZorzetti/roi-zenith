@@ -342,25 +342,33 @@ const CRMPage = () => {
 
   // Add stage to pipeline form
   const addStageToForm = () => {
-    setPipelineForm({
-      ...pipelineForm,
-      stages: [...pipelineForm.stages, { title: '', color: '#6366f1' }]
+    console.log('🔧 Adding new stage to pipeline form');
+    setPipelineForm(prevForm => {
+      const newStages = [...prevForm.stages, { title: '', color: '#6366f1' }];
+      console.log('🔧 New stages count:', newStages.length);
+      return {
+        ...prevForm,
+        stages: newStages
+      };
     });
   };
 
   // Remove stage from pipeline form
   const removeStageFromForm = (index: number) => {
-    setPipelineForm({
-      ...pipelineForm,
-      stages: pipelineForm.stages.filter((_, i) => i !== index)
-    });
+    console.log('🔧 Removing stage at index:', index);
+    setPipelineForm(prevForm => ({
+      ...prevForm,
+      stages: prevForm.stages.filter((_, i) => i !== index)
+    }));
   };
 
   // Update stage in pipeline form
   const updateStageInForm = (index: number, field: 'title' | 'color', value: string) => {
-    const updatedStages = [...pipelineForm.stages];
-    updatedStages[index] = { ...updatedStages[index], [field]: value };
-    setPipelineForm({ ...pipelineForm, stages: updatedStages });
+    setPipelineForm(prevForm => {
+      const updatedStages = [...prevForm.stages];
+      updatedStages[index] = { ...updatedStages[index], [field]: value };
+      return { ...prevForm, stages: updatedStages };
+    });
   };
 
   // Format currency
