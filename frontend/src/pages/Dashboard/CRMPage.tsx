@@ -353,16 +353,16 @@ const CRMPage = () => {
     });
     // Scroll para mostrar a nova etapa
     setTimeout(() => {
-      const stagesContainer = document.querySelector('[data-stages-container]');
-      if (stagesContainer) {
-        stagesContainer.scrollTop = stagesContainer.scrollHeight;
-      }
-      // Também scroll do modal
       const modal = document.querySelector('[data-pipeline-modal]');
+      console.log('🔧 Modal element:', modal);
       if (modal) {
-        modal.scrollTop = modal.scrollHeight;
+        modal.scrollTo({
+          top: modal.scrollHeight,
+          behavior: 'smooth'
+        });
+        console.log('🔧 Scrolled modal to:', modal.scrollHeight);
       }
-    }, 50);
+    }, 100);
   };
 
   // Remove stage from pipeline form
