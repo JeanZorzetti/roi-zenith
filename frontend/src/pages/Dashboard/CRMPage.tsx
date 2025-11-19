@@ -1629,6 +1629,7 @@ const CRMPage = () => {
                     Etapas do Pipeline *
                   </label>
                   <button
+                    type="button"
                     onClick={addStageToForm}
                     className="flex items-center space-x-1 px-3 py-1.5 rounded-lg border transition-all hover:opacity-80"
                     style={{
