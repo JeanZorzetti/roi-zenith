@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { useAuthStore } from '@/stores/authStore';
 import { useGameStore } from '@/stores/gameStore';
-import { GameHUD } from './GameHUD';
 import { GameNotifications } from './GameNotifications';
 
 export function GameProvider({ children }: { children: React.ReactNode }) {
@@ -34,7 +33,6 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
       {children}
       {isConnected && (
         <>
-          <GameHUD />
           <GameNotifications />
         </>
       )}
