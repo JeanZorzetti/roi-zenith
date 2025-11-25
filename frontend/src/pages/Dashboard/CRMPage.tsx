@@ -41,6 +41,8 @@ const CRMPage = () => {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [filterDateFrom, setFilterDateFrom] = useState('');
+  const [filterDateTo, setFilterDateTo] = useState('');
   const [showDealModal, setShowDealModal] = useState(false);
   const [editingDeal, setEditingDeal] = useState<Deal | null>(null);
   const [showPipelineModal, setShowPipelineModal] = useState(false);
@@ -152,7 +154,32 @@ const CRMPage = () => {
   const currentPipeline = pipelines.find(p => p.id === currentPipelineId);
   const pipelineColumns = currentPipeline?.stages.map(stage => ({
     ...stage,
-    deals: deals.filter(d => d.stageId === stage.id)
+    deals: deals.filter(d => {
+      // Filter by stage
+      if (d.stageId !== stage.id) return false;
+
+      // Filter by search term
+      if (searchTerm && !d.title.toLowerCase().includes(searchTerm.toLowerCase())) {
+        return false;
+      }
+
+      // Filter by date range (using createdAt)
+      if (filterDateFrom) {
+        const dealDate = new Date(d.createdAt);
+        const fromDate = new Date(filterDateFrom);
+        fromDate.setHours(0, 0, 0, 0);
+        if (dealDate < fromDate) return false;
+      }
+
+      if (filterDateTo) {
+        const dealDate = new Date(d.createdAt);
+        const toDate = new Date(filterDateTo);
+        toDate.setHours(23, 59, 59, 999);
+        if (dealDate > toDate) return false;
+      }
+
+      return true;
+    })
   })) || [];
 
   // Handle drag and drop
@@ -748,22 +775,78 @@ const CRMPage = () => {
           </div>
         </div>
 
-        {/* Search */}
+        {/* Search and Filters */}
         {activeTab === 'pipeline' && (
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5" style={{ color: currentTheme.colors.textMuted }} />
-            <input
-              type="text"
-              placeholder="Buscar negócios..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 rounded-lg border focus:outline-none focus:ring-2"
-              style={{
-                backgroundColor: currentTheme.colors.input,
-                borderColor: currentTheme.colors.border,
-                color: currentTheme.colors.text
-              }}
-            />
+          <div className="space-y-3">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5" style={{ color: currentTheme.colors.textMuted }} />
+              <input
+                type="text"
+                placeholder="Buscar negócios..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 rounded-lg border focus:outline-none focus:ring-2"
+                style={{
+                  backgroundColor: currentTheme.colors.input,
+                  borderColor: currentTheme.colors.border,
+                  color: currentTheme.colors.text
+                }}
+              />
+            </div>
+
+            {/* Date Filters */}
+            <div className="flex items-center gap-3">
+              <Filter className="h-5 w-5" style={{ color: currentTheme.colors.textMuted }} />
+              <div className="flex items-center gap-2 flex-1">
+                <div className="flex items-center gap-2">
+                  <label className="text-sm font-medium whitespace-nowrap" style={{ color: currentTheme.colors.text }}>
+                    De:
+                  </label>
+                  <input
+                    type="date"
+                    value={filterDateFrom}
+                    onChange={(e) => setFilterDateFrom(e.target.value)}
+                    className="px-3 py-1.5 rounded-lg border focus:outline-none focus:ring-2"
+                    style={{
+                      backgroundColor: currentTheme.colors.input,
+                      borderColor: currentTheme.colors.border,
+                      color: currentTheme.colors.text
+                    }}
+                  />
+                </div>
+                <div className="flex items-center gap-2">
+                  <label className="text-sm font-medium whitespace-nowrap" style={{ color: currentTheme.colors.text }}>
+                    Até:
+                  </label>
+                  <input
+                    type="date"
+                    value={filterDateTo}
+                    onChange={(e) => setFilterDateTo(e.target.value)}
+                    className="px-3 py-1.5 rounded-lg border focus:outline-none focus:ring-2"
+                    style={{
+                      backgroundColor: currentTheme.colors.input,
+                      borderColor: currentTheme.colors.border,
+                      color: currentTheme.colors.text
+                    }}
+                  />
+                </div>
+                {(filterDateFrom || filterDateTo) && (
+                  <button
+                    onClick={() => {
+                      setFilterDateFrom('');
+                      setFilterDateTo('');
+                    }}
+                    className="px-3 py-1.5 text-sm rounded-lg hover:opacity-80 transition-all"
+                    style={{
+                      backgroundColor: currentTheme.colors.textMuted + '20',
+                      color: currentTheme.colors.textMuted
+                    }}
+                  >
+                    Limpar
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
         )}
       </div>
@@ -1127,6 +1210,33 @@ const CRMPage = () => {
                 >
                   <option value="SALES">💰 Sales (Vendas)</option>
                   <option value="MARKET_RESEARCH">🔍 Market Research (Pesquisa de Mercado)</option>
+                </select>
+              </div>
+
+              {/* Stage Selector */}
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: currentTheme.colors.text }}>
+                  Etapa do Pipeline *
+                </label>
+                <select
+                  value={dealForm.stageId}
+                  onChange={(e) => setDealForm({ ...dealForm, stageId: e.target.value })}
+                  className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2"
+                  style={{
+                    backgroundColor: currentTheme.colors.input,
+                    borderColor: currentTheme.colors.border,
+                    color: currentTheme.colors.text
+                  }}
+                >
+                  <option value="">Selecione uma etapa...</option>
+                  {pipelines
+                    .find(p => p.id === currentPipelineId)
+                    ?.stages.map(stage => (
+                      <option key={stage.id} value={stage.id}>
+                        {stage.title}
+                      </option>
+                    ))
+                  }
                 </select>
               </div>
 
