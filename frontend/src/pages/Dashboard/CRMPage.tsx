@@ -37,7 +37,7 @@ const CRMPage = () => {
   const { currentTheme, setTheme, themeId } = useCRMTheme();
 
   // State
-  const [activeTab, setActiveTab] = useState<'pipeline' | 'contacts' | 'agenda'>('pipeline');
+  const [activeTab, setActiveTab] = useState<'pipeline' | 'contacts' | 'empresas' | 'agenda'>('pipeline');
   const [pipelines, setPipelines] = useState<Pipeline[]>([]);
   const [currentPipelineId, setCurrentPipelineId] = useState<string>('');
   const [deals, setDeals] = useState<Deal[]>([]);
@@ -680,7 +680,7 @@ const CRMPage = () => {
           <div className="flex-1">
             <div className="flex items-center space-x-4 mb-2">
               <h1 className="text-3xl font-bold" style={{ color: currentTheme.colors.text }}>
-                CRM - {activeTab === 'pipeline' ? 'Pipeline de Vendas' : activeTab === 'contacts' ? 'Contatos' : 'Agenda'}
+                CRM - {activeTab === 'pipeline' ? 'Pipeline de Vendas' : activeTab === 'contacts' ? 'Contatos' : activeTab === 'empresas' ? 'Empresas' : 'Agenda'}
               </h1>
               {/* Notification Bell */}
               <button
@@ -733,6 +733,19 @@ const CRMPage = () => {
               >
                 <Users className="h-4 w-4" />
                 <span>Contatos</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('empresas')}
+                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all ${
+                  activeTab === 'empresas' ? 'font-semibold' : 'hover:opacity-70'
+                }`}
+                style={{
+                  backgroundColor: activeTab === 'empresas' ? currentTheme.colors.primary : 'transparent',
+                  color: activeTab === 'empresas' ? '#ffffff' : currentTheme.colors.textMuted
+                }}
+              >
+                <Building2 className="h-4 w-4" />
+                <span>Empresas</span>
               </button>
               <button
                 onClick={() => setActiveTab('agenda')}
@@ -859,6 +872,23 @@ const CRMPage = () => {
                 >
                   <Plus className="h-4 w-4" />
                   <span className="text-sm">Novo Contato</span>
+                </button>
+              )}
+              {activeTab === 'empresas' && (
+                <button
+                  onClick={() => {
+                    setEditingCompany(null);
+                    setShowCompanyModal(true);
+                  }}
+                  className="flex items-center space-x-2 px-3 py-1.5 rounded-lg border transition-all hover:opacity-80"
+                  style={{
+                    backgroundColor: currentTheme.colors.primary,
+                    borderColor: currentTheme.colors.primary,
+                    color: '#ffffff'
+                  }}
+                >
+                  <Plus className="h-4 w-4" />
+                  <span className="text-sm">Nova Empresa</span>
                 </button>
               )}
             </div>
@@ -1235,6 +1265,210 @@ const CRMPage = () => {
             onEdit={openEditContactModal}
             onDelete={deleteContact}
           />
+        </div>
+      )}
+
+      {/* Empresas View */}
+      {activeTab === 'empresas' && (
+        <div className="flex-1 overflow-y-auto p-6" style={{ backgroundColor: currentTheme.colors.background }}>
+          <div className="max-w-7xl mx-auto">
+            {/* Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+              <div
+                className="p-4 rounded-lg border"
+                style={{
+                  backgroundColor: currentTheme.colors.cardBg,
+                  borderColor: currentTheme.colors.border
+                }}
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium" style={{ color: currentTheme.colors.textMuted }}>
+                      Total de Empresas
+                    </p>
+                    <p className="text-2xl font-bold mt-1" style={{ color: currentTheme.colors.text }}>
+                      {companies.length}
+                    </p>
+                  </div>
+                  <Building2 className="h-8 w-8" style={{ color: currentTheme.colors.primary, opacity: 0.3 }} />
+                </div>
+              </div>
+              <div
+                className="p-4 rounded-lg border"
+                style={{
+                  backgroundColor: currentTheme.colors.cardBg,
+                  borderColor: currentTheme.colors.border
+                }}
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium" style={{ color: currentTheme.colors.textMuted }}>
+                      Pequenas
+                    </p>
+                    <p className="text-2xl font-bold mt-1" style={{ color: currentTheme.colors.text }}>
+                      {companies.filter(c => c.size === 'SMALL').length}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div
+                className="p-4 rounded-lg border"
+                style={{
+                  backgroundColor: currentTheme.colors.cardBg,
+                  borderColor: currentTheme.colors.border
+                }}
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium" style={{ color: currentTheme.colors.textMuted }}>
+                      Médias
+                    </p>
+                    <p className="text-2xl font-bold mt-1" style={{ color: currentTheme.colors.text }}>
+                      {companies.filter(c => c.size === 'MEDIUM').length}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div
+                className="p-4 rounded-lg border"
+                style={{
+                  backgroundColor: currentTheme.colors.cardBg,
+                  borderColor: currentTheme.colors.border
+                }}
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium" style={{ color: currentTheme.colors.textMuted }}>
+                      Grandes
+                    </p>
+                    <p className="text-2xl font-bold mt-1" style={{ color: currentTheme.colors.text }}>
+                      {companies.filter(c => c.size === 'LARGE').length}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Companies Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {companies.map(company => (
+                <div
+                  key={company.id}
+                  className="p-4 rounded-lg border hover:shadow-lg transition-all cursor-pointer"
+                  style={{
+                    backgroundColor: currentTheme.colors.cardBg,
+                    borderColor: currentTheme.colors.border
+                  }}
+                  onClick={() => openEditCompanyModal(company)}
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex-1">
+                      <h3 className="font-bold text-lg mb-1" style={{ color: currentTheme.colors.text }}>
+                        {company.name}
+                      </h3>
+                      {company.sector && (
+                        <p className="text-sm" style={{ color: currentTheme.colors.textMuted }}>
+                          {company.sector}
+                        </p>
+                      )}
+                    </div>
+                    <Building2 className="h-6 w-6 flex-shrink-0" style={{ color: currentTheme.colors.primary }} />
+                  </div>
+
+                  <div className="space-y-2">
+                    {company.size && (
+                      <div className="flex items-center space-x-2">
+                        <span
+                          className="px-2 py-1 rounded text-xs font-medium"
+                          style={{
+                            backgroundColor: currentTheme.colors.primary + '20',
+                            color: currentTheme.colors.primary
+                          }}
+                        >
+                          {company.size === 'SMALL' ? 'Pequena' : company.size === 'MEDIUM' ? 'Média' : company.size === 'LARGE' ? 'Grande' : 'Enterprise'}
+                        </span>
+                      </div>
+                    )}
+
+                    {company.website && (
+                      <div className="flex items-center space-x-2">
+                        <Mail className="h-4 w-4 flex-shrink-0" style={{ color: currentTheme.colors.textMuted }} />
+                        <a
+                          href={company.website}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm truncate hover:underline"
+                          style={{ color: currentTheme.colors.primary }}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {company.website}
+                        </a>
+                      </div>
+                    )}
+
+                    {company.phone && (
+                      <div className="flex items-center space-x-2">
+                        <Phone className="h-4 w-4 flex-shrink-0" style={{ color: currentTheme.colors.textMuted }} />
+                        <span className="text-sm" style={{ color: currentTheme.colors.text }}>
+                          {company.phone}
+                        </span>
+                      </div>
+                    )}
+
+                    {company.address && (
+                      <div className="flex items-start space-x-2">
+                        <Building2 className="h-4 w-4 flex-shrink-0 mt-0.5" style={{ color: currentTheme.colors.textMuted }} />
+                        <span className="text-sm" style={{ color: currentTheme.colors.text }}>
+                          {company.address}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex items-center justify-end space-x-2 mt-4 pt-3 border-t" style={{ borderColor: currentTheme.colors.border }}>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openEditCompanyModal(company);
+                      }}
+                      className="p-2 rounded-lg hover:opacity-80 transition-all"
+                      style={{
+                        backgroundColor: currentTheme.colors.primary + '20',
+                        color: currentTheme.colors.primary
+                      }}
+                    >
+                      <Edit2 className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteCompany(company.id);
+                      }}
+                      className="p-2 rounded-lg hover:opacity-80 transition-all"
+                      style={{
+                        backgroundColor: currentTheme.colors.error + '20',
+                        color: currentTheme.colors.error
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {companies.length === 0 && (
+              <div className="text-center py-12">
+                <Building2 className="h-16 w-16 mx-auto mb-4 opacity-30" style={{ color: currentTheme.colors.textMuted }} />
+                <p className="text-lg font-medium" style={{ color: currentTheme.colors.text }}>
+                  Nenhuma empresa cadastrada
+                </p>
+                <p className="text-sm mt-2" style={{ color: currentTheme.colors.textMuted }}>
+                  Clique em "Nova Empresa" para adicionar a primeira empresa
+                </p>
+              </div>
+            )}
+          </div>
         </div>
       )}
 
