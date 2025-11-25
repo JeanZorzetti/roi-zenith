@@ -186,18 +186,18 @@ const CRMPage = () => {
       }
 
       // Filter by date range (using createdAt)
-      if (filterDateFrom) {
+      if (filterDateFrom || filterDateTo) {
         const dealDate = new Date(d.createdAt);
-        const fromDate = new Date(filterDateFrom);
-        fromDate.setHours(0, 0, 0, 0);
-        if (dealDate < fromDate) return false;
-      }
+        // Extract only the date part (YYYY-MM-DD) to avoid timezone issues
+        const dealDateStr = dealDate.toISOString().split('T')[0];
 
-      if (filterDateTo) {
-        const dealDate = new Date(d.createdAt);
-        const toDate = new Date(filterDateTo);
-        toDate.setHours(23, 59, 59, 999);
-        if (dealDate > toDate) return false;
+        if (filterDateFrom && dealDateStr < filterDateFrom) {
+          return false;
+        }
+
+        if (filterDateTo && dealDateStr > filterDateTo) {
+          return false;
+        }
       }
 
       return true;
