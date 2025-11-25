@@ -142,15 +142,17 @@ const CRMPage = () => {
 
   const loadData = async () => {
     setLoading(true);
-    const [pipelinesData, companiesData, contactsData] = await Promise.all([
+    const [pipelinesData, companiesData, contactsData, activitiesData] = await Promise.all([
       crmService.getPipelines(),
       crmService.getCompanies(),
-      crmService.getContacts()
+      crmService.getContacts(),
+      crmService.getActivities()
     ]);
 
     setPipelines(pipelinesData);
     setCompanies(companiesData);
     setContacts(contactsData);
+    setActivities(activitiesData);
 
     // Set first pipeline as default
     if (pipelinesData.length > 0) {
@@ -553,6 +555,54 @@ const CRMPage = () => {
     } catch (error) {
       console.error('Erro ao salvar empresa:', error);
       alert('Erro ao salvar empresa');
+    }
+  };
+
+  // Save activity
+  const saveActivity = async () => {
+    if (!activityForm.subject.trim()) {
+      alert('O assunto é obrigatório!');
+      return;
+    }
+
+    if (!activityForm.dueDate) {
+      alert('A data é obrigatória!');
+      return;
+    }
+
+    try {
+      if (editingActivity) {
+        // Update existing activity
+        const success = await crmService.updateActivity(editingActivity.id, activityForm as any);
+        if (success) {
+          const activitiesData = await crmService.getActivities();
+          setActivities(activitiesData);
+          setShowActivityModal(false);
+          setEditingActivity(null);
+        }
+      } else {
+        // Create new activity
+        const newActivity = await crmService.createActivity(activityForm as any);
+        if (newActivity) {
+          const activitiesData = await crmService.getActivities();
+          setActivities(activitiesData);
+          setShowActivityModal(false);
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao salvar atividade:', error);
+      alert('Erro ao salvar atividade');
+    }
+  };
+
+  // Delete activity
+  const deleteActivity = async (activityId: string) => {
+    if (!confirm('Tem certeza que deseja excluir este evento?')) return;
+
+    const success = await crmService.deleteActivity(activityId);
+    if (success) {
+      const activitiesData = await crmService.getActivities();
+      setActivities(activitiesData);
     }
   };
 
@@ -1428,9 +1478,7 @@ const CRMPage = () => {
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            if (confirm('Deseja excluir este evento?')) {
-                              // TODO: Implement delete activity
-                            }
+                            deleteActivity(activity.id);
                           }}
                           className="p-2 rounded-lg hover:opacity-80"
                           style={{
@@ -2381,11 +2429,7 @@ const CRMPage = () => {
                 Cancelar
               </button>
               <button
-                onClick={() => {
-                  // TODO: Save activity
-                  console.log('Salvando atividade:', activityForm);
-                  setShowActivityModal(false);
-                }}
+                onClick={saveActivity}
                 className="px-4 py-2 rounded-lg font-semibold"
                 style={{
                   backgroundColor: currentTheme.colors.primary,
