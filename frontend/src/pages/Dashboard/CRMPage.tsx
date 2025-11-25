@@ -47,6 +47,7 @@ const CRMPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterDateFrom, setFilterDateFrom] = useState('');
   const [filterDateTo, setFilterDateTo] = useState('');
+  const [searchCompany, setSearchCompany] = useState('');
   const [showDealModal, setShowDealModal] = useState(false);
   const [editingDeal, setEditingDeal] = useState<Deal | null>(null);
   const [showPipelineModal, setShowPipelineModal] = useState(false);
@@ -1272,86 +1273,131 @@ const CRMPage = () => {
       {activeTab === 'empresas' && (
         <div className="flex-1 overflow-y-auto p-6" style={{ backgroundColor: currentTheme.colors.background }}>
           <div className="max-w-7xl mx-auto">
-            {/* Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-              <div
-                className="p-4 rounded-lg border"
-                style={{
-                  backgroundColor: currentTheme.colors.cardBg,
-                  borderColor: currentTheme.colors.border
-                }}
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium" style={{ color: currentTheme.colors.textMuted }}>
-                      Total de Empresas
-                    </p>
-                    <p className="text-2xl font-bold mt-1" style={{ color: currentTheme.colors.text }}>
-                      {companies.length}
-                    </p>
-                  </div>
-                  <Building2 className="h-8 w-8" style={{ color: currentTheme.colors.primary, opacity: 0.3 }} />
-                </div>
-              </div>
-              <div
-                className="p-4 rounded-lg border"
-                style={{
-                  backgroundColor: currentTheme.colors.cardBg,
-                  borderColor: currentTheme.colors.border
-                }}
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium" style={{ color: currentTheme.colors.textMuted }}>
-                      Pequenas
-                    </p>
-                    <p className="text-2xl font-bold mt-1" style={{ color: currentTheme.colors.text }}>
-                      {companies.filter(c => c.size === 'SMALL').length}
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div
-                className="p-4 rounded-lg border"
-                style={{
-                  backgroundColor: currentTheme.colors.cardBg,
-                  borderColor: currentTheme.colors.border
-                }}
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium" style={{ color: currentTheme.colors.textMuted }}>
-                      Médias
-                    </p>
-                    <p className="text-2xl font-bold mt-1" style={{ color: currentTheme.colors.text }}>
-                      {companies.filter(c => c.size === 'MEDIUM').length}
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div
-                className="p-4 rounded-lg border"
-                style={{
-                  backgroundColor: currentTheme.colors.cardBg,
-                  borderColor: currentTheme.colors.border
-                }}
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium" style={{ color: currentTheme.colors.textMuted }}>
-                      Grandes
-                    </p>
-                    <p className="text-2xl font-bold mt-1" style={{ color: currentTheme.colors.text }}>
-                      {companies.filter(c => c.size === 'LARGE').length}
-                    </p>
-                  </div>
-                </div>
+            {/* Search */}
+            <div className="mb-6">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5" style={{ color: currentTheme.colors.textMuted }} />
+                <input
+                  type="text"
+                  placeholder="Buscar empresas por nome, setor ou endereço..."
+                  value={searchCompany}
+                  onChange={(e) => setSearchCompany(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 rounded-lg border focus:outline-none focus:ring-2"
+                  style={{
+                    backgroundColor: currentTheme.colors.input,
+                    borderColor: currentTheme.colors.border,
+                    color: currentTheme.colors.text
+                  }}
+                />
+                {searchCompany && (
+                  <button
+                    onClick={() => setSearchCompany('')}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 rounded-lg hover:opacity-80"
+                    style={{ color: currentTheme.colors.textMuted }}
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
               </div>
             </div>
 
-            {/* Companies Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {companies.map(company => (
+            {/* Stats and Companies Grid */}
+            {(() => {
+              // Filter companies
+              const filteredCompanies = companies.filter(company => {
+                if (!searchCompany) return true;
+
+                const searchLower = searchCompany.toLowerCase();
+                return (
+                  company.name?.toLowerCase().includes(searchLower) ||
+                  company.sector?.toLowerCase().includes(searchLower) ||
+                  company.address?.toLowerCase().includes(searchLower) ||
+                  company.website?.toLowerCase().includes(searchLower)
+                );
+              });
+
+              return (
+                <>
+                  {/* Stats */}
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                    <div
+                      className="p-4 rounded-lg border"
+                      style={{
+                        backgroundColor: currentTheme.colors.cardBg,
+                        borderColor: currentTheme.colors.border
+                      }}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium" style={{ color: currentTheme.colors.textMuted }}>
+                            {searchCompany ? 'Encontradas' : 'Total de Empresas'}
+                          </p>
+                          <p className="text-2xl font-bold mt-1" style={{ color: currentTheme.colors.text }}>
+                            {filteredCompanies.length}
+                          </p>
+                        </div>
+                        <Building2 className="h-8 w-8" style={{ color: currentTheme.colors.primary, opacity: 0.3 }} />
+                      </div>
+                    </div>
+                    <div
+                      className="p-4 rounded-lg border"
+                      style={{
+                        backgroundColor: currentTheme.colors.cardBg,
+                        borderColor: currentTheme.colors.border
+                      }}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium" style={{ color: currentTheme.colors.textMuted }}>
+                            Pequenas
+                          </p>
+                          <p className="text-2xl font-bold mt-1" style={{ color: currentTheme.colors.text }}>
+                            {filteredCompanies.filter(c => c.size === 'SMALL').length}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      className="p-4 rounded-lg border"
+                      style={{
+                        backgroundColor: currentTheme.colors.cardBg,
+                        borderColor: currentTheme.colors.border
+                      }}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium" style={{ color: currentTheme.colors.textMuted }}>
+                            Médias
+                          </p>
+                          <p className="text-2xl font-bold mt-1" style={{ color: currentTheme.colors.text }}>
+                            {filteredCompanies.filter(c => c.size === 'MEDIUM').length}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      className="p-4 rounded-lg border"
+                      style={{
+                        backgroundColor: currentTheme.colors.cardBg,
+                        borderColor: currentTheme.colors.border
+                      }}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium" style={{ color: currentTheme.colors.textMuted }}>
+                            Grandes
+                          </p>
+                          <p className="text-2xl font-bold mt-1" style={{ color: currentTheme.colors.text }}>
+                            {filteredCompanies.filter(c => c.size === 'LARGE').length}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Companies Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {filteredCompanies.map(company => (
                 <div
                   key={company.id}
                   className="p-4 rounded-lg border hover:shadow-lg transition-all cursor-pointer"
@@ -1457,6 +1503,18 @@ const CRMPage = () => {
               ))}
             </div>
 
+            {filteredCompanies.length === 0 && searchCompany && (
+              <div className="text-center py-12">
+                <Search className="h-16 w-16 mx-auto mb-4 opacity-30" style={{ color: currentTheme.colors.textMuted }} />
+                <p className="text-lg font-medium" style={{ color: currentTheme.colors.text }}>
+                  Nenhuma empresa encontrada
+                </p>
+                <p className="text-sm mt-2" style={{ color: currentTheme.colors.textMuted }}>
+                  Tente buscar por outro termo
+                </p>
+              </div>
+            )}
+
             {companies.length === 0 && (
               <div className="text-center py-12">
                 <Building2 className="h-16 w-16 mx-auto mb-4 opacity-30" style={{ color: currentTheme.colors.textMuted }} />
@@ -1468,6 +1526,9 @@ const CRMPage = () => {
                 </p>
               </div>
             )}
+          </>
+        );
+      })()}
           </div>
         </div>
       )}
