@@ -16,7 +16,11 @@ import {
   Settings,
   GitBranch,
   Palette,
-  Users
+  Users,
+  Bell,
+  Clock,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import { crmService } from '../../services/crmService';
 import { Deal, Pipeline, PipelineStage, Company, Contact } from '../../types/CRM';
@@ -33,7 +37,7 @@ const CRMPage = () => {
   const { currentTheme, setTheme, themeId } = useCRMTheme();
 
   // State
-  const [activeTab, setActiveTab] = useState<'pipeline' | 'contacts'>('pipeline');
+  const [activeTab, setActiveTab] = useState<'pipeline' | 'contacts' | 'agenda'>('pipeline');
   const [pipelines, setPipelines] = useState<Pipeline[]>([]);
   const [currentPipelineId, setCurrentPipelineId] = useState<string>('');
   const [deals, setDeals] = useState<Deal[]>([]);
@@ -55,6 +59,21 @@ const CRMPage = () => {
   const [promotingDeal, setPromotingDeal] = useState<Deal | null>(null);
   const [promotionEligibility, setPromotionEligibility] = useState<any>(null);
   const [isPromoting, setIsPromoting] = useState(false);
+
+  // Agenda state
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [calendarView, setCalendarView] = useState<'month' | 'week' | 'day'>('month');
+  const [activities, setActivities] = useState<any[]>([]);
+  const [showActivityModal, setShowActivityModal] = useState(false);
+  const [editingActivity, setEditingActivity] = useState<any>(null);
+  const [activityForm, setActivityForm] = useState({
+    type: 'MEETING' as 'CALL' | 'EMAIL' | 'MEETING' | 'NOTE' | 'TASK',
+    subject: '',
+    description: '',
+    dueDate: '',
+    dealId: '',
+    contactId: ''
+  });
 
   // State para scroll horizontal com drag
   const [isDragging, setIsDragging] = useState(false);
@@ -609,9 +628,33 @@ const CRMPage = () => {
       <div className="p-6 border-b" style={{ borderColor: currentTheme.colors.border, backgroundColor: currentTheme.colors.backgroundSecondary }}>
         <div className="flex items-center justify-between mb-4">
           <div className="flex-1">
-            <h1 className="text-3xl font-bold mb-2" style={{ color: currentTheme.colors.text }}>
-              CRM - {activeTab === 'pipeline' ? 'Pipeline de Vendas' : 'Contatos'}
-            </h1>
+            <div className="flex items-center space-x-4 mb-2">
+              <h1 className="text-3xl font-bold" style={{ color: currentTheme.colors.text }}>
+                CRM - {activeTab === 'pipeline' ? 'Pipeline de Vendas' : activeTab === 'contacts' ? 'Contatos' : 'Agenda'}
+              </h1>
+              {/* Notification Bell */}
+              <button
+                onClick={() => setActiveTab('agenda')}
+                className="relative p-2 rounded-lg hover:opacity-80 transition-all"
+                style={{
+                  backgroundColor: currentTheme.colors.input
+                }}
+                title="Ver agenda"
+              >
+                <Bell className="h-5 w-5" style={{ color: currentTheme.colors.text }} />
+                {activities.filter(a => a.dueDate && new Date(a.dueDate) >= new Date() && new Date(a.dueDate) <= new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)).length > 0 && (
+                  <span
+                    className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 text-xs font-bold rounded-full"
+                    style={{
+                      backgroundColor: currentTheme.colors.error,
+                      color: '#ffffff'
+                    }}
+                  >
+                    {activities.filter(a => a.dueDate && new Date(a.dueDate) >= new Date() && new Date(a.dueDate) <= new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)).length}
+                  </span>
+                )}
+              </button>
+            </div>
 
             {/* Tab Navigation */}
             <div className="flex items-center space-x-2 mb-3">
@@ -640,6 +683,19 @@ const CRMPage = () => {
               >
                 <Users className="h-4 w-4" />
                 <span>Contatos</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('agenda')}
+                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all ${
+                  activeTab === 'agenda' ? 'font-semibold' : 'hover:opacity-70'
+                }`}
+                style={{
+                  backgroundColor: activeTab === 'agenda' ? currentTheme.colors.primary : 'transparent',
+                  color: activeTab === 'agenda' ? '#ffffff' : currentTheme.colors.textMuted
+                }}
+              >
+                <Calendar className="h-4 w-4" />
+                <span>Agenda</span>
               </button>
             </div>
 
@@ -1129,6 +1185,272 @@ const CRMPage = () => {
             onEdit={openEditContactModal}
             onDelete={deleteContact}
           />
+        </div>
+      )}
+
+      {/* Agenda View */}
+      {activeTab === 'agenda' && (
+        <div className="flex-1 overflow-y-auto p-6" style={{ backgroundColor: currentTheme.colors.background }}>
+          <div className="max-w-7xl mx-auto space-y-6">
+            {/* Calendar Header */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <button
+                  onClick={() => {
+                    const newDate = new Date(currentDate);
+                    newDate.setMonth(currentDate.getMonth() - 1);
+                    setCurrentDate(newDate);
+                  }}
+                  className="p-2 rounded-lg hover:opacity-80 transition-all"
+                  style={{
+                    backgroundColor: currentTheme.colors.input,
+                    color: currentTheme.colors.text
+                  }}
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                </button>
+                <h2 className="text-2xl font-bold" style={{ color: currentTheme.colors.text }}>
+                  {currentDate.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
+                </h2>
+                <button
+                  onClick={() => {
+                    const newDate = new Date(currentDate);
+                    newDate.setMonth(currentDate.getMonth() + 1);
+                    setCurrentDate(newDate);
+                  }}
+                  className="p-2 rounded-lg hover:opacity-80 transition-all"
+                  style={{
+                    backgroundColor: currentTheme.colors.input,
+                    color: currentTheme.colors.text
+                  }}
+                >
+                  <ChevronRight className="h-5 w-5" />
+                </button>
+                <button
+                  onClick={() => setCurrentDate(new Date())}
+                  className="px-4 py-2 rounded-lg hover:opacity-80 transition-all"
+                  style={{
+                    backgroundColor: currentTheme.colors.primary + '20',
+                    color: currentTheme.colors.primary
+                  }}
+                >
+                  Hoje
+                </button>
+              </div>
+              <button
+                onClick={() => {
+                  setEditingActivity(null);
+                  setActivityForm({
+                    type: 'MEETING',
+                    subject: '',
+                    description: '',
+                    dueDate: new Date().toISOString().split('T')[0],
+                    dealId: '',
+                    contactId: ''
+                  });
+                  setShowActivityModal(true);
+                }}
+                className="flex items-center space-x-2 px-4 py-2 rounded-lg hover:opacity-80 transition-all"
+                style={{
+                  backgroundColor: currentTheme.colors.primary,
+                  color: '#ffffff'
+                }}
+              >
+                <Plus className="h-5 w-5" />
+                <span>Novo Evento</span>
+              </button>
+            </div>
+
+            {/* Calendar Grid */}
+            <div className="grid grid-cols-7 gap-2">
+              {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map(day => (
+                <div
+                  key={day}
+                  className="text-center font-semibold py-3 text-sm"
+                  style={{ color: currentTheme.colors.textMuted }}
+                >
+                  {day}
+                </div>
+              ))}
+              {(() => {
+                const year = currentDate.getFullYear();
+                const month = currentDate.getMonth();
+                const firstDay = new Date(year, month, 1).getDay();
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                const days = [];
+
+                // Empty cells for days before month starts
+                for (let i = 0; i < firstDay; i++) {
+                  days.push(
+                    <div
+                      key={`empty-${i}`}
+                      className="aspect-square rounded-lg"
+                      style={{ backgroundColor: currentTheme.colors.backgroundSecondary }}
+                    />
+                  );
+                }
+
+                // Days of the month
+                for (let day = 1; day <= daysInMonth; day++) {
+                  const date = new Date(year, month, day);
+                  const isToday = date.toDateString() === new Date().toDateString();
+                  const dateStr = date.toISOString().split('T')[0];
+                  const dayActivities = activities.filter(a =>
+                    a.dueDate && a.dueDate.startsWith(dateStr)
+                  );
+
+                  days.push(
+                    <div
+                      key={day}
+                      className={`aspect-square rounded-lg p-2 cursor-pointer hover:opacity-80 transition-all ${
+                        isToday ? 'ring-2' : ''
+                      }`}
+                      style={{
+                        backgroundColor: currentTheme.colors.cardBg,
+                        borderColor: currentTheme.colors.border,
+                        ringColor: currentTheme.colors.primary
+                      }}
+                      onClick={() => {
+                        setActivityForm({
+                          ...activityForm,
+                          dueDate: dateStr
+                        });
+                        setShowActivityModal(true);
+                      }}
+                    >
+                      <div className="flex flex-col h-full">
+                        <span
+                          className={`text-sm font-semibold ${isToday ? 'font-bold' : ''}`}
+                          style={{
+                            color: isToday ? currentTheme.colors.primary : currentTheme.colors.text
+                          }}
+                        >
+                          {day}
+                        </span>
+                        {dayActivities.length > 0 && (
+                          <div className="flex-1 mt-1 space-y-1 overflow-hidden">
+                            {dayActivities.slice(0, 2).map((activity, idx) => (
+                              <div
+                                key={idx}
+                                className="text-xs px-1 py-0.5 rounded truncate"
+                                style={{
+                                  backgroundColor: currentTheme.colors.primary + '20',
+                                  color: currentTheme.colors.primary
+                                }}
+                                title={activity.subject}
+                              >
+                                {activity.subject}
+                              </div>
+                            ))}
+                            {dayActivities.length > 2 && (
+                              <div
+                                className="text-xs"
+                                style={{ color: currentTheme.colors.textMuted }}
+                              >
+                                +{dayActivities.length - 2}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                }
+
+                return days;
+              })()}
+            </div>
+
+            {/* Upcoming Events */}
+            <div className="mt-8">
+              <h3 className="text-xl font-bold mb-4" style={{ color: currentTheme.colors.text }}>
+                Próximos Eventos
+              </h3>
+              <div className="space-y-3">
+                {activities
+                  .filter(a => a.dueDate && new Date(a.dueDate) >= new Date())
+                  .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
+                  .slice(0, 5)
+                  .map(activity => (
+                    <div
+                      key={activity.id}
+                      className="p-4 rounded-lg border cursor-pointer hover:opacity-80 transition-all"
+                      style={{
+                        backgroundColor: currentTheme.colors.cardBg,
+                        borderColor: currentTheme.colors.border
+                      }}
+                      onClick={() => {
+                        setEditingActivity(activity);
+                        setActivityForm({
+                          type: activity.type,
+                          subject: activity.subject,
+                          description: activity.description || '',
+                          dueDate: activity.dueDate?.split('T')[0] || '',
+                          dealId: activity.dealId || '',
+                          contactId: activity.contactId || ''
+                        });
+                        setShowActivityModal(true);
+                      }}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-2 mb-1">
+                            {activity.type === 'MEETING' && <Calendar className="h-4 w-4" style={{ color: currentTheme.colors.primary }} />}
+                            {activity.type === 'CALL' && <Phone className="h-4 w-4" style={{ color: currentTheme.colors.primary }} />}
+                            {activity.type === 'EMAIL' && <Mail className="h-4 w-4" style={{ color: currentTheme.colors.primary }} />}
+                            {activity.type === 'TASK' && <Clock className="h-4 w-4" style={{ color: currentTheme.colors.primary }} />}
+                            <span className="font-semibold" style={{ color: currentTheme.colors.text }}>
+                              {activity.subject}
+                            </span>
+                          </div>
+                          {activity.description && (
+                            <p className="text-sm mb-2" style={{ color: currentTheme.colors.textMuted }}>
+                              {activity.description}
+                            </p>
+                          )}
+                          <div className="flex items-center space-x-4 text-xs" style={{ color: currentTheme.colors.textMuted }}>
+                            <span>
+                              {new Date(activity.dueDate).toLocaleDateString('pt-BR', {
+                                day: '2-digit',
+                                month: 'short',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}
+                            </span>
+                            {activity.dealId && (
+                              <span>• Deal: {deals.find(d => d.id === activity.dealId)?.title}</span>
+                            )}
+                            {activity.contactId && (
+                              <span>• Contato: {contacts.find(c => c.id === activity.contactId)?.name}</span>
+                            )}
+                          </div>
+                        </div>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (confirm('Deseja excluir este evento?')) {
+                              // TODO: Implement delete activity
+                            }
+                          }}
+                          className="p-2 rounded-lg hover:opacity-80"
+                          style={{
+                            color: currentTheme.colors.error
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                {activities.filter(a => a.dueDate && new Date(a.dueDate) >= new Date()).length === 0 && (
+                  <div className="text-center py-12" style={{ color: currentTheme.colors.textMuted }}>
+                    <Calendar className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                    <p>Nenhum evento agendado</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
@@ -1899,6 +2221,183 @@ const CRMPage = () => {
         isLoading={isPromoting}
         salesPipelines={pipelines.filter(p => p.type === 'SALES')}
       />
+
+      {/* Activity Modal */}
+      {showActivityModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
+          <div
+            className="w-full max-w-lg rounded-lg shadow-2xl"
+            style={{ backgroundColor: currentTheme.colors.cardBg }}
+          >
+            <div className="p-6 border-b" style={{ borderColor: currentTheme.colors.border }}>
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold" style={{ color: currentTheme.colors.text }}>
+                  {editingActivity ? 'Editar Evento' : 'Novo Evento'}
+                </h2>
+                <button
+                  onClick={() => setShowActivityModal(false)}
+                  className="p-2 rounded-lg hover:bg-opacity-20"
+                  style={{ color: currentTheme.colors.textMuted }}
+                >
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6 space-y-4">
+              {/* Type */}
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: currentTheme.colors.text }}>
+                  Tipo *
+                </label>
+                <select
+                  value={activityForm.type}
+                  onChange={(e) => setActivityForm({ ...activityForm, type: e.target.value as any })}
+                  className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2"
+                  style={{
+                    backgroundColor: currentTheme.colors.input,
+                    borderColor: currentTheme.colors.border,
+                    color: currentTheme.colors.text
+                  }}
+                >
+                  <option value="MEETING">📅 Reunião</option>
+                  <option value="CALL">📞 Ligação</option>
+                  <option value="EMAIL">✉️ Email</option>
+                  <option value="TASK">✅ Tarefa</option>
+                  <option value="NOTE">📝 Nota</option>
+                </select>
+              </div>
+
+              {/* Subject */}
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: currentTheme.colors.text }}>
+                  Assunto *
+                </label>
+                <input
+                  type="text"
+                  value={activityForm.subject}
+                  onChange={(e) => setActivityForm({ ...activityForm, subject: e.target.value })}
+                  className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2"
+                  style={{
+                    backgroundColor: currentTheme.colors.input,
+                    borderColor: currentTheme.colors.border,
+                    color: currentTheme.colors.text
+                  }}
+                  placeholder="Ex: Reunião com cliente"
+                />
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: currentTheme.colors.text }}>
+                  Descrição
+                </label>
+                <textarea
+                  value={activityForm.description}
+                  onChange={(e) => setActivityForm({ ...activityForm, description: e.target.value })}
+                  rows={3}
+                  className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 resize-none"
+                  style={{
+                    backgroundColor: currentTheme.colors.input,
+                    borderColor: currentTheme.colors.border,
+                    color: currentTheme.colors.text
+                  }}
+                  placeholder="Detalhes do evento..."
+                />
+              </div>
+
+              {/* Due Date & Time */}
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: currentTheme.colors.text }}>
+                  Data e Hora *
+                </label>
+                <input
+                  type="datetime-local"
+                  value={activityForm.dueDate}
+                  onChange={(e) => setActivityForm({ ...activityForm, dueDate: e.target.value })}
+                  className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2"
+                  style={{
+                    backgroundColor: currentTheme.colors.input,
+                    borderColor: currentTheme.colors.border,
+                    color: currentTheme.colors.text
+                  }}
+                />
+              </div>
+
+              {/* Deal */}
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: currentTheme.colors.text }}>
+                  Negócio Relacionado
+                </label>
+                <select
+                  value={activityForm.dealId}
+                  onChange={(e) => setActivityForm({ ...activityForm, dealId: e.target.value })}
+                  className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2"
+                  style={{
+                    backgroundColor: currentTheme.colors.input,
+                    borderColor: currentTheme.colors.border,
+                    color: currentTheme.colors.text
+                  }}
+                >
+                  <option value="">Selecione...</option>
+                  {deals.map(deal => (
+                    <option key={deal.id} value={deal.id}>{deal.title}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Contact */}
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: currentTheme.colors.text }}>
+                  Contato Relacionado
+                </label>
+                <select
+                  value={activityForm.contactId}
+                  onChange={(e) => setActivityForm({ ...activityForm, contactId: e.target.value })}
+                  className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2"
+                  style={{
+                    backgroundColor: currentTheme.colors.input,
+                    borderColor: currentTheme.colors.border,
+                    color: currentTheme.colors.text
+                  }}
+                >
+                  <option value="">Selecione...</option>
+                  {contacts.map(contact => (
+                    <option key={contact.id} value={contact.id}>{contact.name}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div className="p-6 border-t flex justify-end space-x-3" style={{ borderColor: currentTheme.colors.border }}>
+              <button
+                onClick={() => setShowActivityModal(false)}
+                className="px-4 py-2 rounded-lg border"
+                style={{
+                  borderColor: currentTheme.colors.border,
+                  color: currentTheme.colors.text
+                }}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => {
+                  // TODO: Save activity
+                  console.log('Salvando atividade:', activityForm);
+                  setShowActivityModal(false);
+                }}
+                className="px-4 py-2 rounded-lg font-semibold"
+                style={{
+                  backgroundColor: currentTheme.colors.primary,
+                  color: '#ffffff'
+                }}
+              >
+                {editingActivity ? 'Salvar Alterações' : 'Criar Evento'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
