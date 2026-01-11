@@ -2,7 +2,7 @@
 
 **Objetivo:** Transformar completamente o site ROI Labs em um hub empresarial moderno, refletindo as 5 soluções integradas (Sirius CRM, Orion ERP, Vértice Marketing, PCP Industrial, BPO Financeiro).
 
-**Status:** ✅ Fase 1 COMPLETA | ✅ Fase 2 COMPLETA | ✅ Fase 3 COMPLETA | 🟢 Fase 4 EM PROGRESSO (50%)
+**Status:** ✅ Fase 1 COMPLETA | ✅ Fase 2 COMPLETA | ✅ Fase 3 COMPLETA | 🟢 Fase 4 EM PROGRESSO (60%)
 
 ---
 
@@ -660,7 +660,7 @@
 
 ## 💻 FASE 4: Desenvolvimento Core
 **Duração Estimada:** 2-3 semanas
-**Status:** 🟢 Em Progresso (50%)
+**Status:** 🟢 Em Progresso (60%)
 
 ### 4.1 Design System Implementation ✅ COMPLETO (100%)
 
@@ -747,7 +747,7 @@
   - [ ] Background eye-catching
   - [ ] Múltiplas opções (Demo, Trial, Contact)
 
-### 4.4 Páginas Essenciais ⏳ EM PROGRESSO (75%)
+### 4.4 Páginas Essenciais ✅ COMPLETO (100%)
 
 - [x] **About Us** ✅ COMPLETO
   - ✅ Página completa: `app/(marketing)/sobre/page.tsx`
@@ -797,9 +797,23 @@
     - 8 perguntas sobre planos, pagamento, suporte
     - Accordion component
 
-- [ ] **Privacy Policy** (pendente)
+- [x] **Privacy Policy** ✅ COMPLETO
+  - ✅ Página completa: `app/(marketing)/privacidade/page.tsx`
+  - ✅ 13 seções em conformidade com LGPD
+  - ✅ Dados coletados, finalidades e base legal
+  - ✅ Direitos do titular (LGPD): confirmação, acesso, correção, anonimização, portabilidade, eliminação
+  - ✅ Segurança: criptografia SSL/TLS, AES-256, 2FA, monitoramento
+  - ✅ Cookies e transferência internacional
+  - ✅ Contato do DPO (privacidade@roilabs.com.br)
 
-- [ ] **Terms of Service** (pendente)
+- [x] **Terms of Service** ✅ COMPLETO
+  - ✅ Página completa: `app/(marketing)/termos/page.tsx`
+  - ✅ 17 seções completas cobrindo aspectos legais
+  - ✅ Licença de uso, planos e pagamento
+  - ✅ Período de teste (14 dias) e garantia (30 dias)
+  - ✅ Propriedade de dados, uso aceitável e propriedade intelectual
+  - ✅ Limitação de responsabilidade e cancelamento
+  - ✅ Lei aplicável: Brasil / Foro: São Paulo/SP
 
 **Entregáveis da Fase 4:**
 - 🏠 Home page com Integration Section ✅
@@ -807,7 +821,8 @@
 - 📄 Contact page completa ✅
 - 📄 Pricing page completa ✅
 - 📄 About page completa ✅
-- ⏳ Páginas restantes (Privacy, Terms)
+- 📄 Privacy Policy completa ✅
+- 📄 Terms of Service completos ✅
 
 ---
 
