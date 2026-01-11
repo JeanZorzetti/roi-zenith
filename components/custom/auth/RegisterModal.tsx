@@ -10,7 +10,7 @@ import { useAuthStore } from '@/stores/authStore';
 import { toast } from 'sonner';
 
 export default function RegisterModal() {
-  const { isRegisterOpen, closeRegister, openLogin } = useAuthModals();
+  const { registerOpen, closeAll, openLogin } = useAuthModals();
   const login = useAuthStore((state) => state.login);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -45,7 +45,7 @@ export default function RegisterModal() {
       if (response.ok) {
         login(data.user, data.token);
         toast.success('Conta criada com sucesso!');
-        closeRegister();
+        closeAll();
         setName('');
         setEmail('');
         setPassword('');
@@ -61,12 +61,12 @@ export default function RegisterModal() {
   };
 
   const handleSwitchToLogin = () => {
-    closeRegister();
+    closeAll();
     openLogin();
   };
 
   return (
-    <Dialog open={isRegisterOpen} onOpenChange={closeRegister}>
+    <Dialog open={registerOpen} onOpenChange={closeAll}>
       <DialogContent className="sm:max-w-[425px] bg-deep-black border-border">
         <DialogHeader>
           <DialogTitle className="text-2xl font-light text-pure-white">Criar Conta</DialogTitle>

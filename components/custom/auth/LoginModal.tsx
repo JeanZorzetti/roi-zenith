@@ -10,7 +10,7 @@ import { useAuthStore } from '@/stores/authStore';
 import { toast } from 'sonner';
 
 export default function LoginModal() {
-  const { isLoginOpen, closeLogin, openRegister } = useAuthModals();
+  const { loginOpen, closeAll, openRegister } = useAuthModals();
   const login = useAuthStore((state) => state.login);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -32,7 +32,7 @@ export default function LoginModal() {
       if (response.ok) {
         login(data.user, data.token);
         toast.success('Login realizado com sucesso!');
-        closeLogin();
+        closeAll();
         setEmail('');
         setPassword('');
       } else {
@@ -46,12 +46,12 @@ export default function LoginModal() {
   };
 
   const handleSwitchToRegister = () => {
-    closeLogin();
+    closeAll();
     openRegister();
   };
 
   return (
-    <Dialog open={isLoginOpen} onOpenChange={closeLogin}>
+    <Dialog open={loginOpen} onOpenChange={closeAll}>
       <DialogContent className="sm:max-w-[425px] bg-deep-black border-border">
         <DialogHeader>
           <DialogTitle className="text-2xl font-light text-pure-white">Entrar</DialogTitle>
