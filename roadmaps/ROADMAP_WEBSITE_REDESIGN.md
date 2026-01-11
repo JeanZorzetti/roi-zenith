@@ -2,7 +2,7 @@
 
 **Objetivo:** Transformar completamente o site ROI Labs em um hub empresarial moderno, refletindo as 5 soluções integradas (Sirius CRM, Orion ERP, Vértice Marketing, PCP Industrial, BPO Financeiro).
 
-**Status:** ✅ Fase 1 COMPLETA | ✅ Fase 2 COMPLETA | 🟢 Fase 3 em progresso (0%)
+**Status:** ✅ Fase 1 COMPLETA | ✅ Fase 2 COMPLETA | 🟢 Fase 3 em progresso (80%)
 
 ---
 
@@ -420,74 +420,207 @@
 
 ## 🏗️ FASE 3: Arquitetura e Tech Stack
 **Duração Estimada:** 1 semana
-**Status:** 🟢 Em Progresso (0%)
+**Status:** 🟢 Em Progresso (80% completo)
+**Documentos:** `FASE3_ANALISE_ESTRUTURA.md`
 
-### 3.1 Setup do Projeto
-- [ ] Limpar código legado
-- [ ] Reestruturar pastas
-- [ ] Configurar ESLint + Prettier
-- [ ] Setup Tailwind CSS v4
-- [ ] Configurar variáveis de ambiente
+### 3.1 Setup do Projeto ✅ COMPLETO (90%)
 
-### 3.2 Estrutura de Pastas
+- [x] **Limpar código legado**
+  - ✅ Criada pasta `/legacy/` para arquivos removidos
+  - ✅ Movidos scripts: create-deals.sh, deploy.sh, populate-crm-data.py/sh
+  - ✅ Movidos configs Docker: docker-compose.prod.yml, nginx.conf
+  - ✅ Removidos arquivos auth: LoginModal, RegisterModal, authStore, useAuthModals
+  - ✅ Removidos arquivos vazios: .vercel-trigger
+  - ✅ Navigation.tsx simplificado (removida lógica de autenticação)
+
+- [x] **Reestruturar pastas**
+  - ✅ Route groups criados: `(marketing)`, `(products)`
+  - ✅ Componentes reorganizados: `layout/`, `sections/`, `products/`, `forms/`, `animations/`
+  - ✅ Homepage movida para `app/(marketing)/page.tsx`
+  - ✅ Importações atualizadas
+
+- [x] **Configurar ESLint + Prettier**
+  - ✅ ESLint já configurado (eslint.config.mjs validado)
+  - ✅ Prettier configurado (.prettierrc criado)
+  - ✅ .prettierignore criado
+
+- [x] **Setup Tailwind CSS v4**
+  - ✅ Já configurado (postcss.config.mjs usando @tailwindcss/postcss)
+  - ✅ Design tokens implementados em globals.css (742 linhas)
+  - ✅ Sem necessidade de tailwind.config.ts (Tailwind v4 usa @theme inline)
+
+- [ ] **Configurar variáveis de ambiente**
+  - ⏳ Pendente (não necessário para redesign no momento)
+
+### 3.2 Estrutura de Pastas ✅ COMPLETO (100%)
+
+**Estrutura Implementada:**
+
 ```
 /app
-  /(marketing)      # Páginas públicas
-    /page.tsx       # Home
-    /about
-    /solutions
-    /contact
-  /(products)       # Páginas de produtos
-    /sirius-crm
-    /orion-erp
-    /vertice-marketing
-  /(auth)          # Autenticação
-  /(dashboard)     # Área logada
+  /(marketing)          # ✅ Route group criado
+    /page.tsx           # ✅ Homepage (movido de /app/page.tsx)
+    /sobre/
+      /page.tsx         # ✅ About page (placeholder criado)
+    /contato/           # ✅ Pasta criada (pendente implementação)
+    /precos/            # ✅ Pasta criada (pendente implementação)
+  /(products)           # ✅ Route group criado
+    /sirius-crm/        # ✅ Pasta criada (pendente implementação)
+    /orion-erp/         # ✅ Pasta criada (pendente implementação)
+    /vertice-marketing/ # ✅ Pasta criada (pendente implementação)
+    /pcp-industrial/    # ✅ Pasta criada (pendente implementação)
+    /bpo-financeiro/    # ✅ Pasta criada (pendente implementação)
+  /api/                 # ✅ Mantido (API routes se necessário)
+  /layout.tsx           # ✅ Root layout (existente)
+  /globals.css          # ✅ Design System v2.0 (742 linhas)
+  /favicon.ico          # ✅ Mantido
+
 /components
-  /ui              # shadcn/ui components
-  /layout          # Navigation, Footer
-  /sections        # Hero, Features, etc
-  /products        # Product-specific
-  /animations      # Framer Motion wrappers
+  /ui/                  # ✅ shadcn/ui base components
+    /button.tsx         # ✅ Existente
+    /dialog.tsx         # ✅ Existente
+    /input.tsx          # ✅ Existente
+    /label.tsx          # ✅ Existente
+    /sonner.tsx         # ✅ Existente
+  /layout/              # ✅ NOVO - Layout components
+    /Navigation.tsx     # ✅ Movido de custom/ (simplificado)
+    /Footer.tsx         # ✅ Movido de custom/
+  /sections/            # ✅ NOVO - Page sections
+    /HeroSection.tsx    # ✅ Movido de custom/
+    /StatsSection.tsx   # ✅ Movido de custom/
+    /ProductShowcase.tsx # ✅ Movido de custom/
+    /FeaturesSection.tsx # ✅ Movido de custom/
+    /TestimonialsSection.tsx # ✅ Movido de custom/
+    /CTASection.tsx     # ✅ Movido de custom/
+  /products/            # ✅ NOVO - Product-specific (vazio)
+  /forms/               # ✅ NOVO - Form components (vazio)
+  /animations/          # ✅ NOVO - Framer Motion wrappers (vazio)
+  /custom/              # ⚠️ Remanescente (avaliar)
+    /CustomCursor.tsx   # ⚠️ Avaliar se mantém
+    /EasterEgg.tsx      # ⚠️ Avaliar se mantém
+    /LoadingScreen.tsx  # ⚠️ Avaliar se mantém
+
 /lib
-  /utils
-  /constants
-  /hooks
-/styles
-  /globals.css
-  /animations.css
-/public
-  /images
-  /videos
-  /fonts
+  /utils/               # ✅ Existente
+  /constants/           # ⏳ Pendente criação
+  /hooks/               # ✅ Existente (vazio após remover auth hook)
+
+/stores                 # ✅ Existente (vazio após remover authStore)
+
+/public                 # ✅ Existente
+  /images/              # ⏳ Pendente organização
+  /videos/              # ⏳ Pendente (se necessário)
+  /fonts/               # ⏳ Pendente (se necessário)
+
+/roadmaps               # ✅ Documentação completa
+  - ROADMAP_WEBSITE_REDESIGN.md
+  - FASE1_*.md (6 arquivos)
+  - FASE2_*.md (4 arquivos)
+  - FASE3_ANALISE_ESTRUTURA.md
+
+/legacy                 # ✅ NOVO - Arquivos removidos do projeto
+  /auth/                # LoginModal, RegisterModal
+  - authStore.ts
+  - useAuthModals.ts
+  - create-deals.sh
+  - deploy.sh
+  - populate-crm-data.py
+  - populate-crm-data.sh
+  - docker-compose.prod.yml
+  - nginx.conf
 ```
 
-### 3.3 Configurações
-- [ ] next.config.ts otimizado
-- [ ] tailwind.config.ts com design tokens
-- [ ] tsconfig.json strict mode
-- [ ] Configurar absolut imports (@/)
+**Mudanças Implementadas:**
+- ✅ Route groups `(marketing)` e `(products)` criados
+- ✅ Componentes reorganizados em pastas semânticas
+- ✅ Importações atualizadas em `app/(marketing)/page.tsx`
+- ✅ Pasta `legacy/` criada para arquivos removidos
+- ✅ 11 pastas de páginas criadas (1 implementada, 10 pendentes)
 
-### 3.4 Dependências
+### 3.3 Configurações ✅ COMPLETO (100%)
+
+- [x] **next.config.ts otimizado**
+  - ✅ Experimental: optimizePackageImports (lucide-react, framer-motion)
+  - ✅ Image optimization (WebP, AVIF formats)
+  - ✅ Device sizes e image sizes configurados
+  - ✅ Compression enabled
+  - ✅ React Strict Mode enabled
+  - ✅ Security headers completos:
+    - X-DNS-Prefetch-Control, HSTS, X-Frame-Options
+    - X-Content-Type-Options, X-XSS-Protection
+    - Referrer-Policy, Permissions-Policy
+  - ✅ SWC minify enabled
+  - ✅ Powered-by header removed
+
+- [x] **tailwind.config.ts com design tokens**
+  - ✅ Não necessário (Tailwind v4 usa @theme inline no CSS)
+  - ✅ Design tokens já implementados em app/globals.css (742 linhas)
+  - ✅ PostCSS configurado corretamente (postcss.config.mjs)
+
+- [x] **tsconfig.json strict mode**
+  - ✅ Já estava configurado corretamente
+  - ✅ Strict: true
+  - ✅ Paths configurado: "@/*": ["./*"]
+  - ✅ Target: ES2017, Module: esnext
+
+- [x] **Configurar absolute imports (@/)**
+  - ✅ Já configurado no tsconfig.json
+  - ✅ Funcionando em todos os componentes
+
+### 3.4 Dependências ⏳ Em Progresso (20%)
+
+**Status Atual:** Package.json precisa de limpeza
+
+**Dependências a Remover:**
+- [ ] `@prisma/client` - Backend removido
+- [ ] `prisma` - Backend removido
+- [ ] `bcryptjs` - Auth removido
+- [ ] `jsonwebtoken` - Auth removido
+- [ ] `socket.io-client` - Não planejado no redesign
+- [ ] `@tanstack/react-query` - Desnecessário sem backend
+- [ ] Avaliar remoção: `cmdk`, `embla-carousel-react`, `input-otp`, `react-resizable-panels`, `vaul`
+
+**Dependências a Adicionar:**
+- [ ] `prettier` (devDependencies)
+- [ ] `eslint-config-prettier` (devDependencies)
+- [ ] `gsap` - Animações SECONDARY (ScrollTrigger)
+
+**Dependências Essenciais (Manter):**
 ```json
 {
   "dependencies": {
     "next": "16.1.1",
     "react": "19.2.3",
-    "framer-motion": "latest",
+    "react-dom": "19.2.3",
+    "framer-motion": "12.25.0",
     "tailwindcss": "^4",
     "@radix-ui/react-*": "latest",
-    "lucide-react": "latest",
-    "zustand": "latest",
-    "zod": "latest"
+    "lucide-react": "0.562.0",
+    "zustand": "5.0.9",
+    "zod": "4.3.5",
+    "react-hook-form": "7.71.0",
+    "sonner": "2.0.7",
+    "next-themes": "0.4.6",
+    "tailwind-merge": "3.4.0",
+    "class-variance-authority": "0.7.1",
+    "clsx": "2.1.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "typescript": "^5",
+    "@types/*": "...",
+    "eslint": "^9",
+    "eslint-config-next": "16.1.1"
   }
 }
 ```
 
 **Entregáveis da Fase 3:**
-- 📁 Estrutura de projeto limpa
-- ⚙️ Configurações otimizadas
-- 📦 Dependências instaladas
+- ✅ Estrutura de projeto limpa
+- ✅ Configurações otimizadas (next.config.ts, prettier, eslint)
+- ✅ Route groups e componentes reorganizados
+- ✅ Documentação completa (FASE3_ANALISE_ESTRUTURA.md)
+- ⏳ Dependências limpas (20% - falta remover não utilizadas e adicionar Prettier/GSAP)
 
 ---
 
