@@ -73,7 +73,7 @@ export default function FeaturesSection() {
             return (
               <div
                 key={index}
-                ref={el => itemRefs.current[index] = el}
+                ref={el => { itemRefs.current[index] = el; }}
                 className={`glass-card text-center group cursor-pointer ${
                   visibleItems[index] ? 'visible' : ''
                 } fade-in-up`}
