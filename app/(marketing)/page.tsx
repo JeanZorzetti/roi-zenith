@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Navigation from '@/components/layout/Navigation';
 import HeroSection from '@/components/sections/HeroSection';
 import ProductShowcase from '@/components/sections/ProductShowcase';
+import IntegrationSection from '@/components/sections/IntegrationSection';
 import FeaturesSection from '@/components/sections/FeaturesSection';
 import StatsSection from '@/components/sections/StatsSection';
 import TestimonialsSection from '@/components/sections/TestimonialsSection';
@@ -31,6 +32,7 @@ export default function Home() {
       <Navigation />
       <HeroSection />
       <ProductShowcase />
+      <IntegrationSection />
       <FeaturesSection />
       <StatsSection />
       <TestimonialsSection />
