@@ -1,22 +1,24 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const testimonials = [
   {
-    quote: "Nossos clientes agora sentem que conhecemos cada um deles pessoalmente. É mágico.",
-    author: "Marina Costa",
-    company: "CEO, Restaurante Origem",
+    quote: "O Sirius CRM transformou nossa gestão de vendas. Aumentamos a conversão em 45% no primeiro trimestre.",
+    author: "Carlos Eduardo Silva",
+    company: "Diretor Comercial, TechSolutions Brasil",
   },
   {
-    quote: "Reduzimos o tempo de espera em 87% e aumentamos a satisfação para níveis que nunca imaginamos possíveis.",
-    author: "Dr. Ricardo Almeida", 
-    company: "Diretor, Hospital Premium Care",
+    quote: "Com o Orion ERP integramos todos os setores. A eficiência operacional melhorou drasticamente.",
+    author: "Fernanda Oliveira",
+    company: "CFO, Indústria MegaPro",
   },
   {
-    quote: "É como ter 100 atendentes de elite trabalhando 24/7, mas com a consistência de um relógio suíço.",
-    author: "Ana Beatriz Silva",
-    company: "Fundadora, Luxury Concierge BR",
+    quote: "O Vértice Marketing nos deu controle total das campanhas. ROI visível e mensurável em cada ação.",
+    author: "Ricardo Mendes",
+    company: "Head de Marketing, E-commerce Prime",
   },
 ];
 
@@ -57,17 +59,17 @@ export default function TestimonialsSection() {
       <div className="max-w-content mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-display mb-4">
-            Histórias de transformação
+            Histórias de sucesso
           </h2>
           <p className="text-xl font-light text-text-secondary">
-            Empresas que já vivem o futuro
+            Empresas que transformaram seus resultados com ROI Labs
           </p>
         </div>
 
         <div className="relative max-w-4xl mx-auto">
           {/* Testimonial Slider */}
           <div className="overflow-hidden">
-            <div 
+            <div
               className="flex transition-transform duration-500 ease-out"
               style={{ transform: `translateX(-${currentIndex * 100}%)` }}
             >

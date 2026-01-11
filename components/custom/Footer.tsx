@@ -1,9 +1,9 @@
 const footerLinks = [
-  { label: 'Produto', href: '#produto' },
-  { label: 'Recursos', href: '#recursos' },
-  { label: 'Empresa', href: '#empresa' },
-  { label: 'Blog', href: '#blog' },
-  { label: 'Carreiras', href: '#carreiras' },
+  { label: 'Soluções', href: '#produto' },
+  { label: 'Sirius CRM', href: '/sirius-crm' },
+  { label: 'Orion ERP', href: '/orion-erp' },
+  { label: 'Vértice Marketing', href: '/vertice-marketing' },
+  { label: 'Sobre', href: '/about' },
   { label: 'Contato', href: '#contato' },
   { label: 'Política de Privacidade', href: '/privacidade' },
 ];
@@ -29,7 +29,12 @@ export default function Footer() {
         <div className="text-2xl font-thin tracking-[0.3rem] text-pure-white mb-8">
           ROI LABS
         </div>
-        
+
+        {/* Tagline */}
+        <p className="text-text-secondary mb-8 max-w-md mx-auto">
+          Ecossistema completo de soluções empresariais integradas
+        </p>
+
         {/* Links */}
         <div className="flex flex-wrap justify-center gap-8 mb-8">
           {footerLinks.map((link) => (
@@ -42,10 +47,10 @@ export default function Footer() {
             </button>
           ))}
         </div>
-        
+
         {/* Copyright */}
         <div className="text-xs text-text-tertiary tracking-wide">
-          © 2025 ROI LABS. Todos os direitos reservados. Inteligência redefinida.
+          © 2025 ROI LABS. Todos os direitos reservados. Transformando negócios.
         </div>
       </div>
     </footer>
