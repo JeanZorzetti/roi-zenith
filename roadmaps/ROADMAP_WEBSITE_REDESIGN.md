@@ -2,7 +2,7 @@
 
 **Objetivo:** Transformar completamente o site ROI Labs em um hub empresarial moderno, refletindo as 5 soluções integradas (Sirius CRM, Orion ERP, Vértice Marketing, PCP Industrial, BPO Financeiro).
 
-**Status:** ✅ Fase 1 COMPLETA | ✅ Fase 2 COMPLETA | ✅ Fase 3 COMPLETA | 🟢 Fase 4 EM PROGRESSO (30%)
+**Status:** ✅ Fase 1 COMPLETA | ✅ Fase 2 COMPLETA | ✅ Fase 3 COMPLETA | 🟢 Fase 4 EM PROGRESSO (40%)
 
 ---
 
@@ -660,7 +660,7 @@
 
 ## 💻 FASE 4: Desenvolvimento Core
 **Duração Estimada:** 2-3 semanas
-**Status:** 🟢 Em Progresso (30%)
+**Status:** 🟢 Em Progresso (40%)
 
 ### 4.1 Design System Implementation ✅ COMPLETO (100%)
 
@@ -747,7 +747,7 @@
   - [ ] Background eye-catching
   - [ ] Múltiplas opções (Demo, Trial, Contact)
 
-### 4.4 Páginas Essenciais ⏳ EM PROGRESSO (25%)
+### 4.4 Páginas Essenciais ⏳ EM PROGRESSO (50%)
 
 - [ ] **About Us** (pendente)
 
@@ -767,6 +767,24 @@
     - Accordion component
     - Design glass morphism
 
+- [x] **Pricing** ✅ COMPLETO
+  - ✅ Página completa: `app/(marketing)/precos/page.tsx`
+  - ✅ Hero section: `components/sections/PricingHero.tsx`
+    - 4 benefícios principais
+    - Animações FadeIn
+  - ✅ Planos de preços: `components/sections/PricingPlans.tsx`
+    - 3 planos: Starter (R$ 497/mês), Professional (R$ 997/mês), Enterprise (R$ 2.497/mês)
+    - Toggle mensal/anual com 20% de desconto
+    - Badge "Mais Popular" no plano Professional
+    - Client Component com estado interativo
+  - ✅ Tabela comparativa: `components/sections/PricingComparison.tsx`
+    - 4 categorias: Recursos Principais, Suporte, Recursos Avançados, Segurança
+    - Layout responsivo
+    - Glass morphism design
+  - ✅ FAQ: `components/sections/PricingFAQ.tsx`
+    - 8 perguntas sobre planos, pagamento, suporte
+    - Accordion component
+
 - [ ] **Privacy Policy** (pendente)
 
 - [ ] **Terms of Service** (pendente)
@@ -775,7 +793,8 @@
 - 🏠 Home page com Integration Section ✅
 - 🧩 Design system funcionando ✅
 - 📄 Contact page completa ✅
-- ⏳ Páginas restantes (About, Pricing, Privacy, Terms)
+- 📄 Pricing page completa ✅
+- ⏳ Páginas restantes (About, Privacy, Terms)
 
 ---
 
