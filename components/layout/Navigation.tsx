@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Users, Building2, TrendingUp, Factory, Calculator, ChevronDown } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 interface NavigationProps {
   className?: string;
@@ -16,18 +17,53 @@ const navigationItems = [
   { label: 'Preços', path: '/precos' },
 ];
 
-// TODO: Implementar dropdown de soluções conforme wireframes
 const solutionsDropdown = [
-  { name: 'Sirius CRM', path: '/sirius-crm', status: 'available' },
-  { name: 'Orion ERP', path: '/orion-erp', status: 'available' },
-  { name: 'Vértice Marketing', path: '/vertice-marketing', status: 'available' },
-  { name: 'PCP Industrial', path: '/pcp-industrial', status: 'coming-soon' },
-  { name: 'BPO Financeiro', path: '/bpo-financeiro', status: 'coming-soon' },
+  {
+    name: 'Sirius CRM',
+    path: '/sirius-crm',
+    status: 'available' as const,
+    description: 'Gestão completa de relacionamento com clientes',
+    icon: Users,
+    color: 'text-blue-400',
+  },
+  {
+    name: 'Orion ERP',
+    path: '/orion-erp',
+    status: 'available' as const,
+    description: 'Sistema integrado de gestão empresarial',
+    icon: Building2,
+    color: 'text-purple-400',
+  },
+  {
+    name: 'Vértice Marketing',
+    path: '/vertice-marketing',
+    status: 'available' as const,
+    description: 'Automação e análise de marketing digital',
+    icon: TrendingUp,
+    color: 'text-green-400',
+  },
+  {
+    name: 'PCP Industrial',
+    path: '/pcp-industrial',
+    status: 'coming-soon' as const,
+    description: 'Planejamento e controle de produção',
+    icon: Factory,
+    color: 'text-orange-400',
+  },
+  {
+    name: 'BPO Financeiro',
+    path: '/bpo-financeiro',
+    status: 'coming-soon' as const,
+    description: 'Terceirização de processos financeiros',
+    icon: Calculator,
+    color: 'text-yellow-400',
+  },
 ];
 
 export default function Navigation({ className = '' }: NavigationProps) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
@@ -63,18 +99,93 @@ export default function Navigation({ className = '' }: NavigationProps) {
         <div className="hidden md:flex items-center gap-8">
           <ul className="flex items-center gap-8">
             {navigationItems.map((item) => (
-              <li key={item.label}>
-                <Link
-                  href={item.path}
-                  className={`text-sm font-light tracking-wide transition-colors link-elegant ${
-                    pathname === item.path
-                      ? 'text-primary-400'
-                      : 'text-text-secondary hover:text-pure-white'
-                  }`}
-                >
-                  {item.label}
-                  {item.hasDropdown && ' ▼'}
-                </Link>
+              <li
+                key={item.label}
+                className="relative"
+                onMouseEnter={() => item.hasDropdown && setDropdownOpen(true)}
+                onMouseLeave={() => item.hasDropdown && setDropdownOpen(false)}
+              >
+                {item.hasDropdown ? (
+                  <button
+                    className={`text-sm font-light tracking-wide transition-colors flex items-center gap-1 ${
+                      dropdownOpen
+                        ? 'text-primary-400'
+                        : 'text-text-secondary hover:text-pure-white'
+                    }`}
+                  >
+                    {item.label}
+                    <ChevronDown
+                      className={`w-4 h-4 transition-transform ${
+                        dropdownOpen ? 'rotate-180' : ''
+                      }`}
+                    />
+                  </button>
+                ) : (
+                  <Link
+                    href={item.path}
+                    className={`text-sm font-light tracking-wide transition-colors ${
+                      pathname === item.path
+                        ? 'text-primary-400'
+                        : 'text-text-secondary hover:text-pure-white'
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                )}
+
+                {/* Mega Menu Dropdown */}
+                {item.hasDropdown && dropdownOpen && (
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 pt-4 w-[600px]">
+                    <div className="glass-card p-6 shadow-2xl">
+                      {/* Solutions Grid */}
+                      <div className="grid grid-cols-1 gap-3 mb-4">
+                        {solutionsDropdown.map((solution) => (
+                          <Link
+                            key={solution.name}
+                            href={solution.path}
+                            className="flex items-start gap-4 p-4 rounded-lg transition-all hover:bg-white/5 group"
+                          >
+                            {/* Icon */}
+                            <div
+                              className={`w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0 group-hover:bg-white/10 transition-colors ${solution.color}`}
+                            >
+                              <solution.icon className="w-5 h-5" />
+                            </div>
+
+                            {/* Content */}
+                            <div className="flex-grow">
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className="text-sm font-medium text-pure-white">
+                                  {solution.name}
+                                </span>
+                                {solution.status === 'available' ? (
+                                  <Badge variant="available" className="text-xs">
+                                    Disponível
+                                  </Badge>
+                                ) : (
+                                  <Badge variant="coming-soon" className="text-xs">
+                                    Em breve
+                                  </Badge>
+                                )}
+                              </div>
+                              <p className="text-xs text-text-muted">{solution.description}</p>
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
+
+                      {/* View All Link */}
+                      <div className="border-t border-white/10 pt-4">
+                        <Link
+                          href="/#produto"
+                          className="text-sm text-primary-400 hover:text-primary-300 transition-colors flex items-center gap-2"
+                        >
+                          Ver todas as soluções →
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </li>
             ))}
           </ul>
@@ -104,41 +215,65 @@ export default function Navigation({ className = '' }: NavigationProps) {
           <div className="px-8 py-6 space-y-4">
             {/* Soluções Section in Mobile */}
             <div className="space-y-2">
-              <p className="text-sm text-text-secondary uppercase tracking-wider">Soluções</p>
+              <p className="text-sm text-text-secondary uppercase tracking-wider mb-3">
+                Soluções
+              </p>
               {solutionsDropdown.map((solution) => (
                 <Link
                   key={solution.name}
                   href={solution.path}
                   onClick={handleMobileMenuClose}
-                  className={`block text-left transition-colors py-2 ${
-                    solution.status === 'coming-soon'
-                      ? 'text-text-muted'
-                      : 'text-text-secondary hover:text-pure-white'
-                  }`}
+                  className="flex items-center gap-3 py-3 px-3 rounded-lg transition-all hover:bg-white/5"
                 >
-                  {solution.status === 'available' && '● '}
-                  {solution.status === 'coming-soon' && '○ '}
-                  {solution.name}
+                  <div
+                    className={`w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0 ${solution.color}`}
+                  >
+                    <solution.icon className="w-4 h-4" />
+                  </div>
+                  <div className="flex-grow">
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`text-sm ${
+                          solution.status === 'coming-soon'
+                            ? 'text-text-muted'
+                            : 'text-pure-white'
+                        }`}
+                      >
+                        {solution.name}
+                      </span>
+                      {solution.status === 'available' ? (
+                        <Badge variant="available" className="text-xs">
+                          Disponível
+                        </Badge>
+                      ) : (
+                        <Badge variant="coming-soon" className="text-xs">
+                          Em breve
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
                 </Link>
               ))}
             </div>
 
             {/* Other Navigation Items */}
             <div className="border-t border-gray-800 pt-4 space-y-2">
-              {navigationItems.filter(item => !item.hasDropdown).map((item) => (
-                <Link
-                  key={item.label}
-                  href={item.path}
-                  onClick={handleMobileMenuClose}
-                  className={`block text-left transition-colors py-2 ${
-                    pathname === item.path
-                      ? 'text-primary-400'
-                      : 'text-text-secondary hover:text-pure-white'
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              ))}
+              {navigationItems
+                .filter((item) => !item.hasDropdown)
+                .map((item) => (
+                  <Link
+                    key={item.label}
+                    href={item.path}
+                    onClick={handleMobileMenuClose}
+                    className={`block text-left transition-colors py-2 ${
+                      pathname === item.path
+                        ? 'text-primary-400'
+                        : 'text-text-secondary hover:text-pure-white'
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
             </div>
 
             {/* Mobile CTA */}
