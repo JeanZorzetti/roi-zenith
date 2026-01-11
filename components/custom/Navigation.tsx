@@ -3,32 +3,32 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, X, User } from 'lucide-react';
-import { useAuthStore } from '@/stores/authStore';
-import { useAuthModals } from '@/hooks/useAuthModals';
-import LoginModal from './auth/LoginModal';
-import RegisterModal from './auth/RegisterModal';
+import { Menu, X } from 'lucide-react';
 
 interface NavigationProps {
   className?: string;
 }
 
 const navigationItems = [
-  { label: 'Início', path: '/' },
-  { label: 'Sobre', path: '/about' },
-  { label: 'Produtos', path: '/products' },
-  { label: 'Soluções', path: '/solutions' },
-  { label: 'Calculadora', path: '/calculator' },
-  { label: 'Recursos', path: '/resources' },
-  { label: 'Contato', path: '/contact' },
+  { label: 'Soluções', path: '#', hasDropdown: true },
+  { label: 'Sobre', path: '/sobre' },
+  { label: 'Contato', path: '/contato' },
+  { label: 'Preços', path: '/precos' },
+];
+
+// TODO: Implementar dropdown de soluções conforme wireframes
+const solutionsDropdown = [
+  { name: 'Sirius CRM', path: '/sirius-crm', status: 'available' },
+  { name: 'Orion ERP', path: '/orion-erp', status: 'available' },
+  { name: 'Vértice Marketing', path: '/vertice-marketing', status: 'available' },
+  { name: 'PCP Industrial', path: '/pcp-industrial', status: 'coming-soon' },
+  { name: 'BPO Financeiro', path: '/bpo-financeiro', status: 'coming-soon' },
 ];
 
 export default function Navigation({ className = '' }: NavigationProps) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
-  const { isAuthenticated, user, logout } = useAuthStore();
-  const { openLogin, openRegister } = useAuthModals();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -73,47 +73,19 @@ export default function Navigation({ className = '' }: NavigationProps) {
                   }`}
                 >
                   {item.label}
+                  {item.hasDropdown && ' ▼'}
                 </Link>
               </li>
             ))}
           </ul>
-          
-          {/* User Menu */}
-          {isAuthenticated ? (
-            <div className="flex items-center gap-4">
-              <Link
-                href="/dashboard"
-                className="text-sm font-light tracking-wide text-text-secondary hover:text-pure-white transition-colors"
-              >
-                Dashboard
-              </Link>
-              <button
-                onClick={logout}
-                className="text-sm font-light tracking-wide text-text-secondary hover:text-pure-white transition-colors"
-              >
-                Sair
-              </button>
-              <div className="flex items-center gap-2 text-primary-400">
-                <User size={16} />
-                <span className="text-sm">{user?.name}</span>
-              </div>
-            </div>
-          ) : (
-            <div className="flex items-center gap-4">
-              <button
-                onClick={openLogin}
-                className="text-sm font-light tracking-wide text-text-secondary hover:text-pure-white transition-colors"
-              >
-                Entrar
-              </button>
-              <button
-                onClick={openRegister}
-                className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded text-sm transition-colors"
-              >
-                Começar Grátis
-              </button>
-            </div>
-          )}
+
+          {/* CTA Button */}
+          <Link
+            href="/contato"
+            className="bg-primary-600 hover:bg-primary-700 text-white px-6 py-2 rounded text-sm font-light tracking-wide transition-all hover:scale-105"
+          >
+            Agendar Demo →
+          </Link>
         </div>
 
         {/* Mobile Menu Button */}
@@ -130,76 +102,58 @@ export default function Navigation({ className = '' }: NavigationProps) {
       {mobileOpen && (
         <div className="md:hidden absolute top-full left-0 right-0 bg-pure-black/95 backdrop-blur-xl border-b border-white/10">
           <div className="px-8 py-6 space-y-4">
-            {navigationItems.map((item) => (
-              <Link
-                key={item.label}
-                href={item.path}
-                onClick={handleMobileMenuClose}
-                className={`block text-left transition-colors py-2 ${
-                  pathname === item.path
-                    ? 'text-primary-400'
-                    : 'text-text-secondary hover:text-pure-white'
-                }`}
-              >
-                {item.label}
-              </Link>
-            ))}
+            {/* Soluções Section in Mobile */}
+            <div className="space-y-2">
+              <p className="text-sm text-text-secondary uppercase tracking-wider">Soluções</p>
+              {solutionsDropdown.map((solution) => (
+                <Link
+                  key={solution.name}
+                  href={solution.path}
+                  onClick={handleMobileMenuClose}
+                  className={`block text-left transition-colors py-2 ${
+                    solution.status === 'coming-soon'
+                      ? 'text-text-muted'
+                      : 'text-text-secondary hover:text-pure-white'
+                  }`}
+                >
+                  {solution.status === 'available' && '● '}
+                  {solution.status === 'coming-soon' && '○ '}
+                  {solution.name}
+                </Link>
+              ))}
+            </div>
 
-            {/* Mobile User Menu */}
+            {/* Other Navigation Items */}
             <div className="border-t border-gray-800 pt-4 space-y-2">
-              {isAuthenticated ? (
-                <>
-                  <Link
-                    href="/dashboard"
-                    onClick={handleMobileMenuClose}
-                    className="block text-left text-text-secondary hover:text-pure-white transition-colors py-2"
-                  >
-                    Dashboard
-                  </Link>
-                  <button
-                    onClick={() => {
-                      logout();
-                      handleMobileMenuClose();
-                    }}
-                    className="block w-full text-left text-text-secondary hover:text-pure-white transition-colors py-2"
-                  >
-                    Sair
-                  </button>
-                  <div className="flex items-center gap-2 text-primary-400 py-2">
-                    <User size={16} />
-                    <span className="text-sm">{user?.name}</span>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <button
-                    onClick={() => {
-                      openLogin();
-                      handleMobileMenuClose();
-                    }}
-                    className="block w-full text-left text-text-secondary hover:text-pure-white transition-colors py-2"
-                  >
-                    Entrar
-                  </button>
-                  <button
-                    onClick={() => {
-                      openRegister();
-                      handleMobileMenuClose();
-                    }}
-                    className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded text-sm transition-colors w-full"
-                  >
-                    Começar Grátis
-                  </button>
-                </>
-              )}
+              {navigationItems.filter(item => !item.hasDropdown).map((item) => (
+                <Link
+                  key={item.label}
+                  href={item.path}
+                  onClick={handleMobileMenuClose}
+                  className={`block text-left transition-colors py-2 ${
+                    pathname === item.path
+                      ? 'text-primary-400'
+                      : 'text-text-secondary hover:text-pure-white'
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+
+            {/* Mobile CTA */}
+            <div className="border-t border-gray-800 pt-4">
+              <Link
+                href="/contato"
+                onClick={handleMobileMenuClose}
+                className="block w-full text-center bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded text-sm font-light tracking-wide transition-colors"
+              >
+                Agendar Demo →
+              </Link>
             </div>
           </div>
         </div>
       )}
-
-      {/* Auth Modals */}
-      <LoginModal />
-      <RegisterModal />
     </nav>
   );
 }
