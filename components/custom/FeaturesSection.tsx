@@ -1,26 +1,28 @@
+'use client';
+
 import { useEffect, useRef, useState } from 'react';
-import { Infinity, Brain, Target, Gem } from 'lucide-react';
+import { Layers, Zap, Shield, TrendingUp } from 'lucide-react';
 
 const features = [
   {
-    icon: Infinity,
-    title: 'Sempre Disponível',
-    description: '24 horas de excelência. Sem pausas, sem cansaço, sem limites.',
+    icon: Layers,
+    title: 'Totalmente Integrado',
+    description: 'Todos os sistemas conectados. Uma única fonte de verdade para seus dados.',
   },
   {
-    icon: Brain,
-    title: 'Sempre Aprendendo',
-    description: 'Cada interação é uma evolução. Conhece seus clientes melhor a cada dia.',
+    icon: Zap,
+    title: 'Máxima Eficiência',
+    description: 'Automatize processos e elimine trabalho manual. Foque no que importa.',
   },
   {
-    icon: Target,
-    title: 'Sempre Preciso',
-    description: 'Zero erro, total acerto. Respostas perfeitas em milissegundos.',
+    icon: Shield,
+    title: 'Segurança Total',
+    description: 'Dados protegidos com as melhores práticas de segurança e compliance.',
   },
   {
-    icon: Gem,
-    title: 'Sempre Seu',
-    description: 'Personalização absoluta. Fala como você, pensa como você.',
+    icon: TrendingUp,
+    title: 'Crescimento Escalável',
+    description: 'Cresça sem limites. Nossas soluções acompanham a evolução do seu negócio.',
   },
 ];
 
@@ -60,13 +62,13 @@ export default function FeaturesSection() {
       <div className="max-w-content mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-display mb-4 fade-in-up">
-            Precisão em cada detalhe
+            Por que escolher ROI Labs?
           </h2>
           <p className="text-xl font-light text-text-secondary fade-in-up" style={{ animationDelay: '0.2s' }}>
-            Tecnologia que desaparece. Resultados que impressionam.
+            Um ecossistema completo pensado para o sucesso do seu negócio
           </p>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {features.map((feature, index) => {
             const Icon = feature.icon;

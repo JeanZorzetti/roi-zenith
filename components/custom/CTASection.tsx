@@ -25,29 +25,29 @@ export default function CTASection() {
       
       <div className="relative z-10 max-w-content mx-auto text-center">
         <h2 className="text-display mb-4 text-pure-white">
-          Pronto para o futuro?
+          Pronto para transformar seu negócio?
         </h2>
         <p className="text-xl font-light text-text-secondary mb-12 max-w-2xl mx-auto">
-          Comece gratuitamente. Escale infinitamente.
+          Conheça o ecossistema completo de soluções ROI Labs
         </p>
-        
+
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
           <Button
-            onClick={handleTryNow}
+            onClick={handleScheduleDemo}
             variant="premium-primary"
             size="lg"
             className="text-lg px-12 py-4 min-w-[200px]"
           >
-            Experimentar agora
+            Agendar demonstração
           </Button>
-          
+
           <Button
-            onClick={handleScheduleDemo}
+            onClick={handleTryNow}
             variant="premium"
             size="lg"
             className="text-lg px-12 py-4 min-w-[200px]"
           >
-            Agendar demonstração
+            Falar com consultor
           </Button>
         </div>
       </div>
