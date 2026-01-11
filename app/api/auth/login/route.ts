@@ -1,7 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import bcrypt from 'bcryptjs';
-import prisma from '@/lib/prisma';
-import { signToken } from '@/lib/jwt';
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,48 +13,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Buscar usuário
-    const user = await prisma.user.findUnique({
-      where: { email },
-    });
-
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Credenciais inválidas' },
-        { status: 401 }
-      );
-    }
-
-    // Verificar senha
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-
-    if (!isPasswordValid) {
-      return NextResponse.json(
-        { error: 'Credenciais inválidas' },
-        { status: 401 }
-      );
-    }
-
-    // Gerar token
-    const token = signToken({
-      userId: user.id,
-      email: user.email,
-      role: user.role,
-    });
-
-    return NextResponse.json({
-      success: true,
-      token,
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        role: user.role,
-        avatar: user.avatar,
-        company: user.company,
-        position: user.position,
-      },
-    });
+    // TODO: Conectar com banco de dados
+    // Por enquanto, retorna erro informando que o banco não está configurado
+    return NextResponse.json(
+      { error: 'Banco de dados não configurado. Configure o Prisma e as variáveis de ambiente.' },
+      { status: 501 }
+    );
   } catch (error) {
     console.error('Erro no login:', error);
     return NextResponse.json(
