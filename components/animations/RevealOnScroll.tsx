@@ -22,7 +22,7 @@ export function RevealOnScroll({
   ...props
 }: RevealOnScrollProps) {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once, margin });
+  const isInView = useInView(ref, { once, margin: margin as any });
 
   const directions = {
     up: { y: 50 },

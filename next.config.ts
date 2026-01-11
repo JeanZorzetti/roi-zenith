@@ -24,9 +24,6 @@ const nextConfig: NextConfig = {
   // Powered by header removal for security
   poweredByHeader: false,
 
-  // Production optimization
-  swcMinify: true,
-
   // Redirects (if needed later)
   async redirects() {
     return [

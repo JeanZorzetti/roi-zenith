@@ -333,17 +333,20 @@
    ========================================================================== */
 
 * {
-  @apply border-border;
+  border-color: hsl(var(--border));
 }
 
 html {
-  @apply scroll-smooth antialiased;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   font-size: 16px;
   background: hsl(var(--bg-pure-black));
 }
 
 body {
-  @apply bg-background text-foreground;
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
   font-family: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont,
                'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
   line-height: var(--leading-normal);
@@ -441,7 +444,9 @@ body {
 
 /* Premium Buttons */
 .btn-premium {
-  @apply inline-flex items-center justify-center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: var(--space-3) var(--space-8);
   border-radius: var(--radius-full);
   font-weight: var(--font-light);

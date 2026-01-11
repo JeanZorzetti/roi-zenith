@@ -1,3 +1,5 @@
+'use client';
+
 const footerLinks = [
   { label: 'Soluções', href: '#produto' },
   { label: 'Sirius CRM', href: '/sirius-crm' },
