@@ -1,14 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import Navigation from '@/components/custom/Navigation';
-import HeroSection from '@/components/custom/HeroSection';
-import ProductShowcase from '@/components/custom/ProductShowcase';
-import FeaturesSection from '@/components/custom/FeaturesSection';
-import StatsSection from '@/components/custom/StatsSection';
-import TestimonialsSection from '@/components/custom/TestimonialsSection';
-import CTASection from '@/components/custom/CTASection';
-import Footer from '@/components/custom/Footer';
+import Navigation from '@/components/layout/Navigation';
+import HeroSection from '@/components/sections/HeroSection';
+import ProductShowcase from '@/components/sections/ProductShowcase';
+import FeaturesSection from '@/components/sections/FeaturesSection';
+import StatsSection from '@/components/sections/StatsSection';
+import TestimonialsSection from '@/components/sections/TestimonialsSection';
+import CTASection from '@/components/sections/CTASection';
+import Footer from '@/components/layout/Footer';
 import CustomCursor from '@/components/custom/CustomCursor';
 import LoadingScreen from '@/components/custom/LoadingScreen';
 import EasterEgg from '@/components/custom/EasterEgg';
