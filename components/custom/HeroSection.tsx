@@ -1,7 +1,9 @@
+'use client';
+
 import { useEffect, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import heroVisualization from '@/assets/hero-ai-visualization.jpg';
+import Image from 'next/image';
 
 export default function HeroSection() {
   const [mounted, setMounted] = useState(false);
@@ -55,10 +57,12 @@ export default function HeroSection() {
     <section className="relative h-screen flex items-center justify-center overflow-hidden bg-pure-black">
       {/* Background Image */}
       <div className="absolute inset-0">
-        <img 
-          src={heroVisualization} 
-          alt="AI Visualization" 
-          className="w-full h-full object-cover opacity-20"
+        <Image
+          src="/assets/hero-ai-visualization.jpg"
+          alt="AI Visualization"
+          fill
+          className="object-cover opacity-20"
+          priority
         />
         <div className="absolute inset-0 bg-gradient-to-b from-pure-black/60 via-transparent to-pure-black/80" />
       </div>

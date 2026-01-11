@@ -1,22 +1,19 @@
-import { useNavigate } from 'react-router-dom';
+'use client';
+
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 
 export default function CTASection() {
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const handleTryNow = () => {
     // Navigate to ROI Calculator for immediate value demonstration
-    navigate('/calculator');
+    router.push('/calculator');
   };
 
   const handleScheduleDemo = () => {
-    // Navigate to contact page with pre-filled subject for demo
-    navigate('/contact', { 
-      state: { 
-        subject: 'Agendamento de Demonstração - ROI Labs SDR AI',
-        message: 'Olá! Tenho interesse em agendar uma demonstração do ROI Labs SDR AI para entender como pode transformar nossos resultados de vendas.'
-      } 
-    });
+    // Navigate to contact page
+    router.push('/contact');
   };
 
   return (
