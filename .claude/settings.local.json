@@ -7,7 +7,15 @@
       "Bash(git push:*)",
       "Bash(npm install:*)",
       "Read(//c/Users/jeanz/Downloads/**)",
-      "Bash(git remote:*)"
+      "Bash(git remote:*)",
+      "Bash(grep:*)",
+      "Bash(npx eslint:*)",
+      "Bash(npx tsc:*)",
+      "Bash(git checkout:*)",
+      "Bash(cat:*)",
+      "Bash(git rev-list:*)",
+      "Bash(pkill:*)",
+      "Bash(echo:*)"
     ],
     "deny": [],
     "ask": []
