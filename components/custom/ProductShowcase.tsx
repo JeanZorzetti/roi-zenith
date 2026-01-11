@@ -1,33 +1,66 @@
-import { useEffect, useState, useRef } from 'react';
+'use client';
 
-interface Message {
-  type: 'user' | 'ai';
-  text: string;
+import { useEffect, useState, useRef } from 'react';
+import { Users, Package, TrendingUp, Factory, DollarSign } from 'lucide-react';
+
+interface Product {
+  name: string;
+  description: string;
+  icon: typeof Users;
+  status: 'available' | 'coming-soon';
+  features: string[];
 }
 
-const messages: Message[] = [
-  { type: 'ai', text: 'Olá! Como posso tornar seu dia extraordinário?' },
-  { type: 'user', text: 'Preciso de uma experiência única para um cliente especial.' },
-  { type: 'ai', text: 'Entendo perfeitamente. Vejo que o Sr. Hamilton é um apreciador de vinhos. Que tal nossa mesa privativa com vista para a adega, acompanhada de uma degustação exclusiva dos rótulos que chegaram esta semana?' },
-  { type: 'user', text: 'Perfeito! Como você sabia?' },
-  { type: 'ai', text: 'Lembro de cada detalhe sobre seus clientes. O Sr. Hamilton mencionou seu interesse por Bordeaux em sua última visita. Já separei três opções excepcionais para esta noite.' }
+const products: Product[] = [
+  {
+    name: 'Sirius CRM',
+    description: 'Gestão completa de relacionamento com clientes',
+    icon: Users,
+    status: 'available',
+    features: ['Pipeline de vendas', 'Automação de marketing', 'Analytics avançado']
+  },
+  {
+    name: 'Orion ERP',
+    description: 'Sistema integrado de gestão empresarial',
+    icon: Package,
+    status: 'available',
+    features: ['Financeiro', 'Estoque', 'Compras e vendas']
+  },
+  {
+    name: 'Vértice Marketing',
+    description: 'Plataforma completa de marketing digital',
+    icon: TrendingUp,
+    status: 'available',
+    features: ['Campanhas multi-canal', 'Automação', 'ROI tracking']
+  },
+  {
+    name: 'PCP Industrial',
+    description: 'Planejamento e controle de produção',
+    icon: Factory,
+    status: 'coming-soon',
+    features: ['Planejamento de produção', 'Controle de qualidade', 'OEE em tempo real']
+  },
+  {
+    name: 'BPO Financeiro',
+    description: 'Terceirização de processos financeiros',
+    icon: DollarSign,
+    status: 'coming-soon',
+    features: ['Contas a pagar/receber', 'Conciliação bancária', 'Relatórios fiscais']
+  }
 ];
 
 export default function ProductShowcase() {
-  const [visibleMessages, setVisibleMessages] = useState<Message[]>([]);
   const [isVisible, setIsVisible] = useState(false);
-  const [messageIndex, setMessageIndex] = useState(0);
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && !isVisible) {
+        if (entry.isIntersecting) {
           setIsVisible(true);
-          startChatAnimation();
         }
       },
-      { threshold: 0.5 }
+      { threshold: 0.2 }
     );
 
     if (sectionRef.current) {
@@ -35,88 +68,64 @@ export default function ProductShowcase() {
     }
 
     return () => observer.disconnect();
-  }, [isVisible]);
-
-  const startChatAnimation = () => {
-    setTimeout(() => {
-      addMessage(0);
-    }, 1000);
-  };
-
-  const addMessage = (index: number) => {
-    if (index < messages.length) {
-      setVisibleMessages(prev => [...prev, messages[index]]);
-      setMessageIndex(index + 1);
-      
-      if (index + 1 < messages.length) {
-        setTimeout(() => addMessage(index + 1), 2000);
-      }
-    }
-  };
+  }, []);
 
   return (
-    <section 
+    <section
       ref={sectionRef}
-      id="produto" 
+      id="produto"
       className="relative py-24 md:py-32 px-8 bg-gradient-to-b from-pure-black via-charcoal to-pure-black"
     >
-      <div className="max-w-content mx-auto text-center">
-        <h2 className={`text-display mb-4 ${isVisible ? 'fade-in-up visible' : 'fade-in-up'}`}>
-          Conheça o futuro do atendimento
-        </h2>
-        <p className={`text-xl font-light text-text-secondary mb-16 ${isVisible ? 'fade-in-up visible' : 'fade-in-up'}`} 
-           style={{ animationDelay: '0.2s' }}>
-          Um membro invisível e incansável da sua equipe
-        </p>
-        
-        {/* Product Demo */}
-        <div className={`w-full max-w-4xl mx-auto ${isVisible ? 'scale-in visible' : 'scale-in'}`} 
-             style={{ animationDelay: '0.5s' }}>
-          <div className="glass-card shadow-premium overflow-hidden">
-            {/* Chat Interface */}
-            <div className="h-[500px] flex flex-col">
-              {/* Header */}
-              <div className="p-6 border-b border-white/10">
-                <h3 className="text-lg font-light tracking-wide text-pure-white">
-                  ROI LABS Assistant
+      <div className="max-w-content mx-auto">
+        <div className="text-center mb-16">
+          <h2 className={`text-display mb-4 ${isVisible ? 'fade-in-up visible' : 'fade-in-up'}`}>
+            Nossas Soluções
+          </h2>
+          <p className={`text-xl font-light text-text-secondary ${isVisible ? 'fade-in-up visible' : 'fade-in-up'}`}
+             style={{ animationDelay: '0.2s' }}>
+            Um ecossistema completo para transformar seu negócio
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {products.map((product, index) => {
+            const Icon = product.icon;
+            return (
+              <div
+                key={index}
+                className={`glass-card p-8 hover:scale-105 transition-all duration-300 ${isVisible ? 'fade-in-up visible' : 'fade-in-up'}`}
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                <div className="flex items-start justify-between mb-6">
+                  <div className="p-3 rounded-lg bg-white/10 border border-white/20">
+                    <Icon className="w-8 h-8 text-pure-white" strokeWidth={1.5} />
+                  </div>
+                  {product.status === 'coming-soon' && (
+                    <span className="px-3 py-1 text-xs rounded-full bg-white/10 border border-white/20 text-text-secondary">
+                      Em breve
+                    </span>
+                  )}
+                </div>
+
+                <h3 className="text-2xl font-light mb-3 text-pure-white">
+                  {product.name}
                 </h3>
+
+                <p className="text-text-secondary mb-6 leading-relaxed">
+                  {product.description}
+                </p>
+
+                <ul className="space-y-2">
+                  {product.features.map((feature, idx) => (
+                    <li key={idx} className="flex items-center gap-2 text-sm text-text-secondary">
+                      <div className="w-1.5 h-1.5 rounded-full bg-white/40" />
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
               </div>
-              
-              {/* Messages */}
-              <div className="flex-1 p-6 overflow-y-auto space-y-6">
-                {visibleMessages.map((message, index) => (
-                  <div
-                    key={index}
-                    className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'} animate-in slide-in-from-bottom-2 duration-500`}
-                    style={{ animationDelay: `${index * 0.5}s` }}
-                  >
-                    <div
-                      className={`max-w-[70%] px-6 py-3 rounded-2xl text-sm leading-relaxed ${
-                        message.type === 'user'
-                          ? 'bg-white text-pure-black'
-                          : 'bg-white/10 border border-white/20 text-pure-white'
-                      }`}
-                    >
-                      {message.text}
-                    </div>
-                  </div>
-                ))}
-                
-                {/* Typing Indicator */}
-                {messageIndex < messages.length && visibleMessages.length > 0 && (
-                  <div className="flex justify-start">
-                    <div className="bg-white/10 border border-white/20 px-6 py-3 rounded-2xl">
-                      <div className="flex gap-1">
-                        <div className="typing-dot"></div>
-                        <div className="typing-dot"></div>
-                        <div className="typing-dot"></div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
+            );
+          })}
         </div>
       </div>
     </section>

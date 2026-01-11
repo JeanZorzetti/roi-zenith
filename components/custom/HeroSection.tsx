@@ -77,21 +77,21 @@ export default function HeroSection() {
       <div className="hero-content relative z-10 text-center max-w-6xl px-8">
         <h1 className="text-hero mb-8">
           <span className={`block ${mounted ? 'fade-in-up visible' : 'fade-in-up'}`} style={{ animationDelay: '0.5s' }}>
-            SDR AI.
+            ROI Labs.
           </span>
           <span className={`block ${mounted ? 'fade-in-up visible' : 'fade-in-up'}`} style={{ animationDelay: '1s' }}>
-            Revolucionário.
+            Ecossistema.
           </span>
           <span className={`block ${mounted ? 'fade-in-up visible' : 'fade-in-up'}`} style={{ animationDelay: '1.5s' }}>
-            Resultados.
+            Empresarial.
           </span>
         </h1>
-        
-        <p className={`text-xl md:text-2xl font-light text-text-secondary mb-12 ${mounted ? 'fade-in-up visible' : 'fade-in-up'}`} 
+
+        <p className={`text-xl md:text-2xl font-light text-text-secondary mb-12 ${mounted ? 'fade-in-up visible' : 'fade-in-up'}`}
            style={{ animationDelay: '2s' }}>
-          Transforme prospects em oportunidades com Inteligência Artificial de pré-vendas.
+          Soluções integradas de CRM, ERP, Marketing, PCP e BPO Financeiro para impulsionar seu negócio.
         </p>
-        
+
         <Button
           onClick={handleScrollToProduct}
           variant="premium"
@@ -99,7 +99,7 @@ export default function HeroSection() {
           className={`text-lg px-12 py-4 ${mounted ? 'fade-in-up visible' : 'fade-in-up'}`}
           style={{ animationDelay: '2.5s' }}
         >
-          Ver SDR AI em ação
+          Conheça Nossas Soluções
         </Button>
       </div>
       
