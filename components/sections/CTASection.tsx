@@ -1,55 +1,60 @@
-'use client';
+import { RevealOnScroll } from '@/components/animations';
+import { ArrowRight } from 'lucide-react';
 
-import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-
-export default function CTASection() {
-  const router = useRouter();
-
-  const handleTryNow = () => {
-    // Navigate to ROI Calculator for immediate value demonstration
-    router.push('/calculator');
+interface CTASectionProps {
+  title?: string;
+  description?: string;
+  primaryCTA?: {
+    text: string;
+    href: string;
   };
-
-  const handleScheduleDemo = () => {
-    // Navigate to contact page
-    router.push('/contact');
+  secondaryCTA?: {
+    text: string;
+    href: string;
   };
+}
 
+export default function CTASection({
+  title = 'Pronto para transformar seu negócio?',
+  description = 'Junte-se a centenas de empresas que já estão crescendo com a ROI Labs.',
+  primaryCTA = {
+    text: 'Começar teste grátis',
+    href: '#',
+  },
+  secondaryCTA = {
+    text: 'Agendar demonstração',
+    href: '/contato',
+  },
+}: CTASectionProps) {
   return (
-    <section id="contato" className="py-24 md:py-32 px-8 mx-8 my-16 relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-card rounded-2xl"></div>
-      
-      {/* Rotating Glow Effect */}
-      <div className="absolute -top-1/2 -left-1/2 w-[200%] h-[200%] bg-gradient-glow rotate-slow opacity-50"></div>
-      
-      <div className="relative z-10 max-w-content mx-auto text-center">
-        <h2 className="text-display mb-4 text-pure-white">
-          Pronto para transformar seu negócio?
-        </h2>
-        <p className="text-xl font-light text-text-secondary mb-12 max-w-2xl mx-auto">
-          Conheça o ecossistema completo de soluções ROI Labs
-        </p>
+    <section className="py-32 px-8 bg-gradient-to-b from-gray-950 to-pure-black relative overflow-hidden">
+      {/* Background gradient glow */}
+      <div className="absolute inset-0 bg-gradient-radial from-primary-500/10 via-transparent to-transparent" />
 
-        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <Button
-            onClick={handleScheduleDemo}
-            variant="premium-primary"
-            size="lg"
-            className="text-lg px-12 py-4 min-w-[200px]"
-          >
-            Agendar demonstração
-          </Button>
+      <div className="max-w-4xl mx-auto text-center relative z-10">
+        <RevealOnScroll>
+          <h2 className="text-display font-thin mb-6">{title}</h2>
+          <p className="text-subtitle text-text-secondary mb-12">{description}</p>
 
-          <Button
-            onClick={handleTryNow}
-            variant="premium"
-            size="lg"
-            className="text-lg px-12 py-4 min-w-[200px]"
-          >
-            Falar com consultor
-          </Button>
-        </div>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            {/* Primary CTA */}
+            <a
+              href={primaryCTA.href}
+              className="inline-flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-8 py-4 rounded-lg text-lg font-light tracking-wide transition-all hover:scale-105 shadow-glow"
+            >
+              {primaryCTA.text}
+              <ArrowRight className="w-5 h-5" />
+            </a>
+
+            {/* Secondary CTA */}
+            <a
+              href={secondaryCTA.href}
+              className="inline-flex items-center gap-2 bg-white/5 hover:bg-white/10 text-pure-white px-8 py-4 rounded-lg text-lg font-light tracking-wide transition-all border border-white/10 hover:border-white/20"
+            >
+              {secondaryCTA.text}
+            </a>
+          </div>
+        </RevealOnScroll>
       </div>
     </section>
   );
