@@ -13,6 +13,7 @@ interface NavigationProps {
 const navigationItems = [
   { label: 'Soluções', path: '#', hasDropdown: true },
   { label: 'Sobre', path: '/sobre' },
+  { label: 'Blog', path: '/blog' },
   { label: 'Contato', path: '/contato' },
   { label: 'Preços', path: '/precos' },
 ];
