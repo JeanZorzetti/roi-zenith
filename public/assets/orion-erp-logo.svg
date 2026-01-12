@@ -1,0 +1,42 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="orionGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#a855f7;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#c026d3;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e879f9;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Orion Constellation Pattern (simplified) -->
+  <!-- Betelgeuse (top left shoulder) -->
+  <circle cx="60" cy="50" r="8" fill="url(#orionGradient)" filter="url(#glow)"/>
+
+  <!-- Bellatrix (right shoulder) -->
+  <circle cx="140" cy="50" r="7" fill="url(#orionGradient)" filter="url(#glow)"/>
+
+  <!-- Belt Stars (Alnitak, Alnilam, Mintaka) -->
+  <circle cx="85" cy="100" r="6" fill="url(#orionGradient)" filter="url(#glow)"/>
+  <circle cx="100" cy="100" r="7" fill="url(#orionGradient)" filter="url(#glow)"/>
+  <circle cx="115" cy="100" r="6" fill="url(#orionGradient)" filter="url(#glow)"/>
+
+  <!-- Rigel (bottom right foot) -->
+  <circle cx="130" cy="150" r="8" fill="url(#orionGradient)" filter="url(#glow)"/>
+
+  <!-- Saiph (bottom left foot) -->
+  <circle cx="70" cy="150" r="7" fill="url(#orionGradient)" filter="url(#glow)"/>
+
+  <!-- Connecting lines -->
+  <line x1="60" y1="50" x2="85" y2="100" stroke="url(#orionGradient)" stroke-width="2" opacity="0.6"/>
+  <line x1="140" y1="50" x2="115" y2="100" stroke="url(#orionGradient)" stroke-width="2" opacity="0.6"/>
+  <line x1="85" y1="100" x2="100" y2="100" stroke="url(#orionGradient)" stroke-width="2" opacity="0.6"/>
+  <line x1="100" y1="100" x2="115" y2="100" stroke="url(#orionGradient)" stroke-width="2" opacity="0.6"/>
+  <line x1="85" y1="100" x2="70" y2="150" stroke="url(#orionGradient)" stroke-width="2" opacity="0.6"/>
+  <line x1="115" y1="100" x2="130" y2="150" stroke="url(#orionGradient)" stroke-width="2" opacity="0.6"/>
+</svg>
