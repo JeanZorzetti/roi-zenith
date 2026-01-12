@@ -1,7 +1,9 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { Users, Package, TrendingUp, Factory, DollarSign } from 'lucide-react';
+import Link from 'next/link';
+import { Users, Building2, TrendingUp, Factory, Calculator, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 interface Product {
   name: string;
@@ -9,44 +11,74 @@ interface Product {
   icon: typeof Users;
   status: 'available' | 'coming-soon';
   features: string[];
+  color: string;
+  bgColor: string;
+  borderColor: string;
+  path: string;
+  tagline: string;
 }
 
 const products: Product[] = [
   {
     name: 'Sirius CRM',
     description: 'Gestão completa de relacionamento com clientes',
+    tagline: 'Relacionamentos que geram resultados',
     icon: Users,
     status: 'available',
-    features: ['Pipeline de vendas', 'Automação de marketing', 'Analytics avançado']
+    features: ['Pipeline de vendas visual', 'Automação de marketing', 'Analytics em tempo real'],
+    color: 'text-blue-400',
+    bgColor: 'bg-blue-400/10',
+    borderColor: 'border-blue-400/20 hover:border-blue-400/50',
+    path: '/sirius-crm',
   },
   {
     name: 'Orion ERP',
     description: 'Sistema integrado de gestão empresarial',
-    icon: Package,
+    tagline: 'Toda sua empresa em um só lugar',
+    icon: Building2,
     status: 'available',
-    features: ['Financeiro', 'Estoque', 'Compras e vendas']
+    features: ['Financeiro integrado', 'Gestão de estoque', 'Compras e vendas'],
+    color: 'text-purple-400',
+    bgColor: 'bg-purple-400/10',
+    borderColor: 'border-purple-400/20 hover:border-purple-400/50',
+    path: '/orion-erp',
   },
   {
     name: 'Vértice Marketing',
-    description: 'Plataforma completa de marketing digital',
+    description: 'Automação e análise de marketing digital',
+    tagline: 'Marketing que converte',
     icon: TrendingUp,
     status: 'available',
-    features: ['Campanhas multi-canal', 'Automação', 'ROI tracking']
+    features: ['Campanhas multi-canal', 'Automação inteligente', 'ROI tracking detalhado'],
+    color: 'text-green-400',
+    bgColor: 'bg-green-400/10',
+    borderColor: 'border-green-400/20 hover:border-green-400/50',
+    path: '/vertice-marketing',
   },
   {
     name: 'PCP Industrial',
     description: 'Planejamento e controle de produção',
+    tagline: 'Produção eficiente e previsível',
     icon: Factory,
     status: 'coming-soon',
-    features: ['Planejamento de produção', 'Controle de qualidade', 'OEE em tempo real']
+    features: ['Planejamento de produção', 'Controle de qualidade', 'OEE em tempo real'],
+    color: 'text-orange-400',
+    bgColor: 'bg-orange-400/10',
+    borderColor: 'border-orange-400/20 hover:border-orange-400/50',
+    path: '/pcp-industrial',
   },
   {
     name: 'BPO Financeiro',
     description: 'Terceirização de processos financeiros',
-    icon: DollarSign,
+    tagline: 'Foco no que realmente importa',
+    icon: Calculator,
     status: 'coming-soon',
-    features: ['Contas a pagar/receber', 'Conciliação bancária', 'Relatórios fiscais']
-  }
+    features: ['Contas a pagar/receber', 'Conciliação bancária', 'Relatórios fiscais'],
+    color: 'text-yellow-400',
+    bgColor: 'bg-yellow-400/10',
+    borderColor: 'border-yellow-400/20 hover:border-yellow-400/50',
+    path: '/bpo-financeiro',
+  },
 ];
 
 export default function ProductShowcase() {
@@ -76,13 +108,18 @@ export default function ProductShowcase() {
       id="produto"
       className="relative py-24 md:py-32 px-8 bg-gradient-to-b from-pure-black via-charcoal to-pure-black"
     >
-      <div className="max-w-content mx-auto">
+      {/* Background gradient glow */}
+      <div className="absolute inset-0 bg-gradient-radial from-primary-500/5 via-transparent to-transparent pointer-events-none" />
+
+      <div className="max-w-content mx-auto relative z-10">
         <div className="text-center mb-16">
           <h2 className={`text-display mb-4 ${isVisible ? 'fade-in-up visible' : 'fade-in-up'}`}>
             Nossas Soluções
           </h2>
-          <p className={`text-xl font-light text-text-secondary ${isVisible ? 'fade-in-up visible' : 'fade-in-up'}`}
-             style={{ animationDelay: '0.2s' }}>
+          <p
+            className={`text-xl font-light text-text-secondary ${isVisible ? 'fade-in-up visible' : 'fade-in-up'}`}
+            style={{ animationDelay: '0.2s' }}
+          >
             Um ecossistema completo para transformar seu negócio
           </p>
         </div>
@@ -90,42 +127,77 @@ export default function ProductShowcase() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {products.map((product, index) => {
             const Icon = product.icon;
+            const isAvailable = product.status === 'available';
+
             return (
-              <div
+              <Link
                 key={index}
-                className={`glass-card p-8 hover:scale-105 transition-all duration-300 ${isVisible ? 'fade-in-up visible' : 'fade-in-up'}`}
+                href={product.path}
+                className={`group glass-card p-8 border-2 ${product.borderColor} hover:scale-[1.02] transition-all duration-500 ${
+                  isVisible ? 'fade-in-up visible' : 'fade-in-up'
+                } ${isAvailable ? 'cursor-pointer' : 'cursor-not-allowed opacity-75'}`}
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
+                {/* Header with icon and badge */}
                 <div className="flex items-start justify-between mb-6">
-                  <div className="p-3 rounded-lg bg-white/10 border border-white/20">
-                    <Icon className="w-8 h-8 text-pure-white" strokeWidth={1.5} />
+                  <div
+                    className={`p-4 rounded-xl ${product.bgColor} border border-white/10 group-hover:scale-110 transition-transform duration-300`}
+                  >
+                    <Icon className={`w-8 h-8 ${product.color}`} strokeWidth={1.5} />
                   </div>
-                  {product.status === 'coming-soon' && (
-                    <span className="px-3 py-1 text-xs rounded-full bg-white/10 border border-white/20 text-text-secondary">
+                  {product.status === 'available' ? (
+                    <Badge variant="available" className="text-xs">
+                      Disponível
+                    </Badge>
+                  ) : (
+                    <Badge variant="coming-soon" className="text-xs">
                       Em breve
-                    </span>
+                    </Badge>
                   )}
                 </div>
 
-                <h3 className="text-2xl font-light mb-3 text-pure-white">
+                {/* Title and tagline */}
+                <h3 className="text-2xl font-medium mb-2 text-pure-white group-hover:text-primary-400 transition-colors">
                   {product.name}
                 </h3>
+                <p className="text-sm text-text-muted mb-3 italic">{product.tagline}</p>
 
-                <p className="text-text-secondary mb-6 leading-relaxed">
-                  {product.description}
-                </p>
+                <p className="text-text-secondary mb-6 leading-relaxed text-sm">{product.description}</p>
 
-                <ul className="space-y-2">
+                {/* Features list */}
+                <ul className="space-y-3 mb-6">
                   {product.features.map((feature, idx) => (
-                    <li key={idx} className="flex items-center gap-2 text-sm text-text-secondary">
-                      <div className="w-1.5 h-1.5 rounded-full bg-white/40" />
-                      {feature}
+                    <li key={idx} className="flex items-start gap-2 text-sm text-text-secondary">
+                      <CheckCircle2 className={`w-4 h-4 flex-shrink-0 mt-0.5 ${product.color}`} />
+                      <span>{feature}</span>
                     </li>
                   ))}
                 </ul>
-              </div>
+
+                {/* CTA Link */}
+                {isAvailable && (
+                  <div className="flex items-center gap-2 text-sm font-medium text-primary-400 group-hover:gap-3 transition-all">
+                    Saiba mais
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                )}
+              </Link>
             );
           })}
+        </div>
+
+        {/* Bottom CTA */}
+        <div className="text-center mt-16">
+          <p className="text-text-secondary mb-6">
+            Não encontrou o que procura? Desenvolvemos soluções personalizadas para seu negócio.
+          </p>
+          <Link
+            href="/contato"
+            className="inline-flex items-center gap-2 bg-white/5 hover:bg-white/10 text-pure-white px-6 py-3 rounded-lg text-sm font-light tracking-wide transition-all border border-white/10 hover:border-white/20"
+          >
+            Falar com especialista
+            <ArrowRight className="w-4 h-4" />
+          </Link>
         </div>
       </div>
     </section>
