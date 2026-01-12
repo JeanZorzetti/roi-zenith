@@ -4,6 +4,7 @@ import "./globals.css";
 import { defaultMetadata } from "@/lib/metadata";
 import JsonLd, { organizationSchema } from "@/components/seo/JsonLd";
 import { Toaster } from "sonner";
+import GoogleAnalytics from "@/components/analytics/GoogleAnalytics";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -28,6 +29,7 @@ export default function RootLayout({
       <body className="antialiased">
         {children}
         <Toaster position="top-right" richColors />
+        <GoogleAnalytics measurementId="G-7JD9J2QEDJ" />
       </body>
     </html>
   );
