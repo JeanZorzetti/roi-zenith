@@ -1,12 +1,30 @@
-<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg width="400" height="120" viewBox="0 0 400 120" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="orionGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#a855f7;stop-opacity:1" />
-      <stop offset="50%" style="stop-color:#c026d3;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#e879f9;stop-opacity:1" />
+    <!-- Modern Tech Gradient: Deep Purple to Electric Cyan -->
+    <linearGradient id="mainGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#7c3aed;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#a855f7;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:1" />
     </linearGradient>
-    <filter id="glow">
-      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+
+    <!-- Radial gradient for nodes -->
+    <radialGradient id="nodeGradient" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#06b6d4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#a855f7;stop-opacity:1" />
+    </radialGradient>
+
+    <!-- Subtle glow effect -->
+    <filter id="subtleGlow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Stronger glow for emphasis -->
+    <filter id="strongGlow">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
       <feMerge>
         <feMergeNode in="coloredBlur"/>
         <feMergeNode in="SourceGraphic"/>
@@ -14,29 +32,71 @@
     </filter>
   </defs>
 
-  <!-- Orion Constellation Pattern (simplified) -->
-  <!-- Betelgeuse (top left shoulder) -->
-  <circle cx="60" cy="50" r="8" fill="url(#orionGradient)" filter="url(#glow)"/>
+  <!-- Geometric constellation icon (left side) -->
+  <g transform="translate(20, 20)">
+    <!-- Hexagonal container outline (subtle) -->
+    <path d="M 40,10 L 60,20 L 60,40 L 40,50 L 20,40 L 20,20 Z"
+          stroke="url(#mainGradient)"
+          stroke-width="0.5"
+          fill="none"
+          opacity="0.3"/>
 
-  <!-- Bellatrix (right shoulder) -->
-  <circle cx="140" cy="50" r="7" fill="url(#orionGradient)" filter="url(#glow)"/>
+    <!-- Stylized constellation nodes (more geometric) -->
+    <!-- Center node (largest, main focus) -->
+    <circle cx="40" cy="30" r="4" fill="url(#nodeGradient)" filter="url(#strongGlow)"/>
 
-  <!-- Belt Stars (Alnitak, Alnilam, Mintaka) -->
-  <circle cx="85" cy="100" r="6" fill="url(#orionGradient)" filter="url(#glow)"/>
-  <circle cx="100" cy="100" r="7" fill="url(#orionGradient)" filter="url(#glow)"/>
-  <circle cx="115" cy="100" r="6" fill="url(#orionGradient)" filter="url(#glow)"/>
+    <!-- Belt nodes (horizontal alignment) -->
+    <circle cx="25" cy="30" r="2.5" fill="url(#nodeGradient)" filter="url(#subtleGlow)"/>
+    <circle cx="55" cy="30" r="2.5" fill="url(#nodeGradient)" filter="url(#subtleGlow)"/>
 
-  <!-- Rigel (bottom right foot) -->
-  <circle cx="130" cy="150" r="8" fill="url(#orionGradient)" filter="url(#glow)"/>
+    <!-- Shoulder nodes -->
+    <circle cx="30" cy="15" r="2" fill="url(#nodeGradient)" filter="url(#subtleGlow)"/>
+    <circle cx="50" cy="15" r="2" fill="url(#nodeGradient)" filter="url(#subtleGlow)"/>
 
-  <!-- Saiph (bottom left foot) -->
-  <circle cx="70" cy="150" r="7" fill="url(#orionGradient)" filter="url(#glow)"/>
+    <!-- Leg nodes -->
+    <circle cx="30" cy="45" r="2" fill="url(#nodeGradient)" filter="url(#subtleGlow)"/>
+    <circle cx="50" cy="45" r="2" fill="url(#nodeGradient)" filter="url(#subtleGlow)"/>
 
-  <!-- Connecting lines -->
-  <line x1="60" y1="50" x2="85" y2="100" stroke="url(#orionGradient)" stroke-width="2" opacity="0.6"/>
-  <line x1="140" y1="50" x2="115" y2="100" stroke="url(#orionGradient)" stroke-width="2" opacity="0.6"/>
-  <line x1="85" y1="100" x2="100" y2="100" stroke="url(#orionGradient)" stroke-width="2" opacity="0.6"/>
-  <line x1="100" y1="100" x2="115" y2="100" stroke="url(#orionGradient)" stroke-width="2" opacity="0.6"/>
-  <line x1="85" y1="100" x2="70" y2="150" stroke="url(#orionGradient)" stroke-width="2" opacity="0.6"/>
-  <line x1="115" y1="100" x2="130" y2="150" stroke="url(#orionGradient)" stroke-width="2" opacity="0.6"/>
+    <!-- Connection lines (thin and elegant) -->
+    <line x1="30" y1="15" x2="40" y2="30" stroke="url(#mainGradient)" stroke-width="1" opacity="0.5"/>
+    <line x1="50" y1="15" x2="40" y2="30" stroke="url(#mainGradient)" stroke-width="1" opacity="0.5"/>
+    <line x1="25" y1="30" x2="40" y2="30" stroke="url(#mainGradient)" stroke-width="1.5" opacity="0.7"/>
+    <line x1="40" y1="30" x2="55" y2="30" stroke="url(#mainGradient)" stroke-width="1.5" opacity="0.7"/>
+    <line x1="40" y1="30" x2="30" y2="45" stroke="url(#mainGradient)" stroke-width="1" opacity="0.5"/>
+    <line x1="40" y1="30" x2="50" y2="45" stroke="url(#mainGradient)" stroke-width="1" opacity="0.5"/>
+  </g>
+
+  <!-- Typography: ORION ERP -->
+  <g transform="translate(110, 35)">
+    <!-- ORION (larger, bold) -->
+    <text x="0" y="0"
+          font-family="'Inter', 'Roboto', 'Helvetica Neue', sans-serif"
+          font-size="32"
+          font-weight="700"
+          fill="url(#mainGradient)"
+          letter-spacing="-1">
+      ORION
+    </text>
+
+    <!-- ERP (smaller, below) -->
+    <text x="0" y="25"
+          font-family="'Inter', 'Roboto', 'Helvetica Neue', sans-serif"
+          font-size="16"
+          font-weight="400"
+          fill="#a855f7"
+          letter-spacing="4">
+      ERP
+    </text>
+  </g>
+
+  <!-- Tagline/subtitle (optional, subtle) -->
+  <text x="110" y="75"
+        font-family="'Inter', 'Roboto', 'Helvetica Neue', sans-serif"
+        font-size="10"
+        font-weight="300"
+        fill="#cbd5e1"
+        opacity="0.6"
+        letter-spacing="1">
+    Enterprise Resource Planning
+  </text>
 </svg>
