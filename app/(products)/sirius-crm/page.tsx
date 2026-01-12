@@ -204,6 +204,7 @@ export default function SiriusCRMPage() {
         gradientFrom="#4338ca"
         gradientTo="#c026d3"
         logoUrl="/assets/sirius-crm-logo.png"
+        screenshotUrl="/assets/sirius-crm-screenshot.png"
         benefits={[
           'Kanban multi-pipeline com drag & drop (@dnd-kit)',
           '4 automações de email + tracking completo',

@@ -15,6 +15,7 @@ interface ProductHeroProps {
   gradientTo: string;
   benefits: string[];
   logoUrl?: string;
+  screenshotUrl?: string;
   ctaPrimary?: {
     text: string;
     href: string;
@@ -36,6 +37,7 @@ export default function ProductHero({
   gradientTo,
   benefits,
   logoUrl,
+  screenshotUrl,
   ctaPrimary = {
     text: 'Começar teste grátis',
     href: '/contato',
@@ -70,7 +72,19 @@ export default function ProductHero({
             <FadeIn delay={0.2}>
               <div className="flex items-center gap-4 mb-6">
                 <div className={`p-4 rounded-2xl ${iconBg} border border-white/10`}>
-                  <Icon className={`w-10 h-10 ${iconColor}`} strokeWidth={1.5} />
+                  {logoUrl ? (
+                    <div className="relative w-10 h-10">
+                      <Image
+                        src={logoUrl}
+                        alt={`${productName} Logo`}
+                        fill
+                        className="object-contain drop-shadow-lg"
+                        sizes="40px"
+                      />
+                    </div>
+                  ) : (
+                    <Icon className={`w-10 h-10 ${iconColor}`} strokeWidth={1.5} />
+                  )}
                 </div>
                 <div className="text-sm text-text-muted uppercase tracking-wider">{productName}</div>
               </div>
@@ -114,27 +128,41 @@ export default function ProductHero({
             </FadeIn>
           </div>
 
-          {/* Right Column - Visual/Screenshot Placeholder */}
+          {/* Right Column - Visual/Screenshot */}
           <FadeIn delay={0.7}>
             <div className="relative">
               <div className="glass-card p-8 rounded-2xl border-2 border-white/10">
-                <div className="aspect-[4/3] bg-gradient-to-br from-white/5 to-white/0 rounded-lg flex items-center justify-center">
-                  <div className="text-center">
-                    {logoUrl ? (
-                      <div className="relative w-48 h-48 mx-auto mb-4">
-                        <Image
-                          src={logoUrl}
-                          alt={`${productName} Logo`}
-                          fill
-                          className="object-contain drop-shadow-2xl"
-                          priority
-                        />
+                <div className="aspect-[4/3] bg-gradient-to-br from-white/5 to-white/0 rounded-lg overflow-hidden">
+                  {screenshotUrl ? (
+                    <div className="relative w-full h-full">
+                      <Image
+                        src={screenshotUrl}
+                        alt={`Screenshot do ${productName}`}
+                        fill
+                        className="object-cover rounded-lg"
+                        priority
+                      />
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center h-full">
+                      <div className="text-center">
+                        {logoUrl ? (
+                          <div className="relative w-48 h-48 mx-auto mb-4">
+                            <Image
+                              src={logoUrl}
+                              alt={`${productName} Logo`}
+                              fill
+                              className="object-contain drop-shadow-2xl"
+                              priority
+                            />
+                          </div>
+                        ) : (
+                          <Icon className={`w-24 h-24 ${iconColor} mx-auto mb-4 opacity-50`} />
+                        )}
+                        <p className="text-text-muted text-sm">Screenshot do {productName}</p>
                       </div>
-                    ) : (
-                      <Icon className={`w-24 h-24 ${iconColor} mx-auto mb-4 opacity-50`} />
-                    )}
-                    <p className="text-text-muted text-sm">Screenshot do {productName}</p>
-                  </div>
+                    </div>
+                  )}
                 </div>
               </div>
               {/* Decorative elements */}
