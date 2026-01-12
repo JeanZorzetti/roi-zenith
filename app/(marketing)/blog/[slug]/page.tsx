@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Navigation from '@/components/layout/Navigation';
 import Footer from '@/components/layout/Footer';
 import { FadeIn, RevealOnScroll } from '@/components/animations';
+import ScrollProgress from '@/components/animations/ScrollProgress';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Clock, ArrowLeft, Share2 } from 'lucide-react';
 import Link from 'next/link';
@@ -102,6 +103,7 @@ Quer conhecer uma solução pensada especialmente para PMEs brasileiras? **Conhe
 
   return (
     <div className="min-h-screen bg-pure-black text-pure-white">
+      <ScrollProgress />
       <Navigation />
 
       {/* Back to Blog */}

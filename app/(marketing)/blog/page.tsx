@@ -101,6 +101,90 @@ export default function BlogPage() {
         name: 'Mariana Lima',
       },
     },
+    {
+      slug: 'transformacao-digital-pmes',
+      title: 'Transformação Digital para PMEs: Por Onde Começar?',
+      excerpt:
+        'Guia prático para iniciar a jornada de transformação digital na sua empresa sem grandes investimentos iniciais.',
+      category: 'Gestão',
+      date: '26 Dez 2025',
+      readTime: '9 min',
+      author: {
+        name: 'Pedro Almeida',
+      },
+    },
+    {
+      slug: 'kpis-vendas-b2b',
+      title: '15 KPIs de Vendas B2B que Todo Gestor Deve Acompanhar',
+      excerpt:
+        'Descubra os indicadores-chave que realmente impactam a performance do seu time comercial e como monitorá-los.',
+      category: 'CRM',
+      date: '24 Dez 2025',
+      readTime: '12 min',
+      author: {
+        name: 'Carlos Mendes',
+      },
+    },
+    {
+      slug: 'onboarding-clientes-sucesso',
+      title: 'Onboarding de Clientes: Como Garantir 90% de Retenção',
+      excerpt:
+        'Estratégias comprovadas para criar um processo de onboarding que transforma novos clientes em fãs da sua marca.',
+      category: 'CRM',
+      date: '22 Dez 2025',
+      readTime: '8 min',
+      author: {
+        name: 'Ana Silva',
+      },
+    },
+    {
+      slug: 'gestao-estoque-erp',
+      title: 'Gestão de Estoque: Como o ERP Reduz Perdas em 40%',
+      excerpt:
+        'Técnicas e funcionalidades do ERP que eliminam rupturas, reduzem custos de armazenagem e otimizam o capital de giro.',
+      category: 'ERP',
+      date: '20 Dez 2025',
+      readTime: '10 min',
+      author: {
+        name: 'Fernanda Costa',
+      },
+    },
+    {
+      slug: 'funil-vendas-otimizado',
+      title: 'Como Criar um Funil de Vendas de Alta Conversão',
+      excerpt:
+        'Metodologia passo a passo para desenhar, implementar e otimizar um funil de vendas que realmente converte.',
+      category: 'Marketing',
+      date: '18 Dez 2025',
+      readTime: '14 min',
+      author: {
+        name: 'Ricardo Oliveira',
+      },
+    },
+    {
+      slug: 'email-marketing-segmentacao',
+      title: 'Segmentação Avançada em Email Marketing: Guia 2026',
+      excerpt:
+        'Aprenda a segmentar sua base de contatos para aumentar open rate, CTR e conversões em campanhas de email.',
+      category: 'Marketing',
+      date: '16 Dez 2025',
+      readTime: '7 min',
+      author: {
+        name: 'Ricardo Oliveira',
+      },
+    },
+    {
+      slug: 'dashboard-gerencial-kpis',
+      title: 'Dashboard Gerencial: Visualize Seus KPIs em Tempo Real',
+      excerpt:
+        'Como construir dashboards eficazes que dão visibilidade total sobre a saúde do seu negócio em um único lugar.',
+      category: 'Gestão',
+      date: '14 Dez 2025',
+      readTime: '9 min',
+      author: {
+        name: 'João Santos',
+      },
+    },
   ];
 
   const categories = ['Todos', 'CRM', 'ERP', 'Marketing', 'Gestão', 'Integração', 'Compliance'];

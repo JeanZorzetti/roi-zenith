@@ -121,5 +121,47 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'monthly',
       priority: 0.7,
     },
+    {
+      url: `${baseUrl}/blog/transformacao-digital-pmes`,
+      lastModified: new Date('2025-12-26'),
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/blog/kpis-vendas-b2b`,
+      lastModified: new Date('2025-12-24'),
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/blog/onboarding-clientes-sucesso`,
+      lastModified: new Date('2025-12-22'),
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/blog/gestao-estoque-erp`,
+      lastModified: new Date('2025-12-20'),
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/blog/funil-vendas-otimizado`,
+      lastModified: new Date('2025-12-18'),
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/blog/email-marketing-segmentacao`,
+      lastModified: new Date('2025-12-16'),
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/blog/dashboard-gerencial-kpis`,
+      lastModified: new Date('2025-12-14'),
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
   ];
 }
