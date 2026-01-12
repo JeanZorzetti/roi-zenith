@@ -4,8 +4,10 @@ import { useState } from 'react';
 import Navigation from '@/components/layout/Navigation';
 import HeroSection from '@/components/sections/HeroSection';
 import ProductShowcase from '@/components/sections/ProductShowcase';
+import ValueProposition from '@/components/sections/ValueProposition';
 import IntegrationSection from '@/components/sections/IntegrationSection';
 import FeaturesSection from '@/components/sections/FeaturesSection';
+import SocialProof from '@/components/sections/SocialProof';
 import StatsSection from '@/components/sections/StatsSection';
 import TestimonialsSection from '@/components/sections/TestimonialsSection';
 import CTASection from '@/components/sections/CTASection';
@@ -32,8 +34,10 @@ export default function Home() {
       <Navigation />
       <HeroSection />
       <ProductShowcase />
+      <ValueProposition />
       <IntegrationSection />
       <FeaturesSection />
+      <SocialProof />
       <StatsSection />
       <TestimonialsSection />
       <CTASection />
