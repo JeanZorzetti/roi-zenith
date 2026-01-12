@@ -1,4 +1,4 @@
-<svg width="600" height="200" viewBox="0 0 600 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <!-- Modern gradient: Purple to Blue -->
     <linearGradient id="purpleBlue" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -32,8 +32,8 @@
     </filter>
   </defs>
 
-  <!-- 3D Cube/Network Icon -->
-  <g transform="translate(60, 50)">
+  <!-- 3D Cube/Network Icon (centered) -->
+  <g transform="translate(10, 10)">
     <!-- Back face nodes -->
     <circle cx="20" cy="20" r="6" fill="url(#nodeGlow)" opacity="0.7" filter="url(#glow)"/>
     <circle cx="80" cy="20" r="6" fill="url(#nodeGlow)" opacity="0.7" filter="url(#glow)"/>
@@ -67,38 +67,5 @@
     <!-- Diagonal cross connections (network effect) -->
     <line x1="40" y1="40" x2="100" y2="100" stroke="url(#purpleBlue)" stroke-width="1" opacity="0.3"/>
     <line x1="100" y1="40" x2="40" y2="100" stroke="url(#purpleBlue)" stroke-width="1" opacity="0.3"/>
-  </g>
-
-  <!-- Typography -->
-  <g transform="translate(250, 70)">
-    <!-- ORION -->
-    <text x="0" y="0"
-          font-family="'Inter', 'Roboto', sans-serif"
-          font-size="64"
-          font-weight="700"
-          fill="url(#purpleBlue)"
-          letter-spacing="-2">
-      ORION
-    </text>
-
-    <!-- ERP -->
-    <text x="0" y="45"
-          font-family="'Inter', 'Roboto', sans-serif"
-          font-size="32"
-          font-weight="600"
-          fill="#a855f7"
-          letter-spacing="8">
-      ERP
-    </text>
-
-    <!-- Tagline -->
-    <text x="0" y="65"
-          font-family="'Inter', 'Roboto', sans-serif"
-          font-size="14"
-          font-weight="300"
-          fill="#94a3b8"
-          letter-spacing="2">
-      Enterprise Resource Planning
-    </text>
   </g>
 </svg>
