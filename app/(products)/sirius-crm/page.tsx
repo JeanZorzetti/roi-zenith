@@ -19,66 +19,66 @@ import {
 } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Sirius CRM - Gestão Completa de Relacionamento com Clientes | ROI Labs',
+  title: 'Sirius CRM - CRM com IA, Multi-Pipeline e Automações Inteligentes | ROI Labs',
   description:
-    'Transforme seu relacionamento com clientes. Pipeline visual, automação de marketing e analytics avançado em uma única plataforma.',
+    'CRM brasileiro completo com Kanban drag & drop, 8 KPIs avançados, automações de email + WhatsApp, Google Calendar integrado e API pública. Teste grátis por 14 dias.',
 };
 
 export default function SiriusCRMPage() {
   const features = [
     {
       icon: Target,
-      title: 'Pipeline de Vendas Visual',
+      title: 'Kanban Multi-Pipeline',
       description:
-        'Visualize todo o funil de vendas em tempo real. Arraste e solte deals entre estágios e acompanhe a progressão de cada oportunidade.',
+        'Drag & drop entre colunas com reordenação vertical. FREE: 1 pipeline fixo. PRO: pipelines ilimitados customizáveis. Cards coloridos por valor, contadores em tempo real por coluna.',
     },
     {
       icon: Zap,
-      title: 'Automação de Marketing',
+      title: 'Automações Inteligentes',
       description:
-        'Crie campanhas automatizadas multicanal. Envie emails, SMS e notificações no momento certo da jornada do cliente.',
+        '4 tipos de automação: Welcome Email, Deal Created, Deal Stage Changed, Upgrade Nudge. Editor de templates com variáveis dinâmicas. Delay configurável (0min, 1h, 24h). Tracking completo: sent/delivered/opened/clicked.',
     },
     {
       icon: BarChart3,
-      title: 'Analytics em Tempo Real',
+      title: '8 KPIs Avançados',
       description:
-        'Dashboards interativos com métricas que importam. Taxas de conversão, tempo de ciclo, forecast de vendas e muito mais.',
+        'Conversion Rate, Win Rate, Avg Deal Value, Sales Cycle, Pipeline Velocity, Forecast 30/60/90 dias, Churn Rate, LTV/CAC. 4 gráficos: Pipeline Trend, Funnel, Win/Loss, Revenue Forecast. Snapshots diários históricos.',
     },
     {
       icon: Users,
-      title: 'Gestão de Contatos 360°',
+      title: 'Gestão de Contatos Ilimitados',
       description:
-        'Histórico completo de interações, preferências e comportamento. Toda informação do cliente centralizada em um único lugar.',
+        'Database sem limites, busca avançada, filtros e pagination. Vinculação automática com deals. Integração WhatsApp click-to-message. Histórico completo de atividades e notas (PRO).',
     },
     {
       icon: Mail,
-      title: 'Integração com Email',
+      title: 'Email Automations (Resend)',
       description:
-        'Conecte Gmail, Outlook ou qualquer provedor. Registre automaticamente todas as comunicações no CRM.',
+        'Templates React Email customizáveis. Webhooks automáticos de status. Open tracking e click tracking. Histórico de 50+ emails enviados. Condições customizadas (JSON) por automação.',
     },
     {
       icon: Calendar,
-      title: 'Agendamento Inteligente',
+      title: 'Google Calendar Integrado',
       description:
-        'Sincronize calendários, agende reuniões e receba lembretes automáticos. Nunca perca um follow-up importante.',
+        'OAuth2 completo, sync bidirecional de eventos. Lembretes automáticos via cron job. Follow-up dates vinculados a deals. Tracking de sincronização (PENDING/SYNCED/FAILED).',
     },
     {
       icon: Filter,
-      title: 'Segmentação Avançada',
+      title: 'API Pública + Webhooks',
       description:
-        'Crie listas dinâmicas baseadas em qualquer critério. Segmente clientes por comportamento, perfil ou estágio.',
+        'REST API v1 com endpoints CRUD para deals, contacts, pipelines. API keys com bcrypt hash. Webhooks customizados via Svix com retry automático. Rate limiting via Upstash Redis.',
     },
     {
       icon: MessageSquare,
-      title: 'Chat e Comunicação',
+      title: 'WhatsApp via Evolution API',
       description:
-        'Chat interno para colaboração da equipe. Mencione colegas, compartilhe insights e trabalhe em conjunto.',
+        'Envie mensagens WhatsApp direto do CRM. Tracking de status (PENDING/SENT/DELIVERED/READ). Media support (imagens, PDFs). Histórico completo de conversas vinculado a deals e contatos.',
     },
     {
       icon: TrendingUp,
-      title: 'Previsão de Vendas',
+      title: 'Previsão de Vendas + PWA',
       description:
-        'IA prevê probabilidade de fechamento. Identifique deals em risco e oportunidades de upsell automaticamente.',
+        'Forecast baseado em conversion rate histórico. Cálculo de LTV/CAC. Progressive Web App com offline queue. Push notifications (VAPID). Service Worker para caching strategy.',
     },
   ];
 
@@ -135,33 +135,37 @@ export default function SiriusCRMPage() {
 
   const pricingPlans = [
     {
-      name: 'Starter',
-      price: 'R$ 197',
+      name: 'FREE',
+      price: 'R$ 0',
       period: 'mês',
-      description: 'Para equipes de até 5 usuários',
+      description: 'Para começar e validar',
       features: [
-        'Até 5 usuários',
-        'Pipeline de vendas visual',
-        '1.000 contatos',
-        'Automações básicas',
-        'Relatórios essenciais',
-        'Integrações: Email + Calendar',
+        'Usuários ilimitados',
+        '1 pipeline fixo ("Vendas")',
+        'Contatos ilimitados',
+        'Kanban drag & drop básico',
+        'Analytics básico (4 KPIs)',
+        'Deals ilimitados',
         'Suporte por email',
+        'Sem cartão necessário',
       ],
     },
     {
-      name: 'Professional',
-      price: 'R$ 497',
+      name: 'PRO',
+      price: 'R$ 97',
       period: 'mês',
-      description: 'Para equipes em crescimento',
+      description: 'Para escalar vendas',
       features: [
-        'Até 20 usuários',
-        'Tudo do Starter +',
-        'Contatos ilimitados',
-        'Automações avançadas',
-        'Analytics completo',
-        'IA de previsão de vendas',
-        'API + Webhooks',
+        'Usuários ilimitados',
+        'Tudo do FREE +',
+        'Pipelines ilimitados',
+        'Analytics avançado (8 KPIs + 4 gráficos)',
+        '4 automações de email customizáveis',
+        'WhatsApp + Google Calendar integrado',
+        'API REST v1 + Webhooks (Svix)',
+        'Tags, notas e histórico de atividades',
+        'Team management (convites, roles)',
+        'PWA + Push notifications',
         'Suporte prioritário 24/7',
       ],
       highlighted: true,
@@ -172,14 +176,16 @@ export default function SiriusCRMPage() {
       period: 'mês',
       description: 'Para grandes operações',
       features: [
-        'Usuários ilimitados',
-        'Tudo do Professional +',
+        'Tudo do PRO +',
         'Customizações avançadas',
-        'SLA garantido',
+        'White-label disponível (v2.0)',
+        'SLA garantido 99.9%',
         'Gerente de conta dedicado',
         'Treinamento presencial',
-        'Migração assistida',
+        'Migração assistida + onboarding',
         'Suporte white-glove',
+        'N8N workflows customizados',
+        'Multi-region deployment',
       ],
     },
   ];
@@ -194,15 +200,16 @@ export default function SiriusCRMPage() {
         iconBg="bg-blue-400/10"
         productName="Sirius CRM"
         tagline="Relacionamentos que geram resultados"
-        description="Gerencie todo o ciclo de relacionamento com clientes em uma única plataforma. Do primeiro contato ao pós-venda, com automação inteligente e insights que impulsionam vendas."
+        description="CRM brasileiro completo construído com Next.js 16, React 19 e PostgreSQL. Multi-tenancy seguro, 8 KPIs avançados, automações via Resend, WhatsApp via Evolution API, Google Calendar OAuth2 e API REST v1 com webhooks."
         gradientFrom="#1e3a8a"
         gradientTo="#3b82f6"
         benefits={[
-          'Pipeline visual com arrastar e soltar',
-          'Automação de marketing multicanal',
-          'Analytics e previsão com IA',
-          'Integração com email e calendário',
-          'Até 14 dias de teste grátis',
+          'Kanban multi-pipeline com drag & drop (@dnd-kit)',
+          '4 automações de email + tracking completo',
+          '8 KPIs: Conversion, Win Rate, Sales Cycle, LTV/CAC',
+          'API REST v1 + Webhooks (Svix) + Rate limiting',
+          'PWA com offline queue e push notifications',
+          'FREE forever + PRO R$ 97/mês',
         ]}
       />
 
@@ -210,8 +217,8 @@ export default function SiriusCRMPage() {
         features={features}
         iconColor="text-blue-400"
         iconBg="bg-blue-400/10"
-        title="Tudo que você precisa para vender mais"
-        description="Recursos completos para transformar seu processo comercial"
+        title="Stack técnico completo e production-ready"
+        description="Arquitetura moderna: Next.js 16 RSC, Prisma ORM, NextAuth, Upstash Redis, Sentry e Vercel Edge"
       />
 
       <ProductUseCases useCases={useCases} accentColor="text-blue-400" />
@@ -220,19 +227,19 @@ export default function SiriusCRMPage() {
         plans={pricingPlans}
         accentColor="text-blue-400"
         productName="Sirius CRM"
-        title="Escolha seu plano"
-        description="Comece grátis por 14 dias. Sem cartão de crédito necessário."
+        title="Planos transparentes e sem surpresas"
+        description="Comece FREE forever com usuários e contatos ilimitados. Upgrade para PRO (R$ 97/mês) para desbloquear multi-pipeline e automações."
       />
 
       <CTASection
-        title="Pronto para transformar suas vendas?"
-        description="Junte-se a centenas de empresas que já aumentaram suas vendas com o Sirius CRM."
+        title="Comece grátis agora mesmo"
+        description="CRM completo, FREE forever. Sem cartão necessário. Upgrade para PRO quando fizer sentido. Código aberto e documentado."
         primaryCTA={{
-          text: 'Começar teste grátis',
+          text: 'Criar conta FREE',
           href: '/contato',
         }}
         secondaryCTA={{
-          text: 'Agendar demonstração',
+          text: 'Ver documentação técnica',
           href: '/contato',
         }}
       />

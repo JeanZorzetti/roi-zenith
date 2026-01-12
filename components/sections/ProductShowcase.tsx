@@ -21,11 +21,15 @@ interface Product {
 const products: Product[] = [
   {
     name: 'Sirius CRM',
-    description: 'Gestão completa de relacionamento com clientes',
+    description: 'CRM completo com IA, multi-pipeline e automações inteligentes',
     tagline: 'Relacionamentos que geram resultados',
     icon: Users,
     status: 'available',
-    features: ['Pipeline de vendas visual', 'Automação de marketing', 'Analytics em tempo real'],
+    features: [
+      'Kanban multi-pipeline com drag & drop',
+      '8 KPIs e previsão de vendas com IA',
+      'Automações de email + WhatsApp integrado',
+    ],
     color: 'text-blue-400',
     bgColor: 'bg-blue-400/10',
     borderColor: 'border-blue-400/20 hover:border-blue-400/50',
