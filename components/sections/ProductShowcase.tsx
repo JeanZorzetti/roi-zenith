@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Users, Building2, TrendingUp, Factory, Calculator, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
@@ -16,6 +17,7 @@ interface Product {
   borderColor: string;
   path: string;
   tagline: string;
+  logoUrl?: string;
 }
 
 const products: Product[] = [
@@ -34,6 +36,7 @@ const products: Product[] = [
     bgColor: 'bg-gradient-to-br from-indigo-500/10 via-purple-500/10 to-pink-500/10',
     borderColor: 'border-indigo-400/20 hover:border-indigo-400/50',
     path: '/sirius-crm',
+    logoUrl: '/assets/sirius-crm-logo.png',
   },
   {
     name: 'Orion ERP',
@@ -142,12 +145,24 @@ export default function ProductShowcase() {
                 } ${isAvailable ? 'cursor-pointer' : 'cursor-not-allowed opacity-75'}`}
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
-                {/* Header with icon and badge */}
+                {/* Header with logo/icon and badge */}
                 <div className="flex items-start justify-between mb-6">
                   <div
-                    className={`p-4 rounded-xl ${product.bgColor} border border-white/10 group-hover:scale-110 transition-transform duration-300`}
+                    className={`p-4 rounded-xl ${product.bgColor} border border-white/10 group-hover:scale-110 transition-transform duration-300 relative overflow-hidden`}
                   >
-                    <Icon className={`w-8 h-8 ${product.color}`} strokeWidth={1.5} />
+                    {product.logoUrl ? (
+                      <div className="relative w-12 h-12">
+                        <Image
+                          src={product.logoUrl}
+                          alt={`${product.name} Logo`}
+                          fill
+                          className="object-contain drop-shadow-lg"
+                          sizes="48px"
+                        />
+                      </div>
+                    ) : (
+                      <Icon className={`w-8 h-8 ${product.color}`} strokeWidth={1.5} />
+                    )}
                   </div>
                   {product.status === 'available' ? (
                     <Badge variant="available" className="text-xs">
