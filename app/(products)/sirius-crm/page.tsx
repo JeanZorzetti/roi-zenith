@@ -196,13 +196,14 @@ export default function SiriusCRMPage() {
 
       <ProductHero
         icon={Users}
-        iconColor="text-blue-400"
-        iconBg="bg-blue-400/10"
+        iconColor="text-indigo-400"
+        iconBg="bg-gradient-to-br from-indigo-500/10 via-purple-500/10 to-pink-500/10"
         productName="Sirius CRM"
         tagline="Relacionamentos que geram resultados"
         description="CRM brasileiro completo construído com Next.js 16, React 19 e PostgreSQL. Multi-tenancy seguro, 8 KPIs avançados, automações via Resend, WhatsApp via Evolution API, Google Calendar OAuth2 e API REST v1 com webhooks."
-        gradientFrom="#1e3a8a"
-        gradientTo="#3b82f6"
+        gradientFrom="#4338ca"
+        gradientTo="#c026d3"
+        logoUrl="/assets/sirius-crm-logo.png"
         benefits={[
           'Kanban multi-pipeline com drag & drop (@dnd-kit)',
           '4 automações de email + tracking completo',
@@ -215,17 +216,17 @@ export default function SiriusCRMPage() {
 
       <ProductFeatures
         features={features}
-        iconColor="text-blue-400"
-        iconBg="bg-blue-400/10"
+        iconColor="text-indigo-400"
+        iconBg="bg-gradient-to-br from-indigo-500/10 via-purple-500/10 to-pink-500/10"
         title="Stack técnico completo e production-ready"
         description="Arquitetura moderna: Next.js 16 RSC, Prisma ORM, NextAuth, Upstash Redis, Sentry e Vercel Edge"
       />
 
-      <ProductUseCases useCases={useCases} accentColor="text-blue-400" />
+      <ProductUseCases useCases={useCases} accentColor="text-indigo-400" />
 
       <ProductPricing
         plans={pricingPlans}
-        accentColor="text-blue-400"
+        accentColor="text-indigo-400"
         productName="Sirius CRM"
         title="Planos transparentes e sem surpresas"
         description="Comece FREE forever com usuários e contatos ilimitados. Upgrade para PRO (R$ 97/mês) para desbloquear multi-pipeline e automações."

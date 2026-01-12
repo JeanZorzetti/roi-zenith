@@ -1,6 +1,7 @@
 import { FadeIn } from '@/components/animations';
 import { ArrowRight, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import type { LucideIcon } from 'lucide-react';
 
 interface ProductHeroProps {
@@ -13,6 +14,7 @@ interface ProductHeroProps {
   gradientFrom: string;
   gradientTo: string;
   benefits: string[];
+  logoUrl?: string;
   ctaPrimary?: {
     text: string;
     href: string;
@@ -33,6 +35,7 @@ export default function ProductHero({
   gradientFrom,
   gradientTo,
   benefits,
+  logoUrl,
   ctaPrimary = {
     text: 'Começar teste grátis',
     href: '/contato',
@@ -117,7 +120,19 @@ export default function ProductHero({
               <div className="glass-card p-8 rounded-2xl border-2 border-white/10">
                 <div className="aspect-[4/3] bg-gradient-to-br from-white/5 to-white/0 rounded-lg flex items-center justify-center">
                   <div className="text-center">
-                    <Icon className={`w-24 h-24 ${iconColor} mx-auto mb-4 opacity-50`} />
+                    {logoUrl ? (
+                      <div className="relative w-48 h-48 mx-auto mb-4">
+                        <Image
+                          src={logoUrl}
+                          alt={`${productName} Logo`}
+                          fill
+                          className="object-contain drop-shadow-2xl"
+                          priority
+                        />
+                      </div>
+                    ) : (
+                      <Icon className={`w-24 h-24 ${iconColor} mx-auto mb-4 opacity-50`} />
+                    )}
                     <p className="text-text-muted text-sm">Screenshot do {productName}</p>
                   </div>
                 </div>

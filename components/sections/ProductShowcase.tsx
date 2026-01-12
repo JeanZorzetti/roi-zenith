@@ -30,9 +30,9 @@ const products: Product[] = [
       '8 KPIs e previsão de vendas com IA',
       'Automações de email + WhatsApp integrado',
     ],
-    color: 'text-blue-400',
-    bgColor: 'bg-blue-400/10',
-    borderColor: 'border-blue-400/20 hover:border-blue-400/50',
+    color: 'text-indigo-400',
+    bgColor: 'bg-gradient-to-br from-indigo-500/10 via-purple-500/10 to-pink-500/10',
+    borderColor: 'border-indigo-400/20 hover:border-indigo-400/50',
     path: '/sirius-crm',
   },
   {
