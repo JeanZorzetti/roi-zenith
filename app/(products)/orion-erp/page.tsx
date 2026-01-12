@@ -13,72 +13,72 @@ import {
   ShoppingCart,
   FileText,
   BarChart2,
-  Users,
-  Truck,
-  Settings,
+  Store,
+  Boxes,
+  FileCheck,
 } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Orion ERP - Sistema Integrado de Gestão Empresarial | ROI Labs',
+  title: 'Orion ERP - ERP Completo com 9 Integrações de Marketplace | ROI Labs',
   description:
-    'Gerencie financeiro, estoque, compras e vendas em uma única plataforma. ERP completo para PMEs que querem crescer com organização.',
+    'ERP brasileiro com Next.js 15, financeiro completo + portal do fornecedor, 9 marketplaces integrados (ML, Amazon, Shopee), Report Builder customizável e gestão fiscal automatizada.',
 };
 
 export default function OrionERPPage() {
   const features = [
     {
       icon: DollarSign,
-      title: 'Financeiro Integrado',
+      title: 'Financeiro Completo + Portal do Fornecedor',
       description:
-        'Contas a pagar e receber, fluxo de caixa, conciliação bancária e DRE em tempo real. Tenha controle total sobre as finanças.',
+        'Contas a Pagar (aprovações, conciliação bancária, descontos) + Contas a Receber (análise de risco, automação). Portal web dedicado para fornecedores acompanharem status de pagamentos em tempo real.',
     },
     {
-      icon: Package,
-      title: 'Gestão de Estoque',
+      icon: Boxes,
+      title: 'Gestão de Estoque Multi-Depósito',
       description:
-        'Controle de entrada e saída, rastreamento por lote, inventário e alertas de estoque mínimo. Nunca fique sem produto.',
+        'Controle de múltiplos depósitos, rastreamento por lote, inventário automatizado, movimentações entre depósitos, alertas de estoque mínimo. Relatórios de giro, ABC e valuation.',
+    },
+    {
+      icon: Store,
+      title: '9 Marketplaces Integrados',
+      description:
+        'Mercado Livre, Amazon, Shopee, Magalu, B2W, TikTok Shop, Shopify, WooCommerce + Custom. Sincronização automática de produtos, pedidos e estoque. Gestão unificada de todas as vendas.',
+    },
+    {
+      icon: FileCheck,
+      title: 'Report Builder Customizável',
+      description:
+        'Construtor visual de relatórios (Report Builder) com templates prontos, agendamento automático, histórico completo e exportação Excel/PDF. Executive Dashboard com KPIs em tempo real.',
+    },
+    {
+      icon: FileText,
+      title: 'Fiscal e Tributário Automatizado',
+      description:
+        'Emissão de NF-e, cálculo automático de impostos, SPED Fiscal, SPED Contribuições. Configurações fiscais por produto e cliente. 100% compliance com legislação brasileira.',
     },
     {
       icon: ShoppingCart,
-      title: 'Compras Inteligentes',
+      title: 'Vendas com Funil e Analytics',
       description:
-        'Gestão de fornecedores, cotações automáticas, ordens de compra e histórico de negociações. Compre melhor, pague menos.',
+        'Funil de vendas visual, analytics avançado (conversão, ticket médio, LTV), logística integrada com tracking de entregas. Gestão de comissões e metas por vendedor.',
     },
     {
-      icon: FileText,
-      title: 'Vendas e Faturamento',
+      icon: Package,
+      title: 'Gestão de Produtos Avançada',
       description:
-        'Emissão de NF-e, controle de pedidos, gestão de clientes e comissionamento. Do orçamento à nota fiscal em minutos.',
+        'Cadastro completo de produtos, variações (cor, tamanho), kits e combos, precificação dinâmica, margem de lucro automática. Integração direta com marketplaces.',
+    },
+    {
+      icon: DollarSign,
+      title: 'Fluxo de Caixa Projetado',
+      description:
+        'Projeção de fluxo de caixa a 30, 60 e 90 dias. Alertas de vencimento, descontos para pagamento antecipado, conciliação bancária automática. DRE e balanço em tempo real.',
     },
     {
       icon: BarChart2,
-      title: 'Relatórios Gerenciais',
+      title: 'Dashboard Executivo Recharts',
       description:
-        'Dashboards customizáveis com KPIs do seu negócio. DRE, balanço, margem de lucro e análises preditivas.',
-    },
-    {
-      icon: Users,
-      title: 'Gestão de Pessoas',
-      description:
-        'Cadastro de funcionários, controle de ponto, férias e folha de pagamento básica. RH integrado ao financeiro.',
-    },
-    {
-      icon: Truck,
-      title: 'Logística e Distribuição',
-      description:
-        'Planejamento de rotas, tracking de entregas, gestão de transportadoras e cálculo de frete automático.',
-    },
-    {
-      icon: FileText,
-      title: 'Fiscal e Tributário',
-      description:
-        'Cálculo automático de impostos, SPED Fiscal, SPED Contribuições e compliance total com legislação brasileira.',
-    },
-    {
-      icon: Settings,
-      title: 'Customização Avançada',
-      description:
-        'Adapte campos, workflows e relatórios para seu negócio. API aberta para integrações personalizadas.',
+        'Dashboards interativos com Recharts: gráficos de receita, vendas por canal, performance de marketplace, análise de margens. Filtros por período, canal e categoria de produto.',
     },
   ];
 
@@ -191,27 +191,29 @@ export default function OrionERPPage() {
       <ProductHero
         icon={Building2}
         iconColor="text-purple-400"
-        iconBg="bg-purple-400/10"
+        iconBg="bg-gradient-to-br from-purple-500/10 via-violet-500/10 to-fuchsia-500/10"
         productName="Orion ERP"
         tagline="Toda sua empresa em um só lugar"
-        description="Sistema completo de gestão empresarial. Integre financeiro, estoque, compras, vendas e muito mais em uma única plataforma moderna e fácil de usar."
+        description="ERP brasileiro completo construído com Next.js 15 e React 18. Financeiro com Portal do Fornecedor, 9 integrações de marketplace (ML, Amazon, Shopee, Magalu, B2W, TikTok Shop), Report Builder customizável e compliance fiscal automatizado."
         gradientFrom="#581c87"
         gradientTo="#a855f7"
+        screenshotUrl="/assets/orion-erp-screenshot.jpg"
         benefits={[
-          'Financeiro, estoque e vendas integrados',
-          'Emissão de NF-e e compliance fiscal',
-          'Relatórios gerenciais em tempo real',
-          'API aberta para integrações',
-          'Implementação rápida (15-30 dias)',
+          'Financeiro completo + Portal do Fornecedor',
+          '9 marketplaces integrados (ML, Amazon, Shopee, Magalu)',
+          'Report Builder com templates e agendamento automático',
+          'Estoque multi-depósito + rastreamento por lote',
+          'NF-e + SPED Fiscal automatizado',
+          'Dashboard Recharts + Analytics avançado',
         ]}
       />
 
       <ProductFeatures
         features={features}
         iconColor="text-purple-400"
-        iconBg="bg-purple-400/10"
-        title="Gestão empresarial completa"
-        description="Tudo que você precisa para gerenciar seu negócio em um só lugar"
+        iconBg="bg-gradient-to-br from-purple-500/10 via-violet-500/10 to-fuchsia-500/10"
+        title="ERP moderno e production-ready"
+        description="Next.js 15, Radix UI, TanStack Query, Recharts, ExcelJS/jsPDF. Arquitetura escalável e customizável."
       />
 
       <ProductUseCases useCases={useCases} accentColor="text-purple-400" />
