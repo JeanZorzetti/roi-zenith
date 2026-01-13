@@ -191,7 +191,7 @@ export default function OrionERPPage() {
       <ProductHero
         icon={Building2}
         iconColor="text-purple-400"
-        iconBg="bg-gradient-to-br from-purple-500/10 via-violet-500/10 to-fuchsia-500/10"
+        iconBg="bg-white"
         productName="Orion ERP"
         tagline="Toda sua empresa em um só lugar"
         description="ERP brasileiro completo construído com Next.js 15 e React 18. Financeiro com Portal do Fornecedor, 9 integrações de marketplace (ML, Amazon, Shopee, Magalu, B2W, TikTok Shop), Report Builder customizável e compliance fiscal automatizado."
@@ -212,7 +212,7 @@ export default function OrionERPPage() {
       <ProductFeatures
         features={features}
         iconColor="text-purple-400"
-        iconBg="bg-gradient-to-br from-purple-500/10 via-violet-500/10 to-fuchsia-500/10"
+        iconBg="bg-white"
         title="ERP moderno e production-ready"
         description="Next.js 15, Radix UI, TanStack Query, Recharts, ExcelJS/jsPDF. Arquitetura escalável e customizável."
       />

@@ -197,7 +197,7 @@ export default function SiriusCRMPage() {
       <ProductHero
         icon={Users}
         iconColor="text-indigo-400"
-        iconBg="bg-gradient-to-br from-indigo-500/10 via-purple-500/10 to-pink-500/10"
+        iconBg="bg-white"
         productName="Sirius CRM"
         tagline="Relacionamentos que geram resultados"
         description="CRM brasileiro completo construído com Next.js 16, React 19 e PostgreSQL. Multi-tenancy seguro, 8 KPIs avançados, automações via Resend, WhatsApp via Evolution API, Google Calendar OAuth2 e API REST v1 com webhooks."
@@ -218,7 +218,7 @@ export default function SiriusCRMPage() {
       <ProductFeatures
         features={features}
         iconColor="text-indigo-400"
-        iconBg="bg-gradient-to-br from-indigo-500/10 via-purple-500/10 to-pink-500/10"
+        iconBg="bg-white"
         title="Stack técnico completo e production-ready"
         description="Arquitetura moderna: Next.js 16 RSC, Prisma ORM, NextAuth, Upstash Redis, Sentry e Vercel Edge"
       />
