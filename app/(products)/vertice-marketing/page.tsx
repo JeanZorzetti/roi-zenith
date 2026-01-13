@@ -19,150 +19,132 @@ import {
 } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Vértice Marketing - Automação e Análise de Marketing Digital | ROI Labs',
+  title: 'Vértice Marketing - Agência de Performance com CRM Próprio | ROI Labs',
   description:
-    'Automatize campanhas, gere leads qualificados e mensure ROI com precisão. Plataforma completa de marketing digital para PMEs.',
+    'Agência de marketing digital com tráfego pago (Google Ads + Meta Ads), CRM próprio, consultoria de performance, SEO, criação de sites e e-commerce completo.',
 };
 
 export default function VerticeMarketingPage() {
   const features = [
     {
-      icon: Mail,
-      title: 'Email Marketing Avançado',
-      description:
-        'Editor drag-and-drop, segmentação inteligente, A/B testing e automações baseadas em comportamento. Envie o email certo na hora certa.',
-    },
-    {
-      icon: Zap,
-      title: 'Automação de Campanhas',
-      description:
-        'Crie fluxos automatizados multicanal. Nutrição de leads, onboarding, reativação e cross-sell no piloto automático.',
-    },
-    {
       icon: Target,
-      title: 'Geração de Leads',
+      title: 'Gestão de Tráfego Pago',
       description:
-        'Landing pages de alta conversão, formulários inteligentes, pop-ups e lead scoring automático. Capture e qualifique leads continuamente.',
-    },
-    {
-      icon: BarChart3,
-      title: 'Analytics e ROI',
-      description:
-        'Dashboards em tempo real com métricas que importam. CAC, LTV, ROI por canal, taxa de conversão e atribuição multi-touch.',
-    },
-    {
-      icon: MessageCircle,
-      title: 'Marketing Conversacional',
-      description:
-        'Chatbots inteligentes para WhatsApp, Instagram e website. Qualifique leads e agende reuniões 24/7 automaticamente.',
+        'Monitoramos o comportamento do seu público diariamente no Google Ads e Meta Ads (Facebook/Instagram). Garantimos que você atrai compradores, não apenas curiosos. Otimização contínua de campanhas para máximo ROI.',
     },
     {
       icon: Users,
-      title: 'Gestão de Redes Sociais',
+      title: 'CRM & Tecnologia Própria',
       description:
-        'Agende posts, monitore menções, responda comentários e analise engajamento. Tudo em um único painel centralizado.',
-    },
-    {
-      icon: Globe,
-      title: 'SEO e Conteúdo',
-      description:
-        'Pesquisa de palavras-chave, análise de concorrentes, otimização on-page e tracking de rankings. Domine o Google organicamente.',
-    },
-    {
-      icon: Brain,
-      title: 'IA e Personalização',
-      description:
-        'Recomendações de conteúdo personalizadas, otimização de envio e predição de churn. IA trabalha para você 24/7.',
+        'Implementamos nosso CRM exclusivo para organizar sua operação comercial e garantir que nenhum lead fique sem resposta. Integração completa entre marketing e vendas com automações inteligentes.',
     },
     {
       icon: TrendingUp,
-      title: 'Growth Hacking',
+      title: 'Consultoria de Performance',
       description:
-        'Experimentos A/B, testes multivariados, otimização de conversão e viral loops. Cresça rápido com dados.',
+        'Analisamos os resultados junto com você semanalmente para corrigir rotas e definir os próximos passos do crescimento. Relatórios detalhados de CAC, LTV, ROI e conversão por canal.',
+    },
+    {
+      icon: Globe,
+      title: 'Criação de Sites Profissionais',
+      description:
+        'Desenvolvemos sites modernos, responsivos e otimizados para conversão. Design que transmite profissionalismo e transforma visitantes em clientes. Integração com ferramentas de analytics e automação.',
+    },
+    {
+      icon: Brain,
+      title: 'Consultoria de SEO',
+      description:
+        'Otimizamos seu site para aparecer nas primeiras posições do Google e atrair tráfego orgânico qualificado. Pesquisa de palavras-chave, otimização técnica, conteúdo estratégico e link building.',
+    },
+    {
+      icon: BarChart3,
+      title: 'E-commerce Completo',
+      description:
+        'Criamos e gerenciamos lojas virtuais completas, focadas em experiência do usuário e alta conversão. Integração com meios de pagamento, gestão de estoque, marketing e análise de performance.',
     },
   ];
 
   const useCases = [
     {
-      industry: 'E-commerce',
-      title: 'E-commerce dobra taxa de conversão',
+      industry: 'E-commerce de Moda',
+      title: 'Loja de roupas triplica faturamento em 6 meses',
       description:
-        'Loja online implementou automações de carrinho abandonado e campanhas segmentadas.',
+        'E-commerce regional implementou estratégia completa de tráfego pago + SEO com a Vértice Marketing.',
       results: [
-        'Taxa de conversão aumentou de 1,2% para 2,8%',
-        'Recuperação de 35% dos carrinhos abandonados',
-        'CAC reduziu 45% com automações',
-        'ROI de marketing atingiu 480%',
+        'Faturamento cresceu de R$ 80k para R$ 240k/mês',
+        'ROAS (Return on Ad Spend) de 8:1 no Google Ads',
+        'Tráfego orgânico aumentou 420% com SEO',
+        'Taxa de conversão do site subiu de 1,1% para 3,2%',
       ],
     },
     {
-      industry: 'SaaS B2B',
-      title: 'Startup SaaS reduz CAC em 60%',
+      industry: 'Clínica Odontológica',
+      title: 'Clínica reduz CAC em 65% com tráfego pago',
       description:
-        'Empresa de software B2B automatizou nutrição de leads e implementou lead scoring.',
+        'Rede de clínicas odontológicas otimizou campanhas no Google Ads e Meta Ads com consultoria da Vértice.',
       results: [
-        'CAC caiu de R$ 850 para R$ 340',
-        'Conversão de lead para trial aumentou 120%',
-        'LTV/CAC ratio melhorou de 2:1 para 7:1',
-        'Pipeline de vendas cresceu 3x',
+        'CAC caiu de R$ 480 para R$ 168 por paciente',
+        'Agendamentos mensais cresceram 280%',
+        'CRM próprio organizou 100% dos leads',
+        'ROI de marketing atingiu 520%',
       ],
     },
     {
-      industry: 'Educação',
-      title: 'Escola online triplica matrículas',
+      industry: 'Indústria B2B',
+      title: 'Fábrica de embalagens aumenta leads qualificados em 5x',
       description:
-        'Instituição de ensino digital criou funis automatizados de captação de alunos.',
+        'Indústria B2B criou site profissional + estratégia de SEO + tráfego pago para captar distribuidores.',
       results: [
-        'Matrículas mensais triplicaram',
-        'Custo por matrícula caiu 55%',
-        'Taxa de retenção aumentou para 87%',
-        'NPS de alunos atingiu 92 pontos',
+        'Leads qualificados aumentaram de 8 para 42/mês',
+        'Site novo aumentou conversão em 350%',
+        'Primeira página do Google em 4 meses',
+        'Pipeline comercial cresceu R$ 2,8M em 8 meses',
       ],
     },
     {
-      industry: 'Serviços Financeiros',
-      title: 'Fintech aumenta geração de leads em 5x',
+      industry: 'Educação Online',
+      title: 'Escola de cursos online dobra matrículas com funil completo',
       description:
-        'Startup financeira implementou estratégia omnichannel com automações inteligentes.',
+        'Plataforma de cursos profissionalizantes implementou estratégia de tráfego pago + CRM + e-mail marketing.',
       results: [
-        'Geração de leads qualificados aumentou 5x',
-        'Custo por lead qualificado caiu 70%',
-        'Taxa de ativação de contas subiu 180%',
-        'Receita recorrente cresceu 320% em 6 meses',
+        'Matrículas mensais dobraram (180 → 360)',
+        'Custo por aluno caiu 52% com otimizações',
+        'Taxa de conversão de landing page: 12,8%',
+        'Ticket médio aumentou 35% com upsell',
       ],
     },
   ];
 
   const pricingPlans = [
     {
-      name: 'Starter',
-      price: 'R$ 247',
+      name: 'Essencial',
+      price: 'R$ 2.500',
       period: 'mês',
-      description: 'Para começar com automação',
+      description: 'Para começar a crescer online',
       features: [
-        'Até 2.500 contatos',
-        'Email marketing ilimitado',
-        '3 landing pages',
-        'Automações básicas',
-        'Formulários e pop-ups',
-        'Analytics essenciais',
-        'Suporte por email',
+        'Gestão de 1 canal (Google ou Meta)',
+        'Até R$ 5k de investimento em mídia',
+        'Acesso ao CRM Vértice',
+        'Relatórios quinzenais',
+        'Otimização contínua de campanhas',
+        'Suporte por WhatsApp',
+        'Consultoria mensal de performance',
       ],
     },
     {
-      name: 'Professional',
-      price: 'R$ 597',
+      name: 'Performance',
+      price: 'R$ 4.900',
       period: 'mês',
-      description: 'Para escalar marketing',
+      description: 'Para escalar com performance',
       features: [
-        'Até 10.000 contatos',
-        'Tudo do Starter +',
-        'Landing pages ilimitadas',
-        'Automações avançadas',
-        'A/B testing',
-        'Lead scoring com IA',
-        'Chatbots WhatsApp',
-        'Suporte prioritário',
+        'Gestão multi-canal (Google + Meta)',
+        'Até R$ 15k de investimento em mídia',
+        'Tudo do Essencial +',
+        'Landing pages otimizadas',
+        'SEO básico (on-page + técnico)',
+        'Relatórios semanais detalhados',
+        'Consultoria quinzenal de estratégia',
+        'Gestor dedicado',
       ],
       highlighted: true,
     },
@@ -170,16 +152,16 @@ export default function VerticeMarketingPage() {
       name: 'Enterprise',
       price: 'Sob consulta',
       period: 'mês',
-      description: 'Para grandes operações',
+      description: 'Para dominar seu mercado',
       features: [
-        'Contatos ilimitados',
-        'Tudo do Professional +',
-        'Multi-marca / Multi-idioma',
-        'API avançada',
-        'Domínio dedicado',
-        'SLA garantido',
-        'Onboarding personalizado',
-        'Growth strategist dedicado',
+        'Gestão completa multi-canal',
+        'Sem limite de investimento em mídia',
+        'Tudo do Performance +',
+        'Criação/redesign de site ou e-commerce',
+        'SEO avançado + Link Building',
+        'Automações de marketing complexas',
+        'Estrategista de crescimento dedicado',
+        'SLA de resposta garantido',
       ],
     },
   ];
@@ -190,49 +172,50 @@ export default function VerticeMarketingPage() {
 
       <ProductHero
         icon={TrendingUp}
-        iconColor="text-green-400"
-        iconBg="bg-green-400/10"
+        iconColor="text-yellow-600"
+        iconBg="bg-gradient-to-br from-yellow-500/10 via-amber-500/10 to-yellow-600/10"
         productName="Vértice Marketing"
         tagline="Marketing que converte"
-        description="Automatize suas campanhas, gere leads qualificados e mensure ROI com precisão cirúrgica. Plataforma completa de marketing digital feita para PMEs brasileiras."
-        gradientFrom="#065f46"
-        gradientTo="#10b981"
+        description="Agência de performance com gestão completa de tráfego pago (Google Ads + Meta Ads), CRM próprio, consultoria estratégica, SEO, criação de sites e e-commerce. Transformamos investimento em mídia em resultados mensuráveis."
+        gradientFrom="#ca8a04"
+        gradientTo="#f59e0b"
+        logoUrl="/assets/vertice-marketing-logo.png"
         benefits={[
-          'Automação de campanhas multicanal',
-          'Landing pages de alta conversão',
-          'Analytics e atribuição de ROI',
-          'Chatbots inteligentes (WhatsApp + IA)',
-          'Teste grátis por 14 dias',
+          'Gestão especializada Google Ads + Meta Ads',
+          'CRM próprio para organizar 100% dos leads',
+          'Consultoria de performance com relatórios semanais',
+          'SEO + Sites profissionais + E-commerce completo',
+          'ROAS médio de 6:1 para clientes ativos',
         ]}
       />
 
       <ProductFeatures
         features={features}
-        iconColor="text-green-400"
-        iconBg="bg-green-400/10"
-        title="Ferramentas completas de growth"
-        description="Tudo que você precisa para crescer de forma previsível e escalável"
+        iconColor="text-yellow-600"
+        iconBg="bg-gradient-to-br from-yellow-500/10 via-amber-500/10 to-yellow-600/10"
+        title="Ecossistema completo de marketing"
+        description="Todos os serviços integrados para gerar resultados previsíveis e escaláveis"
       />
 
-      <ProductUseCases useCases={useCases} accentColor="text-green-400" />
+      <ProductUseCases useCases={useCases} accentColor="text-yellow-600" />
 
       <ProductPricing
         plans={pricingPlans}
-        accentColor="text-green-400"
+        accentColor="text-yellow-600"
         productName="Vértice Marketing"
-        title="Planos que crescem com você"
-        description="Comece pequeno e escale conforme seus resultados melhoram"
+        title="Planos que crescem com seu negócio"
+        description="Do essencial ao enterprise, escolha o plano ideal para sua operação"
       />
 
       <CTASection
-        title="Pronto para escalar seu marketing?"
-        description="Junte-se a centenas de empresas que já reduziram CAC e aumentaram conversão com o Vértice Marketing."
+        title="Pronto para crescer com performance?"
+        description="Junte-se a dezenas de empresas que já triplicaram faturamento e reduziram CAC com a Vértice Marketing."
         primaryCTA={{
-          text: 'Começar teste grátis',
+          text: 'Falar com especialista',
           href: '/contato',
         }}
         secondaryCTA={{
-          text: 'Ver demonstração',
+          text: 'Ver cases de sucesso',
           href: '/contato',
         }}
       />
