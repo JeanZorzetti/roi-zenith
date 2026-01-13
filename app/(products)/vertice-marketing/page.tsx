@@ -180,6 +180,7 @@ export default function VerticeMarketingPage() {
         gradientFrom="#ca8a04"
         gradientTo="#f59e0b"
         logoUrl="/assets/vertice-marketing-logo.png"
+        screenshotUrl="/assets/vertice-marketing-screenshot.png"
         benefits={[
           'Gestão especializada Google Ads + Meta Ads',
           'CRM próprio para organizar 100% dos leads',
