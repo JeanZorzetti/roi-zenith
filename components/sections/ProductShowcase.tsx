@@ -67,7 +67,7 @@ const products: Product[] = [
       'SEO, criação de sites e e-commerce completo',
     ],
     color: 'text-yellow-600',
-    bgColor: 'bg-gradient-to-br from-yellow-500/10 via-amber-500/10 to-yellow-600/10',
+    bgColor: 'bg-gradient-to-br from-yellow-500/20 via-amber-500/20 to-yellow-600/20',
     borderColor: 'border-yellow-600/20 hover:border-yellow-600/50',
     path: '/vertice-marketing',
     logoUrl: '/assets/vertice-marketing-logo.png',
