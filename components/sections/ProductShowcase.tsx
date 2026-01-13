@@ -50,7 +50,7 @@ const products: Product[] = [
       'Report Builder com templates e agendamento',
     ],
     color: 'text-purple-400',
-    bgColor: 'bg-gradient-to-br from-purple-500/10 via-violet-500/10 to-fuchsia-500/10',
+    bgColor: 'bg-white',
     borderColor: 'border-purple-400/20 hover:border-purple-400/50',
     path: '/orion-erp',
     logoUrl: '/assets/orion-erp-logo.png',
