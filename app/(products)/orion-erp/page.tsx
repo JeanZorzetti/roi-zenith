@@ -197,7 +197,7 @@ export default function OrionERPPage() {
         description="ERP brasileiro completo construído com Next.js 15 e React 18. Financeiro com Portal do Fornecedor, 9 integrações de marketplace (ML, Amazon, Shopee, Magalu, B2W, TikTok Shop), Report Builder customizável e compliance fiscal automatizado."
         gradientFrom="#581c87"
         gradientTo="#a855f7"
-        logoUrl="/assets/orion-erp-logo.svg"
+        logoUrl="/assets/orion-erp-logo.png"
         screenshotUrl="/assets/orion-erp-screenshot.jpg"
         benefits={[
           'Financeiro completo + Portal do Fornecedor',
