@@ -173,7 +173,7 @@ export default function VerticeMarketingPage() {
       <ProductHero
         icon={TrendingUp}
         iconColor="text-yellow-600"
-        iconBg="bg-gradient-to-br from-yellow-500/10 via-amber-500/10 to-yellow-600/10"
+        iconBg="bg-white"
         productName="Vértice Marketing"
         tagline="Marketing que converte"
         description="Agência de performance com gestão completa de tráfego pago (Google Ads + Meta Ads), CRM próprio, consultoria estratégica, SEO, criação de sites e e-commerce. Transformamos investimento em mídia em resultados mensuráveis."
@@ -192,7 +192,7 @@ export default function VerticeMarketingPage() {
       <ProductFeatures
         features={features}
         iconColor="text-yellow-600"
-        iconBg="bg-gradient-to-br from-yellow-500/10 via-amber-500/10 to-yellow-600/10"
+        iconBg="bg-white"
         title="Ecossistema completo de marketing"
         description="Todos os serviços integrados para gerar resultados previsíveis e escaláveis"
       />
