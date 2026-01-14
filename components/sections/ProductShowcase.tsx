@@ -23,14 +23,14 @@ interface Product {
 const products: Product[] = [
   {
     name: 'Sirius CRM',
-    description: 'CRM completo com IA, multi-pipeline e automações inteligentes',
+    description: 'CRM com AGI Sirius - consultora de vendas que qualifica leads, cria scripts e analisa pipeline',
     tagline: 'Relacionamentos que geram resultados',
     icon: Users,
     status: 'available',
     features: [
-      'Kanban multi-pipeline com drag & drop',
-      '8 KPIs e previsão de vendas com IA',
-      'Automações de email + WhatsApp integrado',
+      '🤖 AGI Sirius: BANT scoring, SPIN selling e quebra de objeções',
+      '📊 Previsão de vendas com IA + 8 KPIs em tempo real',
+      '⚡ Automações inteligentes de email e WhatsApp',
     ],
     color: 'text-indigo-400',
     bgColor: 'bg-gradient-to-br from-indigo-500/10 via-purple-500/10 to-pink-500/10',
@@ -40,14 +40,14 @@ const products: Product[] = [
   },
   {
     name: 'Orion ERP',
-    description: 'ERP completo com 9 integrações de marketplace e relatórios customizáveis',
+    description: 'ERP com IA para insights financeiros, previsões de estoque e otimização de processos',
     tagline: 'Toda sua empresa em um só lugar',
     icon: Building2,
     status: 'available',
     features: [
-      'Financeiro completo + Portal do Fornecedor',
-      '9 marketplaces integrados (ML, Amazon, Shopee)',
-      'Report Builder com templates e agendamento',
+      '🧠 IA para análise de fluxo de caixa e previsões financeiras',
+      '🏢 Financeiro completo + Portal do Fornecedor com IA',
+      '📦 9 marketplaces integrados com sync inteligente',
     ],
     color: 'text-purple-400',
     bgColor: 'bg-white',
@@ -57,14 +57,14 @@ const products: Product[] = [
   },
   {
     name: 'Vértice Marketing',
-    description: 'Agência de performance com tráfego pago, CRM próprio e consultoria',
+    description: 'Agência com IA para campanhas, segmentação inteligente e otimização de ROI',
     tagline: 'Marketing que converte',
     icon: TrendingUp,
     status: 'available',
     features: [
-      'Gestão de tráfego Google Ads + Meta Ads',
-      'CRM próprio + Consultoria de performance',
-      'SEO, criação de sites e e-commerce completo',
+      '🎯 IA para targeting, lances automáticos e copy otimizada',
+      '📈 Análise preditiva de performance e tendências',
+      '💬 CRM próprio + Consultoria baseada em dados',
     ],
     color: 'text-yellow-600',
     bgColor: 'bg-white',
@@ -150,9 +150,8 @@ export default function ProductShowcase() {
               <Link
                 key={index}
                 href={product.path}
-                className={`group glass-card p-8 border-2 ${product.borderColor} hover:scale-[1.02] transition-all duration-500 ${
-                  isVisible ? 'fade-in-up visible' : 'fade-in-up'
-                } ${isAvailable ? 'cursor-pointer' : 'cursor-not-allowed opacity-75'}`}
+                className={`group glass-card p-8 border-2 ${product.borderColor} hover:scale-[1.02] transition-all duration-500 ${isVisible ? 'fade-in-up visible' : 'fade-in-up'
+                  } ${isAvailable ? 'cursor-pointer' : 'cursor-not-allowed opacity-75'}`}
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
                 {/* Header with logo/icon and badge */}

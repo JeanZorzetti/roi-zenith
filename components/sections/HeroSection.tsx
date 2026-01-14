@@ -88,17 +88,17 @@ export default function HeroSection() {
         {/* Main Heading */}
         <FadeIn delay={0.5}>
           <h1 className="text-display font-thin mb-6">
-            Ecossistema completo
+            Inteligência Artificial
             <br />
-            de gestão empresarial
+            para gestão empresarial
           </h1>
         </FadeIn>
 
         {/* Subtitle */}
         <FadeIn delay={0.7}>
           <p className="text-subtitle text-text-secondary mb-12 max-w-3xl mx-auto">
-            Integre CRM, ERP, Marketing, PCP Industrial e BPO Financeiro em uma única plataforma.
-            Simplifique, automatize e escale seu negócio.
+            Plataforma completa com <span className="text-primary-400 font-medium">IA integrada</span> em CRM, ERP e Marketing.
+            Automatize processos, preveja resultados e tome decisões mais inteligentes.
           </p>
         </FadeIn>
 
